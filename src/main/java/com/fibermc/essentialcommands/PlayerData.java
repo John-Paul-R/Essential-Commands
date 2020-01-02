@@ -102,23 +102,16 @@ public class PlayerData extends PersistentState {
     // IO
     @Override
     public void fromTag(CompoundTag tag) {
-        System.out.println("Enter PlayerData.fromTag");
         this.pUuid = tag.getUuid("playerUuid");
-        System.out.println("UUID Loaded");
         ListTag homesListTag = tag.getCompound("data").getList("homes", 10);
-        System.out.println(homesListTag.asString());
         HashMap<String, MinecraftLocation> homes = Maps.newHashMap();
-        System.out.println("Homes List Tag loaded - ready to retrieve elements");
         for (Tag t : homesListTag) {
             CompoundTag homeTag = (CompoundTag) t;
-            System.out.println(homeTag.asString());
             MinecraftLocation location = new MinecraftLocation(homeTag);
             String homeName = homeTag.getString("homeName");
             homes.put(homeName, location);
-            System.out.println(location.dim + " " + location.x);
         }
         this.homes = homes;
-        System.out.println("Tag loaded successfully");
     }
 
     @Override

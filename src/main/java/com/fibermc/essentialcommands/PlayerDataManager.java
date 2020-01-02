@@ -48,8 +48,10 @@ public class PlayerDataManager {
         return this.dataMap;
     }
 
+    private void unloadPlayerData(ServerPlayerEntity player) {
+        this.dataMap.remove(player.getUuid());
+    }
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
-        System.out.println("Connection Test - JP");
         try {
             loadPlayerData(player);
         } catch (IOException e) {
@@ -60,8 +62,7 @@ public class PlayerDataManager {
     private File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
         String pUuid = player.getUuidAsString();
 
-        Path mainDirectory = player.getServer().getRunDirectory().toPath();
-        System.out.println(mainDirectory.toString());
+        //Path mainDirectory = player.getServer().getRunDirectory().toPath();
         Path dataDirectoryPath = null;
         try {
             dataDirectoryPath = Files.createDirectories(Paths.get("./world/modplayerdata/"));
@@ -69,13 +70,11 @@ public class PlayerDataManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(dataDirectoryPath.toString());
         File playerDataFile = dataDirectoryPath.resolve(pUuid+".dat").toFile();
-        System.out.println(playerDataFile.toString());
         if (playerDataFile.createNewFile() || playerDataFile.length()==0) {//creates file and returns true only if file did not exist, otherwise returns false
             //Initialize file if just created
             initPlayerDataFile(player, playerDataFile);
-        };
+        }
         return playerDataFile;
     }
 
@@ -89,14 +88,12 @@ public class PlayerDataManager {
         String pUuid = player.getUuidAsString();
 
         File playerDataFile = getPlayerDataFile(player);
-        System.out.println("File currently exists. (in theory)");
 
         PlayerData pData = new PlayerData(pUuid, player);
         //FileReader reader = new FileReader(playerDataFile);
 
         PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(playerDataFile), 2);
         DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
-        System.out.println("Input Streams Created");
 
         CompoundTag compoundTag3 = new CompoundTag();
         Throwable var8 = null;
@@ -104,9 +101,7 @@ public class PlayerDataManager {
             compoundTag3 = NbtIo.readCompressed(pushbackInputStream);
          } else {
             try {
-                System.out.println("Preparing to read file");
                 compoundTag3 = NbtIo.read(dataInputStream);
-                System.out.println("File read successfully.");
             } catch (Throwable var31) {
                 var8 = var31;
                 throw var31;
@@ -125,10 +120,8 @@ public class PlayerDataManager {
 
             }
         }
-        System.out.println("Data Loaded to tag");
-        System.out.println("TagData:\n-=-=-=-=-=-\n"+compoundTag3.asString()+"\n-=-=-=-=-=-=-=-");
+        //System.out.println("TagData:\n-=-=-=-=-=-\n"+compoundTag3.asString()+"\n-=-=-=-=-=-=-=-");
         pData.fromTag(compoundTag3);
-        System.out.println("Data Loaded from tag to PlayerData Object");
         //Testing:
         pData.markDirty();
         addPlayerData(pData);
@@ -166,10 +159,12 @@ public class PlayerDataManager {
     public void onPlayerLeave(ServerPlayerEntity player) {
         try {
             savePlayerData(player);
+
         } catch (Exception e) {
             //TODO: handle exception
         }
-        
+
+        unloadPlayerData(player);
     }
 
     //-=-=-=-=-=-=-=-=-=-=-=-
