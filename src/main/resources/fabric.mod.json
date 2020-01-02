@@ -3,10 +3,10 @@
   "id": "essential_commands",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Essential Commands",
+  "description": "Various commands to improve your minecraft experience!",
   "authors": [
-    "Me!"
+    "John Paul R. (JP79194)"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",

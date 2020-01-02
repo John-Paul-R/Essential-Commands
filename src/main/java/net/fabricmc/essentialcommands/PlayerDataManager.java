@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PushbackInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,14 +60,29 @@ public class PlayerDataManager {
     private File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
         String pUuid = player.getUuidAsString();
 
-        File mainDirectory = player.getServer().getRunDirectory();
+        Path mainDirectory = player.getServer().getRunDirectory().toPath();
         System.out.println(mainDirectory.toString());
-        Path dataDirectoryPath = Files.createDirectories(Path.of("./world/modplayerdata/"));
+        Path dataDirectoryPath = null;
+        try {
+            dataDirectoryPath = Files.createDirectories(Paths.get("./world/modplayerdata/"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println(dataDirectoryPath.toString());
         File playerDataFile = dataDirectoryPath.resolve(pUuid+".dat").toFile();
         System.out.println(playerDataFile.toString());
-        playerDataFile.createNewFile();//creates new file and returns true only if file did not exist, otherwise returns false
+        if (playerDataFile.createNewFile() || playerDataFile.length()==0) {//creates file and returns true only if file did not exist, otherwise returns false
+            //Initialize file if just created
+            initPlayerDataFile(player, playerDataFile);
+        };
         return playerDataFile;
+    }
+
+    private void initPlayerDataFile(ServerPlayerEntity player, File playerDataFile) {
+        PlayerData pData = this.getOrCreate(player);
+        pData.markDirty();
+        pData.save(playerDataFile);
     }
 
     PlayerData loadPlayerData(ServerPlayerEntity player) throws IOException {
@@ -135,7 +151,7 @@ public class PlayerDataManager {
         }
   
         return bl;
-     }
+    }
 
     void savePlayerData(ServerPlayerEntity player) {
         try {
