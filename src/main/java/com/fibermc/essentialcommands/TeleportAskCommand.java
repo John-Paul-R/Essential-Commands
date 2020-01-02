@@ -1,4 +1,4 @@
-package net.fabricmc.essentialcommands;
+package com.fibermc.essentialcommands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;

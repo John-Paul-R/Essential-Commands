@@ -1,4 +1,4 @@
-package net.fabricmc.essentialcommands;
+package com.fibermc.essentialcommands;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -1,4 +1,4 @@
-package net.fabricmc.essentialcommands;
+package com.fibermc.essentialcommands;
 
 import java.util.ArrayList;
 import java.util.List;

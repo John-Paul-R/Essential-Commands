@@ -1,4 +1,4 @@
-package net.fabricmc.essentialcommands;
+package com.fibermc.essentialcommands;
 
 //import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;

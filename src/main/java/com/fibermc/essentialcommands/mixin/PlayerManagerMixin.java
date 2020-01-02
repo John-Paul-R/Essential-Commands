@@ -1,12 +1,12 @@
-package net.fabricmc.essentialcommands.mixin;
+package com.fibermc.essentialcommands.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.fabricmc.essentialcommands.PlayerConnectCallback;
-import net.fabricmc.essentialcommands.PlayerLeaveCallback;
+import com.fibermc.essentialcommands.PlayerConnectCallback;
+import com.fibermc.essentialcommands.PlayerLeaveCallback;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;

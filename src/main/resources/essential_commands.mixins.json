@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "net.fabricmc.essentialcommands.mixin",
+  "package": "com.fibermc.essentialcommands.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "PlayerManagerMixin"

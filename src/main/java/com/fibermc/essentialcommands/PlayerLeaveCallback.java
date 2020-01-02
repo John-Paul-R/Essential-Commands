@@ -1,4 +1,4 @@
-package net.fabricmc.essentialcommands;
+package com.fibermc.essentialcommands;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

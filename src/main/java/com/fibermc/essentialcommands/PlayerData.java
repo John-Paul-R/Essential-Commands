@@ -1,4 +1,4 @@
-package net.fabricmc.essentialcommands;
+package com.fibermc.essentialcommands;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -135,4 +135,45 @@ public class PlayerData extends PersistentState {
         return tag;
     }
 
+    //Just used default method
+//     @Override
+//     public void save(File file) {
+//       if (this.isDirty()) {
+//          CompoundTag compoundTag = new CompoundTag();
+//          compoundTag.put("data", this.toTag(new CompoundTag()));
+//          compoundTag.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
+
+//          try {
+//             FileOutputStream fileOutputStream =new FileOutputStream(file);
+//             DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+//             Throwable var4 = null;
+
+//             try {
+//                NbtIo.write(compoundTag, dataOutputStream);
+//             } catch (Throwable var14) {
+//                var4 = var14;
+//                throw var14;
+//             } finally {
+//                if (dataOutputStream != null) {
+//                   if (var4 != null) {
+//                      try {
+//                         dataOutputStream.close();
+//                      } catch (Throwable var13) {
+//                         var4.addSuppressed(var13);
+//                      }
+//                   } else {
+//                     dataOutputStream.close();
+//                     fileOutputStream.close();
+//                   }
+//                }
+
+//             }
+//          } catch (IOException var16) {
+//              //todo handle exception
+             
+//          }
+
+//          this.setDirty(false);
+//       }
+//    }
 }

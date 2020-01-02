@@ -1,4 +1,4 @@
-package net.fabricmc.essentialcommands;
+package com.fibermc.essentialcommands;
 
 import static net.minecraft.server.command.CommandManager.argument; // argument("bar", word())
 

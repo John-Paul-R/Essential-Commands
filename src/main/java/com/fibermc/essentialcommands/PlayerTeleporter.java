@@ -1,4 +1,4 @@
-package net.fabricmc.essentialcommands;
+package com.fibermc.essentialcommands;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -11,7 +11,7 @@ public class PlayerTeleporter {
     static void teleport(ServerPlayerEntity player, MinecraftLocation dest) {
         MinecraftLocation initialPosition = new MinecraftLocation(player);
         player.teleport(player.getServer().getWorld(dest.dim), dest.x, dest.y, dest.z, dest.headYaw, dest.pitch);
-
+        
     }
     
 }
