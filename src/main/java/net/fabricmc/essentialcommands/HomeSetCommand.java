@@ -1,4 +1,4 @@
-package net.fabricmc.example;
+package net.fabricmc.essentialcommands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -27,12 +27,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         String homeName = StringArgumentType.getString(context, "home_name");
         
         //Add home to PlayerData
-        dataManager.getOrCreatePlayerData(senderPlayer).addHome(homeName,
-            new MinecraftLocation(
-                (int)senderPlayer.x,
-                (int)senderPlayer.y,
-                (int)senderPlayer.z,
-                senderPlayer.getServerWorld()));
+        dataManager.getOrCreate(senderPlayer).addHome(homeName, new MinecraftLocation(senderPlayer));
 
         //todo save home to disk (async this if possible (new thread?))
 
@@ -40,7 +35,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         senderPlayer.sendChatMessage(
                 new LiteralText("Home '").formatted(Formatting.GOLD)
                     .append(new LiteralText(homeName).formatted(Formatting.LIGHT_PURPLE))
-                    .append(new LiteralText("' set.'").formatted(Formatting.GOLD))
+                    .append(new LiteralText("' set.").formatted(Formatting.GOLD))
             , MessageType.SYSTEM);
         
         return 1;

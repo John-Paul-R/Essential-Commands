@@ -1,4 +1,4 @@
-package net.fabricmc.example;
+package net.fabricmc.essentialcommands;
 
 //import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;

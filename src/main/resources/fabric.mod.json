@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.EssentialCommandsMod"
+      "net.fabricmc.essentialcommands.EssentialCommandsMod"
     ]
   },
   "mixins": [

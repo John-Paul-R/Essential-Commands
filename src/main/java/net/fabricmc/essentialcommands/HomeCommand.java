@@ -1,4 +1,4 @@
-package net.fabricmc.example;
+package net.fabricmc.essentialcommands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +35,10 @@ public class HomeCommand implements Command<ServerCommandSource> {
         String homeName = StringArgumentType.getString(context, "home_name");
         
         //Get home location
-        MinecraftLocation loc = dataManager.getOrCreatePlayerData(senderPlayer).getHomeLocation(homeName);
+        MinecraftLocation loc = dataManager.getOrCreate(senderPlayer).getHomeLocation(homeName);
 
         //Teleport player to home location
-        senderPlayer.teleport(loc.world, loc.x, loc.y, loc.z, 0f, 0f);
+        PlayerTeleporter.teleport(senderPlayer, loc);
 
         //inform command sender that the home has been set
         senderPlayer.sendChatMessage(
@@ -50,9 +50,10 @@ public class HomeCommand implements Command<ServerCommandSource> {
         return 1;
     }
 
+    //Brigader Suggestions
     public SuggestionProvider<ServerCommandSource> suggestedStrings() {
         return (context, builder) -> getSuggestionsBuilder(builder, 
-            new ArrayList<String>(dataManager.getOrCreatePlayerData(context.getSource().getPlayer()).getHomeNames()));
+            new ArrayList<String>(dataManager.getOrCreate(context.getSource().getPlayer()).getHomeNames()));
     }
      
     private CompletableFuture<Suggestions> getSuggestionsBuilder(SuggestionsBuilder builder, List<String> list) {

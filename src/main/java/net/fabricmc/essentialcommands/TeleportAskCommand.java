@@ -1,4 +1,4 @@
-package net.fabricmc.example;
+package net.fabricmc.essentialcommands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -13,9 +13,9 @@ import net.minecraft.util.Formatting;
 
 public class TeleportAskCommand implements Command<ServerCommandSource> {
 
-    private PlayerDataManager dataManager;
-    public TeleportAskCommand(PlayerDataManager dataManager) {
-        this.dataManager = dataManager;
+    private TeleportRequestManager tpMgr;
+    public TeleportAskCommand(TeleportRequestManager tpMgr) {
+        this.tpMgr = tpMgr;
     }
 
     @Override
@@ -34,10 +34,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
             , MessageType.SYSTEM);
         
         //Mark TPRequest Sender as having requested a teleport
-        dataManager.handleTpRequest(senderPlayer, targetPlayer);
-        //// CompoundTag tpTimerTag = new CompoundTag();
-        //// tpTimerTag.putInt("tpTimer", 60);
-        //// senderPlayer.writeCustomDataToTag(tpTimerTag);
+        tpMgr.startTpRequest(senderPlayer, targetPlayer);
 
         //inform command sender that request has been sent
         senderPlayer.sendChatMessage(

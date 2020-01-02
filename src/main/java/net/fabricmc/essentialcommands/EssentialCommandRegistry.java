@@ -1,4 +1,4 @@
-package net.fabricmc.example;
+package net.fabricmc.essentialcommands;
 
 import static net.minecraft.server.command.CommandManager.argument; // argument("bar", word())
 
@@ -16,9 +16,10 @@ import net.minecraft.server.command.ServerCommandSource;
 public class EssentialCommandRegistry {
 
     PlayerDataManager dataManager;
-
+    TeleportRequestManager tpManager;
     public EssentialCommandRegistry() {
         dataManager = new PlayerDataManager();
+        tpManager = new TeleportRequestManager(dataManager);
     }
 
     public void register() {
@@ -27,7 +28,7 @@ public class EssentialCommandRegistry {
             LiteralCommandNode<ServerCommandSource> tpaskNode = CommandManager
                 .literal("tpa")
                 .then(argument("target", EntityArgumentType.player())
-                    .executes(new TeleportAskCommand(dataManager)))
+                    .executes(new TeleportAskCommand(tpManager)))
                 .build();
             
             LiteralCommandNode<ServerCommandSource> tpacceptNode = CommandManager
@@ -48,14 +49,13 @@ public class EssentialCommandRegistry {
                     .executes(new HomeSetCommand(dataManager)))
                 .build();
             
-            //todo add suggestion based on player's homes
             HomeCommand homeCommand = new HomeCommand(dataManager);
             LiteralCommandNode<ServerCommandSource> homeNode = CommandManager
                 .literal("home")
                 .then(argument("home_name", StringArgumentType.word()).suggests(homeCommand.suggestedStrings())
                     .executes(homeCommand))
                 .build();
-
+            
             // LiteralCommandNode<ServerCommandSource> backNode = CommandManager
             //     .literal("home")
             //     .executes(new BackCommand())//todo: make a universal teleportaiton method/class that will 
