@@ -27,10 +27,10 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         String homeName = StringArgumentType.getString(context, "home_name");
         
         //Add home to PlayerData
-        dataManager.getOrCreate(senderPlayer).addHome(homeName, new MinecraftLocation(senderPlayer));
-
-        //todo save home to disk (async this if possible (new thread?))
-
+        PlayerData pData = dataManager.getOrCreate(senderPlayer);
+        pData.addHome(homeName, new MinecraftLocation(senderPlayer));
+        pData.markDirty();
+        dataManager.savePlayerData(senderPlayer);
         //inform command sender that the home has been set
         senderPlayer.sendChatMessage(
                 new LiteralText("Home '").formatted(Formatting.GOLD)

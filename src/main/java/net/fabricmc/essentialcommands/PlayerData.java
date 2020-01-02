@@ -9,6 +9,8 @@ import java.util.UUID;
 import com.google.common.collect.Maps;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.PersistentState;
 
@@ -84,7 +86,7 @@ public class PlayerData extends PersistentState {
         return player;
     }
 
-    //Homes
+    // Homes
     public void addHome(String homeName, MinecraftLocation minecraftLocation) {
         homes.put(homeName, minecraftLocation);
     }
@@ -97,32 +99,40 @@ public class PlayerData extends PersistentState {
         return homes.get(homeName);
     }
 
-    //IO
+    // IO
     @Override
     public void fromTag(CompoundTag tag) {
+        System.out.println("Enter PlayerData.fromTag");
         this.pUuid = tag.getUuid("playerUuid");
-        
-        CompoundTag homesTag = tag.getCompound("homes");
+        System.out.println("UUID Loaded");
+        ListTag homesListTag = tag.getCompound("data").getList("homes", 10);
+        System.out.println(homesListTag.asString());
         HashMap<String, MinecraftLocation> homes = Maps.newHashMap();
-        Set<String> homeNames = homesTag.getKeys();
-        for (String s : homeNames) {
-            CompoundTag mcLoc = homesTag.getCompound(s);
-            homes.put(s, new MinecraftLocation(mcLoc));
+        System.out.println("Homes List Tag loaded - ready to retrieve elements");
+        for (Tag t : homesListTag) {
+            CompoundTag homeTag = (CompoundTag) t;
+            System.out.println(homeTag.asString());
+            MinecraftLocation location = new MinecraftLocation(homeTag);
+            String homeName = homeTag.getString("homeName");
+            homes.put(homeName, location);
+            System.out.println(location.dim + " " + location.x);
         }
-
+        this.homes = homes;
+        System.out.println("Tag loaded successfully");
     }
 
     @Override
     public CompoundTag toTag(CompoundTag tag) {
         tag.putUuid("playerUuid", pUuid);
-        CompoundTag homesCompoundTag = new CompoundTag();
-        for(Entry<String, MinecraftLocation> entry : homes.entrySet()) {
-            homesCompoundTag.put(entry.getKey(), entry.getValue().toTag(new CompoundTag()));
+        ListTag homesListTag = new ListTag();
+        for (Entry<String, MinecraftLocation> entry : homes.entrySet()) {
+            CompoundTag homeTag = entry.getValue().toTag(new CompoundTag());
+            homeTag.putString("homeName", entry.getKey());
+            homesListTag.add(homeTag);
         }
-        tag.put("homes", homesCompoundTag);
-        
+        tag.put("homes", homesListTag);
+
         return tag;
     }
-
 
 }

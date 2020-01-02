@@ -5,7 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.fabricmc.essentialcommands.PlayerDataManager;
+import net.fabricmc.essentialcommands.PlayerConnectCallback;
+import net.fabricmc.essentialcommands.PlayerLeaveCallback;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -13,15 +14,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
 
-    private static PlayerDataManager _dataMgr;
-
-    public static void init(PlayerDataManager dataMgr) {
-        _dataMgr = dataMgr;
-    }
- 
     @Inject(method = "onPlayerConnect", at = @At("HEAD"))
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo callbackInfo) {
-        
-        _dataMgr.onPlayerConnect(connection, player);
+        PlayerConnectCallback.EVENT.invoker().onPlayerConnect(connection, player);
+    }
+
+    @Inject(method = "remove", at = @At("HEAD"))
+    public void onPlayerConnect(ServerPlayerEntity player, CallbackInfo callbackInfo) {
+        PlayerLeaveCallback.EVENT.invoker().onPlayerLeave(player);
     }
 }
