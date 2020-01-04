@@ -15,11 +15,10 @@ import net.minecraft.util.Formatting;
 
 import java.util.stream.Collectors;
 
-public class TeleportAcceptCommand extends TeleportResponseCommand implements Command<ServerCommandSource> {
+public class TeleportAcceptCommand implements Command<ServerCommandSource> {
 
     private PlayerDataManager dataManager;
     public TeleportAcceptCommand(PlayerDataManager dataManager) {
-        super(dataManager);
         this.dataManager = dataManager;
     }
     

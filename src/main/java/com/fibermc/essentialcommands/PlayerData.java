@@ -88,6 +88,7 @@ public class PlayerData extends PersistentState {
     // Homes
     public void addHome(String homeName, MinecraftLocation minecraftLocation) {
         homes.put(homeName, minecraftLocation);
+        this.markDirty();
     }
 
     public Set<String> getHomeNames() {
@@ -132,6 +133,17 @@ public class PlayerData extends PersistentState {
     }
     public MinecraftLocation getPreviousLocation() {
         return this.previousLocation;
+    }
+
+    public boolean removeHome(String homeName) {
+        //returns false if home does not exist - true if successful
+        boolean out = false;
+        MinecraftLocation old = this.homes.remove(homeName);
+        if (old != null) {
+            out = true;
+            this.markDirty();
+        }
+        return out;
     }
 
     //Just used default method

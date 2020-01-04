@@ -5,16 +5,10 @@ import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.stream.Collectors;
 
-public abstract class TeleportResponseCommand {
-
-    PlayerDataManager dataManager;
-
-    TeleportResponseCommand(PlayerDataManager dataManager) {
-        this.dataManager = dataManager;
-    }
+public class TeleportResponseSuggestion {
 
     //Brigader Suggestions
-    public SuggestionProvider<ServerCommandSource> suggestedStrings() {
+    public static SuggestionProvider<ServerCommandSource> suggestedStrings(PlayerDataManager dataManager) {
         return (context, builder) -> ListSuggestion.getSuggestionsBuilder(builder,
                 dataManager.getOrCreate(
                         context.getSource().getPlayer()).getTpAskers()

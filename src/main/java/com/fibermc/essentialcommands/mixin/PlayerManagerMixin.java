@@ -16,7 +16,6 @@ public abstract class PlayerManagerMixin {
 
     @Inject(method = "onPlayerConnect", at = @At("HEAD"))
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo callbackInfo) {
-        System.out.println("testAssumptions");
         PlayerConnectCallback.EVENT.invoker().onPlayerConnect(connection, player);
     }
 

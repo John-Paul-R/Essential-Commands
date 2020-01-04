@@ -11,11 +11,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
-public class TeleportDenyCommand extends TeleportResponseCommand implements Command<ServerCommandSource> {
+public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
     private PlayerDataManager dataManager;
     public TeleportDenyCommand(PlayerDataManager dataManager) {
-        super(dataManager);
         this.dataManager = dataManager;
     }
 
