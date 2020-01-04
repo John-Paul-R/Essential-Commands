@@ -30,13 +30,12 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         //Add home to PlayerData
         PlayerData pData = dataManager.getOrCreate(senderPlayer);
         pData.addHome(homeName, new MinecraftLocation(senderPlayer));
-        pData.markDirty();
         dataManager.savePlayerData(senderPlayer);
         //inform command sender that the home has been set
         senderPlayer.sendChatMessage(
-                new LiteralText("Home '").formatted(Formatting.GOLD)
-                    .append(new LiteralText(homeName).formatted(Formatting.LIGHT_PURPLE))
-                    .append(new LiteralText("' set.").formatted(Formatting.GOLD))
+                new LiteralText("Home '").formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT))
+                    .append(new LiteralText(homeName).formatted(Formatting.valueOf(Prefs.FORMATTING_ACCENT)))
+                    .append(new LiteralText("' set.").formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT)))
             , MessageType.SYSTEM);
         
         return 1;

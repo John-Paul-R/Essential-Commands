@@ -1,61 +1,51 @@
 package com.fibermc.essentialcommands;
 
-import java.util.ArrayList;
-
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-
 import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
-public class HomeCommand implements Command<ServerCommandSource> {
-
+public class HomeDeleteCommand implements Command<ServerCommandSource> {
     private PlayerDataManager dataManager;
-    public HomeCommand(PlayerDataManager dataManager) {
+
+    public HomeDeleteCommand(PlayerDataManager dataManager) {
         this.dataManager = dataManager;
     }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        int out = 0;
+        int out = 1;
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         PlayerData senderPlayerData = dataManager.getOrCreate(senderPlayer);
         //Store home name
         String homeName = StringArgumentType.getString(context, "home_name");
-        
-        //Get home location
-        MinecraftLocation loc = senderPlayerData.getHomeLocation(homeName);
 
-        //Teleport player to home location
-        PlayerTeleporter.teleport(senderPlayerData, loc);
+        //Remove Home
+        boolean wasSuccessful = senderPlayerData.removeHome(homeName);
 
-        //chat message
-        if (loc != null) {
+        //inform command sender that the home has been removed
+        if (wasSuccessful) {
             senderPlayer.sendChatMessage(
-                    new LiteralText("Teleporting to ").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT))
+                    new LiteralText("Home ").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT))
                             .append(new LiteralText(homeName).formatted(Formatting.byName(Prefs.FORMATTING_ACCENT)))
-                            .append(new LiteralText("...").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT)))
+                            .append(new LiteralText("has been deleted.").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT)))
                     , MessageType.SYSTEM);
-            out=1;
         } else {
             senderPlayer.sendChatMessage(
-                    new LiteralText("No home with the name '").formatted(Formatting.byName(Prefs.FORMATTING_ERROR))
+                    new LiteralText("Home ").formatted(Formatting.byName(Prefs.FORMATTING_ERROR))
                             .append(new LiteralText(homeName).formatted(Formatting.byName(Prefs.FORMATTING_ACCENT)))
-                            .append(new LiteralText("' could be found.").formatted(Formatting.byName(Prefs.FORMATTING_ERROR)))
+                            .append(new LiteralText(" could not be deleted.").formatted(Formatting.byName(Prefs.FORMATTING_ERROR)))
                     , MessageType.SYSTEM);
-
+            out = 0;
         }
 
-        
         return out;
     }
-
 }
