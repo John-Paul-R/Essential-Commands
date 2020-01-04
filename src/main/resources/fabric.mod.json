@@ -4,12 +4,12 @@
   "version": "${version}",
 
   "name": "Essential Commands",
-  "description": "Various commands to improve your minecraft experience!",
+  "description": "Various commands to improve your Minecraft experience!",
   "authors": [
     "John Paul R. (JP79194)"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
+    "homepage": "https://fibermc.com/",
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
 

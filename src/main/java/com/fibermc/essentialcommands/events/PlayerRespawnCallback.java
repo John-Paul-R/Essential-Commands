@@ -13,5 +13,4 @@ public interface PlayerRespawnCallback {
             });
 
     void onPlayerRespawn(ServerPlayerEntity player);
-
 }

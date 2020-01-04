@@ -15,6 +15,4 @@ public interface PlayerLeaveCallback {
 
     void onPlayerLeave(ServerPlayerEntity player);
 
-    class PlayerRespawnCallback {
-    }
 }

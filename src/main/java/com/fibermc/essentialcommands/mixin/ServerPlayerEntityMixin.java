@@ -18,9 +18,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         super(world, profile);
     }
 
-//    @Shadow
-//    public abstract GameProfile getGameProfile();
-
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void onDeath(DamageSource damageSource, CallbackInfo callbackInfo) {
         PlayerDeathCallback.EVENT.invoker().onDeath(super.getGameProfile().getId(), damageSource);
