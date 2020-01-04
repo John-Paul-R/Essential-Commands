@@ -32,9 +32,9 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         dataManager.savePlayerData(senderPlayer);
         //inform command sender that the home has been set
         senderPlayer.sendChatMessage(
-                new LiteralText("Home '").formatted(Formatting.valueOf(Config.FORMATTING_DEFAULT))
-                    .append(new LiteralText(homeName).formatted(Formatting.valueOf(Config.FORMATTING_ACCENT)))
-                    .append(new LiteralText("' set.").formatted(Formatting.valueOf(Config.FORMATTING_DEFAULT)))
+                new LiteralText("Home '").formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
+                    .append(new LiteralText(homeName).formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
+                    .append(new LiteralText("' set.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
             , MessageType.SYSTEM);
         
         return 1;

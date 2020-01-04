@@ -34,7 +34,7 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
             senderPlayer.sendChatMessage(
                     new LiteralText("Home ").formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
                             .append(new LiteralText(homeName).formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
-                            .append(new LiteralText("has been deleted.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
+                            .append(new LiteralText(" has been deleted.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
                     , MessageType.SYSTEM);
         } else {
             senderPlayer.sendChatMessage(
