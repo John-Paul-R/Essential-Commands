@@ -19,9 +19,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class PlayerDataManager {
 
     private ConcurrentHashMap<UUID, PlayerData> dataMap;
-
     public PlayerDataManager() {
-        this.dataMap = new ConcurrentHashMap<UUID, PlayerData>();
+        this.dataMap = new ConcurrentHashMap<>();
         PlayerConnectCallback.EVENT.register(this::onPlayerConnect);
         PlayerLeaveCallback.EVENT.register(this::onPlayerLeave);
     }
@@ -29,7 +28,7 @@ public class PlayerDataManager {
     public void addPlayerData(ServerPlayerEntity player) {
 
         dataMap.put(player.getUuid(), new PlayerData(player.getUuidAsString(), player));
-    }
+}
     public void addPlayerData(PlayerData pData) {
 
         dataMap.put(pData.getPlayer().getUuid(), pData);
@@ -44,9 +43,9 @@ public class PlayerDataManager {
         return dataMap.get(uuid);
     }
 
-    ConcurrentHashMap<UUID, PlayerData> getDataMap() {
-        return this.dataMap;
-    }
+//    ConcurrentHashMap<UUID, PlayerData> getDataMap() {
+//        return this.dataMap;
+//    }
 
     private void unloadPlayerData(ServerPlayerEntity player) {
         this.dataMap.remove(player.getUuid());
@@ -59,22 +58,23 @@ public class PlayerDataManager {
         }
     }
 
-    private File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
+    private File getPlayerDataFile(ServerPlayerEntity player) {
         String pUuid = player.getUuidAsString();
 
         //Path mainDirectory = player.getServer().getRunDirectory().toPath();
-        Path dataDirectoryPath = null;
+        Path dataDirectoryPath;
+        File playerDataFile = null;
         try {
             dataDirectoryPath = Files.createDirectories(Paths.get("./world/modplayerdata/"));
-
+            playerDataFile = dataDirectoryPath.resolve(pUuid+".dat").toFile();
+            if (playerDataFile.createNewFile() || playerDataFile.length()==0) {//creates file and returns true only if file did not exist, otherwise returns false
+                //Initialize file if just created
+                initPlayerDataFile(player, playerDataFile);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        File playerDataFile = dataDirectoryPath.resolve(pUuid+".dat").toFile();
-        if (playerDataFile.createNewFile() || playerDataFile.length()==0) {//creates file and returns true only if file did not exist, otherwise returns false
-            //Initialize file if just created
-            initPlayerDataFile(player, playerDataFile);
-        }
+
         return playerDataFile;
     }
 
@@ -147,13 +147,7 @@ public class PlayerDataManager {
     }
 
     void savePlayerData(ServerPlayerEntity player) {
-        try {
-            this.getOrCreate(player).save(this.getPlayerDataFile(player));
-        } catch (IOException e) {
-            System.out.println("Failed to save player data.");
-        }
-        
-        
+        this.getOrCreate(player).save(this.getPlayerDataFile(player));
     }
 
     public void onPlayerLeave(ServerPlayerEntity player) {

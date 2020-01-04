@@ -32,6 +32,7 @@ public class PlayerData extends PersistentState {
 
     // HOMES
     HashMap<String, MinecraftLocation> homes;
+    private MinecraftLocation previousLocation;
 
     public PlayerData(String keyUUID, ServerPlayerEntity player) {
         super(keyUUID);
@@ -126,6 +127,13 @@ public class PlayerData extends PersistentState {
         tag.put("homes", homesListTag);
 
         return tag;
+    }
+
+    public void setPreviousLocation(MinecraftLocation location) {
+        this.previousLocation = location;
+    }
+    public MinecraftLocation getPreviousLocation() {
+        return this.previousLocation;
     }
 
     //Just used default method

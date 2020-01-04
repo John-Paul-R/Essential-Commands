@@ -52,22 +52,8 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
     //Brigader Suggestions
     public SuggestionProvider<ServerCommandSource> suggestedStrings() {
-        return (context, builder) -> getSuggestionsBuilder(builder, 
+        return (context, builder) -> ListSuggestion.getSuggestionsBuilder(builder,
             new ArrayList<String>(dataManager.getOrCreate(context.getSource().getPlayer()).getHomeNames()));
     }
-     
-    private CompletableFuture<Suggestions> getSuggestionsBuilder(SuggestionsBuilder builder, List<String> list) {
-        String remaining = builder.getRemaining().toLowerCase(Locale.ROOT);
-     
-        if(list.isEmpty()) { // If the list is empty then return no suggestions
-            return Suggestions.empty(); // No suggestions
-        }
-     
-        for (String str : list) { // Iterate through the supplied list
-            if (str.toLowerCase(Locale.ROOT).startsWith(remaining)) {
-                builder.suggest(str); // Add every single entry to suggestions list.
-            }
-        }
-        return builder.buildFuture(); // Create the CompletableFuture containing all the suggestions
-    }
+
 }

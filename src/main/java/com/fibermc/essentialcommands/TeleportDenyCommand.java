@@ -11,10 +11,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
-public class TeleportDenyCommand implements Command<ServerCommandSource> {
+public class TeleportDenyCommand extends TeleportResponseCommand implements Command<ServerCommandSource> {
 
     private PlayerDataManager dataManager;
     public TeleportDenyCommand(PlayerDataManager dataManager) {
+        super(dataManager);
         this.dataManager = dataManager;
     }
 
@@ -31,15 +32,15 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
         if (targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendChatMessage(
-                new LiteralText("Teleport request denied.").formatted(Formatting.GOLD)
+                new LiteralText("Teleport request denied.").formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT))
                 , MessageType.SYSTEM);
             
             //Clean up TPAsk
             targetPlayerData.setTpTimer(-1);
 
-            //Send message to command sender confiriming that request has been accepted
+            //Send message to command sender confirming that request has been accepted
             senderPlayer.sendChatMessage(
-                    new LiteralText("Teleport request denied.").formatted(Formatting.GOLD)
+                    new LiteralText("Teleport request denied.").formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT))
                 , MessageType.SYSTEM);
             return 1;
         } else {

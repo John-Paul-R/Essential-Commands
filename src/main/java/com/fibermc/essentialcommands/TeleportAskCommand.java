@@ -28,19 +28,25 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
 
         //inform target player of tp request via chat
         targetPlayer.sendChatMessage(
-            new LiteralText(senderPlayer.getEntityName()).formatted(Formatting.LIGHT_PURPLE)
-                .append(new LiteralText(" has requested to teleport to you.").formatted(Formatting.GOLD))
-                .append(new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny this request.").formatted(Formatting.GOLD))
-            , MessageType.SYSTEM);
+                new LiteralText(senderPlayer.getEntityName()).formatted(Formatting.valueOf(Prefs.FORMATTING_ACCENT))
+                        .append(new LiteralText(" has requested to teleport to you.")
+                                .formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT)))
+                        .append(new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny"
+                                +" this request.").formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT)))
+                , MessageType.SYSTEM
+        );
         
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer);
 
         //inform command sender that request has been sent
         senderPlayer.sendChatMessage(
-                new LiteralText("Teleport request has been sent to ").formatted(Formatting.GOLD)
-                    .append(new LiteralText(targetPlayer.getEntityName()).formatted(Formatting.LIGHT_PURPLE))
-            , MessageType.SYSTEM);
+                new LiteralText("Teleport request has been sent to ")
+                        .formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT))
+                        .append(new LiteralText(targetPlayer.getEntityName())
+                                .formatted(Formatting.valueOf(Prefs.FORMATTING_ACCENT)))
+                , MessageType.SYSTEM
+        );
         
         return 1;
     }

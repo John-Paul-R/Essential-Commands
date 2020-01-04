@@ -30,16 +30,18 @@ public class EssentialCommandRegistry {
                 .then(argument("target", EntityArgumentType.player())
                     .executes(new TeleportAskCommand(tpManager)))
                 .build();
-            
+
+            TeleportAcceptCommand tpacceptCommand = new TeleportAcceptCommand(dataManager);
             LiteralCommandNode<ServerCommandSource> tpacceptNode = CommandManager
                 .literal("tpaccept")
-                .then(argument("target", EntityArgumentType.player())
+                .then(argument("target", EntityArgumentType.player()).suggests(tpacceptCommand.suggestedStrings())
                     .executes(new TeleportAcceptCommand(dataManager)))
                 .build();
-        
+
+            TeleportDenyCommand tpdenyCommand = new TeleportDenyCommand(dataManager);
             LiteralCommandNode<ServerCommandSource> tpdenyNode = CommandManager
                 .literal("tpdeny")
-                .then(argument("target", EntityArgumentType.player())
+                .then(argument("target", EntityArgumentType.player()).suggests(tpdenyCommand.suggestedStrings())
                     .executes(new TeleportDenyCommand(dataManager)))
                 .build();
             

@@ -25,6 +25,7 @@ public class TeleportRequestManager {
             PlayerData e = iter.next();
             e.tickTpTimer();
             if (e.getTpTimer() == -1) {
+                e.getTpTarget().removeTpAsker(e);
                 e.setTpTarget(null);
                 iter.remove();
             }
@@ -35,13 +36,14 @@ public class TeleportRequestManager {
     //     return tpList;
     // } 
 
-    public void startTpRequest(ServerPlayerEntity tpRequestSender, ServerPlayerEntity tpTargetPlayer) {
-        PlayerData tpRequestSenderData = dataManager.getOrCreate(tpRequestSender);
-        PlayerData tpTargetPlayerData = dataManager.getOrCreate(tpTargetPlayer);
-        tpRequestSenderData.setTpTimer(60);
-        tpRequestSenderData.setTpTarget(tpTargetPlayerData);
-        tpList.add(tpRequestSenderData);
-        tpTargetPlayerData.addTpAsker(tpRequestSenderData);
+    public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer) {
+        PlayerData requestSenderData = dataManager.getOrCreate(requestSender);
+        PlayerData targetPlayerData = dataManager.getOrCreate(targetPlayer);
+
+        requestSenderData.setTpTimer(60);
+        requestSenderData.setTpTarget(targetPlayerData);
+        tpList.add(requestSenderData);
+        targetPlayerData.addTpAsker(requestSenderData);
 
     }
     
