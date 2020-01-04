@@ -9,7 +9,6 @@ public interface PlayerConnectCallback {
     Event<PlayerConnectCallback> EVENT = EventFactory.createArrayBacked(PlayerConnectCallback.class,
         (listeners) -> (connection, player) -> {
             for (PlayerConnectCallback event : listeners) {
-
                 event.onPlayerConnect(connection, player);
             }
     });

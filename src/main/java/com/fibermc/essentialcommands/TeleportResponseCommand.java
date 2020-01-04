@@ -18,7 +18,7 @@ public abstract class TeleportResponseCommand {
         return (context, builder) -> ListSuggestion.getSuggestionsBuilder(builder,
                 dataManager.getOrCreate(
                         context.getSource().getPlayer()).getTpAskers()
-                        .stream().map((entry) -> entry.getPlayer().getName().toString())
+                        .stream().map((entry) -> entry.getPlayer().getGameProfile().getName())
                         .collect(Collectors.toList()));
     }
 }

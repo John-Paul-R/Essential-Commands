@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
@@ -7,10 +8,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
  */
 public class PlayerTeleporter {
 
-    static PlayerDataManager dataManager;
-    static void teleport(ServerPlayerEntity player, MinecraftLocation dest) {
+    static void teleport(PlayerData pData, MinecraftLocation dest) {
+        ServerPlayerEntity player = pData.getPlayer();
         MinecraftLocation initialPosition = new MinecraftLocation(player);
-        dataManager.getOrCreate(player).setPreviousLocation(initialPosition);
+        pData.setPreviousLocation(initialPosition);
         player.teleport(player.getServer().getWorld(dest.dim), dest.x, dest.y, dest.z, dest.headYaw, dest.pitch);
     }
 

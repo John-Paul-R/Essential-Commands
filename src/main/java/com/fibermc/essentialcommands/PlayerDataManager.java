@@ -90,14 +90,13 @@ public class PlayerDataManager {
         File playerDataFile = getPlayerDataFile(player);
 
         PlayerData pData = new PlayerData(pUuid, player);
-        //FileReader reader = new FileReader(playerDataFile);
 
         PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(playerDataFile), 2);
         DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
 
         CompoundTag compoundTag3 = new CompoundTag();
         Throwable var8 = null;
-        if (this.method_17921(pushbackInputStream)) {
+        if (this.inputIsCompressed(pushbackInputStream)) {
             compoundTag3 = NbtIo.readCompressed(pushbackInputStream);
          } else {
             try {
@@ -128,7 +127,7 @@ public class PlayerDataManager {
         return pData;
     }
     //Compressed NBT Reader
-    private boolean method_17921(PushbackInputStream pushbackInputStream) throws IOException {
+    private boolean inputIsCompressed(PushbackInputStream pushbackInputStream) throws IOException {
         byte[] bs = new byte[2];
         boolean bl = false;
         int i = pushbackInputStream.read(bs, 0, 2);

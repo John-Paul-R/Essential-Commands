@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.google.common.collect.Maps;
 
 import net.minecraft.nbt.CompoundTag;
@@ -54,9 +55,6 @@ public class PlayerData extends PersistentState {
 
     public void tickTpTimer() {
         tpTimer--;
-        if (tpTimer == -1) {
-            this.tpTarget = null;
-        }
     }
 
     public PlayerData getTpTarget() {

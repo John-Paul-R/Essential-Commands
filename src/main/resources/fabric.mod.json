@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.fibermc.essentialcommands.EssentialCommandsMod"
+      "com.fibermc.essentialcommands.EssentialCommands"
     ]
   },
   "mixins": [
