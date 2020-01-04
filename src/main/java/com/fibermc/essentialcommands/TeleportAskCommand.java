@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import net.minecraft.command.arguments.EntityArgumentType;
 import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -28,11 +27,11 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
 
         //inform target player of tp request via chat
         targetPlayer.sendChatMessage(
-                new LiteralText(senderPlayer.getEntityName()).formatted(Formatting.byName(Prefs.FORMATTING_ACCENT))
+                new LiteralText(senderPlayer.getEntityName()).formatted(Formatting.byName(Config.FORMATTING_ACCENT))
                         .append(new LiteralText(" has requested to teleport to you.")
-                                .formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT)))
+                                .formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
                         .append(new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny"
-                                +" this request.").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT)))
+                                +" this request.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
                 , MessageType.SYSTEM
         );
         
@@ -42,9 +41,9 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         //inform command sender that request has been sent
         senderPlayer.sendChatMessage(
                 new LiteralText("Teleport request has been sent to ")
-                        .formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT))
+                        .formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
                         .append(new LiteralText(targetPlayer.getEntityName())
-                                .formatted(Formatting.byName(Prefs.FORMATTING_ACCENT)))
+                                .formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
                 , MessageType.SYSTEM
         );
         

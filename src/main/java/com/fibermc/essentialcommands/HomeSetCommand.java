@@ -5,7 +5,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -33,9 +32,9 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         dataManager.savePlayerData(senderPlayer);
         //inform command sender that the home has been set
         senderPlayer.sendChatMessage(
-                new LiteralText("Home '").formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT))
-                    .append(new LiteralText(homeName).formatted(Formatting.valueOf(Prefs.FORMATTING_ACCENT)))
-                    .append(new LiteralText("' set.").formatted(Formatting.valueOf(Prefs.FORMATTING_DEFAULT)))
+                new LiteralText("Home '").formatted(Formatting.valueOf(Config.FORMATTING_DEFAULT))
+                    .append(new LiteralText(homeName).formatted(Formatting.valueOf(Config.FORMATTING_ACCENT)))
+                    .append(new LiteralText("' set.").formatted(Formatting.valueOf(Config.FORMATTING_DEFAULT)))
             , MessageType.SYSTEM);
         
         return 1;

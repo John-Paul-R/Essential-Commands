@@ -13,7 +13,7 @@ public final class EssentialCommands implements /*DedicatedServer*/ModInitialize
 	public void onInitialize/*Server*/() {
 		LOGGER.info("Mod Load Initiated.");
 		//Load Preferences
-		Prefs.loadPreferences();
+		Config.loadOrCreateProperties();
 		//Register Mod
 		EssentialCommandRegistry registry = new EssentialCommandRegistry();
 		registry.register();

@@ -1,14 +1,10 @@
 package com.fibermc.essentialcommands;
 
-import java.util.ArrayList;
-
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-
 import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -40,16 +36,16 @@ public class HomeCommand implements Command<ServerCommandSource> {
         //chat message
         if (loc != null) {
             senderPlayer.sendChatMessage(
-                    new LiteralText("Teleporting to ").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT))
-                            .append(new LiteralText(homeName).formatted(Formatting.byName(Prefs.FORMATTING_ACCENT)))
-                            .append(new LiteralText("...").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT)))
+                    new LiteralText("Teleporting to ").formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
+                            .append(new LiteralText(homeName).formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
+                            .append(new LiteralText("...").formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
                     , MessageType.SYSTEM);
             out=1;
         } else {
             senderPlayer.sendChatMessage(
-                    new LiteralText("No home with the name '").formatted(Formatting.byName(Prefs.FORMATTING_ERROR))
-                            .append(new LiteralText(homeName).formatted(Formatting.byName(Prefs.FORMATTING_ACCENT)))
-                            .append(new LiteralText("' could be found.").formatted(Formatting.byName(Prefs.FORMATTING_ERROR)))
+                    new LiteralText("No home with the name '").formatted(Formatting.byName(Config.FORMATTING_ERROR))
+                            .append(new LiteralText(homeName).formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
+                            .append(new LiteralText("' could be found.").formatted(Formatting.byName(Config.FORMATTING_ERROR)))
                     , MessageType.SYSTEM);
 
         }

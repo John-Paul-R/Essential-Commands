@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -33,15 +32,15 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             senderPlayer.sendChatMessage(
-                    new LiteralText("Home ").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT))
-                            .append(new LiteralText(homeName).formatted(Formatting.byName(Prefs.FORMATTING_ACCENT)))
-                            .append(new LiteralText("has been deleted.").formatted(Formatting.byName(Prefs.FORMATTING_DEFAULT)))
+                    new LiteralText("Home ").formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
+                            .append(new LiteralText(homeName).formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
+                            .append(new LiteralText("has been deleted.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
                     , MessageType.SYSTEM);
         } else {
             senderPlayer.sendChatMessage(
-                    new LiteralText("Home ").formatted(Formatting.byName(Prefs.FORMATTING_ERROR))
-                            .append(new LiteralText(homeName).formatted(Formatting.byName(Prefs.FORMATTING_ACCENT)))
-                            .append(new LiteralText(" could not be deleted.").formatted(Formatting.byName(Prefs.FORMATTING_ERROR)))
+                    new LiteralText("Home ").formatted(Formatting.byName(Config.FORMATTING_ERROR))
+                            .append(new LiteralText(homeName).formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
+                            .append(new LiteralText(" could not be deleted.").formatted(Formatting.byName(Config.FORMATTING_ERROR)))
                     , MessageType.SYSTEM);
             out = 0;
         }
