@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.commands.suggestions;
 
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;

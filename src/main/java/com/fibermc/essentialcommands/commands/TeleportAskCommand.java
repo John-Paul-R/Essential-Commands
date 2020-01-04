@@ -1,5 +1,7 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.TeleportRequestManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -8,7 +10,6 @@ import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
 
 public class TeleportAskCommand implements Command<ServerCommandSource> {
 
@@ -27,11 +28,11 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
 
         //inform target player of tp request via chat
         targetPlayer.sendChatMessage(
-                new LiteralText(senderPlayer.getEntityName()).formatted(Formatting.byName(Config.FORMATTING_ACCENT))
+                new LiteralText(senderPlayer.getEntityName()).formatted(Config.FORMATTING_ACCENT)
                         .append(new LiteralText(" has requested to teleport to you.")
-                                .formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
+                                .formatted(Config.FORMATTING_DEFAULT))
                         .append(new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny"
-                                +" this request.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
+                                +" this request.").formatted(Config.FORMATTING_DEFAULT))
                 , MessageType.SYSTEM
         );
         
@@ -41,9 +42,9 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         //inform command sender that request has been sent
         senderPlayer.sendChatMessage(
                 new LiteralText("Teleport request has been sent to ")
-                        .formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
+                        .formatted(Config.FORMATTING_DEFAULT)
                         .append(new LiteralText(targetPlayer.getEntityName())
-                                .formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
+                                .formatted(Config.FORMATTING_ACCENT))
                 , MessageType.SYSTEM
         );
         

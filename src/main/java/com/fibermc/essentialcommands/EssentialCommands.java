@@ -2,12 +2,19 @@ package com.fibermc.essentialcommands;
 
 //import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.api.ModInitializer;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
 public final class EssentialCommands implements /*DedicatedServer*/ModInitializer {
 	public static Logger LOGGER = LogManager.getLogger("EssentialCommands");
+
+	public static void log(Level level, String message) {
+		String logPrefix = "[EssentialCommands]: ";
+		LOGGER.log(level, logPrefix.concat(message));
+	}
+
 
     @Override
 	public void onInitialize/*Server*/() {

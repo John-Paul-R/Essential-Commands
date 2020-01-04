@@ -1,20 +1,22 @@
 package com.fibermc.essentialcommands;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PushbackInputStream;
+import com.fibermc.essentialcommands.events.PlayerConnectCallback;
+import com.fibermc.essentialcommands.events.PlayerDeathCallback;
+import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
+import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
+import com.fibermc.essentialcommands.types.MinecraftLocation;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 public class PlayerDataManager {
 
@@ -23,24 +25,40 @@ public class PlayerDataManager {
         this.dataMap = new ConcurrentHashMap<>();
         PlayerConnectCallback.EVENT.register(this::onPlayerConnect);
         PlayerLeaveCallback.EVENT.register(this::onPlayerLeave);
+        PlayerDeathCallback.EVENT.register(this::onPlayerDeath);
+        PlayerRespawnCallback.EVENT.register(this::onPlayerRespawn);
+    }
+
+    private void onPlayerRespawn(ServerPlayerEntity serverPlayerEntity) {
+        PlayerData pData = this.getOrCreate(serverPlayerEntity);
+        pData.updatePlayer(serverPlayerEntity);
+    }
+
+    private void onPlayerDeath(UUID playerID, DamageSource damageSource) {
+        PlayerData pData = getPlayerFromUUID(playerID);
+        //EssentialCommands.log(Level.DEBUG, "Worked2 " + pData.getPlayer().getGameProfile().getName());
+        pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
     }
 
     public void addPlayerData(ServerPlayerEntity player) {
 
         dataMap.put(player.getUuid(), new PlayerData(player.getUuidAsString(), player));
-}
+    }
     public void addPlayerData(PlayerData pData) {
 
         dataMap.put(pData.getPlayer().getUuid(), pData);
     }
 
-    PlayerData getOrCreate(ServerPlayerEntity player) {
+    public PlayerData getOrCreate(ServerPlayerEntity player) {
 
         UUID uuid = player.getUuid();
         if (!dataMap.containsKey(uuid)) {
             addPlayerData(player);
         }
         return dataMap.get(uuid);
+    }
+    PlayerData getPlayerFromUUID(UUID playerID) {
+        return dataMap.get(playerID);
     }
 
 //    ConcurrentHashMap<UUID, PlayerData> getDataMap() {
@@ -119,7 +137,7 @@ public class PlayerDataManager {
 
             }
         }
-        //System.out.println("TagData:\n-=-=-=-=-=-\n"+compoundTag3.asString()+"\n-=-=-=-=-=-=-=-");
+        //EssentialCommands.log(Level.INFO, "TagData:\n-=-=-=-=-=-\n"+compoundTag3.asString()+"\n-=-=-=-=-=-=-=-");
         pData.fromTag(compoundTag3);
         //Testing:
         pData.markDirty();
@@ -145,7 +163,7 @@ public class PlayerDataManager {
         return bl;
     }
 
-    void savePlayerData(ServerPlayerEntity player) {
+    public void savePlayerData(ServerPlayerEntity player) {
         this.getOrCreate(player).save(this.getPlayerDataFile(player));
     }
 

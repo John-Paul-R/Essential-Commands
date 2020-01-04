@@ -3,7 +3,8 @@
   "package": "com.fibermc.essentialcommands.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "PlayerManagerMixin"
+    "PlayerManagerMixin",
+    "ServerPlayerEntityMixin"
   ],
   "client": [
   ],

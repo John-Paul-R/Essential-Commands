@@ -1,19 +1,18 @@
 package com.fibermc.essentialcommands;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
-
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.google.common.collect.Maps;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.PersistentState;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
 
 public class PlayerData extends PersistentState {
 
@@ -86,9 +85,15 @@ public class PlayerData extends PersistentState {
     }
 
     // Homes
-    public void addHome(String homeName, MinecraftLocation minecraftLocation) {
-        homes.put(homeName, minecraftLocation);
-        this.markDirty();
+    public int addHome(String homeName, MinecraftLocation minecraftLocation) {
+        int outCode = 0;
+        if (Config.HOME_LIMIT == -1 || this.homes.size() < Config.HOME_LIMIT) {
+            homes.put(homeName, minecraftLocation);
+            this.markDirty();
+            outCode = 1;
+        }
+
+        return outCode;
     }
 
     public Set<String> getHomeNames() {
@@ -144,6 +149,10 @@ public class PlayerData extends PersistentState {
             this.markDirty();
         }
         return out;
+    }
+
+    public void updatePlayer(ServerPlayerEntity serverPlayerEntity) {
+        this.player = serverPlayerEntity;
     }
 
     //Just used default method

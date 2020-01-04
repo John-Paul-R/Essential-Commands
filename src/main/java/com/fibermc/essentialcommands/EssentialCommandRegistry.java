@@ -1,14 +1,16 @@
 package com.fibermc.essentialcommands;
 
-import static net.minecraft.server.command.CommandManager.argument; // argument("bar", word())
-
+import com.fibermc.essentialcommands.commands.*;
+import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
+import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-
 import net.fabricmc.fabric.api.registry.CommandRegistry;
 import net.minecraft.command.arguments.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+
+import static net.minecraft.server.command.CommandManager.argument;
 
 /**
  * BasicCommands
@@ -69,22 +71,22 @@ public class EssentialCommandRegistry {
                             .executes(new HomeDeleteCommand(dataManager)))
                     .build();
 
-            // LiteralCommandNode<ServerCommandSource> backNode = CommandManager
-            //     .literal("home")
-            //     .executes(new BackCommand())//todo: make a universal teleportaiton method/class that will 
-            //     //todo: allow performing opertaions universally any time a player is teleported (ex: saving last location)
-            //     .build();
+             LiteralCommandNode<ServerCommandSource> backNode = CommandManager
+                 .literal("back")
+                 .executes(new BackCommand(dataManager))
+                 .build();
 
             dispatcher.getRoot().addChild(tpaskNode);
             dispatcher.getRoot().addChild(tpacceptNode);
             dispatcher.getRoot().addChild(tpdenyNode);
-
 
             dispatcher.getRoot().addChild(homeNode);
             homeNode.addChild(homeTpNode);
             homeNode.addChild(homeSetNode);
             homeNode.addChild(homeDeleteNode);
 
+            dispatcher.getRoot().addChild(backNode);
         });
     }
+
 }

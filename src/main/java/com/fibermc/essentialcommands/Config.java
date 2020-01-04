@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
-import org.apache.logging.log4j.LogManager;
+import net.minecraft.util.Formatting;
+import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.FileReader;
@@ -10,19 +11,20 @@ import java.util.Properties;
 
 public class Config {
 
-    public static Properties prefs = new Properties();
+    public static Properties props = new Properties();
     static {
     }
 
-    public static String FORMATTING_DEFAULT;
-    public static String FORMATTING_ACCENT;
-    public static String FORMATTING_ERROR;
+    public static Formatting FORMATTING_DEFAULT;
+    public static Formatting FORMATTING_ACCENT;
+    public static Formatting FORMATTING_ERROR;
     public static boolean ENABLE_HOME;
     public static boolean ENABLE_TPA;
     public static boolean ENABLE_BACK;
     public static int HOME_LIMIT;
     public static double TELEPORT_COOLDOWN;
     public static double TELEPORT_DELAY;
+    public static boolean ALLOW_BACK_ON_DEATH;
 
     public static void loadOrCreateProperties() {
         File inFile = new File("./config/EssentialCommands.json");
@@ -32,37 +34,40 @@ public class Config {
             if (fileAlreadyExisted) {
                 FileReader reader = new FileReader(inFile);
 
-                prefs.load(reader);
+                props.load(reader);
             } else {
 
             }
         } catch (IOException e) {
-            LogManager.getLogger(Config.class).warn("[EssentialCommands] Failed to load or save preferences.");
+            EssentialCommands.log(Level.WARN,"Failed to load preferences.");
         }
         initProperties();
         storeProperties();
     }
 
     public static void initProperties() {
-        prefs.putIfAbsent("FORMATTING_DEFAULT", "gold");
-        prefs.putIfAbsent("formatting_accent", "blue");
-        prefs.putIfAbsent("formatting_error", "red");
-        prefs.putIfAbsent("enable_home", "true");
-        prefs.putIfAbsent("enable_tpa", "true");
-        prefs.putIfAbsent("enable_back", "true");
-        prefs.putIfAbsent("home_limit", "-1");
-        prefs.putIfAbsent("teleport_cooldown", "1D");
-        prefs.putIfAbsent("teleport_delay", "0D");
+        props.putIfAbsent("formatting_default", "gold");
+        props.putIfAbsent("formatting_accent", "light_purple");
+        props.putIfAbsent("formatting_error", "red");
+        props.putIfAbsent("enable_home", "true");
+        props.putIfAbsent("enable_tpa", "true");
+        props.putIfAbsent("enable_back", "true");
+        props.putIfAbsent("home_limit", "-1");
+        props.putIfAbsent("teleport_cooldown", "1D");
+        props.putIfAbsent("teleport_delay", "0D");
+        props.putIfAbsent("allow_back_on_death", "false");
 
-        FORMATTING_DEFAULT  = (String)  prefs.getOrDefault("FORMATTING_DEFAULT", "gold");
-        FORMATTING_ACCENT   = (String)  prefs.getOrDefault("formatting_accent", "blue");
-        FORMATTING_ERROR    = (String)  prefs.getOrDefault("formatting_error", "red");
-        ENABLE_HOME         = Boolean.parseBoolean((String) prefs.getOrDefault("enable_home", "true"));
-        ENABLE_TPA          = Boolean.parseBoolean((String) prefs.getOrDefault("enable_tpa", "true"));
-        ENABLE_BACK         = Boolean.parseBoolean((String) prefs.getOrDefault("enable_back", "true"));
-        HOME_LIMIT          = Integer.parseInt((String) prefs.getOrDefault("home_limit", "-1"));
-        TELEPORT_COOLDOWN   = Double.parseDouble((String)  prefs.getOrDefault("teleport_cooldown", "1D"));
-        TELEPORT_DELAY      = Double.parseDouble((String)  prefs.getOrDefault("teleport_delay", "0D"));
+
+        FORMATTING_DEFAULT  = Formatting.byName((String)  props.getOrDefault("formatting_default", "gold"));
+        FORMATTING_ACCENT   = Formatting.byName((String)  props.getOrDefault("formatting_accent", "light_purple"));
+        FORMATTING_ERROR    = Formatting.byName((String)  props.getOrDefault("formatting_error", "red"));
+        ENABLE_HOME         = Boolean.parseBoolean((String) props.getOrDefault("enable_home", "true"));
+        ENABLE_TPA          = Boolean.parseBoolean((String) props.getOrDefault("enable_tpa", "true"));
+        ENABLE_BACK         = Boolean.parseBoolean((String) props.getOrDefault("enable_back", "true"));
+        HOME_LIMIT          = Integer.parseInt((String) props.getOrDefault("home_limit", "-1"));
+        TELEPORT_COOLDOWN   = Double.parseDouble((String)  props.getOrDefault("teleport_cooldown", "1D"));
+        TELEPORT_DELAY      = Double.parseDouble((String)  props.getOrDefault("teleport_delay", "0D"));
+        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean((String) props.getOrDefault("allow_back_on_death", "false"));
     }
 
     public static void storeProperties() {
@@ -70,25 +75,25 @@ public class Config {
             File outFile = new File("./config/EssentialCommands.json");
             FileWriter writer = new FileWriter(outFile);
 
-            prefs.store(writer, "");
+            props.store(writer, "");
         } catch (IOException e) {
-            //todo catch
+            EssentialCommands.log(Level.WARN,"Failed to store preferences to disk.");
         }
 
     }
 
 //    static {
-//        prefs.put("FORMATTING_DEFAULT", "gold");
-//        prefs.put("formatting_accent", "blue");
-//        prefs.put("formatting_accent", "red");
+//        props.put("FORMATTING_DEFAULT", "gold");
+//        props.put("formatting_accent", "blue");
+//        props.put("formatting_accent", "red");
 //
-//        prefs.putBoolean("enable_home", true);
-//        prefs.putBoolean("enable_tpa", true);
-//        prefs.putBoolean("enable_back", true);
+//        props.putBoolean("enable_home", true);
+//        props.putBoolean("enable_tpa", true);
+//        props.putBoolean("enable_back", true);
 //
-//        prefs.putInt("home_limit", -1);
-//        prefs.putDouble("teleport_cooldown", 1D);
-//        prefs.putDouble("teleport_delay", 0D);
+//        props.putInt("home_limit", -1);
+//        props.putDouble("teleport_cooldown", 1D);
+//        props.putDouble("teleport_delay", 0D);
 //    }
 
 }

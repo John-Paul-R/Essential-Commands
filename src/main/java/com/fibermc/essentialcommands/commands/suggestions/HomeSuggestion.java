@@ -1,5 +1,6 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.commands.suggestions;
 
+import com.fibermc.essentialcommands.PlayerDataManager;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.server.command.ServerCommandSource;
 

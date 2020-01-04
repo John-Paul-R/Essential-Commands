@@ -1,5 +1,8 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.PlayerDataManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -8,7 +11,6 @@ import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
 
 public class HomeDeleteCommand implements Command<ServerCommandSource> {
     private PlayerDataManager dataManager;
@@ -32,15 +34,15 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             senderPlayer.sendChatMessage(
-                    new LiteralText("Home ").formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
-                            .append(new LiteralText(homeName).formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
-                            .append(new LiteralText(" has been deleted.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT)))
+                    new LiteralText("Home ").formatted(Config.FORMATTING_DEFAULT)
+                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(" has been deleted.").formatted(Config.FORMATTING_DEFAULT))
                     , MessageType.SYSTEM);
         } else {
             senderPlayer.sendChatMessage(
-                    new LiteralText("Home ").formatted(Formatting.byName(Config.FORMATTING_ERROR))
-                            .append(new LiteralText(homeName).formatted(Formatting.byName(Config.FORMATTING_ACCENT)))
-                            .append(new LiteralText(" could not be deleted.").formatted(Formatting.byName(Config.FORMATTING_ERROR)))
+                    new LiteralText("Home ").formatted(Config.FORMATTING_ERROR)
+                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(" could not be deleted.").formatted(Config.FORMATTING_ERROR))
                     , MessageType.SYSTEM);
             out = 0;
         }

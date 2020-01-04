@@ -1,5 +1,8 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.PlayerDataManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -8,7 +11,6 @@ import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
 
 public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
@@ -30,7 +32,7 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
         if (targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendChatMessage(
-                new LiteralText("Teleport request denied.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
+                new LiteralText("Teleport request denied.").formatted(Config.FORMATTING_DEFAULT)
                 , MessageType.SYSTEM);
             
             //Clean up TPAsk
@@ -38,7 +40,7 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
             //Send message to command sender confirming that request has been accepted
             senderPlayer.sendChatMessage(
-                    new LiteralText("Teleport request denied.").formatted(Formatting.byName(Config.FORMATTING_DEFAULT))
+                    new LiteralText("Teleport request denied.").formatted(Config.FORMATTING_DEFAULT)
                 , MessageType.SYSTEM);
             return 1;
         } else {

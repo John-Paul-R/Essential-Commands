@@ -8,7 +8,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
  */
 public class PlayerTeleporter {
 
-    static void teleport(PlayerData pData, MinecraftLocation dest) {
+    public static void teleport(PlayerData pData, MinecraftLocation dest) {
         ServerPlayerEntity player = pData.getPlayer();
         MinecraftLocation initialPosition = new MinecraftLocation(player);
         pData.setPreviousLocation(initialPosition);
