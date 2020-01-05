@@ -25,6 +25,7 @@ public class Config {
     public static double TELEPORT_COOLDOWN;
     public static double TELEPORT_DELAY;
     public static boolean ALLOW_BACK_ON_DEATH;
+    public static int TELEPORT_REQUEST_DURATION;
 
     public static void loadOrCreateProperties() {
         File inFile = new File("./config/EssentialCommands.json");
@@ -56,6 +57,7 @@ public class Config {
         props.putIfAbsent("teleport_cooldown", "1D");
         props.putIfAbsent("teleport_delay", "0D");
         props.putIfAbsent("allow_back_on_death", "false");
+        props.putIfAbsent("teleport_request_duration", "60");
 
 
         FORMATTING_DEFAULT  = Formatting.byName((String)  props.getOrDefault("formatting_default", "gold"));
@@ -68,6 +70,7 @@ public class Config {
         TELEPORT_COOLDOWN   = Double.parseDouble((String)  props.getOrDefault("teleport_cooldown", "1D"));
         TELEPORT_DELAY      = Double.parseDouble((String)  props.getOrDefault("teleport_delay", "0D"));
         ALLOW_BACK_ON_DEATH = Boolean.parseBoolean((String) props.getOrDefault("allow_back_on_death", "false"));
+        TELEPORT_REQUEST_DURATION = Integer.parseInt((String) props.getOrDefault("teleport_request_duration", "60"));
     }
 
     public static void storeProperties() {

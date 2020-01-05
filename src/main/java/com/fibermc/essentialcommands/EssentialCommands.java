@@ -9,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 
 public final class EssentialCommands implements /*DedicatedServer*/ModInitializer {
 	public static Logger LOGGER = LogManager.getLogger("EssentialCommands");
+//	private static PlayerDataManager _dataManager;
+//	private static TeleportRequestManager _tpManager;
 
 	public static void log(Level level, String message) {
 		String logPrefix = "[EssentialCommands]: ";
@@ -21,9 +23,15 @@ public final class EssentialCommands implements /*DedicatedServer*/ModInitialize
 		LOGGER.info("Mod Load Initiated.");
 		//Load Preferences
 		Config.loadOrCreateProperties();
+
+		//init mod stuff
+		PlayerDataManager dataManager = new PlayerDataManager();
+		TeleportRequestManager tpManager = new TeleportRequestManager(dataManager);
+		ManagerLocator managers = new ManagerLocator(dataManager, tpManager);
+		PlayerDataFactory.init(managers);
+
 		//Register Mod
-		EssentialCommandRegistry registry = new EssentialCommandRegistry();
-		registry.register();
+		EssentialCommandRegistry.register(managers);
 
 		LOGGER.info("Mod Load Complete.");
 	}

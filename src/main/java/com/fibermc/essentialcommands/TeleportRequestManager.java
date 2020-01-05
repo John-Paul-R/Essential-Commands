@@ -1,29 +1,33 @@
 package com.fibermc.essentialcommands;
 
-import java.util.LinkedList;
-import java.util.ListIterator;
-
 import net.fabricmc.fabric.api.event.server.ServerTickCallback;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * TeleportRequestManager
  */
 public class TeleportRequestManager {
 
+    private static final int TPS = 20;
     private PlayerDataManager dataManager;
-    private LinkedList<PlayerData> tpList;
+    private LinkedList<PlayerData> activeTpRequestList;
+    private LinkedList<PlayerData> tpCooldownList;
+    private LinkedList<PlayerData> tpDelayList;
 
     public TeleportRequestManager(PlayerDataManager dataManager) {
         this.dataManager = dataManager;
-        tpList = new LinkedList<PlayerData>();
+        activeTpRequestList = new LinkedList<PlayerData>();
         ServerTickCallback.EVENT.register(this::tick);
     }
 
     public void tick(MinecraftServer server) {
+        ListIterator<PlayerData> iter;
         //decrement the tp timer for all players that have put in a tp request
-        ListIterator<PlayerData> iter = tpList.listIterator();
+        iter = activeTpRequestList.listIterator();
         while (iter.hasNext()) {
             PlayerData e = iter.next();
             e.tickTpTimer();
@@ -33,25 +37,56 @@ public class TeleportRequestManager {
                 iter.remove();
             }
         }
+
+        iter = tpCooldownList.listIterator();
+        while (iter.hasNext()) {
+            PlayerData e = iter.next();
+            e.tickTpCooldown();
+            if (e.getTpCooldown() < 0) {
+                iter.remove();
+            }
+        }
+
+        iter = tpDelayList.listIterator();
+        while (iter.hasNext()) {
+            PlayerData e = iter.next();
+            e.tickTpDelay();
+            if (e.getTpDelay() < 0) {
+                iter.remove();
+            }
+        }
     }
 
     // public List<PlayerData> getTpList() {
     //     return tpList;
-    // } 
+    // }
 
     public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer) {
         PlayerData requestSenderData = dataManager.getOrCreate(requestSender);
         PlayerData targetPlayerData = dataManager.getOrCreate(targetPlayer);
 
-        requestSenderData.setTpTimer(60*20);//sec * ticks per sec
+        final int TRD = Config.TELEPORT_REQUEST_DURATION;
+        requestSenderData.setTpTimer(TRD*TPS);//sec * ticks per sec
         requestSenderData.setTpTarget(targetPlayerData);
-        tpList.add(requestSenderData);
+        activeTpRequestList.add(requestSenderData);
         targetPlayerData.addTpAsker(requestSenderData);
+    }
 
+    public void startTpCooldown(ServerPlayerEntity player) {
+        PlayerData pData = dataManager.getOrCreate(player);
+
+        final double TC = Config.TELEPORT_COOLDOWN;
+        pData.setTpCooldown((int)(TC*TPS));
+        tpCooldownList.add(pData);
     }
-    
-    public void endTpRequest(ServerPlayerEntity tpRequestSender) {
-        PlayerData data = dataManager.getOrCreate(tpRequestSender);
-        data.setTpTimer(-1);
+
+    public void startTpDelay(ServerPlayerEntity player) {
+        PlayerData pData = dataManager.getOrCreate(player);
+
+        final double TD = Config.TELEPORT_DELAY;
+        pData.setTpDelay((int)(TD*TPS));
+        tpDelayList.add(pData);
     }
+
+
 }

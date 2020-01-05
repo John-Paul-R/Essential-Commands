@@ -16,6 +16,9 @@ import java.util.UUID;
 
 public class PlayerData extends PersistentState {
 
+    // Managers
+    private TeleportRequestManager tpManager;
+
     // ServerPlayerEntity
     private ServerPlayerEntity player;
     private UUID pUuid;
@@ -33,8 +36,10 @@ public class PlayerData extends PersistentState {
     // HOMES
     HashMap<String, MinecraftLocation> homes;
     private MinecraftLocation previousLocation;
+    private int tpCooldown;
+    private int tpDelay;
 
-    public PlayerData(String keyUUID, ServerPlayerEntity player) {
+    public PlayerData(String keyUUID, ServerPlayerEntity player, ManagerLocator managers) {
         super(keyUUID);
         this.player = player;
         this.pUuid = player.getUuid();
@@ -42,6 +47,8 @@ public class PlayerData extends PersistentState {
         tpTarget = null;
         tpAskers = new LinkedList<PlayerData>();
         homes = new HashMap<String, MinecraftLocation>();
+
+        this.tpManager = managers.getTpManager();
     }
 
     public int getTpTimer() {
@@ -153,6 +160,30 @@ public class PlayerData extends PersistentState {
 
     public void updatePlayer(ServerPlayerEntity serverPlayerEntity) {
         this.player = serverPlayerEntity;
+    }
+
+    public void tickTpCooldown() {
+        this.tpCooldown--;
+    }
+
+    public int getTpCooldown() {
+        return tpCooldown;
+    }
+
+    public void tickTpDelay() {
+        this.tpDelay--;
+    }
+
+    public int getTpDelay() {
+        return this.tpDelay;
+    }
+
+    public void setTpCooldown(int cooldown) {
+        this.tpCooldown = cooldown;
+    }
+
+    public void setTpDelay(int delay) {
+        this.tpDelay = delay;
     }
 
     //Just used default method

@@ -21,20 +21,15 @@ import static net.minecraft.server.command.CommandManager.argument;
  */
 public class EssentialCommandRegistry {
 
-    PlayerDataManager dataManager;
-    TeleportRequestManager tpManager;
+    public static void register(ManagerLocator managers) {
+        PlayerDataManager dataManager = managers.getDataManager();
+        TeleportRequestManager tpManager = managers.getTpManager();
 
-    public EssentialCommandRegistry() {
-        dataManager = new PlayerDataManager();
-        tpManager = new TeleportRequestManager(dataManager);
-    }
-
-    public void register() {
         CommandRegistry.INSTANCE.register(false, dispatcher -> {
-            final String disbaledString = "[EssentialCommands] This command is not enabled.";
+            final String disabledString = "[EssentialCommands] This command is not enabled.";
             Command<ServerCommandSource> disabledCommandCommand = context -> {
                 context.getSource().getPlayer().sendChatMessage(
-                        new LiteralText(disbaledString).formatted(Config.FORMATTING_ERROR)
+                        new LiteralText(disabledString).formatted(Config.FORMATTING_ERROR)
                         , MessageType.SYSTEM);
                 return 1;
             };

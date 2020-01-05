@@ -29,6 +29,26 @@ public class PlayerDataManager {
         PlayerRespawnCallback.EVENT.register(this::onPlayerRespawn);
     }
 
+    // EVENTS
+    public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
+        try {
+            loadPlayerData(player);
+        } catch (IOException e) {
+            //TODO: handle exception
+        }
+    }
+
+    public void onPlayerLeave(ServerPlayerEntity player) {
+        try {
+            savePlayerData(player);
+
+        } catch (Exception e) {
+            //TODO: handle exception
+        }
+
+        unloadPlayerData(player);
+    }
+
     private void onPlayerRespawn(ServerPlayerEntity serverPlayerEntity) {
         PlayerData pData = this.getOrCreate(serverPlayerEntity);
         pData.updatePlayer(serverPlayerEntity);
@@ -40,15 +60,20 @@ public class PlayerDataManager {
         pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
     }
 
+    // SET / ADD
     public void addPlayerData(ServerPlayerEntity player) {
 
-        dataMap.put(player.getUuid(), new PlayerData(player.getUuidAsString(), player));
+        dataMap.put(player.getUuid(), PlayerDataFactory.create(player));
     }
     public void addPlayerData(PlayerData pData) {
 
         dataMap.put(pData.getPlayer().getUuid(), pData);
     }
 
+    // GET
+    //    ConcurrentHashMap<UUID, PlayerData> getDataMap() {
+    //        return this.dataMap;
+    //    }
     public PlayerData getOrCreate(ServerPlayerEntity player) {
 
         UUID uuid = player.getUuid();
@@ -61,19 +86,11 @@ public class PlayerDataManager {
         return dataMap.get(playerID);
     }
 
-//    ConcurrentHashMap<UUID, PlayerData> getDataMap() {
-//        return this.dataMap;
-//    }
 
+
+    // SAVE / LOAD
     private void unloadPlayerData(ServerPlayerEntity player) {
         this.dataMap.remove(player.getUuid());
-    }
-    public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
-        try {
-            loadPlayerData(player);
-        } catch (IOException e) {
-            //TODO: handle exception
-        }
     }
 
     private File getPlayerDataFile(ServerPlayerEntity player) {
@@ -107,7 +124,7 @@ public class PlayerDataManager {
 
         File playerDataFile = getPlayerDataFile(player);
 
-        PlayerData pData = new PlayerData(pUuid, player);
+        PlayerData pData = PlayerDataFactory.create(player);
 
         PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(playerDataFile), 2);
         DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
@@ -144,7 +161,7 @@ public class PlayerDataManager {
         addPlayerData(pData);
         return pData;
     }
-    //Compressed NBT Reader
+
     private boolean inputIsCompressed(PushbackInputStream pushbackInputStream) throws IOException {
         byte[] bs = new byte[2];
         boolean bl = false;
@@ -167,16 +184,7 @@ public class PlayerDataManager {
         this.getOrCreate(player).save(this.getPlayerDataFile(player));
     }
 
-    public void onPlayerLeave(ServerPlayerEntity player) {
-        try {
-            savePlayerData(player);
 
-        } catch (Exception e) {
-            //TODO: handle exception
-        }
-
-        unloadPlayerData(player);
-    }
 
     //-=-=-=-=-=-=-=-=-=-=-=-
 
