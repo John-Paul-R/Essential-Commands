@@ -20,7 +20,10 @@ public class TeleportRequestManager {
 
     public TeleportRequestManager(PlayerDataManager dataManager) {
         this.dataManager = dataManager;
-        activeTpRequestList = new LinkedList<PlayerData>();
+        activeTpRequestList = new LinkedList<>();
+        tpCooldownList = new LinkedList<>();
+        tpDelayList = new LinkedList<>();
+
         ServerTickCallback.EVENT.register(this::tick);
     }
 
