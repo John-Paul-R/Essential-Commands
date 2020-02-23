@@ -71,8 +71,8 @@ public class TeleportRequestManager {
         final int TRD = Config.TELEPORT_REQUEST_DURATION;
         requestSenderData.setTpTimer(TRD*TPS);//sec * ticks per sec
         requestSenderData.setTpTarget(targetPlayerData);
-        activeTpRequestList.add(requestSenderData);
         targetPlayerData.addTpAsker(requestSenderData);
+        activeTpRequestList.add(requestSenderData);
     }
 
     public void startTpCooldown(ServerPlayerEntity player) {
