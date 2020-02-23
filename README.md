@@ -1,1 +1,1 @@
-# Personal MC Project - Learning Fabric/Mixins
+# Essential Commands Mod for Fabric (Minecraft)
