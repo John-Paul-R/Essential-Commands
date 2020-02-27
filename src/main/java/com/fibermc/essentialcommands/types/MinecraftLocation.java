@@ -32,9 +32,9 @@ public class MinecraftLocation {
 
     public MinecraftLocation(ServerPlayerEntity player) {
         this.dim = player.getServerWorld().getDimension().getType();
-        this.x = player.x;
-        this.y = player.y;
-        this.z = player.z;
+        this.x = player.getX();
+        this.y = player.getY();
+        this.z = player.getZ();
         this.headYaw = player.headYaw;
         this.pitch = player.pitch;
     }
