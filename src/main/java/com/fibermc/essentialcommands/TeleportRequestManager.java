@@ -35,8 +35,11 @@ public class TeleportRequestManager {
             PlayerData e = iter.next();
             e.tickTpTimer();
             if (e.getTpTimer() < 0) {
-                e.getTpTarget().removeTpAsker(e);
-                e.setTpTarget(null);
+                PlayerData target = e.getTpTarget();
+                if (target!=null) {
+                    target.removeTpAsker(e);
+                    e.setTpTarget(null);
+                }
                 iter.remove();
             }
         }
