@@ -6,7 +6,6 @@ import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,8 +26,8 @@ public abstract class PlayerManagerMixin {
     }
 
     @Inject(method = "respawnPlayer", at = @At("RETURN"))
-    public void onRespawnPlayer(ServerPlayerEntity player, DimensionType dimension, boolean alive, CallbackInfoReturnable callbackInfoReturnable) {
-        ServerPlayerEntity nPlayer  = (ServerPlayerEntity) callbackInfoReturnable.getReturnValue();
+    public void onRespawnPlayer(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> callbackInfoReturnable) {
+        ServerPlayerEntity nPlayer  = callbackInfoReturnable.getReturnValue();
         PlayerRespawnCallback.EVENT.invoker().onPlayerRespawn(nPlayer);
     }
 }

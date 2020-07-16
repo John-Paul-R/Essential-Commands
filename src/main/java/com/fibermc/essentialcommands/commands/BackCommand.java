@@ -8,10 +8,11 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+
+import java.util.UUID;
 
 public class BackCommand implements Command<ServerCommandSource> {
 
@@ -32,18 +33,18 @@ public class BackCommand implements Command<ServerCommandSource> {
 
         //chat message
         if (loc != null) {
-            player.sendChatMessage(
-                    new LiteralText("Teleporting to previous location...").formatted(Config.FORMATTING_DEFAULT)
-                    , MessageType.SYSTEM);
+            player.sendSystemMessage(
+                    new LiteralText("Teleporting to previous location...").formatted(Config.FORMATTING_DEFAULT),
+                    UUID.randomUUID());
+            //Teleport player to home location
+            PlayerTeleporter.teleport(playerData, loc);
+
             out=1;
         } else {
-            player.sendChatMessage(
+            player.sendSystemMessage(
                     new LiteralText("Could not execute 'back' command. No previous location found.").formatted(Config.FORMATTING_ERROR)
-                    , MessageType.SYSTEM);
+                    , UUID.randomUUID());
         }
-
-        //Teleport player to home location
-        PlayerTeleporter.teleport(playerData, loc);
 
         return out;
     }

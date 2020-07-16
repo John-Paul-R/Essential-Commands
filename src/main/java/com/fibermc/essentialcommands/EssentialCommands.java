@@ -13,16 +13,17 @@ public final class EssentialCommands implements /*DedicatedServer*/ModInitialize
 //	private static TeleportRequestManager _tpManager;
 
 	public static void log(Level level, String message) {
-		String logPrefix = "[EssentialCommands]: ";
+		final String logPrefix = "[EssentialCommands]: ";
 		LOGGER.log(level, logPrefix.concat(message));
 	}
 
 
     @Override
 	public void onInitialize/*Server*/() {
-		LOGGER.info("Mod Load Initiated.");
+		log(Level.INFO, "Mod Load Initiated.");
 		//Load Preferences
 		Config.loadOrCreateProperties();
+
 
 		//init mod stuff
 		PlayerDataManager dataManager = new PlayerDataManager();
@@ -33,6 +34,6 @@ public final class EssentialCommands implements /*DedicatedServer*/ModInitialize
 		//Register Mod
 		EssentialCommandRegistry.register(managers);
 
-		LOGGER.info("Mod Load Complete.");
+		log(Level.INFO, "Mod Load Complete.");
 	}
 }

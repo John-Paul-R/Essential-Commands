@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands;
 
-import net.fabricmc.fabric.api.event.server.ServerTickCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -23,8 +23,7 @@ public class TeleportRequestManager {
         activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
         tpDelayList = new LinkedList<>();
-
-        ServerTickCallback.EVENT.register(this::tick);
+        ServerTickEvents.END_SERVER_TICK.register(this::tick);
     }
 
     public void tick(MinecraftServer server) {

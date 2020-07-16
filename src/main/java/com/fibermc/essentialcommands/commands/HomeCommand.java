@@ -11,12 +11,12 @@ import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+
+import java.util.UUID;
 
 public class HomeCommand implements Command<ServerCommandSource> {
 
@@ -28,7 +28,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        int out = 0;
+        int out;
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         PlayerData senderPlayerData = dataManager.getOrCreate(senderPlayer);
@@ -40,20 +40,20 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
         // Teleport & chat message
         if (loc != null) {
-            senderPlayer.sendChatMessage(
+            senderPlayer.sendSystemMessage(
                     new LiteralText("Teleporting to ").formatted(Config.FORMATTING_DEFAULT)
                             .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
                             .append(new LiteralText("...").formatted(Config.FORMATTING_DEFAULT))
-                    , MessageType.SYSTEM);
+                    , UUID.randomUUID());
             //Teleport player to home location
             PlayerTeleporter.teleport(senderPlayerData, loc);
             out=1;
         } else {
-//            senderPlayer.sendChatMessage(
+//            senderPlayer.sendSystemMessage(
 //                    new LiteralText("No home with the name '").formatted(Config.FORMATTING_ERROR)
 //                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
 //                            .append(new LiteralText("' could be found.").formatted(Config.FORMATTING_ERROR))
-//                    , MessageType.SYSTEM);
+//                    , UUID.randomUUID());
             Message msg = new LiteralMessage("No home with the name '" + homeName + "' could be found.");
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
 

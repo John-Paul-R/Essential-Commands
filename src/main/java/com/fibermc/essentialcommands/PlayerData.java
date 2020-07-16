@@ -114,8 +114,9 @@ public class PlayerData extends PersistentState {
     // IO
     @Override
     public void fromTag(CompoundTag tag) {
-        this.pUuid = tag.getUuid("playerUuid");
-        ListTag homesListTag = tag.getCompound("data").getList("homes", 10);
+        CompoundTag dataTag = tag.getCompound("data");
+        this.pUuid = dataTag.getUuid("playerUuid");
+        ListTag homesListTag = dataTag.getList("homes", 10);
         HashMap<String, MinecraftLocation> homes = Maps.newHashMap();
         for (Tag t : homesListTag) {
             CompoundTag homeTag = (CompoundTag) t;

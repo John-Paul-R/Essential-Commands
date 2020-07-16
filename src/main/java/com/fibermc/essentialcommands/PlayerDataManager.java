@@ -10,8 +10,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.apache.logging.log4j.Level;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,14 +38,13 @@ public class PlayerDataManager {
         try {
             loadPlayerData(player);
         } catch (IOException e) {
-            //TODO: handle exception
+            EssentialCommands.log(Level.WARN, "Failed to load essential_commands player data for {"+player.getName().getString()+"}");
         }
     }
 
     public void onPlayerLeave(ServerPlayerEntity player) {
         try {
             savePlayerData(player);
-
         } catch (Exception e) {
             //TODO: handle exception
         }
@@ -126,34 +129,36 @@ public class PlayerDataManager {
 
         PlayerData pData = PlayerDataFactory.create(player);
 
-        PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(playerDataFile), 2);
-        DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
+//        PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(playerDataFile), 2);
+//        DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
 
-        CompoundTag compoundTag3 = new CompoundTag();
-        Throwable var8 = null;
-        if (this.inputIsCompressed(pushbackInputStream)) {
-            compoundTag3 = NbtIo.readCompressed(pushbackInputStream);
-         } else {
-            try {
-                compoundTag3 = NbtIo.read(dataInputStream);
-            } catch (Throwable var31) {
-                var8 = var31;
-                throw var31;
-            } finally {
-                if (dataInputStream != null) {
-                    if (var8 != null) {
-                        try {
-                        dataInputStream.close();
-                        } catch (Throwable var30) {
-                        var8.addSuppressed(var30);
-                        }
-                    } else {
-                        dataInputStream.close();
-                    }
-                }
+//        CompoundTag compoundTag3 = new CompoundTag();
+//        Throwable var8 = null;
+//        if (this.inputIsCompressed(pushbackInputStream)) {
+//            compoundTag3 = NbtIo.readCompressed(pushbackInputStream);
+//         } else {
+//            try {
+//                compoundTag3 = NbtIo.read(dataInputStream);
+//            } catch (Throwable var31) {
+//                var8 = var31;
+//                throw var31;
+//            } finally {
+//                if (dataInputStream != null) {
+//                    if (var8 != null) {
+//                        try {
+//                        dataInputStream.close();
+//                        } catch (Throwable var30) {
+//                        var8.addSuppressed(var30);
+//                        }
+//                    } else {
+//                        dataInputStream.close();
+//                    }
+//                }
+//
+//            }
+//        }
+        CompoundTag compoundTag3 = NbtIo.readCompressed(new FileInputStream(playerDataFile));
 
-            }
-        }
         //EssentialCommands.log(Level.INFO, "TagData:\n-=-=-=-=-=-\n"+compoundTag3.asString()+"\n-=-=-=-=-=-=-=-");
         pData.fromTag(compoundTag3);
         //Testing:
@@ -161,6 +166,27 @@ public class PlayerDataManager {
         addPlayerData(pData);
         return pData;
     }
+
+//    @Nullable
+//    public CompoundTag loadPlayerDataMojang(PlayerEntity playerEntity) {
+//        CompoundTag compoundTag = null;
+//
+//        try {
+//            File file = new File(this.playerDataDir, playerEntity.getUuidAsString() + ".dat");
+//            if (file.exists() && file.isFile()) {
+//                compoundTag = NbtIo.readCompressed(new FileInputStream(file));
+//            }
+//        } catch (Exception var4) {
+//            LOGGER.warn("Failed to load essential_commands player data for {}", playerEntity.getName().getString());
+//        }
+//
+//        if (compoundTag != null) {
+//            int i = compoundTag.contains("DataVersion", 3) ? compoundTag.getInt("DataVersion") : -1;
+//            playerEntity.fromTag(NbtHelper.update(this.dataFixer, DataFixTypes.PLAYER, compoundTag, i));
+//        }
+//
+//        return compoundTag;
+//    }
 
     private boolean inputIsCompressed(PushbackInputStream pushbackInputStream) throws IOException {
         byte[] bs = new byte[2];
