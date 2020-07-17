@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.WorldSavePath;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -103,7 +104,12 @@ public class PlayerDataManager {
         Path dataDirectoryPath;
         File playerDataFile = null;
         try {
-            dataDirectoryPath = Files.createDirectories(Paths.get("./world/modplayerdata/"));
+            try {
+                dataDirectoryPath = Files.createDirectories(player.getServer().getSavePath(WorldSavePath.ROOT).resolve("modplayerdata"));
+            } catch (NullPointerException e){
+                dataDirectoryPath = Files.createDirectories(Paths.get("./world/modplayerdata/"));
+                EssentialCommands.log(Level.WARN, "Session save path could not be found. Defaulting to ./world/modplayerdata");
+            }
             playerDataFile = dataDirectoryPath.resolve(pUuid+".dat").toFile();
             if (playerDataFile.createNewFile() || playerDataFile.length()==0) {//creates file and returns true only if file did not exist, otherwise returns false
                 //Initialize file if just created
