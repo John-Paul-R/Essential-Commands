@@ -2,9 +2,9 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.google.common.collect.Maps;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.PersistentState;
 
@@ -39,8 +39,7 @@ public class PlayerData extends PersistentState {
     private int tpCooldown;
     private int tpDelay;
 
-    public PlayerData(String keyUUID, ServerPlayerEntity player, ManagerLocator managers) {
-        super(keyUUID);
+    public PlayerData(ServerPlayerEntity player, ManagerLocator managers) {
         this.player = player;
         this.pUuid = player.getUuid();
         tpTimer = -1;
@@ -112,14 +111,14 @@ public class PlayerData extends PersistentState {
     }
 
     // IO
-    @Override
-    public void fromTag(CompoundTag tag) {
-        CompoundTag dataTag = tag.getCompound("data");
+//    @Override
+    public void fromTag(NbtCompound tag) {
+        NbtCompound dataTag = tag.getCompound("data");
         this.pUuid = dataTag.getUuid("playerUuid");
-        ListTag homesListTag = dataTag.getList("homes", 10);
+        NbtList homesNbtList = dataTag.getList("homes", 10);
         HashMap<String, MinecraftLocation> homes = Maps.newHashMap();
-        for (Tag t : homesListTag) {
-            CompoundTag homeTag = (CompoundTag) t;
+        for (NbtElement t : homesNbtList) {
+            NbtCompound homeTag = (NbtCompound) t;
             MinecraftLocation location = new MinecraftLocation(homeTag);
             String homeName = homeTag.getString("homeName");
             homes.put(homeName, location);
@@ -128,15 +127,15 @@ public class PlayerData extends PersistentState {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
+    public NbtCompound writeNbt(NbtCompound tag) {
         tag.putUuid("playerUuid", pUuid);
-        ListTag homesListTag = new ListTag();
+        NbtList homesNbtList = new NbtList();
         for (Entry<String, MinecraftLocation> entry : homes.entrySet()) {
-            CompoundTag homeTag = entry.getValue().toTag(new CompoundTag());
+            NbtCompound homeTag = entry.getValue().toTag(new NbtCompound());
             homeTag.putString("homeName", entry.getKey());
-            homesListTag.add(homeTag);
+            homesNbtList.add(homeTag);
         }
-        tag.put("homes", homesListTag);
+        tag.put("homes", homesNbtList);
 
         return tag;
     }
@@ -191,8 +190,8 @@ public class PlayerData extends PersistentState {
 //     @Override
 //     public void save(File file) {
 //       if (this.isDirty()) {
-//          CompoundTag compoundTag = new CompoundTag();
-//          compoundTag.put("data", this.toTag(new CompoundTag()));
+//          NbtCompound compoundTag = new NbtCompound();
+//          compoundTag.put("data", this.toTag(new NbtCompound()));
 //          compoundTag.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
 
 //          try {

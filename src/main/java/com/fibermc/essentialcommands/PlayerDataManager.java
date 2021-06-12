@@ -6,7 +6,7 @@ import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -138,13 +138,13 @@ public class PlayerDataManager {
 //        PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(playerDataFile), 2);
 //        DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
 
-//        CompoundTag compoundTag3 = new CompoundTag();
+//        NbtCompound NbtCompound3 = new NbtCompound();
 //        Throwable var8 = null;
 //        if (this.inputIsCompressed(pushbackInputStream)) {
-//            compoundTag3 = NbtIo.readCompressed(pushbackInputStream);
+//            NbtCompound3 = NbtIo.readCompressed(pushbackInputStream);
 //         } else {
 //            try {
-//                compoundTag3 = NbtIo.read(dataInputStream);
+//                NbtCompound3 = NbtIo.read(dataInputStream);
 //            } catch (Throwable var31) {
 //                var8 = var31;
 //                throw var31;
@@ -163,10 +163,10 @@ public class PlayerDataManager {
 //
 //            }
 //        }
-        CompoundTag compoundTag3 = NbtIo.readCompressed(new FileInputStream(playerDataFile));
+        NbtCompound NbtCompound3 = NbtIo.readCompressed(new FileInputStream(playerDataFile));
 
-        //EssentialCommands.log(Level.INFO, "TagData:\n-=-=-=-=-=-\n"+compoundTag3.asString()+"\n-=-=-=-=-=-=-=-");
-        pData.fromTag(compoundTag3);
+        //EssentialCommands.log(Level.INFO, "TagData:\n-=-=-=-=-=-\n"+NbtCompound3.asString()+"\n-=-=-=-=-=-=-=-");
+        pData.fromTag(NbtCompound3);
         //Testing:
         pData.markDirty();
         addPlayerData(pData);
@@ -174,24 +174,24 @@ public class PlayerDataManager {
     }
 
 //    @Nullable
-//    public CompoundTag loadPlayerDataMojang(PlayerEntity playerEntity) {
-//        CompoundTag compoundTag = null;
+//    public NbtCompound loadPlayerDataMojang(PlayerEntity playerEntity) {
+//        NbtCompound NbtCompound = null;
 //
 //        try {
 //            File file = new File(this.playerDataDir, playerEntity.getUuidAsString() + ".dat");
 //            if (file.exists() && file.isFile()) {
-//                compoundTag = NbtIo.readCompressed(new FileInputStream(file));
+//                NbtCompound = NbtIo.readCompressed(new FileInputStream(file));
 //            }
 //        } catch (Exception var4) {
 //            LOGGER.warn("Failed to load essential_commands player data for {}", playerEntity.getName().getString());
 //        }
 //
-//        if (compoundTag != null) {
-//            int i = compoundTag.contains("DataVersion", 3) ? compoundTag.getInt("DataVersion") : -1;
-//            playerEntity.fromTag(NbtHelper.update(this.dataFixer, DataFixTypes.PLAYER, compoundTag, i));
+//        if (NbtCompound != null) {
+//            int i = NbtCompound.contains("DataVersion", 3) ? NbtCompound.getInt("DataVersion") : -1;
+//            playerEntity.fromTag(NbtHelper.update(this.dataFixer, DataFixTypes.PLAYER, NbtCompound, i));
 //        }
 //
-//        return compoundTag;
+//        return NbtCompound;
 //    }
 
     private boolean inputIsCompressed(PushbackInputStream pushbackInputStream) throws IOException {

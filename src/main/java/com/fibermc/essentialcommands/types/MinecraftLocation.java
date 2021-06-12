@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.types;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -39,12 +39,12 @@ public class MinecraftLocation {
         this.y = player.getY();
         this.z = player.getZ();
         this.headYaw = player.headYaw;
-        this.pitch = player.pitch;
+        this.pitch = player.getPitch();
     }
 
-    public MinecraftLocation(CompoundTag tag) {
+    public MinecraftLocation(NbtCompound tag) {
         //TODO make this actually work per dimension
-        this.dim = RegistryKey.of(Registry.DIMENSION, Identifier.tryParse(tag.getString("WorldRegistryKey")));//World.OVERWORLD;//(RegistryKey<World>) Registry.get(Registry.DIMENSION).get(Identifier.tryParse(tag.getString("WorldRegistryKey"));
+        this.dim = RegistryKey.of(Registry.WORLD_KEY, Identifier.tryParse(tag.getString("WorldRegistryKey")));//World.OVERWORLD;//(RegistryKey<World>) Registry.get(Registry.DIMENSION).get(Identifier.tryParse(tag.getString("WorldRegistryKey"));
         this.x = tag.getDouble("x");
         this.y = tag.getDouble("y");
         this.z = tag.getDouble("z");
@@ -52,7 +52,7 @@ public class MinecraftLocation {
         this.pitch = tag.getFloat("pitch");
     }
 
-    public CompoundTag toTag(CompoundTag tag) {
+    public NbtCompound toTag(NbtCompound tag) {
         tag.putString("WorldRegistryKey", dim.getValue().toString());
         tag.putDouble("x", x);
         tag.putDouble("y", y);
