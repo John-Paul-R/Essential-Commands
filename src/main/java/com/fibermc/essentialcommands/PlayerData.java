@@ -16,9 +16,6 @@ import java.util.UUID;
 
 public class PlayerData extends PersistentState {
 
-    // Managers
-    private TeleportRequestManager tpManager;
-
     // ServerPlayerEntity
     private ServerPlayerEntity player;
     private UUID pUuid;
@@ -39,15 +36,13 @@ public class PlayerData extends PersistentState {
     private int tpCooldown;
     private int tpDelay;
 
-    public PlayerData(ServerPlayerEntity player, ManagerLocator managers) {
+    public PlayerData(ServerPlayerEntity player) {
         this.player = player;
         this.pUuid = player.getUuid();
         tpTimer = -1;
         tpTarget = null;
         tpAskers = new LinkedList<PlayerData>();
         homes = new HashMap<String, MinecraftLocation>();
-
-        this.tpManager = managers.getTpManager();
     }
 
     public int getTpTimer() {
@@ -131,7 +126,7 @@ public class PlayerData extends PersistentState {
         tag.putUuid("playerUuid", pUuid);
         NbtList homesNbtList = new NbtList();
         for (Entry<String, MinecraftLocation> entry : homes.entrySet()) {
-            NbtCompound homeTag = entry.getValue().toTag(new NbtCompound());
+            NbtCompound homeTag = entry.getValue().writeNbt(new NbtCompound());
             homeTag.putString("homeName", entry.getKey());
             homesNbtList.add(homeTag);
         }
@@ -143,6 +138,7 @@ public class PlayerData extends PersistentState {
     public void setPreviousLocation(MinecraftLocation location) {
         this.previousLocation = location;
     }
+
     public MinecraftLocation getPreviousLocation() {
         return this.previousLocation;
     }
@@ -185,46 +181,4 @@ public class PlayerData extends PersistentState {
     public void setTpDelay(int delay) {
         this.tpDelay = delay;
     }
-
-    //Just used default method
-//     @Override
-//     public void save(File file) {
-//       if (this.isDirty()) {
-//          NbtCompound compoundTag = new NbtCompound();
-//          compoundTag.put("data", this.toTag(new NbtCompound()));
-//          compoundTag.putInt("DataVersion", SharedConstants.getGameVersion().getWorldVersion());
-
-//          try {
-//             FileOutputStream fileOutputStream =new FileOutputStream(file);
-//             DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
-//             Throwable var4 = null;
-
-//             try {
-//                NbtIo.write(compoundTag, dataOutputStream);
-//             } catch (Throwable var14) {
-//                var4 = var14;
-//                throw var14;
-//             } finally {
-//                if (dataOutputStream != null) {
-//                   if (var4 != null) {
-//                      try {
-//                         dataOutputStream.close();
-//                      } catch (Throwable var13) {
-//                         var4.addSuppressed(var13);
-//                      }
-//                   } else {
-//                     dataOutputStream.close();
-//                     fileOutputStream.close();
-//                   }
-//                }
-
-//             }
-//          } catch (IOException var16) {
-//              //todo handle exception
-             
-//          }
-
-//          this.setDirty(false);
-//       }
-//    }
 }

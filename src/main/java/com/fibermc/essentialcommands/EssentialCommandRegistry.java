@@ -24,9 +24,9 @@ import static net.minecraft.server.command.CommandManager.argument;
 public class EssentialCommandRegistry {
 
     public static void register(ManagerLocator managers) {
-        PlayerDataManager dataManager = managers.getDataManager();
+        PlayerDataManager dataManager = managers.getPlayerDataManager();
         TeleportRequestManager tpManager = managers.getTpManager();
-
+        WorldDataManager worldDataManager = managers.getWorldDataManager();
         CommandRegistrationCallback.EVENT.register(
             (CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) -> {
                 final String disabledString = "[EssentialCommands] This command is not enabled.";
@@ -45,24 +45,24 @@ public class EssentialCommandRegistry {
 
                 if (Config.ENABLE_TPA) {
                     tpAskBuilder
-                            .then(
-                                    argument("target", EntityArgumentType.player())
-                                            .executes(new TeleportAskCommand(tpManager)))
-                            .build();
+                        .then(
+                            argument("target", EntityArgumentType.player())
+                                .executes(new TeleportAskCommand(tpManager)))
+                        .build();
 
                     tpAcceptBuilder
-                            .then(
-                                    argument("target", EntityArgumentType.player())
-                                            .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
-                                            .executes(new TeleportAcceptCommand(dataManager)))
+                        .then(
+                            argument("target", EntityArgumentType.player())
+                                .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
+                                .executes(new TeleportAcceptCommand(dataManager)))
                             .build();
 
                     tpDenyBuilder
-                            .then(
-                                    argument("target", EntityArgumentType.player())
-                                            .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
-                                            .executes(new TeleportDenyCommand(dataManager)))
-                            .build();
+                        .then(
+                            argument("target", EntityArgumentType.player())
+                                .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
+                                .executes(new TeleportDenyCommand(dataManager)))
+                        .build();
                 } else {
                     tpAskBuilder.executes(disabledCommandCommand);
                     tpAcceptBuilder.executes(disabledCommandCommand);
@@ -79,18 +79,18 @@ public class EssentialCommandRegistry {
                     //homeBuilder;
 
                     homeSetBuilder.then(
-                            argument("home_name", StringArgumentType.word())
-                                    .executes(new HomeSetCommand(dataManager)));
+                        argument("home_name", StringArgumentType.word())
+                            .executes(new HomeSetCommand(dataManager)));
 
                     homeTpBuilder
-                            .then(argument("home_name", StringArgumentType.word())
-                                    .suggests(HomeSuggestion.suggestedStrings(dataManager))
-                                    .executes(new HomeCommand(dataManager)));
+                        .then(argument("home_name", StringArgumentType.word())
+                            .suggests(HomeSuggestion.suggestedStrings(dataManager))
+                            .executes(new HomeCommand(dataManager)));
 
                     homeDeleteBuilder
-                            .then(argument("home_name", StringArgumentType.word())
-                                    .suggests(HomeSuggestion.suggestedStrings(dataManager))
-                                    .executes(new HomeDeleteCommand(dataManager)));
+                        .then(argument("home_name", StringArgumentType.word())
+                            .suggests(HomeSuggestion.suggestedStrings(dataManager))
+                            .executes(new HomeDeleteCommand(dataManager)));
 
                 } else {
                     homeBuilder.executes(disabledCommandCommand);
@@ -108,7 +108,37 @@ public class EssentialCommandRegistry {
                     backBuilder.executes(disabledCommandCommand);
                 }
 
-                //-=-=-=-=-=-=-=-
+                //Warp
+                LiteralArgumentBuilder<ServerCommandSource> warpBuilder = CommandManager.literal("warp");
+                LiteralArgumentBuilder<ServerCommandSource> warpSetBuilder = CommandManager.literal("set");
+                LiteralArgumentBuilder<ServerCommandSource> warpTpBuilder = CommandManager.literal("tp");
+                LiteralArgumentBuilder<ServerCommandSource> warpDeleteBuilder = CommandManager.literal("delete");
+                if (Config.ENABLE_WARP) {
+                    warpSetBuilder.then(
+                            argument("warp_name", StringArgumentType.word())
+                                    .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                                    .executes(new WarpSetCommand(worldDataManager)));
+
+                    warpTpBuilder
+                            .then(argument("warp_name", StringArgumentType.word())
+                                    .suggests(worldDataManager.getWarpSuggestions())
+                                    .executes(new WarpTpCommand(dataManager, worldDataManager)));
+
+                    warpDeleteBuilder
+                            .then(argument("warp_name", StringArgumentType.word())
+                                    .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
+                                    .suggests(worldDataManager.getWarpSuggestions())
+                                    .executes(new WarpDeleteCommand(worldDataManager)));
+
+                } else {
+                    warpBuilder.executes(disabledCommandCommand);
+                    warpSetBuilder.executes(disabledCommandCommand);
+                    warpTpBuilder.executes(disabledCommandCommand);
+                    warpDeleteBuilder.executes(disabledCommandCommand);
+                }
+
+
+                    //-=-=-=-=-=-=-=-
                 dispatcher.getRoot().addChild(tpAskBuilder.build());
                 dispatcher.getRoot().addChild(tpAcceptBuilder.build());
                 dispatcher.getRoot().addChild(tpDenyBuilder.build());
@@ -120,6 +150,12 @@ public class EssentialCommandRegistry {
                 homeNode.addChild(homeDeleteBuilder.build());
 
                 dispatcher.getRoot().addChild(backBuilder.build());
+
+                LiteralCommandNode<ServerCommandSource> warpNode = warpBuilder.build();
+                dispatcher.getRoot().addChild(warpNode);
+                warpNode.addChild(warpTpBuilder.build());
+                warpNode.addChild(warpSetBuilder.build());
+                warpNode.addChild(warpDeleteBuilder.build());
             }
         );
     }

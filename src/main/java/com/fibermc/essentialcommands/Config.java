@@ -21,6 +21,7 @@ public class Config {
     public static boolean ENABLE_HOME;
     public static boolean ENABLE_TPA;
     public static boolean ENABLE_BACK;
+    public static boolean ENABLE_WARP;
     public static int HOME_LIMIT;
     public static double TELEPORT_COOLDOWN;
     public static double TELEPORT_DELAY;
@@ -53,6 +54,7 @@ public class Config {
         props.putIfAbsent("enable_home", "true");
         props.putIfAbsent("enable_tpa", "true");
         props.putIfAbsent("enable_back", "true");
+        props.putIfAbsent("enable_warp", "true");
         props.putIfAbsent("home_limit", "-1");
         props.putIfAbsent("teleport_cooldown", "1D");
         props.putIfAbsent("teleport_delay", "0D");
@@ -66,6 +68,7 @@ public class Config {
         ENABLE_HOME         = Boolean.parseBoolean((String) props.getOrDefault("enable_home", "true"));
         ENABLE_TPA          = Boolean.parseBoolean((String) props.getOrDefault("enable_tpa", "true"));
         ENABLE_BACK         = Boolean.parseBoolean((String) props.getOrDefault("enable_back", "true"));
+        ENABLE_WARP         = Boolean.parseBoolean((String) props.getOrDefault("enable_warp", "true"));
         HOME_LIMIT          = Integer.parseInt((String) props.getOrDefault("home_limit", "-1"));
         TELEPORT_COOLDOWN   = Double.parseDouble((String)  props.getOrDefault("teleport_cooldown", "1D"));
         TELEPORT_DELAY      = Double.parseDouble((String)  props.getOrDefault("teleport_delay", "0D"));
@@ -75,7 +78,7 @@ public class Config {
 
     public static void storeProperties() {
         try{
-            File outFile = new File("./config/EssentialCommands.json");
+            File outFile = new File("./config/EssentialCommands.properties");
             FileWriter writer = new FileWriter(outFile);
 
             props.store(writer, "");

@@ -1,16 +1,16 @@
 package com.fibermc.essentialcommands;
 
 //import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public final class EssentialCommands implements /*DedicatedServer*/ModInitializer {
+public final class EssentialCommands implements ModInitializer {
 	public static Logger LOGGER = LogManager.getLogger("EssentialCommands");
-//	private static PlayerDataManager _dataManager;
-//	private static TeleportRequestManager _tpManager;
 
 	public static void log(Level level, String message) {
 		final String logPrefix = "[EssentialCommands]: ";
@@ -21,16 +21,18 @@ public final class EssentialCommands implements /*DedicatedServer*/ModInitialize
     @Override
 	public void onInitialize/*Server*/() {
 		log(Level.INFO, "Mod Load Initiated.");
+
 		//Load Preferences
 		Config.loadOrCreateProperties();
 
-
 		//init mod stuff
-		PlayerDataManager dataManager = new PlayerDataManager();
-		TeleportRequestManager tpManager = new TeleportRequestManager(dataManager);
-		ManagerLocator managers = new ManagerLocator(dataManager, tpManager);
-		PlayerDataFactory.init(managers);
+		ManagerLocator managers = new ManagerLocator();
 
+		ServerLifecycleEvents.SERVER_STARTED.register((MinecraftServer server) -> {
+			managers.init(server);
+		});
+
+		//TODO Currently known bug: warps will persist between worlds in a single session in singleplayer.
 		//Register Mod
 		EssentialCommandRegistry.register(managers);
 

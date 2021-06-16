@@ -43,16 +43,20 @@ public class MinecraftLocation {
     }
 
     public MinecraftLocation(NbtCompound tag) {
-        //TODO make this actually work per dimension
-        this.dim = RegistryKey.of(Registry.WORLD_KEY, Identifier.tryParse(tag.getString("WorldRegistryKey")));//World.OVERWORLD;//(RegistryKey<World>) Registry.get(Registry.DIMENSION).get(Identifier.tryParse(tag.getString("WorldRegistryKey"));
+        this.dim = RegistryKey.of(
+            Registry.WORLD_KEY,
+            Identifier.tryParse(tag.getString("WorldRegistryKey"))
+        );
         this.x = tag.getDouble("x");
         this.y = tag.getDouble("y");
         this.z = tag.getDouble("z");
         this.headYaw = tag.getFloat("headYaw");
         this.pitch = tag.getFloat("pitch");
     }
-
-    public NbtCompound toTag(NbtCompound tag) {
+    public NbtCompound asNbt() {
+        return this.writeNbt(new NbtCompound());
+    }
+    public NbtCompound writeNbt(NbtCompound tag) {
         tag.putString("WorldRegistryKey", dim.getValue().toString());
         tag.putDouble("x", x);
         tag.putDouble("y", y);

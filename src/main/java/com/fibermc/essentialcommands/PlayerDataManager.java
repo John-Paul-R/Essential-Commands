@@ -65,32 +65,29 @@ public class PlayerDataManager {
     }
 
     // SET / ADD
-    public void addPlayerData(ServerPlayerEntity player) {
-
+    public PlayerData addPlayerData(ServerPlayerEntity player) {
+        PlayerData playerData = PlayerDataFactory.create(player);
         dataMap.put(player.getUuid(), PlayerDataFactory.create(player));
+        return playerData;
     }
     public void addPlayerData(PlayerData pData) {
 
         dataMap.put(pData.getPlayer().getUuid(), pData);
     }
 
-    // GET
-    //    ConcurrentHashMap<UUID, PlayerData> getDataMap() {
-    //        return this.dataMap;
-    //    }
     public PlayerData getOrCreate(ServerPlayerEntity player) {
 
         UUID uuid = player.getUuid();
-        if (!dataMap.containsKey(uuid)) {
-            addPlayerData(player);
+        PlayerData playerData = dataMap.get(uuid);
+
+        if (playerData == null) {
+            playerData = addPlayerData(player);
         }
-        return dataMap.get(uuid);
+        return playerData;
     }
     PlayerData getPlayerFromUUID(UUID playerID) {
         return dataMap.get(playerID);
     }
-
-
 
     // SAVE / LOAD
     private void unloadPlayerData(ServerPlayerEntity player) {
@@ -135,34 +132,6 @@ public class PlayerDataManager {
 
         PlayerData pData = PlayerDataFactory.create(player);
 
-//        PushbackInputStream pushbackInputStream = new PushbackInputStream(new FileInputStream(playerDataFile), 2);
-//        DataInputStream dataInputStream = new DataInputStream(pushbackInputStream);
-
-//        NbtCompound NbtCompound3 = new NbtCompound();
-//        Throwable var8 = null;
-//        if (this.inputIsCompressed(pushbackInputStream)) {
-//            NbtCompound3 = NbtIo.readCompressed(pushbackInputStream);
-//         } else {
-//            try {
-//                NbtCompound3 = NbtIo.read(dataInputStream);
-//            } catch (Throwable var31) {
-//                var8 = var31;
-//                throw var31;
-//            } finally {
-//                if (dataInputStream != null) {
-//                    if (var8 != null) {
-//                        try {
-//                        dataInputStream.close();
-//                        } catch (Throwable var30) {
-//                        var8.addSuppressed(var30);
-//                        }
-//                    } else {
-//                        dataInputStream.close();
-//                    }
-//                }
-//
-//            }
-//        }
         NbtCompound NbtCompound3 = NbtIo.readCompressed(new FileInputStream(playerDataFile));
 
         //EssentialCommands.log(Level.INFO, "TagData:\n-=-=-=-=-=-\n"+NbtCompound3.asString()+"\n-=-=-=-=-=-=-=-");
@@ -171,45 +140,6 @@ public class PlayerDataManager {
         pData.markDirty();
         addPlayerData(pData);
         return pData;
-    }
-
-//    @Nullable
-//    public NbtCompound loadPlayerDataMojang(PlayerEntity playerEntity) {
-//        NbtCompound NbtCompound = null;
-//
-//        try {
-//            File file = new File(this.playerDataDir, playerEntity.getUuidAsString() + ".dat");
-//            if (file.exists() && file.isFile()) {
-//                NbtCompound = NbtIo.readCompressed(new FileInputStream(file));
-//            }
-//        } catch (Exception var4) {
-//            LOGGER.warn("Failed to load essential_commands player data for {}", playerEntity.getName().getString());
-//        }
-//
-//        if (NbtCompound != null) {
-//            int i = NbtCompound.contains("DataVersion", 3) ? NbtCompound.getInt("DataVersion") : -1;
-//            playerEntity.fromTag(NbtHelper.update(this.dataFixer, DataFixTypes.PLAYER, NbtCompound, i));
-//        }
-//
-//        return NbtCompound;
-//    }
-
-    private boolean inputIsCompressed(PushbackInputStream pushbackInputStream) throws IOException {
-        byte[] bs = new byte[2];
-        boolean bl = false;
-        int i = pushbackInputStream.read(bs, 0, 2);
-        if (i == 2) {
-           int j = (bs[1] & 255) << 8 | bs[0] & 255;
-           if (j == 35615) {
-              bl = true;
-           }
-        }
-  
-        if (i != 0) {
-           pushbackInputStream.unread(bs, 0, i);
-        }
-  
-        return bl;
     }
 
     public void savePlayerData(ServerPlayerEntity player) {
