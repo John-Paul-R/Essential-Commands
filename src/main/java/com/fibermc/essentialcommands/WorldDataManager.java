@@ -4,6 +4,7 @@ import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import net.minecraft.SharedConstants;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
@@ -12,6 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.PersistentState;
+import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,10 +42,9 @@ public class WorldDataManager extends PersistentState {
         this.worldDataFile = saveDir.resolve("world_data.dat").toFile();
 
         try {
-            if (worldDataFile.createNewFile() || worldDataFile.length()==0) {//creates file and returns true only if file did not exist, otherwise returns false
-                //Initialize file if just created
-                this.save();
-            } else {
+            boolean fileExisted = !worldDataFile.createNewFile();
+            if (fileExisted) {
+                // if files was not JUST created, read data from it.
                 this.fromNbt(NbtIo.readCompressed(worldDataFile).getCompound("data"));
             }
         } catch (IOException e) {
@@ -56,7 +57,11 @@ public class WorldDataManager extends PersistentState {
     }
 
     public void fromNbt(NbtCompound tag) {
-        this.spawnLocation = new MinecraftLocation(tag.getCompound("spawnLocation"));
+        MinecraftLocation tempSpawnLocation = new MinecraftLocation(tag.getCompound("spawnLocation"));
+        if (tempSpawnLocation.dim.getValue().getPath().isEmpty())
+            this.spawnLocation = null;
+        else
+            this.spawnLocation = tempSpawnLocation;
         NbtCompound warpsNbt = tag.getCompound("warps");
         warpsNbt.getKeys().forEach((key) -> {
             warps.put(key, new MinecraftLocation(warpsNbt.getCompound(key)));
@@ -64,20 +69,17 @@ public class WorldDataManager extends PersistentState {
     }
 
     public void save() {
+        EssentialCommands.log(Level.INFO, "Saving world_data.dat (Spawn/Warps)...");
         super.save(this.worldDataFile);
+        EssentialCommands.log(Level.INFO, "world_data.dat saved.");
     }
 
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
-
         // Spawn to NBT
         NbtElement spawnNbt;
-        try {
-            spawnNbt = spawnLocation.asNbt();
-        } catch (NullPointerException e) {
-            spawnNbt = NbtNull.INSTANCE;
-        }
-        tag.put("spawnLocation", spawnNbt);
+        if (spawnLocation != null)
+            tag.put("spawnLocation", spawnLocation.asNbt());
 
         // Warps to NBT
         NbtCompound warpsNbt = new NbtCompound();
