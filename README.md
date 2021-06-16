@@ -19,6 +19,12 @@ All of these commands support automatic tab completion using Minecraft's new com
   - /home tp \<home-name>
   - /home delete \<home-name>
 
+### Warps
+
+  - /warp set \<warp-name>
+  - /warp tp \<warp-name>
+  - /warp delete \<warp-name>
+
 ### Back
 
   - /back
