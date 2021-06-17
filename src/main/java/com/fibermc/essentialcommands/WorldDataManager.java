@@ -4,11 +4,9 @@ import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import net.minecraft.SharedConstants;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtNull;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.WorldSavePath;
@@ -26,6 +24,10 @@ public class WorldDataManager extends PersistentState {
     private MinecraftLocation spawnLocation;
     private Path saveDir;
     private File worldDataFile;
+
+    private final String SPAWN_KEY = "spawn";
+    private final String WARPS_KEY = "warps";
+
     public WorldDataManager() {
         warps = new HashMap<String, MinecraftLocation>();
         spawnLocation = null;
@@ -57,12 +59,12 @@ public class WorldDataManager extends PersistentState {
     }
 
     public void fromNbt(NbtCompound tag) {
-        MinecraftLocation tempSpawnLocation = new MinecraftLocation(tag.getCompound("spawnLocation"));
+        MinecraftLocation tempSpawnLocation = new MinecraftLocation(tag.getCompound(SPAWN_KEY));
         if (tempSpawnLocation.dim.getValue().getPath().isEmpty())
             this.spawnLocation = null;
         else
             this.spawnLocation = tempSpawnLocation;
-        NbtCompound warpsNbt = tag.getCompound("warps");
+        NbtCompound warpsNbt = tag.getCompound(WARPS_KEY);
         warpsNbt.getKeys().forEach((key) -> {
             warps.put(key, new MinecraftLocation(warpsNbt.getCompound(key)));
         });
@@ -79,14 +81,17 @@ public class WorldDataManager extends PersistentState {
         // Spawn to NBT
         NbtElement spawnNbt;
         if (spawnLocation != null)
-            tag.put("spawnLocation", spawnLocation.asNbt());
+            spawnNbt = spawnLocation.asNbt();
+        else
+            spawnNbt = new NbtCompound();
+        tag.put(SPAWN_KEY, spawnNbt);
 
-        // Warps to NBT
+                // Warps to NBT
         NbtCompound warpsNbt = new NbtCompound();
         warps.forEach((key, value) -> {
             warpsNbt.put(key, value.asNbt());
         });
-        tag.put("warps", warpsNbt);
+        tag.put(WARPS_KEY, warpsNbt);
 
         return tag;
     }
