@@ -42,7 +42,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
                     new LiteralText("Teleporting to ").formatted(Config.FORMATTING_DEFAULT)
                             .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
                             .append(new LiteralText("...").formatted(Config.FORMATTING_DEFAULT))
-                    , UUID.randomUUID());
+                    , new UUID(0, 0));
             //Teleport player to home location
             PlayerTeleporter.teleport(senderPlayerData, loc);
             out = 1;

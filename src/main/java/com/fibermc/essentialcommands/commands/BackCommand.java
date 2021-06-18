@@ -35,7 +35,7 @@ public class BackCommand implements Command<ServerCommandSource> {
         if (loc != null) {
             player.sendSystemMessage(
                     new LiteralText("Teleporting to previous location...").formatted(Config.FORMATTING_DEFAULT),
-                    UUID.randomUUID());
+                    new UUID(0, 0));
             //Teleport player to home location
             PlayerTeleporter.teleport(playerData, loc);
 
@@ -43,7 +43,7 @@ public class BackCommand implements Command<ServerCommandSource> {
         } else {
             player.sendSystemMessage(
                     new LiteralText("Could not execute 'back' command. No previous location found.").formatted(Config.FORMATTING_ERROR)
-                    , UUID.randomUUID());
+                    , new UUID(0, 0));
         }
 
         return out;

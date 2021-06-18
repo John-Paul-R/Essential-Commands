@@ -34,7 +34,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
                                 .formatted(Config.FORMATTING_DEFAULT))
                         .append(new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny"
                                 +" this request.").formatted(Config.FORMATTING_DEFAULT))
-                , UUID.randomUUID()
+                , new UUID(0, 0)
         );
         
         //Mark TPRequest Sender as having requested a teleport
@@ -46,7 +46,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
                         .formatted(Config.FORMATTING_DEFAULT)
                         .append(new LiteralText(targetPlayer.getEntityName())
                                 .formatted(Config.FORMATTING_ACCENT))
-                , UUID.randomUUID()
+                , new UUID(0, 0)
         );
         
         return 1;

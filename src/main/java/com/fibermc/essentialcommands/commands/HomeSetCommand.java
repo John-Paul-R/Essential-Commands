@@ -40,7 +40,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
                     new LiteralText("Home '").formatted(Config.FORMATTING_DEFAULT)
                             .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
                             .append(new LiteralText("' set.").formatted(Config.FORMATTING_DEFAULT))
-                    , UUID.randomUUID());
+                    , new UUID(0, 0));
         } else if (successCode==0) {
             senderPlayer.sendSystemMessage(
                     new LiteralText("Home '").formatted(Config.FORMATTING_ERROR)
@@ -48,7 +48,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
                             .append(new LiteralText("' could not be set. Home limit (").formatted(Config.FORMATTING_ERROR))
                             .append(new LiteralText(String.valueOf(Config.HOME_LIMIT)).formatted(Config.FORMATTING_ACCENT))
                             .append(new LiteralText(") reached.").formatted(Config.FORMATTING_ERROR))
-                    , UUID.randomUUID());
+                    , new UUID(0, 0));
         }
 
 

@@ -44,7 +44,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
                     new LiteralText("Teleporting to ").formatted(Config.FORMATTING_DEFAULT)
                             .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
                             .append(new LiteralText("...").formatted(Config.FORMATTING_DEFAULT))
-                    , UUID.randomUUID());
+                    , new UUID(0, 0));
             //Teleport player to home location
             PlayerTeleporter.teleport(senderPlayerData, loc);
             out=1;
@@ -53,7 +53,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
 //                    new LiteralText("No home with the name '").formatted(Config.FORMATTING_ERROR)
 //                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
 //                            .append(new LiteralText("' could be found.").formatted(Config.FORMATTING_ERROR))
-//                    , UUID.randomUUID());
+//                    , new UUID(0, 0));
             Message msg = new LiteralMessage("No home with the name '" + homeName + "' could be found.");
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
 

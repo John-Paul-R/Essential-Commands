@@ -35,13 +35,13 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
                     new LiteralText("Warp ").formatted(Config.FORMATTING_DEFAULT)
                             .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
                             .append(new LiteralText(" has been deleted.").formatted(Config.FORMATTING_DEFAULT))
-                    , UUID.randomUUID());
+                    , new UUID(0, 0));
         } else {
             senderPlayer.sendSystemMessage(
                     new LiteralText("Warp ").formatted(Config.FORMATTING_ERROR)
                             .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
                             .append(new LiteralText(" could not be deleted. (Correct spelling?)").formatted(Config.FORMATTING_ERROR))
-                    , UUID.randomUUID());
+                    , new UUID(0, 0));
             out = 0;
         }
 
