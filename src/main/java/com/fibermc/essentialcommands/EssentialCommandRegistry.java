@@ -8,6 +8,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -33,7 +34,7 @@ public class EssentialCommandRegistry {
                 Command<ServerCommandSource> disabledCommandCommand = context -> {
                     context.getSource().getPlayer().sendSystemMessage(
                             new LiteralText(disabledString).formatted(Config.FORMATTING_ERROR)
-                            , UUID.randomUUID());
+                            , new UUID(0,0));
                     return 1;
                 };
 
@@ -44,25 +45,22 @@ public class EssentialCommandRegistry {
                 LiteralArgumentBuilder<ServerCommandSource> tpDenyBuilder = CommandManager.literal("tpdeny");
 
                 if (Config.ENABLE_TPA) {
-                    tpAskBuilder
-                        .then(
-                            argument("target", EntityArgumentType.player())
-                                .executes(new TeleportAskCommand(tpManager)))
-                        .build();
+                    tpAskBuilder.then(
+                        argument("target", EntityArgumentType.player())
+                            .requires(ECPerms.require("essentialcommands.tpa.ask", 0))
+                            .executes(new TeleportAskCommand(tpManager)));
 
-                    tpAcceptBuilder
-                        .then(
-                            argument("target", EntityArgumentType.player())
-                                .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
-                                .executes(new TeleportAcceptCommand(dataManager)))
-                            .build();
+                    tpAcceptBuilder.then(
+                        argument("target", EntityArgumentType.player())
+                            .requires(ECPerms.require("essentialcommands.tpa.accept", 0))
+                            .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
+                            .executes(new TeleportAcceptCommand(dataManager)));
 
-                    tpDenyBuilder
-                        .then(
-                            argument("target", EntityArgumentType.player())
-                                .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
-                                .executes(new TeleportDenyCommand(dataManager)))
-                        .build();
+                    tpDenyBuilder.then(
+                        argument("target", EntityArgumentType.player())
+                            .requires(ECPerms.require("essentialcommands.tpa.deny", 0))
+                            .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
+                            .executes(new TeleportDenyCommand(dataManager)));
                 } else {
                     tpAskBuilder.executes(disabledCommandCommand);
                     tpAcceptBuilder.executes(disabledCommandCommand);
@@ -80,15 +78,18 @@ public class EssentialCommandRegistry {
 
                     homeSetBuilder.then(
                         argument("home_name", StringArgumentType.word())
+                            .requires(ECPerms.require("essentialcommands.home.set", 0))
                             .executes(new HomeSetCommand(dataManager)));
 
-                    homeTpBuilder
-                        .then(argument("home_name", StringArgumentType.word())
+                    homeTpBuilder.then(
+                        argument("home_name", StringArgumentType.word())
+                            .requires(ECPerms.require("essentialcommands.home.tp", 0))
                             .suggests(HomeSuggestion.suggestedStrings(dataManager))
                             .executes(new HomeCommand(dataManager)));
 
-                    homeDeleteBuilder
-                        .then(argument("home_name", StringArgumentType.word())
+                    homeDeleteBuilder.then(
+                        argument("home_name", StringArgumentType.word())
+                            .requires(ECPerms.require("essentialcommands.home.delete", 0))
                             .suggests(HomeSuggestion.suggestedStrings(dataManager))
                             .executes(new HomeDeleteCommand(dataManager)));
 
@@ -103,7 +104,9 @@ public class EssentialCommandRegistry {
                 //Back
                 LiteralArgumentBuilder<ServerCommandSource> backBuilder = CommandManager.literal("back");
                 if (Config.ENABLE_BACK) {
-                    backBuilder.executes(new BackCommand(dataManager));
+                    backBuilder
+                        .requires(ECPerms.require("essentialcommands.back", 0))
+                        .executes(new BackCommand(dataManager));
                 } else {
                     backBuilder.executes(disabledCommandCommand);
                 }
@@ -115,20 +118,21 @@ public class EssentialCommandRegistry {
                 LiteralArgumentBuilder<ServerCommandSource> warpDeleteBuilder = CommandManager.literal("delete");
                 if (Config.ENABLE_WARP) {
                     warpSetBuilder.then(
-                            argument("warp_name", StringArgumentType.word())
-                                    .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
-                                    .executes(new WarpSetCommand(worldDataManager)));
+                        argument("warp_name", StringArgumentType.word())
+                            .requires(ECPerms.require("essentialcommands.warp.set", 4))
+                            .executes(new WarpSetCommand(worldDataManager)));
 
                     warpTpBuilder
-                            .then(argument("warp_name", StringArgumentType.word())
-                                    .suggests(worldDataManager.getWarpSuggestions())
-                                    .executes(new WarpTpCommand(dataManager, worldDataManager)));
+                        .then(argument("warp_name", StringArgumentType.word())
+                            .requires(ECPerms.require("essentialcommands.warp.tp", 0))
+                            .suggests(worldDataManager.getWarpSuggestions())
+                            .executes(new WarpTpCommand(dataManager, worldDataManager)));
 
                     warpDeleteBuilder
-                            .then(argument("warp_name", StringArgumentType.word())
-                                    .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(4))
-                                    .suggests(worldDataManager.getWarpSuggestions())
-                                    .executes(new WarpDeleteCommand(worldDataManager)));
+                        .then(argument("warp_name", StringArgumentType.word())
+                            .requires(ECPerms.require("essentialcommands.warp.delete", 4))
+                            .suggests(worldDataManager.getWarpSuggestions())
+                            .executes(new WarpDeleteCommand(worldDataManager)));
 
                 } else {
                     warpBuilder.executes(disabledCommandCommand);

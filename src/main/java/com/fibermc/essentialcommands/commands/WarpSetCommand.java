@@ -39,7 +39,7 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
                 new LiteralText("Warp '").formatted(Config.FORMATTING_DEFAULT)
                         .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
                         .append(new LiteralText("' set.").formatted(Config.FORMATTING_DEFAULT))
-                , UUID.randomUUID());
+                , new UUID(0, 0));
 
         return successCode;
     }
