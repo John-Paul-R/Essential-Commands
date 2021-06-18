@@ -6,6 +6,9 @@ Essential commands is a Minecraft (Fabric) mod that adds several simple commands
 ## Permissions
 
 Essential Commands supports permissions mods like LuckPerms!
+All commands and sub-commands have their own permissions node in the form:
+
+`essentialcommands.<command>.<subcommand>`
 
 ## Commands
 
