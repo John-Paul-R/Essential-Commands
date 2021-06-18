@@ -3,6 +3,10 @@
 
 Essential commands is a Minecraft (Fabric) mod that adds several simple commands to the game. It is a purely serverside mod (but does work on LAN singleplayer worlds).
 
+## Permissions
+
+Essential Commands supports permissions mods like LuckPerms!
+
 ## Commands
 
 All of these commands support automatic tab completion using Minecraft's new commands system.
