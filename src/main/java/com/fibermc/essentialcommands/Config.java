@@ -7,6 +7,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 public class Config {
@@ -14,6 +20,8 @@ public class Config {
     public static Properties props = new Properties();
     static {
     }
+
+    private static String CONFIG_PATH = "./config/EssentialCommands.properties";
 
     public static Formatting FORMATTING_DEFAULT;
     public static Formatting FORMATTING_ACCENT;
@@ -27,9 +35,10 @@ public class Config {
     public static double TELEPORT_DELAY;
     public static boolean ALLOW_BACK_ON_DEATH;
     public static int TELEPORT_REQUEST_DURATION;
+    public static boolean USE_PERMISSIONS_API;
 
     public static void loadOrCreateProperties() {
-        File inFile = new File("./config/EssentialCommands.json");
+        File inFile = new File(CONFIG_PATH);
 
         try{
             boolean fileAlreadyExisted = !inFile.createNewFile();
@@ -48,37 +57,43 @@ public class Config {
     }
 
     public static void initProperties() {
-        props.putIfAbsent("formatting_default", "gold");
-        props.putIfAbsent("formatting_accent", "light_purple");
-        props.putIfAbsent("formatting_error", "red");
-        props.putIfAbsent("enable_home", "true");
-        props.putIfAbsent("enable_tpa", "true");
-        props.putIfAbsent("enable_back", "true");
-        props.putIfAbsent("enable_warp", "true");
-        props.putIfAbsent("home_limit", "-1");
-        props.putIfAbsent("teleport_cooldown", "1D");
-        props.putIfAbsent("teleport_delay", "0D");
-        props.putIfAbsent("allow_back_on_death", "false");
-        props.putIfAbsent("teleport_request_duration", "60");
+        List<SimpleEntry<String, String>> defProps = List.of(
+            new SimpleEntry<>("formatting_default", "gold"),
+            new SimpleEntry<>("formatting_accent", "light_purple"),
+            new SimpleEntry<>("formatting_error", "red"),
+            new SimpleEntry<>("enable_home", "true"),
+            new SimpleEntry<>("enable_tpa", "true"),
+            new SimpleEntry<>("enable_back", "true"),
+            new SimpleEntry<>("enable_warp", "true"),
+            new SimpleEntry<>("home_limit", "-1"),
+            new SimpleEntry<>("teleport_cooldown", "1D"),
+            new SimpleEntry<>("teleport_delay", "0D"),
+            new SimpleEntry<>("allow_back_on_death", "false"),
+            new SimpleEntry<>("teleport_request_duration", "60"),
+            new SimpleEntry<>("use_permissions_api", "false")
+        );
+        for (SimpleEntry<String, String> property : defProps) {
+            props.putIfAbsent(property.getKey(), property.getValue());
+        }
 
-
-        FORMATTING_DEFAULT  = Formatting.byName((String)  props.getOrDefault("formatting_default", "gold"));
-        FORMATTING_ACCENT   = Formatting.byName((String)  props.getOrDefault("formatting_accent", "light_purple"));
-        FORMATTING_ERROR    = Formatting.byName((String)  props.getOrDefault("formatting_error", "red"));
-        ENABLE_HOME         = Boolean.parseBoolean((String) props.getOrDefault("enable_home", "true"));
-        ENABLE_TPA          = Boolean.parseBoolean((String) props.getOrDefault("enable_tpa", "true"));
-        ENABLE_BACK         = Boolean.parseBoolean((String) props.getOrDefault("enable_back", "true"));
-        ENABLE_WARP         = Boolean.parseBoolean((String) props.getOrDefault("enable_warp", "true"));
-        HOME_LIMIT          = Integer.parseInt((String) props.getOrDefault("home_limit", "-1"));
-        TELEPORT_COOLDOWN   = Double.parseDouble((String)  props.getOrDefault("teleport_cooldown", "1D"));
-        TELEPORT_DELAY      = Double.parseDouble((String)  props.getOrDefault("teleport_delay", "0D"));
-        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean((String) props.getOrDefault("allow_back_on_death", "false"));
-        TELEPORT_REQUEST_DURATION = Integer.parseInt((String) props.getOrDefault("teleport_request_duration", "60"));
+        FORMATTING_DEFAULT  = Formatting.byName((String)        props.get(defProps.get(0).getKey()));
+        FORMATTING_ACCENT   = Formatting.byName((String)        props.get(defProps.get(1).getKey()));
+        FORMATTING_ERROR    = Formatting.byName((String)        props.get(defProps.get(2).getKey()));
+        ENABLE_HOME         = Boolean.parseBoolean((String)     props.get(defProps.get(3).getKey()));
+        ENABLE_TPA          = Boolean.parseBoolean((String)     props.get(defProps.get(4).getKey()));
+        ENABLE_BACK         = Boolean.parseBoolean((String)     props.get(defProps.get(5).getKey()));
+        ENABLE_WARP         = Boolean.parseBoolean((String)     props.get(defProps.get(6).getKey()));
+        HOME_LIMIT          = Integer.parseInt((String)         props.get(defProps.get(7).getKey()));
+        TELEPORT_COOLDOWN   = Double.parseDouble((String)       props.get(defProps.get(8).getKey()));
+        TELEPORT_DELAY      = Double.parseDouble((String)       props.get(defProps.get(9).getKey()));
+        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean((String)     props.get(defProps.get(10).getKey()));
+        TELEPORT_REQUEST_DURATION = Integer.parseInt((String)   props.get(defProps.get(11).getKey()));
+        USE_PERMISSIONS_API = Boolean.parseBoolean((String)     props.get(defProps.get(12).getKey()));
     }
 
     public static void storeProperties() {
         try{
-            File outFile = new File("./config/EssentialCommands.properties");
+            File outFile = new File(CONFIG_PATH);
             FileWriter writer = new FileWriter(outFile);
 
             props.store(writer, "");

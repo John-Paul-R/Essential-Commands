@@ -27,14 +27,23 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
         //Store home name
         String warpName = StringArgumentType.getString(context, "warp_name");
 
-        worldDataManager.delWarp(warpName);
+        boolean wasSuccessful = worldDataManager.delWarp(warpName);
 
         //inform command sender that the home has been removed
-        senderPlayer.sendSystemMessage(
-                new LiteralText("Warp ").formatted(Config.FORMATTING_DEFAULT)
-                        .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
-                        .append(new LiteralText(" has been deleted.").formatted(Config.FORMATTING_DEFAULT))
-                , UUID.randomUUID());
+        if (wasSuccessful) {
+            senderPlayer.sendSystemMessage(
+                    new LiteralText("Warp ").formatted(Config.FORMATTING_DEFAULT)
+                            .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(" has been deleted.").formatted(Config.FORMATTING_DEFAULT))
+                    , UUID.randomUUID());
+        } else {
+            senderPlayer.sendSystemMessage(
+                    new LiteralText("Warp ").formatted(Config.FORMATTING_ERROR)
+                            .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(" could not be deleted. (Correct spelling?)").formatted(Config.FORMATTING_ERROR))
+                    , UUID.randomUUID());
+            out = 0;
+        }
 
         out = 1;
         return out;

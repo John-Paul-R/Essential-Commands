@@ -102,10 +102,11 @@ public class WorldDataManager extends PersistentState {
         this.markDirty();
         this.save();
     }
-    public void delWarp(String warpName) {
-        warps.remove(warpName);
+    public boolean delWarp(String warpName) {
+        MinecraftLocation prevValue = warps.remove(warpName);
         this.markDirty();
         this.save();
+        return prevValue != null;
     }
     public MinecraftLocation getWarp(String warpName) {
         return warps.get(warpName);

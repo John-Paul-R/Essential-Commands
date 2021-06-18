@@ -31,7 +31,7 @@ public final class EssentialCommands implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register((MinecraftServer server) -> {
 			managers.init(server);
 		});
-
+		ECPerms.init();
 		//TODO Currently known bug: warps will persist between worlds in a single session in singleplayer.
 		//Register Mod
 		EssentialCommandRegistry.register(managers);
