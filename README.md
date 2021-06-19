@@ -3,6 +3,11 @@
 
 Essential commands is a Minecraft (Fabric) mod that adds several simple commands to the game. It is a purely serverside mod (but does work on LAN singleplayer worlds).
 
+## Download
+
+(Fabric only)
+[Modrinth](https://modrinth.com/mod/essential-commands) || [CurseForge](https://www.curseforge.com/minecraft/mc-mods/essential-commands)
+
 ## Permissions
 
 Essential Commands supports permissions mods like LuckPerms!
