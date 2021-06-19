@@ -119,6 +119,8 @@ public class WorldDataManager extends PersistentState {
 
     public void setSpawn(MinecraftLocation location) {
         spawnLocation = location;
+        this.markDirty();
+        this.save();
     }
     public MinecraftLocation getSpawn() {
         return spawnLocation;

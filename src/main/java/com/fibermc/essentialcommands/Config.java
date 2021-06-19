@@ -21,9 +21,10 @@ public class Config {
     public static Formatting FORMATTING_DEFAULT;
     public static Formatting FORMATTING_ACCENT;
     public static Formatting FORMATTING_ERROR;
-    public static boolean ENABLE_HOME;
-    public static boolean ENABLE_TPA;
     public static boolean ENABLE_BACK;
+    public static boolean ENABLE_HOME;
+    public static boolean ENABLE_SPAWN;
+    public static boolean ENABLE_TPA;
     public static boolean ENABLE_WARP;
     public static int HOME_LIMIT;
     public static double TELEPORT_COOLDOWN;
@@ -56,9 +57,10 @@ public class Config {
             new SimpleEntry<>("formatting_default", "gold"),
             new SimpleEntry<>("formatting_accent", "light_purple"),
             new SimpleEntry<>("formatting_error", "red"),
-            new SimpleEntry<>("enable_home", "true"),
-            new SimpleEntry<>("enable_tpa", "true"),
             new SimpleEntry<>("enable_back", "true"),
+            new SimpleEntry<>("enable_home", "true"),
+            new SimpleEntry<>("enable_spawn", "true"),
+            new SimpleEntry<>("enable_tpa", "true"),
             new SimpleEntry<>("enable_warp", "true"),
             new SimpleEntry<>("home_limit", "-1"),
             new SimpleEntry<>("teleport_cooldown", "1D"),
@@ -74,16 +76,17 @@ public class Config {
         FORMATTING_DEFAULT  = Formatting.byName((String)        props.get(defProps.get(0).getKey()));
         FORMATTING_ACCENT   = Formatting.byName((String)        props.get(defProps.get(1).getKey()));
         FORMATTING_ERROR    = Formatting.byName((String)        props.get(defProps.get(2).getKey()));
-        ENABLE_HOME         = Boolean.parseBoolean((String)     props.get(defProps.get(3).getKey()));
-        ENABLE_TPA          = Boolean.parseBoolean((String)     props.get(defProps.get(4).getKey()));
-        ENABLE_BACK         = Boolean.parseBoolean((String)     props.get(defProps.get(5).getKey()));
-        ENABLE_WARP         = Boolean.parseBoolean((String)     props.get(defProps.get(6).getKey()));
-        HOME_LIMIT          = Integer.parseInt((String)         props.get(defProps.get(7).getKey()));
-        TELEPORT_COOLDOWN   = Double.parseDouble((String)       props.get(defProps.get(8).getKey()));
-        TELEPORT_DELAY      = Double.parseDouble((String)       props.get(defProps.get(9).getKey()));
-        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean((String)     props.get(defProps.get(10).getKey()));
-        TELEPORT_REQUEST_DURATION = Integer.parseInt((String)   props.get(defProps.get(11).getKey()));
-        USE_PERMISSIONS_API = Boolean.parseBoolean((String)     props.get(defProps.get(12).getKey()));
+        ENABLE_BACK         = Boolean.parseBoolean((String)     props.get(defProps.get(3).getKey()));
+        ENABLE_HOME         = Boolean.parseBoolean((String)     props.get(defProps.get(4).getKey()));
+        ENABLE_SPAWN        = Boolean.parseBoolean((String)     props.get(defProps.get(5).getKey()));
+        ENABLE_TPA          = Boolean.parseBoolean((String)     props.get(defProps.get(6).getKey()));
+        ENABLE_WARP         = Boolean.parseBoolean((String)     props.get(defProps.get(7).getKey()));
+        HOME_LIMIT          = Integer.parseInt((String)         props.get(defProps.get(8).getKey()));
+        TELEPORT_COOLDOWN   = Double.parseDouble((String)       props.get(defProps.get(9).getKey()));
+        TELEPORT_DELAY      = Double.parseDouble((String)       props.get(defProps.get(10).getKey()));
+        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean((String)     props.get(defProps.get(11).getKey()));
+        TELEPORT_REQUEST_DURATION = Integer.parseInt((String)   props.get(defProps.get(12).getKey()));
+        USE_PERMISSIONS_API = Boolean.parseBoolean((String)     props.get(defProps.get(13).getKey()));
     }
 
     public static void storeProperties() {

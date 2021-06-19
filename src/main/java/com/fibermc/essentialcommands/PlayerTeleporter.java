@@ -30,5 +30,7 @@ public class PlayerTeleporter {
             dest.headYaw, dest.pitch
         );
     }
-
+    public static void teleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
+        teleport(PlayerDataManager.getInstance().getOrCreate(playerEntity), dest);
+    }
 }

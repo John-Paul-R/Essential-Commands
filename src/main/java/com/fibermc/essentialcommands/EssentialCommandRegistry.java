@@ -140,6 +140,29 @@ public class EssentialCommandRegistry {
                     warpDeleteBuilder.executes(disabledCommandCommand);
                 }
 
+                //Spawn
+                LiteralArgumentBuilder<ServerCommandSource> spawnBuilder = CommandManager.literal("spawn");
+                LiteralArgumentBuilder<ServerCommandSource> spawnSetBuilder = CommandManager.literal("set");
+                LiteralArgumentBuilder<ServerCommandSource> spawnTpBuilder = CommandManager.literal("tp");
+                if (Config.ENABLE_SPAWN) {
+                    spawnSetBuilder
+                            .requires(ECPerms.require("essentialcommands.spawn.set", 4))
+                            .executes(new SpawnSetCommand());
+
+                    SpawnCommand cmd = new SpawnCommand();
+                    spawnBuilder
+                            .requires(ECPerms.require("essentialcommands.spawn.tp", 0))
+                            .executes(cmd);
+                    spawnTpBuilder
+                        .requires(ECPerms.require("essentialcommands.spawn.tp", 0))
+                        .executes(cmd);
+
+                } else {
+                    spawnBuilder.executes(disabledCommandCommand);
+                    spawnTpBuilder.executes(disabledCommandCommand);
+                    spawnSetBuilder.executes(disabledCommandCommand);
+
+                }
 
                     //-=-=-=-=-=-=-=-
                 dispatcher.getRoot().addChild(tpAskBuilder.build());
@@ -159,6 +182,11 @@ public class EssentialCommandRegistry {
                 warpNode.addChild(warpTpBuilder.build());
                 warpNode.addChild(warpSetBuilder.build());
                 warpNode.addChild(warpDeleteBuilder.build());
+
+                LiteralCommandNode<ServerCommandSource> spawnNode = spawnBuilder.build();
+                dispatcher.getRoot().addChild(spawnNode);
+                spawnNode.addChild(spawnSetBuilder.build());
+                spawnNode.addChild(spawnTpBuilder.build());
             }
         );
     }
