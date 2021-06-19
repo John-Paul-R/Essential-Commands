@@ -7,19 +7,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
+
+import com.fibermc.essentialcommands.SortedProperties;
 
 public class Config {
 
-    public static Properties props = new Properties();
-    static {
-    }
+    public static SortedProperties props = new SortedProperties();
 
     private static String CONFIG_PATH = "./config/EssentialCommands.properties";
 
@@ -96,7 +91,7 @@ public class Config {
             File outFile = new File(CONFIG_PATH);
             FileWriter writer = new FileWriter(outFile);
 
-            props.store(writer, "");
+            props.storeSorted(writer, "Essential Commands Properties");
         } catch (IOException e) {
             EssentialCommands.log(Level.WARN,"Failed to store preferences to disk.");
         }
