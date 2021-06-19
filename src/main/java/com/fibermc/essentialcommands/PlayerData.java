@@ -107,16 +107,14 @@ public class PlayerData extends PersistentState {
 
     // IO
 //    @Override
-    public void fromTag(NbtCompound tag) {
+    public void fromNbt(NbtCompound tag) {
         NbtCompound dataTag = tag.getCompound("data");
         this.pUuid = dataTag.getUuid("playerUuid");
         NbtList homesNbtList = dataTag.getList("homes", 10);
         HashMap<String, MinecraftLocation> homes = Maps.newHashMap();
         for (NbtElement t : homesNbtList) {
             NbtCompound homeTag = (NbtCompound) t;
-            MinecraftLocation location = new MinecraftLocation(homeTag);
-            String homeName = homeTag.getString("homeName");
-            homes.put(homeName, location);
+            homes.put(homeTag.getString("homeName"), new MinecraftLocation(homeTag));
         }
         this.homes = homes;
     }
@@ -125,11 +123,11 @@ public class PlayerData extends PersistentState {
     public NbtCompound writeNbt(NbtCompound tag) {
         tag.putUuid("playerUuid", pUuid);
         NbtList homesNbtList = new NbtList();
-        for (Entry<String, MinecraftLocation> entry : homes.entrySet()) {
-            NbtCompound homeTag = entry.getValue().writeNbt(new NbtCompound());
-            homeTag.putString("homeName", entry.getKey());
+        homes.forEach((String key, MinecraftLocation homeLocation) -> {
+            NbtCompound homeTag = homeLocation.writeNbt(new NbtCompound());
+            homeTag.putString("homeName", key);
             homesNbtList.add(homeTag);
-        }
+        });
         tag.put("homes", homesNbtList);
 
         return tag;

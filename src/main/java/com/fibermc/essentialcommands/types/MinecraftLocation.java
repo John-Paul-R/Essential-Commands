@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.types;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -10,15 +11,13 @@ import net.minecraft.world.World;
 
 public class MinecraftLocation {
 
-    public double x, y, z;
+    public Vec3d pos;
     public float pitch, headYaw;
     public RegistryKey<World> dim;
 
     public MinecraftLocation(RegistryKey<World>  dim, double x, double y, double z) {
         this.dim = dim;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.pos = new Vec3d(x, y, z);
         this.pitch = 0f;
         this.headYaw = 0f;
         //todo world.getPersistentStateManager().
@@ -26,19 +25,15 @@ public class MinecraftLocation {
 
     public MinecraftLocation(RegistryKey<World>  dim, double x, double y, double z, float headYaw, float pitch) {
         this.dim = dim;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.pos = new Vec3d(x, y, z);
         this.headYaw = headYaw;
         this.pitch = pitch; 
     }
 
     public MinecraftLocation(ServerPlayerEntity player) {
         this.dim = player.getServerWorld().getRegistryKey();
-        this.x = player.getX();
-        this.y = player.getY();
-        this.z = player.getZ();
-        this.headYaw = player.headYaw;
+        this.pos = Vec3d.ZERO.add(player.getPos());
+        this.headYaw = player.getHeadYaw();
         this.pitch = player.getPitch();
     }
 
@@ -47,9 +42,11 @@ public class MinecraftLocation {
             Registry.WORLD_KEY,
             Identifier.tryParse(tag.getString("WorldRegistryKey"))
         );
-        this.x = tag.getDouble("x");
-        this.y = tag.getDouble("y");
-        this.z = tag.getDouble("z");
+        this.pos = new Vec3d(
+            tag.getDouble("x"),
+            tag.getDouble("y"),
+            tag.getDouble("z")
+        );
         this.headYaw = tag.getFloat("headYaw");
         this.pitch = tag.getFloat("pitch");
     }
@@ -58,9 +55,9 @@ public class MinecraftLocation {
     }
     public NbtCompound writeNbt(NbtCompound tag) {
         tag.putString("WorldRegistryKey", dim.getValue().toString());
-        tag.putDouble("x", x);
-        tag.putDouble("y", y);
-        tag.putDouble("z", z);
+        tag.putDouble("x", pos.x);
+        tag.putDouble("y", pos.y);
+        tag.putDouble("z", pos.z);
         tag.putFloat("headYaw", headYaw);
         tag.putFloat("pitch", pitch);
 

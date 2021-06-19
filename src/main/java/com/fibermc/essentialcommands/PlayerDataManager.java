@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Level;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PushbackInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -87,7 +86,8 @@ public class PlayerDataManager {
     }
 
     public PlayerData getOrCreate(ServerPlayerEntity player) {
-
+        //TODO perhaps this should just be "get" and we let it error if null.
+        // @body In theory, this should never be null if everything else works correctly.
         UUID uuid = player.getUuid();
         PlayerData playerData = dataMap.get(uuid);
 
@@ -146,7 +146,7 @@ public class PlayerDataManager {
         NbtCompound NbtCompound3 = NbtIo.readCompressed(new FileInputStream(playerDataFile));
 
         //EssentialCommands.log(Level.INFO, "TagData:\n-=-=-=-=-=-\n"+NbtCompound3.asString()+"\n-=-=-=-=-=-=-=-");
-        pData.fromTag(NbtCompound3);
+        pData.fromNbt(NbtCompound3);
         //Testing:
         pData.markDirty();
         addPlayerData(pData);
