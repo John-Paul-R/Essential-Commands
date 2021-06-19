@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.TeleportRequestManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -14,14 +15,11 @@ import java.util.UUID;
 
 public class TeleportAskCommand implements Command<ServerCommandSource> {
 
-    private TeleportRequestManager tpMgr;
-    public TeleportAskCommand(TeleportRequestManager tpMgr) {
-        this.tpMgr = tpMgr;
-    }
+    public TeleportAskCommand() {}
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        
+        TeleportRequestManager tpMgr = ManagerLocator.INSTANCE.getTpManager();
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store Target Player

@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerDataManager;
 import com.mojang.brigadier.Command;
@@ -14,14 +15,12 @@ import net.minecraft.text.LiteralText;
 import java.util.UUID;
 
 public class HomeDeleteCommand implements Command<ServerCommandSource> {
-    private PlayerDataManager dataManager;
 
-    public HomeDeleteCommand(PlayerDataManager dataManager) {
-        this.dataManager = dataManager;
-    }
+    public HomeDeleteCommand() {}
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerDataManager dataManager = ManagerLocator.INSTANCE.getPlayerDataManager();
         int out = 1;
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();

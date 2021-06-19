@@ -1,9 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.Config;
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataManager;
-import com.fibermc.essentialcommands.WorldDataManager;
+import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -17,12 +14,11 @@ import java.util.UUID;
 
 public class WarpSetCommand implements Command<ServerCommandSource> {
 
-    private final WorldDataManager worldDataManager;
-    public WarpSetCommand(WorldDataManager worldDataManager) {
-        this.worldDataManager = worldDataManager;
-    }
+    public WarpSetCommand() {}
+
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
 
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();

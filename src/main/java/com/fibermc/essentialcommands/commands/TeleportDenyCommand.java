@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerDataManager;
 import com.mojang.brigadier.Command;
@@ -15,14 +16,12 @@ import java.util.UUID;
 
 public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
-    private PlayerDataManager dataManager;
-    public TeleportDenyCommand(PlayerDataManager dataManager) {
-        this.dataManager = dataManager;
-    }
+    public TeleportDenyCommand() {}
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        
+        PlayerDataManager dataManager = ManagerLocator.INSTANCE.getPlayerDataManager();
+
         //Store command sender
          ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store Target Player

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 
 public class WorldDataManager extends PersistentState {
     private HashMap<String, MinecraftLocation> warps;
@@ -111,10 +112,9 @@ public class WorldDataManager extends PersistentState {
     public MinecraftLocation getWarp(String warpName) {
         return warps.get(warpName);
     }
-    public SuggestionProvider<ServerCommandSource> getWarpSuggestions() {
-        return (context, builder) -> ListSuggestion.getSuggestionsBuilder(builder,
-            this.warps.keySet().stream().toList()
-        );
+
+    public List<String> getWarpNames() {
+        return this.warps.keySet().stream().toList();
     }
 
     public void setSpawn(MinecraftLocation location) {

@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerDataManager;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -16,14 +17,11 @@ import java.util.UUID;
 
 public class HomeSetCommand implements Command<ServerCommandSource> {
 
-    private PlayerDataManager dataManager;
-    public HomeSetCommand(PlayerDataManager dataManager) {
-        this.dataManager = dataManager;
-    }
+    public HomeSetCommand() {}
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-
+        PlayerDataManager dataManager = ManagerLocator.INSTANCE.getPlayerDataManager();
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store home name

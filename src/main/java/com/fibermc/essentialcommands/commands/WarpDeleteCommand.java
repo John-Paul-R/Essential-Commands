@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.WorldDataManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -14,13 +15,11 @@ import java.util.UUID;
 
 public class WarpDeleteCommand implements Command<ServerCommandSource> {
 
-    private final WorldDataManager worldDataManager;
-    public WarpDeleteCommand(WorldDataManager worldDataManager) {
-        this.worldDataManager = worldDataManager;
-    }
+    public WarpDeleteCommand() {}
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
         int out = 0;
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();

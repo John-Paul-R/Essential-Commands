@@ -4,17 +4,25 @@ import net.minecraft.server.MinecraftServer;
 
 public class ManagerLocator {
 
-    private final PlayerDataManager playerDataManager;
-    private final TeleportRequestManager tpManager;
-    private final WorldDataManager worldDataManager;
+    private PlayerDataManager playerDataManager;
+    private TeleportRequestManager tpManager;
+    private WorldDataManager worldDataManager;
+
+    public static ManagerLocator INSTANCE;
 
     public ManagerLocator() {
+        INSTANCE = this;
+    }
+
+    public void init() {
+        PlayerDataManager.init();
+        TeleportRequestManager.init();
+    }
+
+    public void onServerStart(MinecraftServer server) {
         this.playerDataManager = new PlayerDataManager();
         this.tpManager = new TeleportRequestManager(this.playerDataManager);
         this.worldDataManager = new WorldDataManager();
-    }
-
-    public void init(MinecraftServer server) {
         this.worldDataManager.init(server);
     }
 

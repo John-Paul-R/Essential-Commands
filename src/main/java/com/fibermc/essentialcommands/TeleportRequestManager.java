@@ -1,8 +1,13 @@
 package com.fibermc.essentialcommands;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -18,12 +23,18 @@ public class TeleportRequestManager {
     private LinkedList<PlayerData> tpCooldownList;
     private LinkedList<PlayerData> tpDelayList;
 
+    private static TeleportRequestManager INSTANCE;
+
     public TeleportRequestManager(PlayerDataManager dataManager) {
+        INSTANCE = this;
         this.dataManager = dataManager;
         activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
         tpDelayList = new LinkedList<>();
-        ServerTickEvents.END_SERVER_TICK.register(this::tick);
+    }
+
+    public static void init() {
+        ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> TeleportRequestManager.INSTANCE.tick(server));
     }
 
     public void tick(MinecraftServer server) {

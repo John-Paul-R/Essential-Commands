@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
+import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -24,10 +25,8 @@ import static net.minecraft.server.command.CommandManager.argument;
  */
 public class EssentialCommandRegistry {
 
-    public static void register(ManagerLocator managers) {
-        PlayerDataManager dataManager = managers.getPlayerDataManager();
-        TeleportRequestManager tpManager = managers.getTpManager();
-        WorldDataManager worldDataManager = managers.getWorldDataManager();
+    public static void register() {
+
         CommandRegistrationCallback.EVENT.register(
             (CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) -> {
                 final String disabledString = "[EssentialCommands] This command is not enabled.";
@@ -48,19 +47,19 @@ public class EssentialCommandRegistry {
                     tpAskBuilder.then(
                         argument("target", EntityArgumentType.player())
                             .requires(ECPerms.require("essentialcommands.tpa.ask", 0))
-                            .executes(new TeleportAskCommand(tpManager)));
+                            .executes(new TeleportAskCommand()));
 
                     tpAcceptBuilder.then(
                         argument("target", EntityArgumentType.player())
                             .requires(ECPerms.require("essentialcommands.tpa.accept", 0))
-                            .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
-                            .executes(new TeleportAcceptCommand(dataManager)));
+                            .suggests(TeleportResponseSuggestion.suggestedStrings())
+                            .executes(new TeleportAcceptCommand()));
 
                     tpDenyBuilder.then(
                         argument("target", EntityArgumentType.player())
                             .requires(ECPerms.require("essentialcommands.tpa.deny", 0))
-                            .suggests(TeleportResponseSuggestion.suggestedStrings(dataManager))
-                            .executes(new TeleportDenyCommand(dataManager)));
+                            .suggests(TeleportResponseSuggestion.suggestedStrings())
+                            .executes(new TeleportDenyCommand()));
                 } else {
                     tpAskBuilder.executes(disabledCommandCommand);
                     tpAcceptBuilder.executes(disabledCommandCommand);
@@ -79,19 +78,19 @@ public class EssentialCommandRegistry {
                     homeSetBuilder.then(
                         argument("home_name", StringArgumentType.word())
                             .requires(ECPerms.require("essentialcommands.home.set", 0))
-                            .executes(new HomeSetCommand(dataManager)));
+                            .executes(new HomeSetCommand()));
 
                     homeTpBuilder.then(
                         argument("home_name", StringArgumentType.word())
                             .requires(ECPerms.require("essentialcommands.home.tp", 0))
-                            .suggests(HomeSuggestion.suggestedStrings(dataManager))
-                            .executes(new HomeCommand(dataManager)));
+                            .suggests(HomeSuggestion.suggestedStrings())
+                            .executes(new HomeCommand()));
 
                     homeDeleteBuilder.then(
                         argument("home_name", StringArgumentType.word())
                             .requires(ECPerms.require("essentialcommands.home.delete", 0))
-                            .suggests(HomeSuggestion.suggestedStrings(dataManager))
-                            .executes(new HomeDeleteCommand(dataManager)));
+                            .suggests(HomeSuggestion.suggestedStrings())
+                            .executes(new HomeDeleteCommand()));
 
                 } else {
                     homeBuilder.executes(disabledCommandCommand);
@@ -106,7 +105,7 @@ public class EssentialCommandRegistry {
                 if (Config.ENABLE_BACK) {
                     backBuilder
                         .requires(ECPerms.require("essentialcommands.back", 0))
-                        .executes(new BackCommand(dataManager));
+                        .executes(new BackCommand());
                 } else {
                     backBuilder.executes(disabledCommandCommand);
                 }
@@ -120,19 +119,19 @@ public class EssentialCommandRegistry {
                     warpSetBuilder.then(
                         argument("warp_name", StringArgumentType.word())
                             .requires(ECPerms.require("essentialcommands.warp.set", 4))
-                            .executes(new WarpSetCommand(worldDataManager)));
+                            .executes(new WarpSetCommand()));
 
                     warpTpBuilder
                         .then(argument("warp_name", StringArgumentType.word())
                             .requires(ECPerms.require("essentialcommands.warp.tp", 0))
-                            .suggests(worldDataManager.getWarpSuggestions())
-                            .executes(new WarpTpCommand(dataManager, worldDataManager)));
+                            .suggests(WarpSuggestion.suggestedStrings())
+                            .executes(new WarpTpCommand()));
 
                     warpDeleteBuilder
                         .then(argument("warp_name", StringArgumentType.word())
                             .requires(ECPerms.require("essentialcommands.warp.delete", 4))
-                            .suggests(worldDataManager.getWarpSuggestions())
-                            .executes(new WarpDeleteCommand(worldDataManager)));
+                            .suggests(WarpSuggestion.suggestedStrings())
+                            .executes(new WarpDeleteCommand()));
 
                 } else {
                     warpBuilder.executes(disabledCommandCommand);

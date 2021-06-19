@@ -17,15 +17,12 @@ import java.util.UUID;
 
 public class WarpTpCommand implements Command<ServerCommandSource> {
 
-    private final PlayerDataManager playerDataManager;
-    private final WorldDataManager worldDataManager;
-    public WarpTpCommand(PlayerDataManager playerDataManager, WorldDataManager worldDataManager) {
-        this.playerDataManager = playerDataManager;
-        this.worldDataManager = worldDataManager;
-    }
+    public WarpTpCommand() { }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerDataManager playerDataManager = ManagerLocator.INSTANCE.getPlayerDataManager();
+        WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
         int out;
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();

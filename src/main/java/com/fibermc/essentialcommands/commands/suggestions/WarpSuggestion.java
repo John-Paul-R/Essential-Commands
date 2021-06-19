@@ -7,10 +7,11 @@ import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.ArrayList;
 
-public class HomeSuggestion {
+public class WarpSuggestion {
     //Brigader Suggestions
     public static SuggestionProvider<ServerCommandSource> suggestedStrings() {
         return (context, builder) -> ListSuggestion.getSuggestionsBuilder(builder,
-                new ArrayList<String>(ManagerLocator.INSTANCE.getPlayerDataManager().getOrCreate(context.getSource().getPlayer()).getHomeNames()));
+            ManagerLocator.INSTANCE.getWorldDataManager().getWarpNames()
+        );
     }
 }

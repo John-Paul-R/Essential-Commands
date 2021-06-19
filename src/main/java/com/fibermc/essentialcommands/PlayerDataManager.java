@@ -26,40 +26,51 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlayerDataManager {
 
     private ConcurrentHashMap<UUID, PlayerData> dataMap;
+
+    private static PlayerDataManager INSTANCE;
+
     public PlayerDataManager() {
+        INSTANCE = this;
         this.dataMap = new ConcurrentHashMap<>();
-        PlayerConnectCallback.EVENT.register(this::onPlayerConnect);
-        PlayerLeaveCallback.EVENT.register(this::onPlayerLeave);
-        PlayerDeathCallback.EVENT.register(this::onPlayerDeath);
-        PlayerRespawnCallback.EVENT.register(this::onPlayerRespawn);
+    }
+
+    public static void init() {
+        PlayerConnectCallback.EVENT.register(PlayerDataManager::onPlayerConnect);
+        PlayerLeaveCallback.EVENT.register(PlayerDataManager::onPlayerLeave);
+        PlayerDeathCallback.EVENT.register(PlayerDataManager::onPlayerDeath);
+        PlayerRespawnCallback.EVENT.register(PlayerDataManager::onPlayerRespawn);
+    }
+
+    public static PlayerDataManager getInstance() {
+        return INSTANCE;
     }
 
     // EVENTS
-    public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
+    public static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
         try {
-            loadPlayerData(player);
+            INSTANCE.loadPlayerData(player);
         } catch (IOException e) {
             EssentialCommands.log(Level.WARN, "Failed to load essential_commands player data for {"+player.getName().getString()+"}");
         }
     }
 
-    public void onPlayerLeave(ServerPlayerEntity player) {
+    public static void onPlayerLeave(ServerPlayerEntity player) {
         try {
-            savePlayerData(player);
+            INSTANCE.savePlayerData(player);
         } catch (Exception e) {
             //TODO: handle exception
         }
 
-        unloadPlayerData(player);
+        INSTANCE.unloadPlayerData(player);
     }
 
-    private void onPlayerRespawn(ServerPlayerEntity serverPlayerEntity) {
-        PlayerData pData = this.getOrCreate(serverPlayerEntity);
+    private static void onPlayerRespawn(ServerPlayerEntity serverPlayerEntity) {
+        PlayerData pData = INSTANCE.getOrCreate(serverPlayerEntity);
         pData.updatePlayer(serverPlayerEntity);
     }
 
-    private void onPlayerDeath(UUID playerID, DamageSource damageSource) {
-        PlayerData pData = getPlayerFromUUID(playerID);
+    private static void onPlayerDeath(UUID playerID, DamageSource damageSource) {
+        PlayerData pData = INSTANCE.getPlayerFromUUID(playerID);
         //EssentialCommands.log(Level.DEBUG, "Worked2 " + pData.getPlayer().getGameProfile().getName());
         pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
     }
