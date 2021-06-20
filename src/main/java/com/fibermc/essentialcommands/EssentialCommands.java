@@ -36,6 +36,10 @@ public final class EssentialCommands implements ModInitializer {
 		//Register Mod
 		EssentialCommandRegistry.register();
 
+		if (Config.CHECK_FOR_UPDATES) {
+			Updater.checkForUpdates();
+		}
+
 		log(Level.INFO, "Mod Load Complete.");
 	}
 }
