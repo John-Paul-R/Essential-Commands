@@ -30,7 +30,7 @@ dependencies {
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
-	modImplementation 'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
+	modImplementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
 }
 
 processResources {

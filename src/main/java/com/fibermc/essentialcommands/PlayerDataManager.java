@@ -71,7 +71,8 @@ public class PlayerDataManager {
     private static void onPlayerDeath(UUID playerID, DamageSource damageSource) {
         PlayerData pData = INSTANCE.getPlayerFromUUID(playerID);
         //EssentialCommands.log(Level.DEBUG, "Worked2 " + pData.getPlayer().getGameProfile().getName());
-        pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
+        if (Config.ALLOW_BACK_ON_DEATH)
+            pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
     }
 
     // SET / ADD
