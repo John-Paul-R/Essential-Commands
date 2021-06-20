@@ -9,7 +9,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import me.lucko.fabric.api.permissions.v0.Permissions;
+import com.mojang.brigadier.tree.RootCommandNode;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
@@ -164,29 +164,49 @@ public class EssentialCommandRegistry {
 
                 }
 
+                RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
                     //-=-=-=-=-=-=-=-
-                dispatcher.getRoot().addChild(tpAskBuilder.build());
-                dispatcher.getRoot().addChild(tpAcceptBuilder.build());
-                dispatcher.getRoot().addChild(tpDenyBuilder.build());
+                LiteralCommandNode<ServerCommandSource> tpAskNode = tpAskBuilder.build();
+                LiteralCommandNode<ServerCommandSource> tpAcceptNode = tpAcceptBuilder.build();
+                LiteralCommandNode<ServerCommandSource> tpDenyNode = tpDenyBuilder.build();
+
+                rootNode.addChild(tpAskNode);
+                rootNode.addChild(tpAcceptNode);
+                rootNode.addChild(tpDenyNode);
 
                 LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder.build();
-                dispatcher.getRoot().addChild(homeNode);
+                rootNode.addChild(homeNode);
                 homeNode.addChild(homeTpBuilder.build());
                 homeNode.addChild(homeSetBuilder.build());
                 homeNode.addChild(homeDeleteBuilder.build());
 
-                dispatcher.getRoot().addChild(backBuilder.build());
+                LiteralCommandNode<ServerCommandSource> backNode = backBuilder.build();
+                rootNode.addChild(backNode);
 
                 LiteralCommandNode<ServerCommandSource> warpNode = warpBuilder.build();
-                dispatcher.getRoot().addChild(warpNode);
+                rootNode.addChild(warpNode);
                 warpNode.addChild(warpTpBuilder.build());
                 warpNode.addChild(warpSetBuilder.build());
                 warpNode.addChild(warpDeleteBuilder.build());
 
                 LiteralCommandNode<ServerCommandSource> spawnNode = spawnBuilder.build();
-                dispatcher.getRoot().addChild(spawnNode);
+                rootNode.addChild(spawnNode);
                 spawnNode.addChild(spawnSetBuilder.build());
                 spawnNode.addChild(spawnTpBuilder.build());
+
+                LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode =
+                    CommandManager.literal("essentialcommands").build();
+                essentialCommandsRootNode.addChild(spawnNode);
+                essentialCommandsRootNode.addChild(warpNode);
+                essentialCommandsRootNode.addChild(tpAskNode);
+                essentialCommandsRootNode.addChild(tpAcceptNode);
+                essentialCommandsRootNode.addChild(tpDenyNode);
+                essentialCommandsRootNode.addChild(homeNode);
+                essentialCommandsRootNode.addChild(backNode);
+                rootNode.addChild(essentialCommandsRootNode);
+                //TODO if commands are disbleed, don't register them at all
+                // @body this allows users to modify EssentialCommands functionality
+                // @body so that it does not conflict with their other mods/config.
             }
         );
     }
