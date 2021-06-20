@@ -99,10 +99,15 @@ public class TeleportRequestManager {
     }
 
     public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, String destName) {
-        final double TD = Config.TELEPORT_DELAY;
-        PlayerData pData = dataManager.getOrCreate(player);
+        queueTeleport(new QueuedLocationTeleport(dataManager.getOrCreate(player), dest, destName));
+    }
 
-        QueuedTeleport prevValue = delayedTeleportQueue.put(player.getUuid(), new QueuedTeleport(pData, dest, destName, (int)(TD*TPS)));
+
+    public void queueTeleport(QueuedTeleport queuedTeleport) {
+        QueuedTeleport prevValue = delayedTeleportQueue.put(
+            queuedTeleport.getPlayerData().getPlayer().getUuid(),
+            queuedTeleport
+        );
         if (Objects.nonNull(prevValue)) {
             prevValue.getPlayerData().getPlayer().sendSystemMessage(
                 new LiteralText("Teleport request canceled. Reason: New teleport started!")
@@ -110,7 +115,6 @@ public class TeleportRequestManager {
                 new UUID(0,0)
             );
         }
+
     }
-
-
 }

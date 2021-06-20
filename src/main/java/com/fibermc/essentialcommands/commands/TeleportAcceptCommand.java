@@ -34,11 +34,14 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
                 , new UUID(0, 0));
 
             //Conduct teleportation
-            PlayerTeleporter.teleport(targetPlayerData, new MinecraftLocation(senderPlayer));
+            PlayerTeleporter.requestTeleport(new QueuedPlayerTeleport(
+                targetPlayerData,
+                senderPlayer,
+                senderPlayer.getGameProfile().getName()
+            ));
 
             //Clean up TPAsk
             targetPlayerData.setTpTimer(-1);
-            ////tpManager.endTpRequest(targetPlayer);
 
             //Send message to command sender confirming that request has been accepted
             senderPlayer.sendSystemMessage(

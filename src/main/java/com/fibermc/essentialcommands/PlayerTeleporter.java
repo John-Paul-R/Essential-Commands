@@ -12,17 +12,20 @@ import java.util.UUID;
 public class PlayerTeleporter {
 
     public static void requestTeleport(PlayerData pData, MinecraftLocation dest, String destName) {
-        ServerPlayerEntity player = pData.getPlayer();
+        requestTeleport(new QueuedLocationTeleport(pData, dest, destName));
+    }
+    public static void requestTeleport(QueuedTeleport queuedTeleport) {
+        ServerPlayerEntity player = queuedTeleport.getPlayerData().getPlayer();
 //        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
         if (player.hasPermissionLevel(4) || Config.TELEPORT_DELAY <= 0) {
-            teleport(pData, dest);
+            teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
-            TeleportRequestManager.getInstance().queueTeleport(player, dest, destName);
+            TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             player.sendSystemMessage(
                 new LiteralText("Teleporting to ").formatted(Config.FORMATTING_DEFAULT)
-                    .append(new LiteralText(destName).formatted(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(queuedTeleport.getDestName()).formatted(Config.FORMATTING_ACCENT))
                     .append(new LiteralText(" in ").formatted(Config.FORMATTING_DEFAULT))
                     .append(new LiteralText(String.format("%.1f", Config.TELEPORT_DELAY)).formatted(Config.FORMATTING_ACCENT))
                     .append(new LiteralText(" seconds...")).formatted(Config.FORMATTING_DEFAULT),

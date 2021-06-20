@@ -3,16 +3,21 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.server.MinecraftServer;
 
-public class QueuedTeleport {
+public abstract class QueuedTeleport {
 
     private int ticksRemaining;
-    private final MinecraftLocation dest;
-    private final String destName;
     private final PlayerData playerData;
+    private final String destName;
 
-    public QueuedTeleport(PlayerData playerData, MinecraftLocation dest, String destName, int delay) {
+
+    public QueuedTeleport(PlayerData playerData, String destName) {
         this.playerData = playerData;
-        this.dest = dest;
+        this.destName = destName;
+        this.ticksRemaining = (int)(Config.TELEPORT_DELAY*20);
+    }
+
+    public QueuedTeleport(PlayerData playerData, String destName, int delay) {
+        this.playerData = playerData;
         this.destName = destName;
         this.ticksRemaining = delay;
     }
@@ -25,9 +30,7 @@ public class QueuedTeleport {
         this.ticksRemaining--;
     }
 
-    public MinecraftLocation getDest() {
-        return dest;
-    }
+    public abstract MinecraftLocation getDest();
 
     public String getDestName() {
         return destName;
