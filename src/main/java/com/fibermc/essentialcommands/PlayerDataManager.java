@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerDataManager {
 
-    private ConcurrentHashMap<UUID, PlayerData> dataMap;
+    private final ConcurrentHashMap<UUID, PlayerData> dataMap;
 
     private static PlayerDataManager INSTANCE;
 

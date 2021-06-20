@@ -34,7 +34,6 @@ public class PlayerData extends PersistentState {
     HashMap<String, MinecraftLocation> homes;
     private MinecraftLocation previousLocation;
     private int tpCooldown;
-    private int tpDelay;
 
     public PlayerData(ServerPlayerEntity player) {
         this.player = player;
@@ -164,19 +163,8 @@ public class PlayerData extends PersistentState {
         return tpCooldown;
     }
 
-    public void tickTpDelay() {
-        this.tpDelay--;
-    }
-
-    public int getTpDelay() {
-        return this.tpDelay;
-    }
-
     public void setTpCooldown(int cooldown) {
         this.tpCooldown = cooldown;
     }
 
-    public void setTpDelay(int delay) {
-        this.tpDelay = delay;
-    }
 }

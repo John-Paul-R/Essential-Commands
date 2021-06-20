@@ -25,8 +25,6 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
         //Store home name
         String warpName = StringArgumentType.getString(context, "warp_name");
 
-        int successCode = 1;
-
         //Add warp
         worldDataManager.setWarp(warpName, new MinecraftLocation(senderPlayer));
 
@@ -37,6 +35,6 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
                         .append(new LiteralText("' set.").formatted(Config.FORMATTING_DEFAULT))
                 , new UUID(0, 0));
 
-        return successCode;
+        return 1;
     }
 }
