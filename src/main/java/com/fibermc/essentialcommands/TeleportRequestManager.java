@@ -1,16 +1,12 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.text.LiteralText;
 
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * TeleportRequestManager
@@ -21,7 +17,7 @@ public class TeleportRequestManager {
     private PlayerDataManager dataManager;
     private LinkedList<PlayerData> activeTpRequestList;
     private LinkedList<PlayerData> tpCooldownList;
-    private LinkedList<PlayerData> tpDelayList;
+    private HashMap<UUID, QueuedTeleport> delayedTeleportQueue;
 
     private static TeleportRequestManager INSTANCE;
 
@@ -30,7 +26,11 @@ public class TeleportRequestManager {
         this.dataManager = dataManager;
         activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
-        tpDelayList = new LinkedList<>();
+        delayedTeleportQueue = new HashMap<>();
+    }
+
+    public static TeleportRequestManager getInstance() {
+        return INSTANCE;
     }
 
     public static void init() {
@@ -63,12 +63,14 @@ public class TeleportRequestManager {
             }
         }
 
-        iter = tpDelayList.listIterator();
-        while (iter.hasNext()) {
-            PlayerData e = iter.next();
-            e.tickTpDelay();
-            if (e.getTpDelay() < 0) {
-                iter.remove();
+        Iterator<Map.Entry<UUID, QueuedTeleport>> tpQueueIter = delayedTeleportQueue.entrySet().iterator();
+        while (tpQueueIter.hasNext()) {
+            Map.Entry<UUID, QueuedTeleport> entry = tpQueueIter.next();
+            QueuedTeleport tp = entry.getValue();
+            tp.tick(server);
+            if (tp.getTicksRemaining() < 0) {
+                tpQueueIter.remove();
+                PlayerTeleporter.teleport(tp.getPlayerData(), tp.getDest());
             }
         }
     }
@@ -96,12 +98,18 @@ public class TeleportRequestManager {
         tpCooldownList.add(pData);
     }
 
-    public void startTpDelay(ServerPlayerEntity player) {
+    public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, String destName) {
+        final double TD = Config.TELEPORT_DELAY;
         PlayerData pData = dataManager.getOrCreate(player);
 
-        final double TD = Config.TELEPORT_DELAY;
-        pData.setTpDelay((int)(TD*TPS));
-        tpDelayList.add(pData);
+        QueuedTeleport prevValue = delayedTeleportQueue.put(player.getUuid(), new QueuedTeleport(pData, dest, destName, (int)(TD*TPS)));
+        if (Objects.nonNull(prevValue)) {
+            prevValue.getPlayerData().getPlayer().sendSystemMessage(
+                new LiteralText("Teleport request canceled. Reason: New teleport started!")
+                    .formatted(Config.FORMATTING_DEFAULT),
+                new UUID(0,0)
+            );
+        }
     }
 
 

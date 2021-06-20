@@ -28,11 +28,8 @@ public class BackCommand implements Command<ServerCommandSource> {
 
         //chat message
         if (loc != null) {
-            player.sendSystemMessage(
-                    new LiteralText("Teleporting to previous location...").formatted(Config.FORMATTING_DEFAULT),
-                    new UUID(0, 0));
             //Teleport player to home location
-            PlayerTeleporter.teleport(playerData, loc);
+            PlayerTeleporter.requestTeleport(playerData, loc, "previous location");
 
             out=1;
         } else {

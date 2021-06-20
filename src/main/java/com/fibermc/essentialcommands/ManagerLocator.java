@@ -14,14 +14,21 @@ public class ManagerLocator {
         INSTANCE = this;
     }
 
-    private static boolean playerDataEnabled() {
-        return (Config.ENABLE_HOME || Config.ENABLE_TPA || Config.ENABLE_BACK);
+    static boolean playerDataEnabled() {
+        return (
+            Config.ENABLE_HOME  ||
+            Config.ENABLE_TPA   ||
+            Config.ENABLE_BACK  ||
+            Config.ENABLE_WARP  ||
+            Config.ENABLE_SPAWN
+        );
+
     }
-    private static boolean teleportRequestEnabled() {
+    static boolean teleportRequestEnabled() {
         return (Config.ENABLE_TPA);
     }
-    private static boolean warpEnabled() {
-        return (Config.ENABLE_TPA);
+    static boolean warpEnabled() {
+        return (Config.ENABLE_TPA || Config.ENABLE_SPAWN);
     }
 
     public void init() {

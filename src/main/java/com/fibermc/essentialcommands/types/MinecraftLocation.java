@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.types;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
@@ -11,9 +12,9 @@ import net.minecraft.world.World;
 
 public class MinecraftLocation {
 
-    public Vec3d pos;
-    public float pitch, headYaw;
-    public RegistryKey<World> dim;
+    public final Vec3d pos;
+    public final float pitch, headYaw;
+    public final RegistryKey<World> dim;
 
     public MinecraftLocation(RegistryKey<World>  dim, double x, double y, double z) {
         this.dim = dim;
@@ -62,6 +63,10 @@ public class MinecraftLocation {
         tag.putFloat("pitch", pitch);
 
         return tag;
+    }
+
+    public LiteralText toLiteralTextSimple() {
+        return new LiteralText(String.format("(%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
     }
     
 }

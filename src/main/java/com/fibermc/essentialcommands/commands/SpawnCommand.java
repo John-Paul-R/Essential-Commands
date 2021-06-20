@@ -1,6 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.PlayerTeleporter;
+import com.fibermc.essentialcommands.WorldDataManager;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.LiteralMessage;
@@ -10,13 +12,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
-
-import java.util.UUID;
 
 public class SpawnCommand implements Command<ServerCommandSource> {
 
-    public SpawnCommand() {}
+    public SpawnCommand() {
+    }
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -30,13 +30,8 @@ public class SpawnCommand implements Command<ServerCommandSource> {
 
         // Teleport & chat message
         if (loc != null) {
-            senderPlayer.sendSystemMessage(
-                new LiteralText("Teleporting to ").formatted(Config.FORMATTING_DEFAULT)
-                    .append(new LiteralText("spawn").formatted(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText("...").formatted(Config.FORMATTING_DEFAULT))
-                , new UUID(0, 0));
             //Teleport player to home location
-            PlayerTeleporter.teleport(senderPlayer, loc);
+            PlayerTeleporter.requestTeleport(senderPlayer, loc, "spawn");
             out = 1;
         } else {
             Message msg = new LiteralMessage("Spawn not set.");
