@@ -35,7 +35,7 @@ public class MinecraftLocation {
         this.dim = player.getServerWorld().getRegistryKey();
         this.pos = Vec3d.ZERO.add(player.getPos());
         this.headYaw = player.getHeadYaw();
-        this.pitch = player.getPitch();
+        this.pitch = player.getPitch(1.0F);
     }
 
     public MinecraftLocation(NbtCompound tag) {

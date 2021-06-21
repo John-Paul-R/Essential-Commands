@@ -36,6 +36,7 @@ public class PlayerData extends PersistentState {
     private int tpCooldown;
 
     public PlayerData(ServerPlayerEntity player) {
+        super(player.getUuid().toString());
         this.player = player;
         this.pUuid = player.getUuid();
         tpTimer = -1;
@@ -106,6 +107,11 @@ public class PlayerData extends PersistentState {
 
     // IO
 //    @Override
+    @Override
+    public void fromTag(NbtCompound tag) {
+        fromNbt(tag);
+    }
+
     public void fromNbt(NbtCompound tag) {
         NbtCompound dataTag = tag.getCompound("data");
         this.pUuid = dataTag.getUuid("playerUuid");

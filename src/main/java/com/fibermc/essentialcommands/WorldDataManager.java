@@ -17,8 +17,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WorldDataManager extends PersistentState {
     private HashMap<String, MinecraftLocation> warps;
@@ -30,6 +32,7 @@ public class WorldDataManager extends PersistentState {
     private final String WARPS_KEY = "warps";
 
     public WorldDataManager() {
+        super("ec-world-data-manager");
         warps = new HashMap<String, MinecraftLocation>();
         spawnLocation = null;
     }
@@ -59,6 +62,9 @@ public class WorldDataManager extends PersistentState {
         return worldDataFile;
     }
 
+    public void fromTag(NbtCompound tag) {
+        fromNbt(tag);
+    }
     public void fromNbt(NbtCompound tag) {
         MinecraftLocation tempSpawnLocation = new MinecraftLocation(tag.getCompound(SPAWN_KEY));
         if (tempSpawnLocation.dim.getValue().getPath().isEmpty())
@@ -114,7 +120,7 @@ public class WorldDataManager extends PersistentState {
     }
 
     public List<String> getWarpNames() {
-        return this.warps.keySet().stream().toList();
+        return new ArrayList<>(this.warps.keySet());
     }
 
     public void setSpawn(MinecraftLocation location) {
