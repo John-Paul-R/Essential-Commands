@@ -37,6 +37,10 @@ public class PlayerTeleporter {
     public static void requestTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, String destName) {
         requestTeleport(PlayerDataManager.getInstance().getOrCreate(playerEntity), dest, destName);
     }
+    public static void teleport(QueuedTeleport queuedTeleport) {
+        queuedTeleport.complete();
+        teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
+    }
     public static void teleport(PlayerData pData, MinecraftLocation dest) {//forceTeleport
         ServerPlayerEntity player = pData.getPlayer();
         pData.setPreviousLocation(new MinecraftLocation(player));

@@ -73,7 +73,7 @@ public class TeleportRequestManager {
             queuedTeleport.tick(server);
             if (queuedTeleport.getTicksRemaining() < 0) {
                 tpQueueIter.remove();
-                queuedTeleport.complete();
+                PlayerTeleporter.teleport(queuedTeleport);
             }
         }
     }

@@ -41,7 +41,6 @@ public abstract class QueuedTeleport {
     }
 
     public void complete() {
-        PlayerTeleporter.teleport(playerData, getDest());
         ((ServerPlayerEntityAccess) playerData.getPlayer()).endEcQueuedTeleport();
     }
 }
