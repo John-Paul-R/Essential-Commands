@@ -46,18 +46,18 @@ public class EssentialCommandRegistry {
                 if (Config.ENABLE_TPA) {
                     tpAskBuilder.then(
                         argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require("essentialcommands.tpa.ask", 0))
+                            .requires(ECPerms.require("essentialcommands.tpa", 0))
                             .executes(new TeleportAskCommand()));
 
                     tpAcceptBuilder.then(
                         argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require("essentialcommands.tpa.accept", 0))
+                            .requires(ECPerms.require("essentialcommands.tpaccept", 0))
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportAcceptCommand()));
 
                     tpDenyBuilder.then(
                         argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require("essentialcommands.tpa.deny", 0))
+                            .requires(ECPerms.require("essentialcommands.tpdeny", 0))
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportDenyCommand()));
                 } else {
@@ -203,10 +203,26 @@ public class EssentialCommandRegistry {
                 essentialCommandsRootNode.addChild(tpDenyNode);
                 essentialCommandsRootNode.addChild(homeNode);
                 essentialCommandsRootNode.addChild(backNode);
+
+                LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
+
+                LiteralCommandNode<ServerCommandSource> configReloadNode = CommandManager.literal("reload")
+                    .executes((context) -> {
+                        Config.loadOrCreateProperties();
+                        context.getSource().sendFeedback(
+                            new LiteralText("[Essential Commands] Config Reloaded."),
+                            true
+                        );
+                        return 1;
+                    }).requires(
+                        ECPerms.require("essentialcommands.config.reload", 4)
+                    ).build();
+                configNode.addChild(configReloadNode);
+                essentialCommandsRootNode.addChild(configNode);
                 rootNode.addChild(essentialCommandsRootNode);
                 //TODO if commands are disbleed, don't register them at all
                 // @body this allows users to modify EssentialCommands functionality
-                // @body so that it does not conflict with their other mods/config.
+                // @body so that it does` not conflict with their other mods/config.
             }
         );
     }
