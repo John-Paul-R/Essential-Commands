@@ -16,10 +16,10 @@ import java.util.*;
 public class TeleportRequestManager {
 
     private static final int TPS = 20;
-    private PlayerDataManager dataManager;
-    private LinkedList<PlayerData> activeTpRequestList;
-    private LinkedList<PlayerData> tpCooldownList;
-    private HashMap<UUID, QueuedTeleport> delayedTeleportQueue;
+    private final PlayerDataManager dataManager;
+    private final LinkedList<PlayerData> activeTpRequestList;
+    private final LinkedList<PlayerData> tpCooldownList;
+    private final HashMap<UUID, QueuedTeleport> delayedTeleportQueue;
 
     private static TeleportRequestManager INSTANCE;
 
@@ -36,7 +36,7 @@ public class TeleportRequestManager {
     }
 
     public static void init() {
-        PlayerDamageCallback.EVENT.register((UUID playerId, DamageSource source) -> TeleportRequestManager.INSTANCE.onPlayerDamaged(playerId, source));
+        PlayerDamageCallback.EVENT.register((ServerPlayerEntity playerEntity, DamageSource source) -> TeleportRequestManager.INSTANCE.onPlayerDamaged(playerEntity, source));
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> TeleportRequestManager.INSTANCE.tick(server));
     }
 
@@ -73,33 +73,31 @@ public class TeleportRequestManager {
             queuedTeleport.tick(server);
             if (queuedTeleport.getTicksRemaining() < 0) {
                 tpQueueIter.remove();
-                PlayerTeleporter.teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
+                queuedTeleport.complete();
             }
         }
     }
 
-    public void onPlayerDamaged(UUID playerId, DamageSource damageSource) {
-        try {
-            if (Config.TELEPORT_INTERRUPT_ON_DAMAGED) {
-                QueuedTeleport queuedTeleport = delayedTeleportQueue.get(playerId);
-                delayedTeleportQueue.remove(playerId);
-                queuedTeleport.getPlayerData().getPlayer().sendSystemMessage(
+    public void onPlayerDamaged(ServerPlayerEntity playerEntity, DamageSource damageSource) {
+        if (Config.TELEPORT_INTERRUPT_ON_DAMAGED) {
+            try {
+                Objects.requireNonNull( ((ServerPlayerEntityAccess)playerEntity).endEcQueuedTeleport());
+
+                delayedTeleportQueue.remove(playerEntity.getUuid());
+                playerEntity.sendSystemMessage(
                     new LiteralText("Teleport interrupted. Reason: Damage Taken").formatted(Config.FORMATTING_ERROR),
                     new UUID(0, 0)
                 );
-            }
-        } catch (NullPointerException ignored) {}
+            } catch (NullPointerException ignored) {}
+        }
     }
-    // public List<PlayerData> getTpList() {
-    //     return tpList;
-    // }
 
     public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer) {
         PlayerData requestSenderData = dataManager.getOrCreate(requestSender);
         PlayerData targetPlayerData = dataManager.getOrCreate(targetPlayer);
 
-        final int TRD = Config.TELEPORT_REQUEST_DURATION;
-        requestSenderData.setTpTimer(TRD*TPS);//sec * ticks per sec
+        final int TRD = Config.TELEPORT_REQUEST_DURATION * TPS;//sec * ticks per sec
+        requestSenderData.setTpTimer(TRD);
         requestSenderData.setTpTarget(targetPlayerData);
         targetPlayerData.addTpAsker(requestSenderData);
         activeTpRequestList.add(requestSenderData);
@@ -108,8 +106,8 @@ public class TeleportRequestManager {
     public void startTpCooldown(ServerPlayerEntity player) {
         PlayerData pData = dataManager.getOrCreate(player);
 
-        final double TC = Config.TELEPORT_COOLDOWN;
-        pData.setTpCooldown((int)(TC*TPS));
+        final int TC = (int)(Config.TELEPORT_COOLDOWN * TPS);
+        pData.setTpCooldown(TC);
         tpCooldownList.add(pData);
     }
 

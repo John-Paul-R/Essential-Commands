@@ -22,6 +22,7 @@ public class PlayerTeleporter {
         if (player.hasPermissionLevel(4) || Config.TELEPORT_DELAY <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
+            ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             player.sendSystemMessage(
                 new LiteralText("Teleporting to ").formatted(Config.FORMATTING_DEFAULT)

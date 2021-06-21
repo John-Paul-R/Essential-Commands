@@ -68,8 +68,8 @@ public class PlayerDataManager {
         pData.updatePlayer(serverPlayerEntity);
     }
 
-    private static void onPlayerDeath(UUID playerID, DamageSource damageSource) {
-        PlayerData pData = INSTANCE.getPlayerFromUUID(playerID);
+    private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
+        PlayerData pData = INSTANCE.getPlayerFromUUID(playerEntity.getGameProfile().getId());
         //EssentialCommands.log(Level.DEBUG, "Worked2 " + pData.getPlayer().getGameProfile().getName());
         if (Config.ALLOW_BACK_ON_DEATH)
             pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));

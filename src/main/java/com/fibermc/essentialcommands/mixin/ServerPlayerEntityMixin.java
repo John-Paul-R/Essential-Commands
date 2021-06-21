@@ -1,29 +1,27 @@
 package com.fibermc.essentialcommands.mixin;
 
+import com.fibermc.essentialcommands.QueuedTeleport;
+import com.fibermc.essentialcommands.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntity {
+public class ServerPlayerEntityMixin implements ServerPlayerEntityAccess {
 
-    public ServerPlayerEntityMixin(World world, BlockPos blockPos, float yaw, GameProfile profile) {
-        super(world, blockPos, yaw, profile);
-    }
+    @Unique
+    public QueuedTeleport ecQueuedTeleport;
 
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void onDeath(DamageSource damageSource, CallbackInfo callbackInfo) {
-        PlayerDeathCallback.EVENT.invoker().onDeath(super.getGameProfile().getId(), damageSource);
+        PlayerDeathCallback.EVENT.invoker().onDeath(((ServerPlayerEntity) (Object) this), damageSource);
     }
 
     @Inject(method = "damage", at = @At("RETURN"))
@@ -31,9 +29,26 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
         // If damage was actually applied...
         if (cir.getReturnValue()) {
             PlayerDamageCallback.EVENT.invoker().onPlayerDamaged(
-                super.getGameProfile().getId(),
+                ((ServerPlayerEntity) (Object) this),
                 damageSource
             );
         }
+    }
+
+    @Override
+    public QueuedTeleport getEcQueuedTeleport() {
+        return ecQueuedTeleport;
+    }
+
+    @Override
+    public void setEcQueuedTeleport(QueuedTeleport queuedTeleport) {
+        ecQueuedTeleport = queuedTeleport;
+    }
+
+    @Override
+    public QueuedTeleport endEcQueuedTeleport() {
+        QueuedTeleport prevQueuedTeleport = ecQueuedTeleport;
+        ecQueuedTeleport = null;
+        return prevQueuedTeleport;
     }
 }

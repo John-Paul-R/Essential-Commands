@@ -8,8 +8,6 @@ import net.fabricmc.loader.api.VersionParsingException;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.util.version.VersionDeserializer;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -21,7 +19,7 @@ public class Updater {
 
     public static void checkForUpdates() {
         HttpClient client = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofMillis(500))
+            .connectTimeout(Duration.ofMillis(1500))
             .build();
         client.sendAsync(
             HttpRequest.newBuilder()
@@ -35,7 +33,7 @@ public class Updater {
 
             ModMetadata modMetadata = FabricLoader.getInstance().getModContainer("essential_commands").get().getMetadata();
             if (Objects.isNull(modMetadata)) {
-                EssentialCommands.LOGGER.warn("Failed to check for EssentialCommands updates.");
+                EssentialCommands.LOGGER.warn("Failed to check for Essential Commands updates.");
                 return;
             }
 
