@@ -89,7 +89,7 @@ public class Config {
         ALLOW_BACK_ON_DEATH = Boolean.parseBoolean((String)     props.get(defProps.get(11).getKey()));
         TELEPORT_REQUEST_DURATION = Integer.parseInt((String)   props.get(defProps.get(12).getKey()));
         USE_PERMISSIONS_API = Boolean.parseBoolean((String)     props.get(defProps.get(13).getKey()));
-        CHECK_FOR_UPDATES = Boolean.parseBoolean((String)     props.get(defProps.get(14).getKey()));
+        CHECK_FOR_UPDATES = Boolean.parseBoolean((String)       props.get(defProps.get(14).getKey()));
     }
 
     public static void storeProperties() {
