@@ -9,8 +9,10 @@
     "John Paul R. (JP79194)"
   ],
   "contact": {
-    "homepage": "https://github.com/John-Paul-R/Essential-Commands",
-    "sources": "https://github.com/John-Paul-R/Essential-Commands"
+    "homepage": "https://www.jpcode.dev",
+    "issues": "https://github.com/John-Paul-R/Essential-Commands/issues",
+    "sources": "https://github.com/John-Paul-R/Essential-Commands",
+    "discord": "https://discord.jpcode.dev"
   },
 
   "license": "CC0-1.0",
@@ -33,5 +35,6 @@
   },
   "suggests": {
     "flamingo": "*"
-  }
+  },
+  "jars": []
 }

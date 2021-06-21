@@ -66,11 +66,11 @@ public class TeleportRequestManager {
         Iterator<Map.Entry<UUID, QueuedTeleport>> tpQueueIter = delayedTeleportQueue.entrySet().iterator();
         while (tpQueueIter.hasNext()) {
             Map.Entry<UUID, QueuedTeleport> entry = tpQueueIter.next();
-            QueuedTeleport tp = entry.getValue();
-            tp.tick(server);
-            if (tp.getTicksRemaining() < 0) {
+            QueuedTeleport queuedTeleport = entry.getValue();
+            queuedTeleport.tick(server);
+            if (queuedTeleport.getTicksRemaining() < 0) {
                 tpQueueIter.remove();
-                PlayerTeleporter.teleport(tp.getPlayerData(), tp.getDest());
+                PlayerTeleporter.teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
             }
         }
     }
