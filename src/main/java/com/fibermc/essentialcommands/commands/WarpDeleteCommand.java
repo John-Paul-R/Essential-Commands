@@ -31,16 +31,16 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             senderPlayer.sendSystemMessage(
-                    new LiteralText("Warp ").formatted(Config.FORMATTING_DEFAULT)
-                            .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(" has been deleted.").formatted(Config.FORMATTING_DEFAULT))
+                    new LiteralText("Warp ").setStyle(Config.FORMATTING_DEFAULT)
+                            .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
                     , new UUID(0, 0));
             out = 1;
         } else {
             senderPlayer.sendSystemMessage(
-                    new LiteralText("Warp ").formatted(Config.FORMATTING_ERROR)
-                            .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(" could not be deleted. (Correct spelling?)").formatted(Config.FORMATTING_ERROR))
+                    new LiteralText("Warp ").setStyle(Config.FORMATTING_ERROR)
+                            .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(" could not be deleted. (Correct spelling?)").setStyle(Config.FORMATTING_ERROR))
                     , new UUID(0, 0));
         }
 

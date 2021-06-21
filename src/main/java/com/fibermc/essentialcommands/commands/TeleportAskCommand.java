@@ -27,11 +27,11 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
 
         //inform target player of tp request via chat
         targetPlayer.sendSystemMessage(
-                new LiteralText(senderPlayer.getEntityName()).formatted(Config.FORMATTING_ACCENT)
+                new LiteralText(senderPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT)
                         .append(new LiteralText(" has requested to teleport to you.")
-                                .formatted(Config.FORMATTING_DEFAULT))
+                                .setStyle(Config.FORMATTING_DEFAULT))
                         .append(new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny"
-                                +" this request.").formatted(Config.FORMATTING_DEFAULT))
+                                +" this request.").setStyle(Config.FORMATTING_DEFAULT))
                 , new UUID(0, 0)
         );
         
@@ -41,9 +41,9 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         //inform command sender that request has been sent
         senderPlayer.sendSystemMessage(
                 new LiteralText("Teleport request has been sent to ")
-                        .formatted(Config.FORMATTING_DEFAULT)
+                        .setStyle(Config.FORMATTING_DEFAULT)
                         .append(new LiteralText(targetPlayer.getEntityName())
-                                .formatted(Config.FORMATTING_ACCENT))
+                                .setStyle(Config.FORMATTING_ACCENT))
                 , new UUID(0, 0)
         );
         

@@ -35,17 +35,17 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been set
         if (successCode == 1) {
             senderPlayer.sendSystemMessage(
-                    new LiteralText("Home '").formatted(Config.FORMATTING_DEFAULT)
-                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText("' set.").formatted(Config.FORMATTING_DEFAULT))
+                    new LiteralText("Home '").setStyle(Config.FORMATTING_DEFAULT)
+                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT))
                     , new UUID(0, 0));
         } else if (successCode==0) {
             senderPlayer.sendSystemMessage(
-                    new LiteralText("Home '").formatted(Config.FORMATTING_ERROR)
-                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText("' could not be set. Home limit (").formatted(Config.FORMATTING_ERROR))
-                            .append(new LiteralText(String.valueOf(Config.HOME_LIMIT)).formatted(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(") reached.").formatted(Config.FORMATTING_ERROR))
+                    new LiteralText("Home '").setStyle(Config.FORMATTING_ERROR)
+                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText("' could not be set. Home limit (").setStyle(Config.FORMATTING_ERROR))
+                            .append(new LiteralText(String.valueOf(Config.HOME_LIMIT)).setStyle(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(") reached.").setStyle(Config.FORMATTING_ERROR))
                     , new UUID(0, 0));
         }
 

@@ -25,11 +25,11 @@ public class PlayerTeleporter {
             ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             player.sendSystemMessage(
-                new LiteralText("Teleporting to ").formatted(Config.FORMATTING_DEFAULT)
-                    .append(new LiteralText(queuedTeleport.getDestName()).formatted(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText(" in ").formatted(Config.FORMATTING_DEFAULT))
-                    .append(new LiteralText(String.format("%.1f", Config.TELEPORT_DELAY)).formatted(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText(" seconds...")).formatted(Config.FORMATTING_DEFAULT),
+                new LiteralText("Teleporting to ").setStyle(Config.FORMATTING_DEFAULT)
+                    .append(new LiteralText(queuedTeleport.getDestName()).setStyle(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(" in ").setStyle(Config.FORMATTING_DEFAULT))
+                    .append(new LiteralText(String.format("%.1f", Config.TELEPORT_DELAY)).setStyle(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(" seconds...")).setStyle(Config.FORMATTING_DEFAULT),
                 new UUID(0,0)
             );
         }
@@ -61,9 +61,9 @@ public class PlayerTeleporter {
             dest.headYaw, dest.pitch
         );
         playerEntity.sendSystemMessage(
-            new LiteralText("Teleported to ").formatted(Config.FORMATTING_DEFAULT)
-                .append(dest.toLiteralTextSimple().formatted(Config.FORMATTING_ACCENT))
-                .append(new LiteralText(".").formatted(Config.FORMATTING_DEFAULT)),
+            new LiteralText("Teleported to ").setStyle(Config.FORMATTING_DEFAULT)
+                .append(dest.toLiteralTextSimple().setStyle(Config.FORMATTING_ACCENT))
+                .append(new LiteralText(".").setStyle(Config.FORMATTING_DEFAULT)),
             new UUID(0,0)
         );
     }

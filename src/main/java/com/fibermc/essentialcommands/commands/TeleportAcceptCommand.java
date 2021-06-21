@@ -30,7 +30,7 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
 
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
-                new LiteralText("Teleport request accepted.").formatted(Config.FORMATTING_DEFAULT)
+                new LiteralText("Teleport request accepted.").setStyle(Config.FORMATTING_DEFAULT)
                 , new UUID(0, 0));
 
             //Conduct teleportation
@@ -45,13 +45,13 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
 
             //Send message to command sender confirming that request has been accepted
             senderPlayer.sendSystemMessage(
-                    new LiteralText("Teleport request accepted.").formatted(Config.FORMATTING_DEFAULT)
+                    new LiteralText("Teleport request accepted.").setStyle(Config.FORMATTING_DEFAULT)
                 , new UUID(0, 0));
             return 1;
         } else {
             //throw new CommandSyntaxException(type, message)
             senderPlayer.sendSystemMessage(
-                    new LiteralText("ERROR: Teleport failed.").formatted(Config.FORMATTING_ERROR)
+                    new LiteralText("ERROR: Teleport failed.").setStyle(Config.FORMATTING_ERROR)
                 , new UUID(0, 0));
             return 0;
         }

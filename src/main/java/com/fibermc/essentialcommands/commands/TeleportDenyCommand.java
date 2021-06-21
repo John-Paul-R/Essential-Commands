@@ -32,7 +32,7 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
         if (targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
-                new LiteralText("Teleport request denied.").formatted(Config.FORMATTING_DEFAULT)
+                new LiteralText("Teleport request denied.").setStyle(Config.FORMATTING_DEFAULT)
                 , new UUID(0, 0));
             
             //Clean up TPAsk
@@ -40,7 +40,7 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
             //Send message to command sender confirming that request has been accepted
             senderPlayer.sendSystemMessage(
-                    new LiteralText("Teleport request denied.").formatted(Config.FORMATTING_DEFAULT)
+                    new LiteralText("Teleport request denied.").setStyle(Config.FORMATTING_DEFAULT)
                 , new UUID(0, 0));
             return 1;
         } else {

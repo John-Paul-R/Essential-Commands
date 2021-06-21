@@ -31,8 +31,8 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
 
         //inform command sender that the home has been set
         senderPlayer.sendSystemMessage(
-            new LiteralText("Spawn set at ").formatted(Config.FORMATTING_DEFAULT)
-                .append(new LiteralText(loc.pos.toString()).formatted(Config.FORMATTING_ACCENT))
+            new LiteralText("Spawn set at ").setStyle(Config.FORMATTING_DEFAULT)
+                .append(new LiteralText(loc.pos.toString()).setStyle(Config.FORMATTING_ACCENT))
             , new UUID(0, 0));
 
         return successCode;

@@ -32,7 +32,7 @@ public class EssentialCommandRegistry {
                 final String disabledString = "[EssentialCommands] This command is not enabled.";
                 Command<ServerCommandSource> disabledCommandCommand = context -> {
                     context.getSource().getPlayer().sendSystemMessage(
-                            new LiteralText(disabledString).formatted(Config.FORMATTING_ERROR)
+                            new LiteralText(disabledString).setStyle(Config.FORMATTING_ERROR)
                             , new UUID(0,0));
                     return 1;
                 };

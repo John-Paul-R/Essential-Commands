@@ -34,7 +34,7 @@ public class BackCommand implements Command<ServerCommandSource> {
             out=1;
         } else {
             player.sendSystemMessage(
-                    new LiteralText("Could not execute 'back' command. No previous location found.").formatted(Config.FORMATTING_ERROR)
+                    new LiteralText("Could not execute 'back' command. No previous location found.").setStyle(Config.FORMATTING_ERROR)
                     , new UUID(0, 0));
         }
 

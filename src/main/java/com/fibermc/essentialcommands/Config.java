@@ -1,5 +1,8 @@
 package com.fibermc.essentialcommands;
 
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonParser;
+import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.Level;
 
@@ -9,8 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
-
-import com.fibermc.essentialcommands.SortedProperties;
+import java.util.Objects;
 
 public class Config {
 
@@ -18,9 +20,9 @@ public class Config {
 
     private static String CONFIG_PATH = "./config/EssentialCommands.properties";
 
-    public static Formatting FORMATTING_DEFAULT;
-    public static Formatting FORMATTING_ACCENT;
-    public static Formatting FORMATTING_ERROR;
+    public static Style FORMATTING_DEFAULT;
+    public static Style FORMATTING_ACCENT;
+    public static Style FORMATTING_ERROR;
     public static boolean ENABLE_BACK;
     public static boolean ENABLE_HOME;
     public static boolean ENABLE_SPAWN;
@@ -72,10 +74,21 @@ public class Config {
         for (SimpleEntry<String, String> property : defProps) {
             props.putIfAbsent(property.getKey(), property.getValue());
         }
+        styleJsonDeserializer = new Style.Serializer();
+        jsonParser = new JsonParser();
 
-        FORMATTING_DEFAULT  = Formatting.byName((String)        props.get(defProps.get(0).getKey()));
-        FORMATTING_ACCENT   = Formatting.byName((String)        props.get(defProps.get(1).getKey()));
-        FORMATTING_ERROR    = Formatting.byName((String)        props.get(defProps.get(2).getKey()));
+        FORMATTING_DEFAULT = parseStyleOrDefault(
+            (String)props.get(defProps.get(0).getKey()),
+            defProps.get(0).getValue()
+        );
+        FORMATTING_ACCENT = parseStyleOrDefault(
+            (String)props.get(defProps.get(1).getKey()),
+            defProps.get(1).getValue()
+        );
+        FORMATTING_ERROR = parseStyleOrDefault(
+            (String)props.get(defProps.get(2).getKey()),
+            defProps.get(2).getValue()
+        );
         ENABLE_BACK         = Boolean.parseBoolean((String)     props.get(defProps.get(3).getKey()));
         ENABLE_HOME         = Boolean.parseBoolean((String)     props.get(defProps.get(4).getKey()));
         ENABLE_SPAWN        = Boolean.parseBoolean((String)     props.get(defProps.get(5).getKey()));
@@ -89,6 +102,45 @@ public class Config {
         USE_PERMISSIONS_API = Boolean.parseBoolean((String)     props.get(defProps.get(13).getKey()));
         CHECK_FOR_UPDATES = Boolean.parseBoolean((String)       props.get(defProps.get(14).getKey()));
         TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean((String) props.get(defProps.get(15).getKey()));
+
+
+        Objects.requireNonNull(FORMATTING_DEFAULT);
+        Objects.requireNonNull(FORMATTING_ACCENT);
+        Objects.requireNonNull(FORMATTING_ERROR);
+//        FORMATTING_DEFAULT = FORMATTING_DEFAULT == null ? Formatting.byName(defProps.get(0).getValue()) : FORMATTING_DEFAULT;
+//        FORMATTING_ACCENT = FORMATTING_ACCENT == null ? Formatting.byName(defProps.get(1).getValue()) : FORMATTING_ACCENT;
+//        FORMATTING_ERROR = FORMATTING_ERROR == null ? Formatting.byName(defProps.get(2).getValue()) : FORMATTING_ERROR;
+    }
+
+    private static JsonDeserializer<Style> styleJsonDeserializer;
+    private static JsonParser jsonParser;
+    private static Style parseStyleOrDefault(String styleStr, String defaultStyleStr) {
+        Style outStyle = parseStyle(styleStr);
+        if (Objects.isNull(outStyle)) {
+            outStyle = parseStyle(defaultStyleStr);
+            EssentialCommands.log(
+                Level.WARN,
+                String.format("Could not load malformed style: '%s'. Using default, '%s'.", styleStr, defaultStyleStr)
+            );
+        }
+        return outStyle;
+    }
+
+    private static Style parseStyle(String styleStr) {
+        Style outStyle = null;
+        Formatting formatting = Formatting.byName(styleStr);
+        if (Objects.nonNull(formatting)) {
+            outStyle = Style.EMPTY.withFormatting(formatting);
+        }
+        
+        if (Objects.isNull(outStyle)) {
+            outStyle = styleJsonDeserializer.deserialize(
+                jsonParser.parse(styleStr),
+                null, null
+            );
+        }
+
+        return outStyle;
     }
 
     public static void storeProperties() {

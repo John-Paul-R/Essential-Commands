@@ -40,9 +40,9 @@ public class HomeCommand implements Command<ServerCommandSource> {
             out = 1;
         } else {
 //            senderPlayer.sendSystemMessage(
-//                    new LiteralText("No home with the name '").formatted(Config.FORMATTING_ERROR)
-//                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
-//                            .append(new LiteralText("' could be found.").formatted(Config.FORMATTING_ERROR))
+//                    new LiteralText("No home with the name '").setStyle(Config.FORMATTING_ERROR)
+//                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
+//                            .append(new LiteralText("' could be found.").setStyle(Config.FORMATTING_ERROR))
 //                    , new UUID(0, 0));
             Message msg = new LiteralMessage("No home with the name '" + homeName + "' could be found.");
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);

@@ -85,7 +85,7 @@ public class TeleportRequestManager {
 
                 delayedTeleportQueue.remove(playerEntity.getUuid());
                 playerEntity.sendSystemMessage(
-                    new LiteralText("Teleport interrupted. Reason: Damage Taken").formatted(Config.FORMATTING_ERROR),
+                    new LiteralText("Teleport interrupted. Reason: Damage Taken").setStyle(Config.FORMATTING_ERROR),
                     new UUID(0, 0)
                 );
             } catch (NullPointerException ignored) {}
@@ -124,7 +124,7 @@ public class TeleportRequestManager {
         if (Objects.nonNull(prevValue)) {
             prevValue.getPlayerData().getPlayer().sendSystemMessage(
                 new LiteralText("Teleport request canceled. Reason: New teleport started!")
-                    .formatted(Config.FORMATTING_DEFAULT),
+                    .setStyle(Config.FORMATTING_DEFAULT),
                 new UUID(0,0)
             );
         }

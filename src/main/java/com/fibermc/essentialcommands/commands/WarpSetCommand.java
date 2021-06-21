@@ -30,9 +30,9 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
 
         //inform command sender that the home has been set
         senderPlayer.sendSystemMessage(
-                new LiteralText("Warp '").formatted(Config.FORMATTING_DEFAULT)
-                        .append(new LiteralText(warpName).formatted(Config.FORMATTING_ACCENT))
-                        .append(new LiteralText("' set.").formatted(Config.FORMATTING_DEFAULT))
+                new LiteralText("Warp '").setStyle(Config.FORMATTING_DEFAULT)
+                        .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
+                        .append(new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT))
                 , new UUID(0, 0));
 
         return 1;

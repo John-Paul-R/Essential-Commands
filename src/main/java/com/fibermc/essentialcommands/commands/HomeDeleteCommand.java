@@ -34,15 +34,15 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             senderPlayer.sendSystemMessage(
-                    new LiteralText("Home ").formatted(Config.FORMATTING_DEFAULT)
-                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(" has been deleted.").formatted(Config.FORMATTING_DEFAULT))
+                    new LiteralText("Home ").setStyle(Config.FORMATTING_DEFAULT)
+                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
                     , new UUID(0, 0));
         } else {
             senderPlayer.sendSystemMessage(
-                    new LiteralText("Home ").formatted(Config.FORMATTING_ERROR)
-                            .append(new LiteralText(homeName).formatted(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(" could not be deleted.").formatted(Config.FORMATTING_ERROR))
+                    new LiteralText("Home ").setStyle(Config.FORMATTING_ERROR)
+                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
+                            .append(new LiteralText(" could not be deleted.").setStyle(Config.FORMATTING_ERROR))
                     , new UUID(0, 0));
             out = 0;
         }
