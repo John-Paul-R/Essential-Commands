@@ -1,7 +1,9 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -34,6 +36,7 @@ public class TeleportRequestManager {
     }
 
     public static void init() {
+        PlayerDamageCallback.EVENT.register((UUID playerId, DamageSource source) -> TeleportRequestManager.INSTANCE.onPlayerDamaged(playerId, source));
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> TeleportRequestManager.INSTANCE.tick(server));
     }
 
@@ -75,6 +78,18 @@ public class TeleportRequestManager {
         }
     }
 
+    public void onPlayerDamaged(UUID playerId, DamageSource damageSource) {
+        try {
+            if (Config.TELEPORT_INTERRUPT_ON_DAMAGED) {
+                QueuedTeleport queuedTeleport = delayedTeleportQueue.get(playerId);
+                delayedTeleportQueue.remove(playerId);
+                queuedTeleport.getPlayerData().getPlayer().sendSystemMessage(
+                    new LiteralText("Teleport interrupted. Reason: Damage Taken").formatted(Config.FORMATTING_ERROR),
+                    new UUID(0, 0)
+                );
+            }
+        } catch (NullPointerException ignored) {}
+    }
     // public List<PlayerData> getTpList() {
     //     return tpList;
     // }

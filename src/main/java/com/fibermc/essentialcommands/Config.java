@@ -33,6 +33,7 @@ public class Config {
     public static int TELEPORT_REQUEST_DURATION;
     public static boolean USE_PERMISSIONS_API;
     public static boolean CHECK_FOR_UPDATES;
+    public static boolean TELEPORT_INTERRUPT_ON_DAMAGED;
 
     public static void loadOrCreateProperties() {
         File inFile = new File(CONFIG_PATH);
@@ -40,11 +41,7 @@ public class Config {
         try{
             boolean fileAlreadyExisted = !inFile.createNewFile();
             if (fileAlreadyExisted) {
-                FileReader reader = new FileReader(inFile);
-
-                props.load(reader);
-            } else {
-
+                props.load(new FileReader(inFile));
             }
         } catch (IOException e) {
             EssentialCommands.log(Level.WARN,"Failed to load preferences.");
@@ -69,7 +66,8 @@ public class Config {
             new SimpleEntry<>("allow_back_on_death", "false"),
             new SimpleEntry<>("teleport_request_duration", "60"),
             new SimpleEntry<>("use_permissions_api", "false"),
-            new SimpleEntry<>("check_for_updates", "true")
+            new SimpleEntry<>("check_for_updates", "true"),
+            new SimpleEntry<>("teleport_interrupt_on_damaged", "true")
         );
         for (SimpleEntry<String, String> property : defProps) {
             props.putIfAbsent(property.getKey(), property.getValue());
@@ -90,6 +88,7 @@ public class Config {
         TELEPORT_REQUEST_DURATION = Integer.parseInt((String)   props.get(defProps.get(12).getKey()));
         USE_PERMISSIONS_API = Boolean.parseBoolean((String)     props.get(defProps.get(13).getKey()));
         CHECK_FOR_UPDATES = Boolean.parseBoolean((String)       props.get(defProps.get(14).getKey()));
+        TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean((String) props.get(defProps.get(15).getKey()));
     }
 
     public static void storeProperties() {
