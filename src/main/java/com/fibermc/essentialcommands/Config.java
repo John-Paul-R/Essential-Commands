@@ -1,9 +1,11 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.util.StringBuilderPlus;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParser;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -106,12 +108,15 @@ public class Config {
         TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean((String) props.get(defProps.get(15).getKey()));
         ALLOW_TELEPORT_BETWEEN_DIMENSIONS = Boolean.parseBoolean((String) props.get(defProps.get(16).getKey()));
 
-        Objects.requireNonNull(FORMATTING_DEFAULT);
-        Objects.requireNonNull(FORMATTING_ACCENT);
-        Objects.requireNonNull(FORMATTING_ERROR);
-//        FORMATTING_DEFAULT = FORMATTING_DEFAULT == null ? Formatting.byName(defProps.get(0).getValue()) : FORMATTING_DEFAULT;
-//        FORMATTING_ACCENT = FORMATTING_ACCENT == null ? Formatting.byName(defProps.get(1).getValue()) : FORMATTING_ACCENT;
-//        FORMATTING_ERROR = FORMATTING_ERROR == null ? Formatting.byName(defProps.get(2).getValue()) : FORMATTING_ERROR;
+        try {
+            Objects.requireNonNull(FORMATTING_DEFAULT);
+            Objects.requireNonNull(FORMATTING_ACCENT);
+            Objects.requireNonNull(FORMATTING_ERROR);
+        } catch (NullPointerException e) {
+            EssentialCommands.log(Level.ERROR, "Something went wrong while loading chat styles from EssentialCommands.properties. Additionally, default values could not be loaded.");
+            e.printStackTrace();
+        }
+
     }
 
     private static JsonDeserializer<Style> styleJsonDeserializer;
@@ -150,7 +155,11 @@ public class Config {
             File outFile = new File(CONFIG_PATH);
             FileWriter writer = new FileWriter(outFile);
 
-            props.storeSorted(writer, "Essential Commands Properties");
+            props.storeSorted(writer, new StringBuilderPlus()
+                .appendLine("Essential Commands Properties")
+                .append("Config Documentation: https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation")
+                .toString()
+            );
         } catch (IOException e) {
             EssentialCommands.log(Level.WARN,"Failed to store preferences to disk.");
         }
