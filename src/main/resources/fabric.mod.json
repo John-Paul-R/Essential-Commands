@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "essential_commands",
+  "id": "${id}",
   "version": "${version}",
 
-  "name": "Essential Commands",
+  "name": "${name}",
   "description": "Various commands to improve your Minecraft experience! (tpa, home, back, warp)",
   "authors": [
     "John Paul R. (JP79194)"
@@ -29,7 +29,7 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.4.0",
+    "fabricloader": ">=0.11.3",
     "fabric": "*",
     "fabric-permissions-api-v0": "*"
   },

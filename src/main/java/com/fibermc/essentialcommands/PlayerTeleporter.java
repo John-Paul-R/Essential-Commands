@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Util;
 
 import java.util.UUID;
 
@@ -43,6 +44,17 @@ public class PlayerTeleporter {
     }
     public static void teleport(PlayerData pData, MinecraftLocation dest) {//forceTeleport
         ServerPlayerEntity player = pData.getPlayer();
+
+        if (!Config.ALLOW_TELEPORT_BETWEEN_DIMENSIONS && !pData.getPlayer().hasPermissionLevel(4)) {
+            if (dest.dim != player.getServerWorld().getRegistryKey()) {
+                player.sendSystemMessage(
+                    new LiteralText("Teleport failed. Reason: Interdimensional teleportation disabled.").setStyle(Config.FORMATTING_ERROR),
+                    Util.NIL_UUID
+                );
+                return;
+            }
+        }
+
         pData.setPreviousLocation(new MinecraftLocation(player));
 
         execTeleport(player, dest);

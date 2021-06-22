@@ -36,6 +36,7 @@ public class Config {
     public static boolean USE_PERMISSIONS_API;
     public static boolean CHECK_FOR_UPDATES;
     public static boolean TELEPORT_INTERRUPT_ON_DAMAGED;
+    public static boolean ALLOW_TELEPORT_BETWEEN_DIMENSIONS;
 
     public static void loadOrCreateProperties() {
         File inFile = new File(CONFIG_PATH);
@@ -69,7 +70,8 @@ public class Config {
             new SimpleEntry<>("teleport_request_duration", "60"),
             new SimpleEntry<>("use_permissions_api", "false"),
             new SimpleEntry<>("check_for_updates", "true"),
-            new SimpleEntry<>("teleport_interrupt_on_damaged", "true")
+            new SimpleEntry<>("teleport_interrupt_on_damaged", "true"),
+            new SimpleEntry<>("allow_teleport_between_dimensions", "true")
         );
         for (SimpleEntry<String, String> property : defProps) {
             props.putIfAbsent(property.getKey(), property.getValue());
@@ -102,7 +104,7 @@ public class Config {
         USE_PERMISSIONS_API = Boolean.parseBoolean((String)     props.get(defProps.get(13).getKey()));
         CHECK_FOR_UPDATES = Boolean.parseBoolean((String)       props.get(defProps.get(14).getKey()));
         TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean((String) props.get(defProps.get(15).getKey()));
-
+        ALLOW_TELEPORT_BETWEEN_DIMENSIONS = Boolean.parseBoolean((String) props.get(defProps.get(16).getKey()));
 
         Objects.requireNonNull(FORMATTING_DEFAULT);
         Objects.requireNonNull(FORMATTING_ACCENT);
