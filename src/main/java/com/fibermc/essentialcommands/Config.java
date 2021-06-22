@@ -55,23 +55,23 @@ public class Config {
 
     public static void initProperties() {
         List<SimpleEntry<String, String>> defProps = List.of(
-            new SimpleEntry<>("formatting_default", "gold"),
-            new SimpleEntry<>("formatting_accent", "light_purple"),
-            new SimpleEntry<>("formatting_error", "red"),
-            new SimpleEntry<>("enable_back", "true"),
-            new SimpleEntry<>("enable_home", "true"),
-            new SimpleEntry<>("enable_spawn", "true"),
-            new SimpleEntry<>("enable_tpa", "true"),
-            new SimpleEntry<>("enable_warp", "true"),
-            new SimpleEntry<>("home_limit", "-1"),
-            new SimpleEntry<>("teleport_cooldown", "1D"),
-            new SimpleEntry<>("teleport_delay", "0D"),
-            new SimpleEntry<>("allow_back_on_death", "false"),
-            new SimpleEntry<>("teleport_request_duration", "60"),
-            new SimpleEntry<>("use_permissions_api", "false"),
-            new SimpleEntry<>("check_for_updates", "true"),
-            new SimpleEntry<>("teleport_interrupt_on_damaged", "true"),
-            new SimpleEntry<>("allow_teleport_between_dimensions", "true")
+            new SimpleEntry<>("formatting_default",               "gold"),
+            new SimpleEntry<>("formatting_accent",                "light_purple"),
+            new SimpleEntry<>("formatting_error",                 "red"),
+            new SimpleEntry<>("enable_back",                      "true"),
+            new SimpleEntry<>("enable_home",                      "true"),
+            new SimpleEntry<>("enable_spawn",                     "true"),
+            new SimpleEntry<>("enable_tpa",                       "true"),
+            new SimpleEntry<>("enable_warp",                      "true"),
+            new SimpleEntry<>("home_limit",                       "-1"),
+            new SimpleEntry<>("teleport_cooldown",                "1D"),
+            new SimpleEntry<>("teleport_delay",                   "0D"),
+            new SimpleEntry<>("allow_back_on_death",              "false"),
+            new SimpleEntry<>("teleport_request_duration",        "60"),
+            new SimpleEntry<>("use_permissions_api",              "false"),
+            new SimpleEntry<>("check_for_updates",                "true"),
+            new SimpleEntry<>("teleport_interrupt_on_damaged",    "true"),
+            new SimpleEntry<>("allow_teleport_between_dimensions","true")
         );
         for (SimpleEntry<String, String> property : defProps) {
             props.putIfAbsent(property.getKey(), property.getValue());

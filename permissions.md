@@ -27,3 +27,4 @@ Command | Permission
 /back     |   `essentialcommands.back`
 /spawn tp \|\| /spawn     |   `essentialcommands.spawn.tp`
 /spawn set              |   `essentialcommands.spawn.set`
+/essentialcommands config reload    |   `essentialcommands.config.reload`
