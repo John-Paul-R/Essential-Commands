@@ -22,7 +22,7 @@ public class PlayerTeleporter {
 //        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
-        if (playerHasTpRulesBypass(player, "essentialcommands.bypass.teleport_delay") || Config.TELEPORT_DELAY <= 0) {
+        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || Config.TELEPORT_DELAY <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
             ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
@@ -48,7 +48,7 @@ public class PlayerTeleporter {
         ServerPlayerEntity player = pData.getPlayer();
 
         // If teleporting between dimensions is disabled and player doesn't have TP rules override
-        if (!Config.ALLOW_TELEPORT_BETWEEN_DIMENSIONS && !playerHasTpRulesBypass(player, "essentialcommands.bypass.allow_teleport_between_dimensions")) {
+        if (!Config.ALLOW_TELEPORT_BETWEEN_DIMENSIONS && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
             if (dest.dim != player.getServerWorld().getRegistryKey()) {
                 player.sendSystemMessage(

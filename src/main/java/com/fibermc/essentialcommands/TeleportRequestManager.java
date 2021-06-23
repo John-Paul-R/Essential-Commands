@@ -79,7 +79,7 @@ public class TeleportRequestManager {
     }
 
     public void onPlayerDamaged(ServerPlayerEntity playerEntity, DamageSource damageSource) {
-        if (Config.TELEPORT_INTERRUPT_ON_DAMAGED && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, "essentialcommands.bypass.teleport_interrupt_on_damaged")) {
+        if (Config.TELEPORT_INTERRUPT_ON_DAMAGED && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)) {
             try {
                 Objects.requireNonNull( ((ServerPlayerEntityAccess)playerEntity).endEcQueuedTeleport());
 
