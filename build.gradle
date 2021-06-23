@@ -5,6 +5,7 @@ plugins {
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "1.2.1"
 	id 'com.matthewprenger.cursegradle' version "1.4.0"
+	id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
 sourceCompatibility = JavaVersion.VERSION_16
@@ -134,6 +135,8 @@ publishing {
 	}
 }
 
+
+import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
 import com.modrinth.minotaur.TaskModrinthUpload
 task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after build!
 	description 'Uploads all Modrinth projects'
@@ -155,7 +158,7 @@ task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after buil
 
 	uploadFile = jar.outputs.getFiles().asPath // This is the java jar task. If it can't find the jar, try 'jar.outputs.getFiles().asPath' in place of 'jar'
 	addGameVersion(minecraft_version) // Call this multiple times to add multiple game versions. There are tools that can help you generate the list of versions
-	changelog = project.file('./changelog.md').getText('UTF-8')
+	changelog = getChangelog()
 	addLoader('fabric')
 
 	if (project.mr_relations_required) project.mr_relations_required.split(',').each { addDependency it, 'required' }
@@ -206,6 +209,33 @@ curseforge {
 	}
 }
 
+tasks.getByName("githubRelease").each { task -> configure(task) {
+	group = "upload"
+}}
+githubRelease {
+	Map env = getenv()
+	token env.get("GITHUB") as String // This is your personal access token with Repo permissions
+	// You get this from your user settings > developer settings > Personal Access Tokens
+	owner project.gh_owner // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
+	repo project.gh_repo // by default this is set to your project name
+	tagName project.mod_version // by default this is set to "v${project.version}"
+	targetCommitish "master" // by default this is set to "master"
+	releaseName project.mod_version // Release title, by default this is the same as the tagName
+	body getChangelog() // by default this is empty
+	draft false // by default this is false
+	prerelease false // by default this is false
+	releaseAssets jar.destinationDirectory.getAsFileTree().matching {
+		include "**/*${project.mod_version}.jar"
+//		include "**/*${project.mod_version}-sources.jar"
+	}// this points to which files you want to upload as assets with your release
+	//jar.outputs.getFiles().asPath//
+	overwrite false // by default false; if set to true, will delete an existing release with the same tag and name
+	dryRun false // by default false; you can use this to see what actions would be taken without making a release
+	apiEndpoint "https://api.github.com" // should only change for github enterprise users
+	client // This is the okhttp client used for http requests
+}
+
+
 def static getenv(path = ".env") {
 	def env = [:]
 
@@ -217,4 +247,8 @@ def static getenv(path = ".env") {
 		}
 	}
 	return env
+}
+
+def getChangelog() {
+	return project.file('./changelog.md').getText('UTF-8')
 }
