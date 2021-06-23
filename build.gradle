@@ -5,6 +5,7 @@ plugins {
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "1.2.1"
 	id 'com.matthewprenger.cursegradle' version "1.4.0"
+	id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -14,36 +15,83 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-}
 
-dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+allprojects {
+	apply plugin: 'fabric-loom'
+	apply plugin: 'idea'
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	group = project.maven_group
+	version = project.mod_version
+	archivesBaseName = "${project.mod_id}"//-mc${project.minecraft_version}
 
-	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-	// You may need to force-disable transitiveness on them.
-	modImplementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
-}
+	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
 
-processResources {
-	inputs.property "version", project.version
+	// Declare dependencies
+	dependencies {
+		// Fabric
+		minecraft "com.mojang:minecraft:${project.minecraft_version}"
+		mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		// Mods
+		modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+//		modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
+		modImplementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+
+		// Code Quality
+		compileOnly "org.jetbrains:annotations:${project.jetbrains_annotations_version}"
+		testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_jupiter_version}"
+		testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_jupiter_version}"
+
+		// Subprojects
+		subprojects.each {
+			implementation project(":${it.name}")
+			include project("${it.name}:") // nest within distribution
+		}
 	}
+
+	// Perform tests using the JUnit test suite
+	test {
+		useJUnitPlatform()
+	}
+
+	// Produce a sources distribution
+	java {
+		withSourcesJar()
+	}
+
+	// Add the licence to all distributions
+	tasks.withType(Jar).configureEach {
+		it.from rootProject.file('LICENCE')
+	}
+
+	// Process any resources
+	processResources {
+		inputs.property 'id', project.mod_id
+		inputs.property 'name', project.mod_name
+		inputs.property 'version', project.version
+
+		// fabric.mod.json
+		filesMatching('fabric.mod.json') {
+			expand(['id': project.mod_id, 'name': project.mod_name, 'version': project.version])
+		}
+	}
+
+	// Add any additional repositories
+	repositories {
+		mavenCentral()
+		maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
+		maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
+		// Add repositories to retrieve artifacts from in here.
+		// You should only use this when depending on other mods because
+		// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+		// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+		// for more information about repositories.
+		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+	}
+
 }
+
 
 tasks.withType(JavaCompile).configureEach {
 	// ensure that the encoding is set to UTF-8, no matter what the system default is
@@ -56,18 +104,13 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 11
 }
 
-java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
-}
 
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
-}
+
+//jar {
+//	from("LICENSE") {
+//		rename { "${it}_${project.archivesBaseName}"}
+//	}
+//}
 
 // configure the maven publication
 publishing {
@@ -92,8 +135,13 @@ publishing {
 	}
 }
 
+
+import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
 import com.modrinth.minotaur.TaskModrinthUpload
 task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after build!
+	description 'Uploads all Modrinth projects'
+	group 'upload'
+
 	Map env = getenv()
 
 	onlyIf {
@@ -104,34 +152,88 @@ task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after buil
 	token = env.get("MODRINTH") // An environment property called MODRINTH that is your token, set via Gradle CLI, GitHub Actions, Idea Run Configuration, or other
 	projectId = modrinth_project_id
 	versionNumber = project.version // Will fail if Modrinth has this version already
+	versionType = project.version.contains('alpha') ? 'alpha' : project.version.contains('beta') ? 'beta' : 'release'
+
 	// On fabric, use 'remapJar' instead of 'jar'
 
 	uploadFile = jar.outputs.getFiles().asPath // This is the java jar task. If it can't find the jar, try 'jar.outputs.getFiles().asPath' in place of 'jar'
 	addGameVersion(minecraft_version) // Call this multiple times to add multiple game versions. There are tools that can help you generate the list of versions
-	changelog = project.file('./changelog.md').getText('UTF-8')
+	changelog = getChangelog()
 	addLoader('fabric')
 
-//	curseforge {
-//		apiKey = env.get("CURSEFORGE") as String
-//		project {
-//			id = 475964
-//			releaseType = 'release'
-//			changelogType = 'markdown'
-//			changelog = new File('./changelog.md').getText('UTF-8')
-//			relations {
-//				requiredLibrary 'fabric'
-//	//			requiredDependency 'fabric-permissions-api-v0'
-//			}
-//			addGameVersion(minecraft_version)
-//		}
-//
-//		options {
-//			forgeGradleIntegration = false
-//		}
-//	}
+	if (project.mr_relations_required) project.mr_relations_required.split(',').each { addDependency it, 'required' }
+	if (project.mr_relations_optional) project.mr_relations_optional.split(',').each { addDependency it, 'optional' }
+	if (project.mr_relations_incompatible) project.mr_relations_incompatible.split(',').each { addDependency it, 'incompatible' }
+
 }
 //curseforge475964 // Begin the cursegradle task. Replacing ID with the id you set on the cursegradle config.
+curseforge {
+	Map env = getenv()
+	apiKey = env.get("CURSEFORGE") as String//changelog = new File('./changelog.md').getText('UTF-8')
 
+	// Declare all projects
+	//noinspection GroovyAssignabilityCheck
+	project {
+		// Set the project id
+		id = project.cf_project_id
+		// Set the release type
+		releaseType = project.version.contains('alpha') ? 'alpha' : project.version.contains('beta') ? 'beta' : 'release'
+		// Set the release notes
+		changelog = "For a list of changes, please refer to https://github.com/${project.github_repo}/releases/tag/${project.version}"
+		// Add all supported game versions
+		project.cf_game_versions.split(',').each { addGameVersion it }
+		// Add the main artifact
+		mainArtifact(remapJar) { displayName = "${project.version}" }
+
+		// Add any additional artifacts
+		addArtifact sourcesJar
+		addArtifact jar
+		subprojects.each {
+			addArtifact it.remapJar
+			addArtifact it.sourcesJar
+			addArtifact it.jar
+		}
+		// Add any dependencies
+		relations {
+			if (project.cf_relations_required) project.cf_relations_required.split(',').each { requiredDependency it }
+			if (project.cf_relations_optional) project.cf_relations_optional.split(',').each { optionalDependency it }
+			if (project.cf_relations_embedded) project.cf_relations_embedded.split(',').each { embeddedLibrary it }
+			if (project.cf_relations_tools) project.cf_relations_tools.split(',').each { tool it }
+			if (project.cf_relations_incompatible) project.cf_relations_incompatible.split(',').each { incompatible it }
+		}
+	}
+
+	// Configure other options
+	options {
+		forgeGradleIntegration = false
+	}
+}
+
+tasks.getByName("githubRelease").each { task -> configure(task) {
+	group = "upload"
+}}
+githubRelease {
+	Map env = getenv()
+	token env.get("GITHUB") as String // This is your personal access token with Repo permissions
+	// You get this from your user settings > developer settings > Personal Access Tokens
+	owner project.gh_owner // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
+	repo project.gh_repo // by default this is set to your project name
+	tagName project.mod_version // by default this is set to "v${project.version}"
+	targetCommitish "master" // by default this is set to "master"
+	releaseName project.mod_version // Release title, by default this is the same as the tagName
+	body getChangelog() // by default this is empty
+	draft false // by default this is false
+	prerelease false // by default this is false
+	releaseAssets jar.destinationDirectory.getAsFileTree().matching {
+		include "**/*${project.mod_version}.jar"
+//		include "**/*${project.mod_version}-sources.jar"
+	}// this points to which files you want to upload as assets with your release
+	//jar.outputs.getFiles().asPath//
+	overwrite false // by default false; if set to true, will delete an existing release with the same tag and name
+	dryRun false // by default false; you can use this to see what actions would be taken without making a release
+	apiEndpoint "https://api.github.com" // should only change for github enterprise users
+	client // This is the okhttp client used for http requests
+}
 
 
 def static getenv(path = ".env") {
@@ -145,4 +247,8 @@ def static getenv(path = ".env") {
 		}
 	}
 	return env
+}
+
+def getChangelog() {
+	return project.file('./changelog.md').getText('UTF-8')
 }

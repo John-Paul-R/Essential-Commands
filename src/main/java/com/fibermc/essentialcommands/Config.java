@@ -1,7 +1,9 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.util.StringBuilderPlus;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.Level;
@@ -11,14 +13,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Config {
 
-    public static SortedProperties props = new SortedProperties();
-
-    private static String CONFIG_PATH = "./config/EssentialCommands.properties";
+    private static SortedProperties props;
+    private static final String CONFIG_PATH = "./config/EssentialCommands.properties";
 
     public static Style FORMATTING_DEFAULT;
     public static Style FORMATTING_ACCENT;
@@ -36,8 +37,30 @@ public class Config {
     public static boolean USE_PERMISSIONS_API;
     public static boolean CHECK_FOR_UPDATES;
     public static boolean TELEPORT_INTERRUPT_ON_DAMAGED;
+    public static boolean ALLOW_TELEPORT_BETWEEN_DIMENSIONS;
+    public static boolean OPS_BYPASS_TELEPORT_RULES;
+
+    private static final String KEY_FORMATTING_DEFAULT = "formatting_default";
+    private static final String KEY_FORMATTING_ACCENT = "formatting_accent";
+    private static final String KEY_FORMATTING_ERROR = "formatting_error";
+    private static final String KEY_ENABLE_BACK = "enable_back";
+    private static final String KEY_ENABLE_HOME = "enable_home";
+    private static final String KEY_ENABLE_SPAWN = "enable_spawn";
+    private static final String KEY_ENABLE_TPA = "enable_tpa";
+    private static final String KEY_ENABLE_WARP = "enable_warp";
+    private static final String KEY_HOME_LIMIT = "home_limit";
+    private static final String KEY_TELEPORT_COOLDOWN = "teleport_cooldown";
+    private static final String KEY_TELEPORT_DELAY = "teleport_delay";
+    private static final String KEY_ALLOW_BACK_ON_DEATH = "allow_back_on_death";
+    private static final String KEY_TELEPORT_REQUEST_DURATION = "teleport_request_duration";
+    private static final String KEY_USE_PERMISSIONS_API = "use_permissions_api";
+    private static final String KEY_CHECK_FOR_UPDATES = "check_for_updates";
+    private static final String KEY_TELEPORT_INTERRUPT_ON_DAMAGED = "teleport_interrupt_on_damaged";
+    private static final String KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS = "allow_teleport_between_dimensions";
+    private static final String KEY_OPS_BYPASS_TELEPORT_RULES = "ops_bypass_teleport_rules";
 
     public static void loadOrCreateProperties() {
+        props = new SortedProperties();
         File inFile = new File(CONFIG_PATH);
 
         try{
@@ -52,70 +75,66 @@ public class Config {
         storeProperties();
     }
 
-    public static void initProperties() {
-        List<SimpleEntry<String, String>> defProps = List.of(
-            new SimpleEntry<>("formatting_default", "gold"),
-            new SimpleEntry<>("formatting_accent", "light_purple"),
-            new SimpleEntry<>("formatting_error", "red"),
-            new SimpleEntry<>("enable_back", "true"),
-            new SimpleEntry<>("enable_home", "true"),
-            new SimpleEntry<>("enable_spawn", "true"),
-            new SimpleEntry<>("enable_tpa", "true"),
-            new SimpleEntry<>("enable_warp", "true"),
-            new SimpleEntry<>("home_limit", "-1"),
-            new SimpleEntry<>("teleport_cooldown", "1D"),
-            new SimpleEntry<>("teleport_delay", "0D"),
-            new SimpleEntry<>("allow_back_on_death", "false"),
-            new SimpleEntry<>("teleport_request_duration", "60"),
-            new SimpleEntry<>("use_permissions_api", "false"),
-            new SimpleEntry<>("check_for_updates", "true"),
-            new SimpleEntry<>("teleport_interrupt_on_damaged", "true")
-        );
-        for (SimpleEntry<String, String> property : defProps) {
-            props.putIfAbsent(property.getKey(), property.getValue());
-        }
+    private static void initProperties() {
         styleJsonDeserializer = new Style.Serializer();
         jsonParser = new JsonParser();
 
-        FORMATTING_DEFAULT = parseStyleOrDefault(
-            (String)props.get(defProps.get(0).getKey()),
-            defProps.get(0).getValue()
-        );
-        FORMATTING_ACCENT = parseStyleOrDefault(
-            (String)props.get(defProps.get(1).getKey()),
-            defProps.get(1).getValue()
-        );
-        FORMATTING_ERROR = parseStyleOrDefault(
-            (String)props.get(defProps.get(2).getKey()),
-            defProps.get(2).getValue()
-        );
-        ENABLE_BACK         = Boolean.parseBoolean((String)     props.get(defProps.get(3).getKey()));
-        ENABLE_HOME         = Boolean.parseBoolean((String)     props.get(defProps.get(4).getKey()));
-        ENABLE_SPAWN        = Boolean.parseBoolean((String)     props.get(defProps.get(5).getKey()));
-        ENABLE_TPA          = Boolean.parseBoolean((String)     props.get(defProps.get(6).getKey()));
-        ENABLE_WARP         = Boolean.parseBoolean((String)     props.get(defProps.get(7).getKey()));
-        HOME_LIMIT          = Integer.parseInt((String)         props.get(defProps.get(8).getKey()));
-        TELEPORT_COOLDOWN   = Double.parseDouble((String)       props.get(defProps.get(9).getKey()));
-        TELEPORT_DELAY      = Double.parseDouble((String)       props.get(defProps.get(10).getKey()));
-        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean((String)     props.get(defProps.get(11).getKey()));
-        TELEPORT_REQUEST_DURATION = Integer.parseInt((String)   props.get(defProps.get(12).getKey()));
-        USE_PERMISSIONS_API = Boolean.parseBoolean((String)     props.get(defProps.get(13).getKey()));
-        CHECK_FOR_UPDATES = Boolean.parseBoolean((String)       props.get(defProps.get(14).getKey()));
-        TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean((String) props.get(defProps.get(15).getKey()));
+        FORMATTING_DEFAULT  = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_DEFAULT), "gold");
+        FORMATTING_ACCENT   = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_ACCENT),  "light_purple");
+        FORMATTING_ERROR    = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_ERROR),   "red");
+        ENABLE_BACK         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_BACK, String.valueOf(true)));
+        ENABLE_HOME         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_HOME, String.valueOf(true)));
+        ENABLE_SPAWN        = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_SPAWN, String.valueOf(true)));
+        ENABLE_TPA          = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_TPA, String.valueOf(true)));
+        ENABLE_WARP         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_WARP, String.valueOf(true)));
+        HOME_LIMIT          = parseInt(                             (String) props.getOrDefault(KEY_HOME_LIMIT, String.valueOf(-1)));
+        TELEPORT_COOLDOWN   = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_COOLDOWN, String.valueOf(1D)));
+        TELEPORT_DELAY      = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_DELAY, String.valueOf(0D)));
+        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ALLOW_BACK_ON_DEATH, String.valueOf(false)));
+        TELEPORT_REQUEST_DURATION = parseInt(                       (String) props.getOrDefault(KEY_TELEPORT_REQUEST_DURATION, String.valueOf(60)));
+        USE_PERMISSIONS_API = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_USE_PERMISSIONS_API, String.valueOf(false)));
+        CHECK_FOR_UPDATES = Boolean.parseBoolean(                   (String) props.getOrDefault(KEY_CHECK_FOR_UPDATES, String.valueOf(true)));
+        TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean(       (String) props.getOrDefault(KEY_TELEPORT_INTERRUPT_ON_DAMAGED, String.valueOf(true)));
+        ALLOW_TELEPORT_BETWEEN_DIMENSIONS = Boolean.parseBoolean(   (String) props.getOrDefault(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS, String.valueOf(true)));
+        OPS_BYPASS_TELEPORT_RULES = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_OPS_BYPASS_TELEPORT_RULES, String.valueOf(true)));
 
+        try {
+            Objects.requireNonNull(FORMATTING_DEFAULT);
+            Objects.requireNonNull(FORMATTING_ACCENT);
+            Objects.requireNonNull(FORMATTING_ERROR);
+        } catch (NullPointerException e) {
+            EssentialCommands.log(Level.ERROR, "Something went wrong while loading chat styles from EssentialCommands.properties. Additionally, default values could not be loaded.");
+            e.printStackTrace();
+        }
 
-        Objects.requireNonNull(FORMATTING_DEFAULT);
-        Objects.requireNonNull(FORMATTING_ACCENT);
-        Objects.requireNonNull(FORMATTING_ERROR);
-//        FORMATTING_DEFAULT = FORMATTING_DEFAULT == null ? Formatting.byName(defProps.get(0).getValue()) : FORMATTING_DEFAULT;
-//        FORMATTING_ACCENT = FORMATTING_ACCENT == null ? Formatting.byName(defProps.get(1).getValue()) : FORMATTING_ACCENT;
-//        FORMATTING_ERROR = FORMATTING_ERROR == null ? Formatting.byName(defProps.get(2).getValue()) : FORMATTING_ERROR;
+        props.putIfAbsent(KEY_FORMATTING_DEFAULT,                   String.valueOf(styleJsonDeserializer.serialize(FORMATTING_DEFAULT, null, null)));
+        props.putIfAbsent(KEY_FORMATTING_ACCENT,                    String.valueOf(styleJsonDeserializer.serialize(FORMATTING_ACCENT, null, null)));
+        props.putIfAbsent(KEY_FORMATTING_ERROR,                     String.valueOf(styleJsonDeserializer.serialize(FORMATTING_ERROR, null, null)));
+        props.putIfAbsent(KEY_ENABLE_BACK,                          String.valueOf(ENABLE_BACK));
+        props.putIfAbsent(KEY_ENABLE_HOME,                          String.valueOf(ENABLE_HOME));
+        props.putIfAbsent(KEY_ENABLE_SPAWN,                         String.valueOf(ENABLE_SPAWN));
+        props.putIfAbsent(KEY_ENABLE_TPA,                           String.valueOf(ENABLE_TPA));
+        props.putIfAbsent(KEY_ENABLE_WARP,                          String.valueOf(ENABLE_WARP));
+        props.putIfAbsent(KEY_HOME_LIMIT,                           String.valueOf(HOME_LIMIT));
+        props.putIfAbsent(KEY_TELEPORT_COOLDOWN,                    String.valueOf(TELEPORT_COOLDOWN));
+        props.putIfAbsent(KEY_TELEPORT_DELAY,                       String.valueOf(TELEPORT_DELAY));
+        props.putIfAbsent(KEY_ALLOW_BACK_ON_DEATH,                  String.valueOf(ALLOW_BACK_ON_DEATH));
+        props.putIfAbsent(KEY_TELEPORT_REQUEST_DURATION,            String.valueOf(TELEPORT_REQUEST_DURATION));
+        props.putIfAbsent(KEY_USE_PERMISSIONS_API,                  String.valueOf(USE_PERMISSIONS_API));
+        props.putIfAbsent(KEY_CHECK_FOR_UPDATES,                    String.valueOf(CHECK_FOR_UPDATES));
+        props.putIfAbsent(KEY_TELEPORT_INTERRUPT_ON_DAMAGED,        String.valueOf(TELEPORT_INTERRUPT_ON_DAMAGED));
+        props.putIfAbsent(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS,    String.valueOf(ALLOW_TELEPORT_BETWEEN_DIMENSIONS));
+        props.putIfAbsent(KEY_OPS_BYPASS_TELEPORT_RULES,            String.valueOf(OPS_BYPASS_TELEPORT_RULES));
     }
 
-    private static JsonDeserializer<Style> styleJsonDeserializer;
+    private static Style.Serializer styleJsonDeserializer;
     private static JsonParser jsonParser;
     private static Style parseStyleOrDefault(String styleStr, String defaultStyleStr) {
-        Style outStyle = parseStyle(styleStr);
+        Style outStyle = null;
+        if (Objects.nonNull(styleStr)) {
+            outStyle = parseStyle(styleStr);
+        }
+
         if (Objects.isNull(outStyle)) {
             outStyle = parseStyle(defaultStyleStr);
             EssentialCommands.log(
@@ -134,10 +153,18 @@ public class Config {
         }
         
         if (Objects.isNull(outStyle)) {
-            outStyle = styleJsonDeserializer.deserialize(
-                jsonParser.parse(styleStr),
-                null, null
-            );
+            try {
+                outStyle = styleJsonDeserializer.deserialize(
+                    jsonParser.parse(styleStr),
+                    null, null
+                );
+            } catch (JsonSyntaxException e) {
+                EssentialCommands.log(Level.ERROR, String.format(
+                    "Malformed Style JSON in config: %s", styleStr
+                ));
+//                e.printStackTrace();
+            }
+
         }
 
         return outStyle;
@@ -148,25 +175,36 @@ public class Config {
             File outFile = new File(CONFIG_PATH);
             FileWriter writer = new FileWriter(outFile);
 
-            props.storeSorted(writer, "Essential Commands Properties");
+            props.storeSorted(writer, new StringBuilderPlus()
+                .appendLine("Essential Commands Properties")
+                .append("Config Documentation: https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation")
+                .toString()
+            );
         } catch (IOException e) {
             EssentialCommands.log(Level.WARN,"Failed to store preferences to disk.");
         }
 
     }
 
-//    static {
-//        props.put("FORMATTING_DEFAULT", "gold");
-//        props.put("formatting_accent", "blue");
-//        props.put("formatting_accent", "red");
-//
-//        props.putBoolean("enable_home", true);
-//        props.putBoolean("enable_tpa", true);
-//        props.putBoolean("enable_back", true);
-//
-//        props.putInt("home_limit", -1);
-//        props.putDouble("teleport_cooldown", 1D);
-//        props.putDouble("teleport_delay", 0D);
-//    }
-
+    private static int parseInt(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            logNumberParseError(s, "int");
+        }
+        return -1;
+    }
+    private static double parseDouble(String s) {
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            logNumberParseError(s, "double");
+        }
+        return -1;
+    }
+    private static void logNumberParseError(String num, String type) {
+        EssentialCommands.log(Level.WARN, String.format(
+            "Invalid number format for type '%s' in config. Value provided: '%s'", type, num
+        ));
+    }
 }

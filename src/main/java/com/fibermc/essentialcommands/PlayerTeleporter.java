@@ -1,8 +1,11 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import net.minecraft.command.CommandSource;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Util;
 
 import java.util.UUID;
 
@@ -19,7 +22,7 @@ public class PlayerTeleporter {
 //        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
-        if (player.hasPermissionLevel(4) || Config.TELEPORT_DELAY <= 0) {
+        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || Config.TELEPORT_DELAY <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
             ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
@@ -43,6 +46,19 @@ public class PlayerTeleporter {
     }
     public static void teleport(PlayerData pData, MinecraftLocation dest) {//forceTeleport
         ServerPlayerEntity player = pData.getPlayer();
+
+        // If teleporting between dimensions is disabled and player doesn't have TP rules override
+        if (!Config.ALLOW_TELEPORT_BETWEEN_DIMENSIONS && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
+            // If this teleport is between dimensions
+            if (dest.dim != player.getServerWorld().getRegistryKey()) {
+                player.sendSystemMessage(
+                    new LiteralText("Teleport failed. Reason: Interdimensional teleportation disabled.").setStyle(Config.FORMATTING_ERROR),
+                    Util.NIL_UUID
+                );
+                return;
+            }
+        }
+
         pData.setPreviousLocation(new MinecraftLocation(player));
 
         execTeleport(player, dest);
@@ -66,5 +82,13 @@ public class PlayerTeleporter {
                 .append(new LiteralText(".").setStyle(Config.FORMATTING_DEFAULT)),
             new UUID(0,0)
         );
+    }
+
+    public static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
+        return (
+            (player.hasPermissionLevel(4) && Config.OPS_BYPASS_TELEPORT_RULES)
+            || ECPerms.check(player.getCommandSource(), permission, 5)
+        );
+
     }
 }

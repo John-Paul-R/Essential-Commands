@@ -46,18 +46,18 @@ public class EssentialCommandRegistry {
                 if (Config.ENABLE_TPA) {
                     tpAskBuilder.then(
                         argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require("essentialcommands.tpa", 0))
+                            .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                             .executes(new TeleportAskCommand()));
 
                     tpAcceptBuilder.then(
                         argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require("essentialcommands.tpaccept", 0))
+                            .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportAcceptCommand()));
 
                     tpDenyBuilder.then(
                         argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require("essentialcommands.tpdeny", 0))
+                            .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportDenyCommand()));
                 } else {
@@ -77,18 +77,18 @@ public class EssentialCommandRegistry {
 
                     homeSetBuilder.then(
                         argument("home_name", StringArgumentType.word())
-                            .requires(ECPerms.require("essentialcommands.home.set", 0))
+                            .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
                             .executes(new HomeSetCommand()));
 
                     homeTpBuilder.then(
                         argument("home_name", StringArgumentType.word())
-                            .requires(ECPerms.require("essentialcommands.home.tp", 0))
+                            .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                             .suggests(HomeSuggestion.suggestedStrings())
                             .executes(new HomeCommand()));
 
                     homeDeleteBuilder.then(
                         argument("home_name", StringArgumentType.word())
-                            .requires(ECPerms.require("essentialcommands.home.delete", 0))
+                            .requires(ECPerms.require(ECPerms.Registry.home_delete, 0))
                             .suggests(HomeSuggestion.suggestedStrings())
                             .executes(new HomeDeleteCommand()));
 
@@ -104,7 +104,7 @@ public class EssentialCommandRegistry {
                 LiteralArgumentBuilder<ServerCommandSource> backBuilder = CommandManager.literal("back");
                 if (Config.ENABLE_BACK) {
                     backBuilder
-                        .requires(ECPerms.require("essentialcommands.back", 0))
+                        .requires(ECPerms.require(ECPerms.Registry.back, 0))
                         .executes(new BackCommand());
                 } else {
                     backBuilder.executes(disabledCommandCommand);
@@ -118,18 +118,18 @@ public class EssentialCommandRegistry {
                 if (Config.ENABLE_WARP) {
                     warpSetBuilder.then(
                         argument("warp_name", StringArgumentType.word())
-                            .requires(ECPerms.require("essentialcommands.warp.set", 4))
+                            .requires(ECPerms.require(ECPerms.Registry.warp_set, 4))
                             .executes(new WarpSetCommand()));
 
                     warpTpBuilder
                         .then(argument("warp_name", StringArgumentType.word())
-                            .requires(ECPerms.require("essentialcommands.warp.tp", 0))
+                            .requires(ECPerms.require(ECPerms.Registry.warp_tp, 0))
                             .suggests(WarpSuggestion.suggestedStrings())
                             .executes(new WarpTpCommand()));
 
                     warpDeleteBuilder
                         .then(argument("warp_name", StringArgumentType.word())
-                            .requires(ECPerms.require("essentialcommands.warp.delete", 4))
+                            .requires(ECPerms.require(ECPerms.Registry.warp_delete, 4))
                             .suggests(WarpSuggestion.suggestedStrings())
                             .executes(new WarpDeleteCommand()));
 
@@ -146,15 +146,15 @@ public class EssentialCommandRegistry {
                 LiteralArgumentBuilder<ServerCommandSource> spawnTpBuilder = CommandManager.literal("tp");
                 if (Config.ENABLE_SPAWN) {
                     spawnSetBuilder
-                            .requires(ECPerms.require("essentialcommands.spawn.set", 4))
+                            .requires(ECPerms.require(ECPerms.Registry.spawn_set, 4))
                             .executes(new SpawnSetCommand());
 
                     SpawnCommand cmd = new SpawnCommand();
                     spawnBuilder
-                            .requires(ECPerms.require("essentialcommands.spawn.tp", 0))
+                            .requires(ECPerms.require(ECPerms.Registry.spawn_tp, 0))
                             .executes(cmd);
                     spawnTpBuilder
-                        .requires(ECPerms.require("essentialcommands.spawn.tp", 0))
+                        .requires(ECPerms.require(ECPerms.Registry.spawn_tp, 0))
                         .executes(cmd);
 
                 } else {
@@ -215,7 +215,7 @@ public class EssentialCommandRegistry {
                         );
                         return 1;
                     }).requires(
-                        ECPerms.require("essentialcommands.config.reload", 4)
+                        ECPerms.require(ECPerms.Registry.config_reload, 4)
                     ).build();
                 configNode.addChild(configReloadNode);
                 essentialCommandsRootNode.addChild(configNode);
