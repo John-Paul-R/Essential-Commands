@@ -13,9 +13,9 @@ public class ECPerms {
 
     static void init() {
         PermissionCheckEvent.EVENT.register((source, permission) -> {
-            if (isSuperAdmin(source)) {
-                return TriState.TRUE;
-            }
+//            if (isSuperAdmin(source)) {
+//                return TriState.TRUE;
+//            }
             return TriState.DEFAULT;
         });
     }
@@ -26,11 +26,18 @@ public class ECPerms {
 
 
     static @NotNull Predicate<ServerCommandSource> require(@NotNull String permission, int defaultRequireLevel) {
+        return player -> check(player, permission, defaultRequireLevel);
+    }
+
+    static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
         if (Config.USE_PERMISSIONS_API) {
-            return Permissions.require(permission);
+            return Permissions.getPermissionValue(source, permission).orElse(false);
         } else {
-            return (ServerCommandSource source) -> source.hasPermissionLevel(defaultRequireLevel);
+            return (source.hasPermissionLevel(defaultRequireLevel) ? TriState.TRUE : TriState.FALSE).orElse(false);
         }
     }
 
+    static boolean check(@NotNull CommandSource source, @NotNull String permission) {
+        return check(source, permission, 4);
+    }
 }

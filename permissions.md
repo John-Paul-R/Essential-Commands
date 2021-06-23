@@ -13,18 +13,29 @@ Grant access to all subcommands using wildcards, like so:
 
 ## Command Permission Nodes
 
-Command | Permission
---------|-----------
-/tpa \<player>        |   `essentialcommands.tpa`
-/tpaccept \<player>   |   `essentialcommands.tpaccept`
-/tpdeny \<player>     |   `essentialcommands.tpdeny`
-/home set \<home_name>    |   `essentialcommands.home.set`
-/home tp \<home_name>     |   `essentialcommands.home.tp`
-/home delete \<home_name> |   `essentialcommands.home.delete`
-/warp set \<warp_name>      |   `essentialcommands.warp.set`
-/warp tp \<warp_name>       |   `essentialcommands.warp.tp`
-/warp delete \<warp_name>   |   `essentialcommands.warp.delete`
-/back     |   `essentialcommands.back`
-/spawn tp \|\| /spawn     |   `essentialcommands.spawn.tp`
-/spawn set              |   `essentialcommands.spawn.set`
-/essentialcommands config reload    |   `essentialcommands.config.reload`
+Command | Permission | Description
+--------|------------|------------
+/tpa \<player>        |   `essentialcommands.tpa`   |   Request to teleport to a player.
+/tpaccept \<player>   |   `essentialcommands.tpaccept`  |   Accept player's teleport request.
+/tpdeny \<player>     |   `essentialcommands.tpdeny`    |   Deny Player's teleport request.
+/home set \<home_name>    |   `essentialcommands.home.set`  |   Set a personal home location.
+/home tp \<home_name>     |   `essentialcommands.home.tp`   |   Teleport to your home.
+/home delete \<home_name> |   `essentialcommands.home.delete`   |   Delete your home.
+/warp set \<warp_name>      |   `essentialcommands.warp.set`    |   Set a server-wide warp locaiton.
+/warp tp \<warp_name>       |   `essentialcommands.warp.tp` |   Teleport to a warp.
+/warp delete \<warp_name>   |   `essentialcommands.warp.delete` |   Delete a warp.
+/back     |   `essentialcommands.back`  |   Teleport to your previous location.
+/spawn tp \|\| /spawn     |   `essentialcommands.spawn.tp`  |   Teleport to the server spawn.
+/spawn set              |   `essentialcommands.spawn.set`   |   Set the server spawn.
+/essentialcommands config reload    |   `essentialcommands.config.reload`   |   Reload essentialcommands config.
+
+## Rules/Config Bypass Permissions
+
+These permissions allow players to bypass rules defined in the [Essential Commands config](https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation).
+
+Permission | Description
+-----------|------------
+`essentialcommands.bypass.teleport_delay` | Ignore `teleport_delay`.
+`essentialcommands.bypass.allow_teleport_between_dimensions` | Ignore `allow_teleport_between_dimensions`.
+`essentialcommands.bypass.teleport_interrupt_on_damaged` | Ignore `teleport_interrupt_on_damaged`.
+
