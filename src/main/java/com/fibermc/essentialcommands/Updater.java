@@ -42,9 +42,10 @@ public class Updater {
                 if (latestVers.compareTo(currentVers) > 0) {
                     EssentialCommands.LOGGER.info(
                         String.format(
-                            "A new version of Essential Commands is available. Current: '%s' Latest: '%s'",
+                            "A new version of Essential Commands is available. Current: '%s' Latest: '%s'. Get the new version at %s",
                             currentVersionStr,
-                            latestVersionStr
+                            latestVersionStr,
+                            "https://modrinth.com/mod/essential-commands"
                         )
                     );
                 } else {
