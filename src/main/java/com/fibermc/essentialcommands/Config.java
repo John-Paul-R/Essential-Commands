@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.util.StringBuilderPlus;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.Level;
@@ -75,51 +76,27 @@ public class Config {
     }
 
     private static void initProperties() {
-        Map<String, Object> defProps = Map.ofEntries(
-            new SimpleEntry<>(KEY_FORMATTING_DEFAULT,                 "gold"),
-            new SimpleEntry<>(KEY_FORMATTING_ACCENT,                  "light_purple"),
-            new SimpleEntry<>(KEY_FORMATTING_ERROR,                   "red"),
-            new SimpleEntry<>(KEY_ENABLE_BACK,                        String.valueOf(true)),
-            new SimpleEntry<>(KEY_ENABLE_HOME,                        String.valueOf(true)),
-            new SimpleEntry<>(KEY_ENABLE_SPAWN,                       String.valueOf(true)),
-            new SimpleEntry<>(KEY_ENABLE_TPA,                         String.valueOf(true)),
-            new SimpleEntry<>(KEY_ENABLE_WARP,                        String.valueOf(true)),
-            new SimpleEntry<>(KEY_HOME_LIMIT,                         String.valueOf(-1)),
-            new SimpleEntry<>(KEY_TELEPORT_COOLDOWN,                  String.valueOf(1D)),
-            new SimpleEntry<>(KEY_TELEPORT_DELAY,                     String.valueOf(0D)),
-            new SimpleEntry<>(KEY_ALLOW_BACK_ON_DEATH,                String.valueOf(false)),
-            new SimpleEntry<>(KEY_TELEPORT_REQUEST_DURATION,          String.valueOf(60)),
-            new SimpleEntry<>(KEY_USE_PERMISSIONS_API,                String.valueOf(false)),
-            new SimpleEntry<>(KEY_CHECK_FOR_UPDATES,                  String.valueOf(true)),
-            new SimpleEntry<>(KEY_TELEPORT_INTERRUPT_ON_DAMAGED,      String.valueOf(true)),
-            new SimpleEntry<>(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS,  String.valueOf(true)),
-            new SimpleEntry<>(KEY_OPS_BYPASS_TELEPORT_RULES,          String.valueOf(true))
-        );
-
-        // If property did not exist in file, load it into props now from defaults.
-        defProps.forEach((key, value) -> props.putIfAbsent(key, value));
-
         styleJsonDeserializer = new Style.Serializer();
         jsonParser = new JsonParser();
 
-        FORMATTING_DEFAULT  = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_DEFAULT),  (String)defProps.get(KEY_FORMATTING_DEFAULT));
-        FORMATTING_ACCENT   = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_ACCENT),   (String)defProps.get(KEY_FORMATTING_ACCENT));
-        FORMATTING_ERROR    = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_ERROR),    (String)defProps.get(KEY_FORMATTING_ERROR));
-        ENABLE_BACK         = Boolean.parseBoolean(                 (String) props.get(KEY_ENABLE_BACK));
-        ENABLE_HOME         = Boolean.parseBoolean(                 (String) props.get(KEY_ENABLE_HOME));
-        ENABLE_SPAWN        = Boolean.parseBoolean(                 (String) props.get(KEY_ENABLE_SPAWN));
-        ENABLE_TPA          = Boolean.parseBoolean(                 (String) props.get(KEY_ENABLE_TPA));
-        ENABLE_WARP         = Boolean.parseBoolean(                 (String) props.get(KEY_ENABLE_WARP));
-        HOME_LIMIT          = Integer.parseInt(                     (String) props.get(KEY_HOME_LIMIT));
-        TELEPORT_COOLDOWN   = Double.parseDouble(                   (String) props.get(KEY_TELEPORT_COOLDOWN));
-        TELEPORT_DELAY      = Double.parseDouble(                   (String) props.get(KEY_TELEPORT_DELAY));
-        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean(                 (String) props.get(KEY_ALLOW_BACK_ON_DEATH));
-        TELEPORT_REQUEST_DURATION = Integer.parseInt(               (String) props.get(KEY_TELEPORT_REQUEST_DURATION));
-        USE_PERMISSIONS_API = Boolean.parseBoolean(                 (String) props.get(KEY_USE_PERMISSIONS_API));
-        CHECK_FOR_UPDATES = Boolean.parseBoolean(                   (String) props.get(KEY_CHECK_FOR_UPDATES));
-        TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean(       (String) props.get(KEY_TELEPORT_INTERRUPT_ON_DAMAGED));
-        ALLOW_TELEPORT_BETWEEN_DIMENSIONS = Boolean.parseBoolean(   (String) props.get(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS));
-        OPS_BYPASS_TELEPORT_RULES = Boolean.parseBoolean(           (String) props.get(KEY_OPS_BYPASS_TELEPORT_RULES));
+        FORMATTING_DEFAULT  = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_DEFAULT), "gold");
+        FORMATTING_ACCENT   = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_ACCENT),  "light_purple");
+        FORMATTING_ERROR    = parseStyleOrDefault(                  (String) props.get(KEY_FORMATTING_ERROR),   "red");
+        ENABLE_BACK         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_BACK, String.valueOf(true)));
+        ENABLE_HOME         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_HOME, String.valueOf(true)));
+        ENABLE_SPAWN        = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_SPAWN, String.valueOf(true)));
+        ENABLE_TPA          = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_TPA, String.valueOf(true)));
+        ENABLE_WARP         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_WARP, String.valueOf(true)));
+        HOME_LIMIT          = parseInt(                             (String) props.getOrDefault(KEY_HOME_LIMIT, String.valueOf(-1)));
+        TELEPORT_COOLDOWN   = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_COOLDOWN, String.valueOf(1D)));
+        TELEPORT_DELAY      = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_DELAY, String.valueOf(0D)));
+        ALLOW_BACK_ON_DEATH = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ALLOW_BACK_ON_DEATH, String.valueOf(false)));
+        TELEPORT_REQUEST_DURATION = parseInt(                       (String) props.getOrDefault(KEY_TELEPORT_REQUEST_DURATION, String.valueOf(60)));
+        USE_PERMISSIONS_API = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_USE_PERMISSIONS_API, String.valueOf(false)));
+        CHECK_FOR_UPDATES = Boolean.parseBoolean(                   (String) props.getOrDefault(KEY_CHECK_FOR_UPDATES, String.valueOf(true)));
+        TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean(       (String) props.getOrDefault(KEY_TELEPORT_INTERRUPT_ON_DAMAGED, String.valueOf(true)));
+        ALLOW_TELEPORT_BETWEEN_DIMENSIONS = Boolean.parseBoolean(   (String) props.getOrDefault(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS, String.valueOf(true)));
+        OPS_BYPASS_TELEPORT_RULES = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_OPS_BYPASS_TELEPORT_RULES, String.valueOf(true)));
 
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
@@ -130,12 +107,34 @@ public class Config {
             e.printStackTrace();
         }
 
+        props.putIfAbsent(KEY_FORMATTING_DEFAULT,                   String.valueOf(styleJsonDeserializer.serialize(FORMATTING_DEFAULT, null, null)));
+        props.putIfAbsent(KEY_FORMATTING_ACCENT,                    String.valueOf(styleJsonDeserializer.serialize(FORMATTING_ACCENT, null, null)));
+        props.putIfAbsent(KEY_FORMATTING_ERROR,                     String.valueOf(styleJsonDeserializer.serialize(FORMATTING_ERROR, null, null)));
+        props.putIfAbsent(KEY_ENABLE_BACK,                          String.valueOf(ENABLE_BACK));
+        props.putIfAbsent(KEY_ENABLE_HOME,                          String.valueOf(ENABLE_HOME));
+        props.putIfAbsent(KEY_ENABLE_SPAWN,                         String.valueOf(ENABLE_SPAWN));
+        props.putIfAbsent(KEY_ENABLE_TPA,                           String.valueOf(ENABLE_TPA));
+        props.putIfAbsent(KEY_ENABLE_WARP,                          String.valueOf(ENABLE_WARP));
+        props.putIfAbsent(KEY_HOME_LIMIT,                           String.valueOf(HOME_LIMIT));
+        props.putIfAbsent(KEY_TELEPORT_COOLDOWN,                    String.valueOf(TELEPORT_COOLDOWN));
+        props.putIfAbsent(KEY_TELEPORT_DELAY,                       String.valueOf(TELEPORT_DELAY));
+        props.putIfAbsent(KEY_ALLOW_BACK_ON_DEATH,                  String.valueOf(ALLOW_BACK_ON_DEATH));
+        props.putIfAbsent(KEY_TELEPORT_REQUEST_DURATION,            String.valueOf(TELEPORT_REQUEST_DURATION));
+        props.putIfAbsent(KEY_USE_PERMISSIONS_API,                  String.valueOf(USE_PERMISSIONS_API));
+        props.putIfAbsent(KEY_CHECK_FOR_UPDATES,                    String.valueOf(CHECK_FOR_UPDATES));
+        props.putIfAbsent(KEY_TELEPORT_INTERRUPT_ON_DAMAGED,        String.valueOf(TELEPORT_INTERRUPT_ON_DAMAGED));
+        props.putIfAbsent(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS,    String.valueOf(ALLOW_TELEPORT_BETWEEN_DIMENSIONS));
+        props.putIfAbsent(KEY_OPS_BYPASS_TELEPORT_RULES,            String.valueOf(OPS_BYPASS_TELEPORT_RULES));
     }
 
-    private static JsonDeserializer<Style> styleJsonDeserializer;
+    private static Style.Serializer styleJsonDeserializer;
     private static JsonParser jsonParser;
     private static Style parseStyleOrDefault(String styleStr, String defaultStyleStr) {
-        Style outStyle = parseStyle(styleStr);
+        Style outStyle = null;
+        if (Objects.nonNull(styleStr)) {
+            outStyle = parseStyle(styleStr);
+        }
+
         if (Objects.isNull(outStyle)) {
             outStyle = parseStyle(defaultStyleStr);
             EssentialCommands.log(
@@ -154,10 +153,18 @@ public class Config {
         }
         
         if (Objects.isNull(outStyle)) {
-            outStyle = styleJsonDeserializer.deserialize(
-                jsonParser.parse(styleStr),
-                null, null
-            );
+            try {
+                outStyle = styleJsonDeserializer.deserialize(
+                    jsonParser.parse(styleStr),
+                    null, null
+                );
+            } catch (JsonSyntaxException e) {
+                EssentialCommands.log(Level.ERROR, String.format(
+                    "Malformed Style JSON in config: %s", styleStr
+                ));
+//                e.printStackTrace();
+            }
+
         }
 
         return outStyle;
@@ -179,4 +186,25 @@ public class Config {
 
     }
 
+    private static int parseInt(String s) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            logNumberParseError(s, "int");
+        }
+        return -1;
+    }
+    private static double parseDouble(String s) {
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            logNumberParseError(s, "double");
+        }
+        return -1;
+    }
+    private static void logNumberParseError(String num, String type) {
+        EssentialCommands.log(Level.WARN, String.format(
+            "Invalid number format for type '%s' in config. Value provided: '%s'", type, num
+        ));
+    }
 }
