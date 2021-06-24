@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerConnectCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
@@ -47,7 +48,7 @@ public class PlayerDataManager {
     // EVENTS
     public static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
         try {
-            INSTANCE.loadPlayerData(player);
+            ((PlayerEntityAccess) player).setEcPlayerData(INSTANCE.loadPlayerData(player));
         } catch (IOException e) {
             EssentialCommands.log(Level.WARN, "Failed to load essential_commands player data for {"+player.getName().getString()+"}");
         }
@@ -66,6 +67,7 @@ public class PlayerDataManager {
     private static void onPlayerRespawn(ServerPlayerEntity serverPlayerEntity) {
         PlayerData pData = INSTANCE.getOrCreate(serverPlayerEntity);
         pData.updatePlayer(serverPlayerEntity);
+        ((PlayerEntityAccess) serverPlayerEntity).setEcPlayerData(pData);
     }
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {

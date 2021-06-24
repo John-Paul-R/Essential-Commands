@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.access;
 
 import com.fibermc.essentialcommands.QueuedTeleport;
 

@@ -112,28 +112,36 @@ tasks.withType(JavaCompile).configureEach {
 //	}
 //}
 
-// configure the maven publication
+// Define how packages are published
 publishing {
+	// Declare all publications
 	publications {
 		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
+			artifactId = project.mod_id
+			// Main
+			artifact(remapJar) { builtBy remapJar }
+			// Sources
 			artifact(sourcesJar) {
 				builtBy remapSourcesJar
+
 			}
 		}
 	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+	Map env = getenv()
+	// Add repositories to publish to
 	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+		// GitHub Packages (https://pkg.github.com)
+		maven {
+			name 'GitHub'
+			url "https://maven.pkg.github.com/${project.github_repo}"
+			credentials {
+				username env.get('GITHUB_ACTOR')
+				password env.get('GITHUB_TOKEN')
+			}
+		}
 	}
 }
+
 
 
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension

@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_11",
 
   "mixins": [
+    "PlayerEntityMixin",
     "PlayerManagerMixin",
     "ServerPlayerEntityMixin"
   ],
