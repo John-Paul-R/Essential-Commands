@@ -4,7 +4,6 @@ import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -17,8 +16,6 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 
-import java.util.UUID;
-
 import static net.minecraft.server.command.CommandManager.argument;
 
 /**
@@ -30,14 +27,6 @@ public class EssentialCommandRegistry {
 
         CommandRegistrationCallback.EVENT.register(
             (CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) -> {
-                final String disabledString = "[EssentialCommands] This command is not enabled.";
-                Command<ServerCommandSource> disabledCommandCommand = context -> {
-                    context.getSource().getPlayer().sendSystemMessage(
-                            new LiteralText(disabledString).setStyle(Config.FORMATTING_ERROR)
-                            , new UUID(0,0));
-                    return 1;
-                };
-
                 //Make some new nodes
                 //Tpa
                 LiteralArgumentBuilder<ServerCommandSource> tpAskBuilder = CommandManager.literal("tpa");
@@ -61,10 +50,6 @@ public class EssentialCommandRegistry {
                             .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportDenyCommand()));
-                } else {
-                    tpAskBuilder.executes(disabledCommandCommand);
-                    tpAcceptBuilder.executes(disabledCommandCommand);
-                    tpDenyBuilder.executes(disabledCommandCommand);
                 }
 
 
@@ -93,11 +78,6 @@ public class EssentialCommandRegistry {
                             .suggests(HomeSuggestion.suggestedStrings())
                             .executes(new HomeDeleteCommand()));
 
-                } else {
-                    homeBuilder.executes(disabledCommandCommand);
-                    homeSetBuilder.executes(disabledCommandCommand);
-                    homeTpBuilder.executes(disabledCommandCommand);
-                    homeDeleteBuilder.executes(disabledCommandCommand);
                 }
 
 
@@ -107,8 +87,6 @@ public class EssentialCommandRegistry {
                     backBuilder
                         .requires(ECPerms.require(ECPerms.Registry.back, 0))
                         .executes(new BackCommand());
-                } else {
-                    backBuilder.executes(disabledCommandCommand);
                 }
 
                 //Warp
@@ -134,11 +112,6 @@ public class EssentialCommandRegistry {
                             .suggests(WarpSuggestion.suggestedStrings())
                             .executes(new WarpDeleteCommand()));
 
-                } else {
-                    warpBuilder.executes(disabledCommandCommand);
-                    warpSetBuilder.executes(disabledCommandCommand);
-                    warpTpBuilder.executes(disabledCommandCommand);
-                    warpDeleteBuilder.executes(disabledCommandCommand);
                 }
 
                 //Spawn
@@ -158,11 +131,6 @@ public class EssentialCommandRegistry {
                         .requires(ECPerms.require(ECPerms.Registry.spawn_tp, 0))
                         .executes(cmd);
 
-                } else {
-                    spawnBuilder.executes(disabledCommandCommand);
-                    spawnTpBuilder.executes(disabledCommandCommand);
-                    spawnSetBuilder.executes(disabledCommandCommand);
-
                 }
                 //Spawn
                 LiteralArgumentBuilder<ServerCommandSource> nickBuilder = CommandManager.literal("nickname");
@@ -178,11 +146,6 @@ public class EssentialCommandRegistry {
                     nickClearBuilder
                         .requires(ECPerms.require(ECPerms.Registry.nickname_set, 2))
                         .executes(new NicknameClearCommand());
-
-                } else {
-                    nickBuilder.executes(disabledCommandCommand);
-                    nickSetBuilder.executes(disabledCommandCommand);
-                    nickClearBuilder.executes(disabledCommandCommand);
 
                 }
 
@@ -248,9 +211,6 @@ public class EssentialCommandRegistry {
                 configNode.addChild(configReloadNode);
                 essentialCommandsRootNode.addChild(configNode);
                 rootNode.addChild(essentialCommandsRootNode);
-                //TODO if commands are disbleed, don't register them at all
-                // @body this allows users to modify EssentialCommands functionality
-                // @body so that it does` not conflict with their other mods/config.
             }
         );
     }

@@ -5,6 +5,8 @@
 
 *Options marked with ~~strikethrough~~ are not yet fully implemented.*
 
+*Note: Enabling/Disabling commands requires a server restart. `/essentialcommands config reload` is not sufficient.*
+
 Config Var | Default Value | Acceptable Values
 ---|---|---
 formatting_default                 | gold           | Formatting Code, Style JSON
