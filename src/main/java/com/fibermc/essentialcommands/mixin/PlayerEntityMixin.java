@@ -22,10 +22,8 @@ public class PlayerEntityMixin implements PlayerEntityAccess {
 
     @Inject(method = "getDisplayName", at = @At("RETURN"), cancellable = true)
     public void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
-        System.out.println(this.getEcPlayerData().getNickname());
         if (this.getEcPlayerData().getNickname() != null) {
             cir.setReturnValue(this.getEcPlayerData().getNickname());
-            System.out.printf("getDisplayName: %s%n", cir.getReturnValue().toString());
             cir.cancel();
         }
     }
