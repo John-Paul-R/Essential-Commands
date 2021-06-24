@@ -6,13 +6,14 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.NbtText;
+import net.minecraft.text.Text;
 import net.minecraft.world.PersistentState;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 
 public class PlayerData extends PersistentState {
 
@@ -34,6 +35,9 @@ public class PlayerData extends PersistentState {
     HashMap<String, MinecraftLocation> homes;
     private MinecraftLocation previousLocation;
     private int tpCooldown;
+
+    // Nickname
+    private Text nickname;
 
     public PlayerData(ServerPlayerEntity player) {
         this.player = player;
@@ -116,6 +120,9 @@ public class PlayerData extends PersistentState {
             homes.put(homeTag.getString("homeName"), new MinecraftLocation(homeTag));
         }
         this.homes = homes;
+        if (dataTag.contains("nickname")){
+            this.nickname = Text.Serializer.fromJson(dataTag.getString("nickname"));
+        }
     }
 
     @Override
@@ -128,6 +135,8 @@ public class PlayerData extends PersistentState {
             homesNbtList.add(homeTag);
         });
         tag.put("homes", homesNbtList);
+
+        tag.putString("nickname", Text.Serializer.toJson(nickname));
 
         return tag;
     }
@@ -167,4 +176,15 @@ public class PlayerData extends PersistentState {
         this.tpCooldown = cooldown;
     }
 
+    public MutableText getNickname() {
+        return Objects.nonNull(nickname) ? nickname.shallowCopy() : null;
+    }
+
+    public int setNickname(Text nickname) {
+        this.nickname = nickname;
+        this.markDirty();
+        // Return codes based on fail/success
+        //  ex: caused by profanity filter.
+        return 0;
+    }
 }

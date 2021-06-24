@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands.mixin;
 
 import com.fibermc.essentialcommands.QueuedTeleport;
-import com.fibermc.essentialcommands.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import net.minecraft.entity.damage.DamageSource;

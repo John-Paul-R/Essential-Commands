@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;

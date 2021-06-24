@@ -3,6 +3,7 @@
   "package": "com.fibermc.essentialcommands.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "PlayerEntityMixin",
     "PlayerManagerMixin",
     "ServerPlayerEntityMixin"
   ],

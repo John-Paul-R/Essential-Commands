@@ -30,6 +30,7 @@ public final class EssentialCommands implements ModInitializer {
 		managers.init();
 		ServerLifecycleEvents.SERVER_STARTED.register((MinecraftServer server) -> {
 			managers.onServerStart(server);
+//			server.
 		});
 		ECPerms.init();
 		

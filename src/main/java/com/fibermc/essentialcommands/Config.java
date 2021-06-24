@@ -29,6 +29,7 @@ public class Config {
     public static boolean ENABLE_SPAWN;
     public static boolean ENABLE_TPA;
     public static boolean ENABLE_WARP;
+    public static boolean ENABLE_NICK;
     public static int HOME_LIMIT;
     public static double TELEPORT_COOLDOWN;
     public static double TELEPORT_DELAY;
@@ -48,6 +49,7 @@ public class Config {
     private static final String KEY_ENABLE_SPAWN = "enable_spawn";
     private static final String KEY_ENABLE_TPA = "enable_tpa";
     private static final String KEY_ENABLE_WARP = "enable_warp";
+    private static final String KEY_ENABLE_NICK = "enable_nick";
     private static final String KEY_HOME_LIMIT = "home_limit";
     private static final String KEY_TELEPORT_COOLDOWN = "teleport_cooldown";
     private static final String KEY_TELEPORT_DELAY = "teleport_delay";
@@ -87,6 +89,7 @@ public class Config {
         ENABLE_SPAWN        = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_SPAWN, String.valueOf(true)));
         ENABLE_TPA          = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_TPA, String.valueOf(true)));
         ENABLE_WARP         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_WARP, String.valueOf(true)));
+        ENABLE_NICK         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_NICK, String.valueOf(true)));
         HOME_LIMIT          = parseInt(                             (String) props.getOrDefault(KEY_HOME_LIMIT, String.valueOf(-1)));
         TELEPORT_COOLDOWN   = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_COOLDOWN, String.valueOf(1D)));
         TELEPORT_DELAY      = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_DELAY, String.valueOf(0D)));
@@ -115,6 +118,7 @@ public class Config {
         props.putIfAbsent(KEY_ENABLE_SPAWN,                         String.valueOf(ENABLE_SPAWN));
         props.putIfAbsent(KEY_ENABLE_TPA,                           String.valueOf(ENABLE_TPA));
         props.putIfAbsent(KEY_ENABLE_WARP,                          String.valueOf(ENABLE_WARP));
+        props.putIfAbsent(KEY_ENABLE_NICK,                          String.valueOf(ENABLE_NICK));
         props.putIfAbsent(KEY_HOME_LIMIT,                           String.valueOf(HOME_LIMIT));
         props.putIfAbsent(KEY_TELEPORT_COOLDOWN,                    String.valueOf(TELEPORT_COOLDOWN));
         props.putIfAbsent(KEY_TELEPORT_DELAY,                       String.valueOf(TELEPORT_DELAY));

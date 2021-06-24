@@ -1,8 +1,7 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;

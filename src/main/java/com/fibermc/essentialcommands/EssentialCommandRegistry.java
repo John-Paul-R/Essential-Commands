@@ -12,6 +12,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
@@ -163,6 +164,27 @@ public class EssentialCommandRegistry {
                     spawnSetBuilder.executes(disabledCommandCommand);
 
                 }
+                //Spawn
+                LiteralArgumentBuilder<ServerCommandSource> nickBuilder = CommandManager.literal("nickname");
+                LiteralArgumentBuilder<ServerCommandSource> nickSetBuilder = CommandManager.literal("set");
+                LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
+                if (Config.ENABLE_NICK) {
+                    nickSetBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.nickname_set, 2))
+                        .then(argument("nickname", TextArgumentType.text())
+                            .executes(new NicknameSetCommand())
+                        );
+
+                    nickClearBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.nickname_set, 2))
+                        .executes(new NicknameClearCommand());
+
+                } else {
+                    nickBuilder.executes(disabledCommandCommand);
+                    nickSetBuilder.executes(disabledCommandCommand);
+                    nickClearBuilder.executes(disabledCommandCommand);
+
+                }
 
                 RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
                     //-=-=-=-=-=-=-=-
@@ -194,6 +216,11 @@ public class EssentialCommandRegistry {
                 spawnNode.addChild(spawnSetBuilder.build());
                 spawnNode.addChild(spawnTpBuilder.build());
 
+                LiteralCommandNode<ServerCommandSource> nickNode = nickBuilder.build();
+                rootNode.addChild(nickNode);
+                nickNode.addChild(nickSetBuilder.build());
+                nickNode.addChild(nickClearBuilder.build());
+
                 LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode =
                     CommandManager.literal("essentialcommands").build();
                 essentialCommandsRootNode.addChild(spawnNode);
@@ -203,6 +230,7 @@ public class EssentialCommandRegistry {
                 essentialCommandsRootNode.addChild(tpDenyNode);
                 essentialCommandsRootNode.addChild(homeNode);
                 essentialCommandsRootNode.addChild(backNode);
+                essentialCommandsRootNode.addChild(nickNode);
 
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
 
