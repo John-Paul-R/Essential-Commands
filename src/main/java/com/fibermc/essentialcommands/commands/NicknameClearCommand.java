@@ -5,6 +5,7 @@ import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -17,16 +18,22 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Store command sender
-        ServerPlayerEntity serverPlayerEntity = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayerEntity = context.getSource().getPlayer();
+        ServerPlayerEntity targetPlayer = null;
+        try {
+            targetPlayer = EntityArgumentType.getPlayer(context, "target");
+        } catch (IllegalArgumentException e) {
+            targetPlayer = senderPlayerEntity;
+        }
 
-        PlayerEntityAccess playerEntityAccess = (PlayerEntityAccess) serverPlayerEntity;
-        playerEntityAccess.getEcPlayerData().setNickname(null);
+        PlayerEntityAccess targetPlayerEntityAccess = (PlayerEntityAccess) targetPlayer;
+        targetPlayerEntityAccess.getEcPlayerData().setNickname(null);
 
         //inform command sender that the nickname has been set
-        serverPlayerEntity.sendSystemMessage(
+        senderPlayerEntity.sendSystemMessage(
             new LiteralText("")
                 .append(new LiteralText("Nickname set to '").setStyle(Config.FORMATTING_DEFAULT))
-                .append(new LiteralText(serverPlayerEntity.getGameProfile().getName())
+                .append(new LiteralText(senderPlayerEntity.getGameProfile().getName())
                 ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
             , new UUID(0, 0));
 

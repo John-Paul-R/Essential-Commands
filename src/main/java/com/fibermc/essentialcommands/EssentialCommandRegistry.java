@@ -138,17 +138,24 @@ public class EssentialCommandRegistry {
                 LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
                 if (Config.ENABLE_NICK) {
                     nickSetBuilder
-                        .requires(ECPerms.require(ECPerms.Registry.nickname_set, 2))
+                        .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))
                         .then(argument("nickname", TextArgumentType.text())
                             .executes(new NicknameSetCommand())
-                        );
+                        ).then(argument("target", EntityArgumentType.player())
+                            .requires(ECPerms.require(ECPerms.Registry.nickname_others, 4))
+                            .then(argument("nickname", TextArgumentType.text())
+                                .executes(new NicknameSetCommand())
+                        ));
 
                     nickClearBuilder
-                        .requires(ECPerms.require(ECPerms.Registry.nickname_set, 2))
-                        .executes(new NicknameClearCommand());
+                        .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))
+                        .executes(new NicknameClearCommand())
+                        .then(argument("target", EntityArgumentType.player())
+                            .requires(ECPerms.require(ECPerms.Registry.nickname_others, 4))
+                            .executes(new NicknameClearCommand()));
 
                 }
-
+                //TODO Command literals still get registered, they just don't do anything if disabled. Fix this.
                 RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
                     //-=-=-=-=-=-=-=-
                 LiteralCommandNode<ServerCommandSource> tpAskNode = tpAskBuilder.build();
