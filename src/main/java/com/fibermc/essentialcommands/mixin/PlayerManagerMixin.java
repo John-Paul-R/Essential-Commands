@@ -6,6 +6,7 @@ import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,14 +38,14 @@ public abstract class PlayerManagerMixin {
     ), locals = LocalCapture.CAPTURE_FAILHARD
     )
     public void onRespawnPlayer(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir,
-            BlockPos blockPos          ,
-            float  f,
-            boolean  bl,
-            ServerWorld  serverWorld,
-            Optional optional2,
-            ServerWorld serverWorld2,
-            ServerPlayerEntity  serverPlayerEntity,
-            boolean  bl2
+        BlockPos  blockPos,
+        float  f,
+        boolean  bl,
+        ServerWorld ServerPlayerInteractionManager,
+        Optional  optional2,
+        ServerPlayerInteractionManager  serverPlayerInteractionManager2,
+        ServerWorld  serverWorld2,
+        ServerPlayerEntity  serverPlayerEntity
     ) {
         PlayerRespawnCallback.EVENT.invoker().onPlayerRespawn(serverPlayerEntity);
     }
