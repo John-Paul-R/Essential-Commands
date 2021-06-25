@@ -17,6 +17,7 @@ enable_home                        | true           | boolean
 enable_spawn                       | true           | boolean
 enable_tpa                         | true           | boolean
 enable_warp                        | true           | boolean
+enable_nick                        | true           | boolean
 home_limit                         | 1              | integer
 ~~teleport_cooldown~~              | 1.0            | double (seconds)
 teleport_delay                     | 0.0            | double (seconds)
