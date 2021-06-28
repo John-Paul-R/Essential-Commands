@@ -51,6 +51,7 @@ public class WorldDataManager extends PersistentState {
                 this.fromNbt(NbtIo.readCompressed(worldDataFile).getCompound("data"));
             }
         } catch (IOException e) {
+            EssentialCommands.log(Level.ERROR, String.format("An unexpected error occoured while loading the Essential Commands World Data file (Path: '%s')", worldDataFile.getPath()));
             e.printStackTrace();
         }
     }
