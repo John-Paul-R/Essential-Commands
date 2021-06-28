@@ -27,6 +27,14 @@ public class EssentialCommandRegistry {
 
         CommandRegistrationCallback.EVENT.register(
             (CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) -> {
+
+                //TODO Command literals still get registered, they just don't do anything if disabled. Fix this.
+                RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
+
+                LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode =
+                    CommandManager.literal("essentialcommands").build();
+
+
                 //Make some new nodes
                 //Tpa
                 LiteralArgumentBuilder<ServerCommandSource> tpAskBuilder = CommandManager.literal("tpa");
@@ -50,6 +58,18 @@ public class EssentialCommandRegistry {
                             .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportDenyCommand()));
+
+                    LiteralCommandNode<ServerCommandSource> tpAskNode = tpAskBuilder.build();
+                    LiteralCommandNode<ServerCommandSource> tpAcceptNode = tpAcceptBuilder.build();
+                    LiteralCommandNode<ServerCommandSource> tpDenyNode = tpDenyBuilder.build();
+
+                    rootNode.addChild(tpAskNode);
+                    rootNode.addChild(tpAcceptNode);
+                    rootNode.addChild(tpDenyNode);
+                    essentialCommandsRootNode.addChild(tpAskNode);
+                    essentialCommandsRootNode.addChild(tpAcceptNode);
+                    essentialCommandsRootNode.addChild(tpDenyNode);
+
                 }
 
 
@@ -78,6 +98,13 @@ public class EssentialCommandRegistry {
                             .suggests(HomeSuggestion.suggestedStrings())
                             .executes(new HomeDeleteCommand()));
 
+                    LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder.build();
+                    homeNode.addChild(homeTpBuilder.build());
+                    homeNode.addChild(homeSetBuilder.build());
+                    homeNode.addChild(homeDeleteBuilder.build());
+
+                    rootNode.addChild(homeNode);
+                    essentialCommandsRootNode.addChild(homeNode);
                 }
 
 
@@ -87,6 +114,11 @@ public class EssentialCommandRegistry {
                     backBuilder
                         .requires(ECPerms.require(ECPerms.Registry.back, 0))
                         .executes(new BackCommand());
+
+                    LiteralCommandNode<ServerCommandSource> backNode = backBuilder.build();
+
+                    rootNode.addChild(backNode);
+                    essentialCommandsRootNode.addChild(backNode);
                 }
 
                 //Warp
@@ -112,6 +144,13 @@ public class EssentialCommandRegistry {
                             .suggests(WarpSuggestion.suggestedStrings())
                             .executes(new WarpDeleteCommand()));
 
+                    LiteralCommandNode<ServerCommandSource> warpNode = warpBuilder.build();
+                    warpNode.addChild(warpTpBuilder.build());
+                    warpNode.addChild(warpSetBuilder.build());
+                    warpNode.addChild(warpDeleteBuilder.build());
+
+                    rootNode.addChild(warpNode);
+                    essentialCommandsRootNode.addChild(warpNode);
                 }
 
                 //Spawn
@@ -131,6 +170,12 @@ public class EssentialCommandRegistry {
                         .requires(ECPerms.require(ECPerms.Registry.spawn_tp, 0))
                         .executes(cmd);
 
+                    LiteralCommandNode<ServerCommandSource> spawnNode = spawnBuilder.build();
+                    spawnNode.addChild(spawnSetBuilder.build());
+                    spawnNode.addChild(spawnTpBuilder.build());
+
+                    rootNode.addChild(spawnNode);
+                    essentialCommandsRootNode.addChild(spawnNode);
                 }
                 //Spawn
                 LiteralArgumentBuilder<ServerCommandSource> nickBuilder = CommandManager.literal("nickname");
@@ -154,53 +199,13 @@ public class EssentialCommandRegistry {
                             .requires(ECPerms.require(ECPerms.Registry.nickname_others, 4))
                             .executes(new NicknameClearCommand()));
 
+                    LiteralCommandNode<ServerCommandSource> nickNode = nickBuilder.build();
+                    nickNode.addChild(nickSetBuilder.build());
+                    nickNode.addChild(nickClearBuilder.build());
+
+                    rootNode.addChild(nickNode);
+                    essentialCommandsRootNode.addChild(nickNode);
                 }
-                //TODO Command literals still get registered, they just don't do anything if disabled. Fix this.
-                RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
-                    //-=-=-=-=-=-=-=-
-                LiteralCommandNode<ServerCommandSource> tpAskNode = tpAskBuilder.build();
-                LiteralCommandNode<ServerCommandSource> tpAcceptNode = tpAcceptBuilder.build();
-                LiteralCommandNode<ServerCommandSource> tpDenyNode = tpDenyBuilder.build();
-
-                rootNode.addChild(tpAskNode);
-                rootNode.addChild(tpAcceptNode);
-                rootNode.addChild(tpDenyNode);
-
-                LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder.build();
-                rootNode.addChild(homeNode);
-                homeNode.addChild(homeTpBuilder.build());
-                homeNode.addChild(homeSetBuilder.build());
-                homeNode.addChild(homeDeleteBuilder.build());
-
-                LiteralCommandNode<ServerCommandSource> backNode = backBuilder.build();
-                rootNode.addChild(backNode);
-
-                LiteralCommandNode<ServerCommandSource> warpNode = warpBuilder.build();
-                rootNode.addChild(warpNode);
-                warpNode.addChild(warpTpBuilder.build());
-                warpNode.addChild(warpSetBuilder.build());
-                warpNode.addChild(warpDeleteBuilder.build());
-
-                LiteralCommandNode<ServerCommandSource> spawnNode = spawnBuilder.build();
-                rootNode.addChild(spawnNode);
-                spawnNode.addChild(spawnSetBuilder.build());
-                spawnNode.addChild(spawnTpBuilder.build());
-
-                LiteralCommandNode<ServerCommandSource> nickNode = nickBuilder.build();
-                rootNode.addChild(nickNode);
-                nickNode.addChild(nickSetBuilder.build());
-                nickNode.addChild(nickClearBuilder.build());
-
-                LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode =
-                    CommandManager.literal("essentialcommands").build();
-                essentialCommandsRootNode.addChild(spawnNode);
-                essentialCommandsRootNode.addChild(warpNode);
-                essentialCommandsRootNode.addChild(tpAskNode);
-                essentialCommandsRootNode.addChild(tpAcceptNode);
-                essentialCommandsRootNode.addChild(tpDenyNode);
-                essentialCommandsRootNode.addChild(homeNode);
-                essentialCommandsRootNode.addChild(backNode);
-                essentialCommandsRootNode.addChild(nickNode);
 
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
 
@@ -217,6 +222,7 @@ public class EssentialCommandRegistry {
                     ).build();
                 configNode.addChild(configReloadNode);
                 essentialCommandsRootNode.addChild(configNode);
+
                 rootNode.addChild(essentialCommandsRootNode);
             }
         );
