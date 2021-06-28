@@ -1,9 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
-import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataManager;
+import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -21,7 +20,6 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerDataManager dataManager = ManagerLocator.INSTANCE.getPlayerDataManager();
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store home name
@@ -29,9 +27,10 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
 
         //Add home to PlayerData
         //TODO if home with given name is already set, warn of overwrite and require that the command be typed again, or a confirmation message be given
-        PlayerData pData = dataManager.getOrCreate(senderPlayer);
+        PlayerData pData = ((PlayerEntityAccess)senderPlayer).getEcPlayerData();
         int successCode = pData.addHome(homeName, new MinecraftLocation(senderPlayer));
-        dataManager.savePlayerData(senderPlayer);
+        pData.markDirty();
+        pData.save();
         //inform command sender that the home has been set
         if (successCode == 1) {
             senderPlayer.sendSystemMessage(
