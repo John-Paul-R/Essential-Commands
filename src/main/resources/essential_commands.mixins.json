@@ -5,7 +5,8 @@
   "mixins": [
     "PlayerEntityMixin",
     "PlayerManagerMixin",
-    "ServerPlayerEntityMixin"
+    "ServerPlayerEntityMixin",
+    "WorldSaveHandlerMixin"
   ],
   "client": [
   ],
