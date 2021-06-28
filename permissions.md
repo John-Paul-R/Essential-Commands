@@ -49,4 +49,6 @@ Permission | Description
 
 Essentially, any value that works for `/tellraw`'s message field. (JSON text or string enclosed by quotes)
 
+You can use a tellraw generator like [MinecraftJson](https://www.minecraftjson.com/) to create this JSON text with a graphical interface and preview.
+
 Examples: `"Alexandra"`, `{"text":"Alex","color":"green","bold":true}`
