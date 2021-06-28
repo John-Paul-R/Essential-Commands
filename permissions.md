@@ -27,6 +27,10 @@ Command | Permission | Description
 /back     |   `essentialcommands.back`  |   Teleport to your previous location.
 /spawn tp \|\| /spawn     |   `essentialcommands.spawn.tp`  |   Teleport to the server spawn.
 /spawn set              |   `essentialcommands.spawn.set`   |   Set the server spawn.
+/nickname set \<nickname>                   | `essentialcommands.nickname.self`     | Set your own nickname to specified Text.
+/nickname set \<target-player> \<nickname>  | `essentialcommands.nickname.others`   | Set target player's nickname to specified Text.
+/nickname clear                             | `essentialcommands.nickname.self`     | Clear your own nickname.
+/nickname clear \<target-player>            | `essentialcommands.nickname.others`   | Clear target player's nickname.
 /essentialcommands config reload    |   `essentialcommands.config.reload`   |   Reload essentialcommands config.
 
 ## Rules/Config Bypass Permissions
@@ -39,3 +43,12 @@ Permission | Description
 `essentialcommands.bypass.allow_teleport_between_dimensions` | Ignore `allow_teleport_between_dimensions`.
 `essentialcommands.bypass.teleport_interrupt_on_damaged` | Ignore `teleport_interrupt_on_damaged`.
 
+## Types
+
+### Text
+
+Essentially, any value that works for `/tellraw`'s message field. (JSON text or string enclosed by quotes)
+
+You can use a tellraw generator like [MinecraftJson](https://www.minecraftjson.com/) to create this JSON text with a graphical interface and preview.
+
+Examples: `"Alexandra"`, `{"text":"Alex","color":"green","bold":true}`

@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.VersionParsingException;
@@ -12,6 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.function.UnaryOperator;
 
 public class Updater {
 
@@ -35,19 +37,20 @@ public class Updater {
                 return;
             }
 
+            UnaryOperator<String> stripMinecraftVersion = (String versionStr) -> versionStr.substring(0, versionStr.indexOf("-mc"));
             String currentVersionStr = modMetadata.getVersion().getFriendlyString();
             try {
-                SemanticVersion currentVers = VersionDeserializer.deserializeSemantic(currentVersionStr);
-                SemanticVersion latestVers = VersionDeserializer.deserializeSemantic(latestVersionStr);
+                SemanticVersion currentVers = VersionDeserializer.deserializeSemantic(stripMinecraftVersion.apply(currentVersionStr));
+                SemanticVersion latestVers = VersionDeserializer.deserializeSemantic(stripMinecraftVersion.apply(latestVersionStr));
                 if (latestVers.compareTo(currentVers) > 0) {
-                    EssentialCommands.LOGGER.info(
-                        String.format(
+                    String updateMessage = String.format(
                             "A new version of Essential Commands is available. Current: '%s' Latest: '%s'. Get the new version at %s",
                             currentVersionStr,
                             latestVersionStr,
                             "https://modrinth.com/mod/essential-commands"
-                        )
-                    );
+                        );
+                    EssentialCommands.LOGGER.info(updateMessage);
+                    ServerLifecycleEvents.SERVER_STARTED.register((server) -> EssentialCommands.LOGGER.info(updateMessage));
                 } else {
                     EssentialCommands.LOGGER.info("Essential Commands is up to date!");
                 }

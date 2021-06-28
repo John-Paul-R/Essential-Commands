@@ -1,9 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
-import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataManager;
+import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -20,13 +19,12 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerDataManager dataManager = ManagerLocator.INSTANCE.getPlayerDataManager();
 
         //Store command sender
          ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store Target Player
          ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
-         PlayerData targetPlayerData = dataManager.getOrCreate(targetPlayer);
+         PlayerData targetPlayerData = ((PlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
         if (targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {

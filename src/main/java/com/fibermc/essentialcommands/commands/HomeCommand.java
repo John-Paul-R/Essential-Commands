@@ -1,9 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataManager;
 import com.fibermc.essentialcommands.PlayerTeleporter;
+import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.LiteralMessage;
@@ -22,11 +21,10 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerDataManager dataManager = ManagerLocator.INSTANCE.getPlayerDataManager();
         int out;
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
-        PlayerData senderPlayerData = dataManager.getOrCreate(senderPlayer);
+        PlayerData senderPlayerData = ((PlayerEntityAccess)senderPlayer).getEcPlayerData();
         //Store home name
         String homeName = StringArgumentType.getString(context, "home_name");
 

@@ -12,6 +12,7 @@ import net.minecraft.text.NbtText;
 import net.minecraft.text.Text;
 import net.minecraft.world.PersistentState;
 
+import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -20,6 +21,7 @@ public class PlayerData extends PersistentState {
     // ServerPlayerEntity
     private ServerPlayerEntity player;
     private UUID pUuid;
+    private final File saveFile;
 
     // TELEPORT
     // Remaining time before current tp Ask (sent by this player) expires.
@@ -39,10 +41,11 @@ public class PlayerData extends PersistentState {
     // Nickname
     private Text nickname;
 
-    public PlayerData(ServerPlayerEntity player) {
+    public PlayerData(ServerPlayerEntity player, File saveFile) {
         super(player.getUuid().toString());
         this.player = player;
         this.pUuid = player.getUuid();
+        this.saveFile = saveFile;
         tpTimer = -1;
         tpTarget = null;
         tpAskers = new LinkedList<PlayerData>();
@@ -192,5 +195,9 @@ public class PlayerData extends PersistentState {
         // Return codes based on fail/success
         //  ex: caused by profanity filter.
         return 0;
+    }
+
+    public void save() {
+        super.save(saveFile);
     }
 }
