@@ -25,7 +25,7 @@ public class PlayerDataManager {
     }
 
     public static void init() {
-//        PlayerConnectCallback.EVENT.register(PlayerDataManager::onPlayerConnect);
+        PlayerConnectCallback.EVENT.register(PlayerDataManager::onPlayerConnect);
         PlayerLeaveCallback.EVENT.register(PlayerDataManager::onPlayerLeave);
         PlayerDeathCallback.EVENT.register(PlayerDataManager::onPlayerDeath);
         PlayerRespawnCallback.EVENT.register(PlayerDataManager::onPlayerRespawn);

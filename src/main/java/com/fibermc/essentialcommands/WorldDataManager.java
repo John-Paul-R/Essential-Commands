@@ -46,9 +46,12 @@ public class WorldDataManager extends PersistentState {
 
         try {
             boolean fileExisted = !worldDataFile.createNewFile();
-            if (fileExisted) {
+            if (fileExisted && worldDataFile.length() > 0) {
                 // if files was not JUST created, read data from it.
                 this.fromNbt(NbtIo.readCompressed(worldDataFile).getCompound("data"));
+            } else {
+                this.markDirty();
+                this.save();
             }
         } catch (IOException e) {
             EssentialCommands.log(Level.ERROR, String.format("An unexpected error occoured while loading the Essential Commands World Data file (Path: '%s')", worldDataFile.getPath()));
