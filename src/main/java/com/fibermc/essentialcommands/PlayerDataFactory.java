@@ -17,17 +17,18 @@ public class PlayerDataFactory {
 
     public static PlayerData create(ServerPlayerEntity player, File saveFile) {
         PlayerData pData = new PlayerData(player, saveFile);
-        try {
-            NbtCompound NbtCompound3 = NbtIo.readCompressed(new FileInputStream(saveFile));
-            pData.fromNbt(NbtCompound3);
-            //Testing:
-            pData.markDirty();
+        if (Files.exists(saveFile.toPath()) && saveFile.length() != 0) {
+            try {
+                NbtCompound NbtCompound3 = NbtIo.readCompressed(new FileInputStream(saveFile));
+                pData.fromNbt(NbtCompound3);
+                //Testing:
 
-        } catch (IOException e) {
-            EssentialCommands.log(Level.WARN, "Failed to load essential_commands player data for {"+player.getName().getString()+"}");
-            e.printStackTrace();
+            } catch (IOException e) {
+                EssentialCommands.log(Level.WARN, "Failed to load essential_commands player data for {"+player.getName().getString()+"}");
+                e.printStackTrace();
+            }
         }
-
+        pData.markDirty();
         return pData;
     }
     public static PlayerData create(ServerPlayerEntity player) {
