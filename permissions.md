@@ -27,8 +27,8 @@ Command | Permission | Description
 /back     |   `essentialcommands.back`  |   Teleport to your previous location.
 /spawn tp \|\| /spawn     |   `essentialcommands.spawn.tp`  |   Teleport to the server spawn.
 /spawn set              |   `essentialcommands.spawn.set`   |   Set the server spawn.
-/nickname set \<nickname>                   | `essentialcommands.nickname.self`     | Set your own nickname to specified Text.
-/nickname set \<target-player> \<nickname>  | `essentialcommands.nickname.others`   | Set target player's nickname to specified Text.
+/nickname set \<nickname>                   | `essentialcommands.nickname.self`     | Set your own nickname to specified MinecraftText.
+/nickname set \<target-player> \<nickname>  | `essentialcommands.nickname.others`   | Set target player's nickname to specified MinecraftText.
 /nickname clear                             | `essentialcommands.nickname.self`     | Clear your own nickname.
 /nickname clear \<target-player>            | `essentialcommands.nickname.others`   | Clear target player's nickname.
 /essentialcommands config reload    |   `essentialcommands.config.reload`   |   Reload essentialcommands config.
@@ -45,7 +45,7 @@ Permission | Description
 
 ## Types
 
-### Text
+### MinecraftText
 
 Essentially, any value that works for `/tellraw`'s message field. (JSON text or string enclosed by quotes)
 
