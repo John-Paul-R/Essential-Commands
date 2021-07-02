@@ -5,6 +5,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.Level;
 
@@ -41,6 +42,8 @@ public class Config {
     public static boolean ALLOW_TELEPORT_BETWEEN_DIMENSIONS;
     public static boolean OPS_BYPASS_TELEPORT_RULES;
     public static boolean NICKNAMES_IN_PLAYER_LIST;
+    public static Text NICKNAME_PREFIX;
+
 
     private static final String KEY_FORMATTING_DEFAULT = "formatting_default";
     private static final String KEY_FORMATTING_ACCENT = "formatting_accent";
@@ -62,6 +65,7 @@ public class Config {
     private static final String KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS = "allow_teleport_between_dimensions";
     private static final String KEY_OPS_BYPASS_TELEPORT_RULES = "ops_bypass_teleport_rules";
     private static final String KEY_NICKNAMES_IN_PLAYER_LIST = "nicknames_in_player_list";
+    private static final String KEY_NICKNAME_PREFIX = "nickname_prefix";
 
     public static void loadOrCreateProperties() {
         props = new SortedProperties();
@@ -103,6 +107,7 @@ public class Config {
         ALLOW_TELEPORT_BETWEEN_DIMENSIONS = Boolean.parseBoolean(   (String) props.getOrDefault(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS, String.valueOf(true)));
         OPS_BYPASS_TELEPORT_RULES = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_OPS_BYPASS_TELEPORT_RULES, String.valueOf(true)));
         NICKNAMES_IN_PLAYER_LIST  = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_NICKNAMES_IN_PLAYER_LIST, String.valueOf(true)));
+        NICKNAME_PREFIX     = parseTextOrDefault(                   (String) props.get(KEY_NICKNAME_PREFIX), "{\"text\":\"~\",\"color\":\"red\"}");
 
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
@@ -133,6 +138,8 @@ public class Config {
         props.putIfAbsent(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS,    String.valueOf(ALLOW_TELEPORT_BETWEEN_DIMENSIONS));
         props.putIfAbsent(KEY_OPS_BYPASS_TELEPORT_RULES,            String.valueOf(OPS_BYPASS_TELEPORT_RULES));
         props.putIfAbsent(KEY_NICKNAMES_IN_PLAYER_LIST,             String.valueOf(NICKNAMES_IN_PLAYER_LIST));
+        props.putIfAbsent(KEY_NICKNAME_PREFIX,                      Text.Serializer.toJson(NICKNAME_PREFIX));
+
     }
 
     private static Style.Serializer styleJsonDeserializer;
@@ -176,6 +183,26 @@ public class Config {
         }
 
         return outStyle;
+    }
+
+    private static Text parseTextOrDefault(String textStr, String defaultTextStr) {
+        Text outText = null;
+        if (textStr != null) {
+            outText = parseText(textStr);
+        }
+
+        if (outText == null) {
+            outText = parseText(defaultTextStr);
+            EssentialCommands.log(
+                Level.WARN,
+                String.format("Could not load malformed Text: '%s'. Using default, '%s'.", textStr, defaultTextStr)
+            );
+        }
+        return outText;
+    }
+
+    private static Text parseText(String textStr) {
+        return Text.Serializer.fromJson(textStr);
     }
 
     public static void storeProperties() {

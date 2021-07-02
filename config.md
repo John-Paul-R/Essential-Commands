@@ -29,6 +29,7 @@ teleport_interrupt_on_damaged      | true           | boolean
 allow_teleport_between_dimensions  | true           | boolean
 ops_bypass_teleport_rules          | true           | boolean
 nicknames_in_player_list           | true           | boolean
+nickname_prefix                    | {"text":"~","color":"red"} | MinecraftText
 
 *Note: if `use_permissions_api` is set to true, OPs are treated as having all permissions (thus making the `ops_bypass_teleport_rules` config option do nothing).*
 
@@ -63,3 +64,11 @@ Example: `light_purple`, `gold`
 See [Raw JSON text format](https://minecraft.fandom.com/wiki/Raw_JSON_text_format#Java_Edition) on the minecraft wiki.
 
 Example: `{"italic":"true", "color":"light_purple"}`
+
+### MinecraftText
+
+Essentially, any value that works for `/tellraw`'s message field. (JSON text or string enclosed by quotes)
+
+You can use a tellraw generator like [MinecraftJson](https://www.minecraftjson.com/) to create this JSON text with a graphical interface and preview.
+
+Examples: `"Alexandra"`, `{"text":"Alex","color":"green","bold":true}`
