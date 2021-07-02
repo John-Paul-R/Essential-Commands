@@ -37,9 +37,9 @@ public class ECPerms {
     static void init() {
         if (Config.USE_PERMISSIONS_API) {
             PermissionCheckEvent.EVENT.register((source, permission) -> {
-//                if (isSuperAdmin(source)) {
-//                    return TriState.TRUE;
-//                }
+                if (isSuperAdmin(source)) {
+                    return TriState.TRUE;
+                }
                 return TriState.DEFAULT;
             });
         }
