@@ -13,6 +13,7 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -119,4 +120,16 @@ public class PlayerDataManager {
         pData.save();
     }
 
+    public Collection<PlayerData> getAllPlayerData() {
+        return dataMap.values();
+    }
+
+    /**
+     * Case insentitive
+     */
+    public List<PlayerData> getPlayerDataMatchingNickname(String nickname) {
+        return dataMap.values().stream()
+            .filter(playerData -> playerData.getNickname().getString().equalsIgnoreCase(nickname))
+            .collect(Collectors.toList());
+    }
 }

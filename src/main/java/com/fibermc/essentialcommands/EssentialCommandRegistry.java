@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
+import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.mojang.brigadier.CommandDispatcher;
@@ -181,6 +182,7 @@ public class EssentialCommandRegistry {
                 LiteralArgumentBuilder<ServerCommandSource> nickBuilder = CommandManager.literal("nickname");
                 LiteralArgumentBuilder<ServerCommandSource> nickSetBuilder = CommandManager.literal("set");
                 LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
+                LiteralArgumentBuilder<ServerCommandSource> nickRevealBuilder = CommandManager.literal("reveal");
                 if (Config.ENABLE_NICK) {
                     nickSetBuilder
                         .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))
@@ -199,9 +201,17 @@ public class EssentialCommandRegistry {
                             .requires(ECPerms.require(ECPerms.Registry.nickname_others, 4))
                             .executes(new NicknameClearCommand()));
 
+                    nickRevealBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.nickname_reveal, 4))
+                        .then(argument("player_nickname", StringArgumentType.word())
+                            .suggests(NicknamePlayersSuggestion.suggestedStrings())
+                            .executes(new RealNameCommand())
+                        );
+
                     LiteralCommandNode<ServerCommandSource> nickNode = nickBuilder.build();
                     nickNode.addChild(nickSetBuilder.build());
                     nickNode.addChild(nickClearBuilder.build());
+                    nickNode.addChild(nickRevealBuilder.build());
 
                     rootNode.addChild(nickNode);
                     essentialCommandsRootNode.addChild(nickNode);

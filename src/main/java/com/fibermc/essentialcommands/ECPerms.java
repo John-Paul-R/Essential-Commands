@@ -28,6 +28,7 @@ public class ECPerms {
         public static final String spawn_set = "essentialcommands.spawn.set";
         public static final String nickname_self =   "essentialcommands.nickname.self";
         public static final String nickname_others =   "essentialcommands.nickname.others";
+        public static final String nickname_reveal =   "essentialcommands.nickname.reveal";
         public static final String config_reload = "essentialcommands.config.reload";
         public static final String bypass_teleport_delay = "essentialcommands.bypass.teleport_delay";
         public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";
