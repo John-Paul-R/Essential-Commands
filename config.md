@@ -28,6 +28,7 @@ check_for_updates                  | true           | boolean
 teleport_interrupt_on_damaged      | true           | boolean
 allow_teleport_between_dimensions  | true           | boolean
 ops_bypass_teleport_rules          | true           | boolean
+nicknames_in_player_list           | true           | boolean
 
 *Note: if `use_permissions_api` is set to true, OPs are treated as having all permissions (thus making the `ops_bypass_teleport_rules` config option do nothing).*
 

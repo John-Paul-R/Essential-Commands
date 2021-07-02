@@ -40,6 +40,7 @@ public class Config {
     public static boolean TELEPORT_INTERRUPT_ON_DAMAGED;
     public static boolean ALLOW_TELEPORT_BETWEEN_DIMENSIONS;
     public static boolean OPS_BYPASS_TELEPORT_RULES;
+    public static boolean NICKNAMES_IN_PLAYER_LIST;
 
     private static final String KEY_FORMATTING_DEFAULT = "formatting_default";
     private static final String KEY_FORMATTING_ACCENT = "formatting_accent";
@@ -60,6 +61,7 @@ public class Config {
     private static final String KEY_TELEPORT_INTERRUPT_ON_DAMAGED = "teleport_interrupt_on_damaged";
     private static final String KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS = "allow_teleport_between_dimensions";
     private static final String KEY_OPS_BYPASS_TELEPORT_RULES = "ops_bypass_teleport_rules";
+    private static final String KEY_NICKNAMES_IN_PLAYER_LIST = "nicknames_in_player_list";
 
     public static void loadOrCreateProperties() {
         props = new SortedProperties();
@@ -100,6 +102,7 @@ public class Config {
         TELEPORT_INTERRUPT_ON_DAMAGED = Boolean.parseBoolean(       (String) props.getOrDefault(KEY_TELEPORT_INTERRUPT_ON_DAMAGED, String.valueOf(true)));
         ALLOW_TELEPORT_BETWEEN_DIMENSIONS = Boolean.parseBoolean(   (String) props.getOrDefault(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS, String.valueOf(true)));
         OPS_BYPASS_TELEPORT_RULES = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_OPS_BYPASS_TELEPORT_RULES, String.valueOf(true)));
+        NICKNAMES_IN_PLAYER_LIST  = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_NICKNAMES_IN_PLAYER_LIST, String.valueOf(true)));
 
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
@@ -129,6 +132,7 @@ public class Config {
         props.putIfAbsent(KEY_TELEPORT_INTERRUPT_ON_DAMAGED,        String.valueOf(TELEPORT_INTERRUPT_ON_DAMAGED));
         props.putIfAbsent(KEY_ALLOW_TELEPORT_BETWEEN_DIMENSIONS,    String.valueOf(ALLOW_TELEPORT_BETWEEN_DIMENSIONS));
         props.putIfAbsent(KEY_OPS_BYPASS_TELEPORT_RULES,            String.valueOf(OPS_BYPASS_TELEPORT_RULES));
+        props.putIfAbsent(KEY_NICKNAMES_IN_PLAYER_LIST,             String.valueOf(NICKNAMES_IN_PLAYER_LIST));
     }
 
     private static Style.Serializer styleJsonDeserializer;

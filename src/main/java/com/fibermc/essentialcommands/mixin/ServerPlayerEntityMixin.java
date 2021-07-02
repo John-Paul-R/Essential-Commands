@@ -1,11 +1,13 @@
 package com.fibermc.essentialcommands.mixin;
 
+import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.QueuedTeleport;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,5 +52,13 @@ public class ServerPlayerEntityMixin implements ServerPlayerEntityAccess {
         QueuedTeleport prevQueuedTeleport = ecQueuedTeleport;
         ecQueuedTeleport = null;
         return prevQueuedTeleport;
+    }
+
+    @Inject(method = "getPlayerListName", at = @At("RETURN"), cancellable = true)
+    public void getPlayerListName(CallbackInfoReturnable<Text> cir) {
+        if (Config.NICKNAMES_IN_PLAYER_LIST) {
+            cir.setReturnValue(((ServerPlayerEntity)(Object)this).getDisplayName());
+            cir.cancel();
+        }
     }
 }
