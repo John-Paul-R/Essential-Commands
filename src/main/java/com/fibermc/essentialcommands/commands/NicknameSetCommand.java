@@ -55,11 +55,17 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
                             nicknameText : new LiteralText(senderPlayerEntity.getGameProfile().getName())
                     ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
                 , new UUID(0, 0));
-        } else if (successCode==1) {
+        } else {
+            String failReason = "Unknown";
+            switch (successCode) {
+                case -1: failReason = "Insufficient permissions for specified nickname.";
+                break;
+            }
             senderPlayerEntity.sendSystemMessage(
                 new LiteralText("Nickname could not be set to '").setStyle(Config.FORMATTING_ERROR)
                     .append(nicknameText)
                     .append(new LiteralText("'. Reason: ").setStyle(Config.FORMATTING_ERROR))
+                    .append(new LiteralText(failReason).setStyle(Config.FORMATTING_ERROR))
 //                    .append(new LiteralText(String.valueOf(Config.HOME_LIMIT)).setStyle(Config.FORMATTING_ACCENT))
 //                    .append(new LiteralText(") reached.").setStyle(Config.FORMATTING_ERROR))
                 , new UUID(0, 0));
