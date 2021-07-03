@@ -60,6 +60,8 @@ See the [full List of Commands & Permissions](https://github.com/John-Paul-R/Ess
 
   - /nickname set \<nickname>
   - /nickname clear
+  - /nickname reveal \<nickname>
+
 ### Config
 
   - /essentialcommands config reload
