@@ -24,9 +24,12 @@ public class NicknameText extends LiteralText {
         }
         boolean hasRequiredPerms = checkClickEventPerms(parentText, source);
         for (Text text : parentText.getSiblings()) {
-            checkPerms(text, source);
+            if (!checkPerms(text, source)) {
+                hasRequiredPerms = false;
+                break;
+            }
 
-            if (checkClickEventPerms(text, source)) {
+            if (!checkClickEventPerms(text, source)) {
                 hasRequiredPerms = false;
                 break;
             }
