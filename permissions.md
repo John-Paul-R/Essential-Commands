@@ -31,6 +31,7 @@ Command | Permission | Description
 /nickname set \<target-player> \<nickname>  | `essentialcommands.nickname.others`   | Set target player's nickname to specified MinecraftText.
 /nickname clear                             | `essentialcommands.nickname.self`     | Clear your own nickname.
 /nickname clear \<target-player>            | `essentialcommands.nickname.others`   | Clear target player's nickname.
+/nickname reveal \<player-nickname>         | `essentialcommands.nickname.reveal`   | Get list of players with the provided nickname (String, case-insensitive).
 /essentialcommands config reload    |   `essentialcommands.config.reload`   |   Reload essentialcommands config.
 
 ## Rules/Config Bypass Permissions

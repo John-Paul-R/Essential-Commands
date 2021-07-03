@@ -3,18 +3,15 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.google.common.collect.Maps;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.NbtText;
 import net.minecraft.text.Text;
 import net.minecraft.world.PersistentState;
 
 import java.io.File;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class PlayerData extends PersistentState {
 
@@ -191,6 +188,7 @@ public class PlayerData extends PersistentState {
 
     public int setNickname(Text nickname) {
         this.nickname = nickname;
+        PlayerDataManager.getInstance().markNicknameDirty(this);
         this.markDirty();
         // Return codes based on fail/success
         //  ex: caused by profanity filter.

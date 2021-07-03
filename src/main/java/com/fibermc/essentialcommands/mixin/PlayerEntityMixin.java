@@ -1,13 +1,11 @@
 package com.fibermc.essentialcommands.mixin;
 
-import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataFactory;
-import com.fibermc.essentialcommands.QueuedTeleport;
+import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,7 +28,10 @@ public class PlayerEntityMixin implements PlayerEntityAccess {
         try {
             if (this.getEcPlayerData().getNickname() != null) {
 
-                cir.setReturnValue(this.getEcPlayerData().getNickname());
+                cir.setReturnValue(new LiteralText("")
+                    .append(Config.NICKNAME_PREFIX)
+                    .append(this.getEcPlayerData().getNickname())
+                );
                 cir.cancel();
             }
         } catch (NullPointerException e) {
