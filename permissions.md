@@ -32,7 +32,8 @@ Command | Permission | Description
 /nickname clear                             | `essentialcommands.nickname.self`     | Clear your own nickname.
 /nickname clear \<target-player>            | `essentialcommands.nickname.others`   | Clear target player's nickname.
 /nickname reveal \<player-nickname>         | `essentialcommands.nickname.reveal`   | Get list of players with the provided nickname (String, case-insensitive).
-/essentialcommands config reload    |   `essentialcommands.config.reload`   |   Reload essentialcommands config.
+N/A                                 | `essentialcommands.nickname.style.clickevent` | Allows setting nicknames that execute an action on click.
+/essentialcommands config reload    | `essentialcommands.config.reload`   |   Reload essentialcommands config.
 
 ## Rules/Config Bypass Permissions
 

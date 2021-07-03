@@ -187,6 +187,21 @@ public class PlayerData extends PersistentState {
     }
 
     public int setNickname(Text nickname) {
+        boolean hasRequiredPerms = NicknameText.checkPerms(nickname, this.player.getCommandSource());
+        if (!hasRequiredPerms) {
+            EssentialCommands.LOGGER.info(String.format(
+                "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
+                this.player.getGameProfile().getName(),
+                nickname
+            ));
+            return -1;
+        } else {
+            EssentialCommands.LOGGER.info(String.format(
+                "Set %s's nickname to '%s'.",
+                this.player.getGameProfile().getName(),
+                nickname
+            ));
+        }
         this.nickname = nickname;
         PlayerDataManager.getInstance().markNicknameDirty(this);
         this.markDirty();
