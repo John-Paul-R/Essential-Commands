@@ -187,6 +187,16 @@ public class PlayerData extends PersistentState {
     }
 
     public int setNickname(Text nickname) {
+        // Reset nickname
+        if (nickname == null) {
+            this.nickname = null;
+            return 1;
+        }
+        // Ensure nickname does not exceed max length
+        if (nickname.getString().length() > Config.NICKNAME_MAX_LENGTH) {
+            return -2;
+        }
+        // Ensure player has permissions required to set the specified nickname
         boolean hasRequiredPerms = NicknameText.checkPerms(nickname, this.player.getCommandSource());
         if (!hasRequiredPerms) {
             EssentialCommands.LOGGER.info(String.format(
@@ -202,6 +212,8 @@ public class PlayerData extends PersistentState {
                 nickname
             ));
         }
+
+        // Set nickname
         this.nickname = nickname;
         PlayerDataManager.getInstance().markNicknameDirty(this);
         this.markDirty();

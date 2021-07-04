@@ -12,6 +12,7 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.gradle.internal.impldep.org.apache.maven.settings.Server;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -78,10 +79,10 @@ public class PlayerDataManager {
         INSTANCE.unloadPlayerData(player);
     }
 
-    private static void onPlayerRespawn(ServerPlayerEntity serverPlayerEntity) {
-        PlayerData pData = ((PlayerEntityAccess) serverPlayerEntity).getEcPlayerData();
-        pData.updatePlayer(serverPlayerEntity);
-        ((PlayerEntityAccess) serverPlayerEntity).setEcPlayerData(pData);
+    private static void onPlayerRespawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
+        PlayerData pData = ((PlayerEntityAccess) oldPlayerEntity).getEcPlayerData();
+        pData.updatePlayer(newPlayerEntity);
+        ((PlayerEntityAccess) newPlayerEntity).setEcPlayerData(pData);
     }
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {

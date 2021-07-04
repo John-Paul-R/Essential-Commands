@@ -37,7 +37,7 @@ public abstract class PlayerManagerMixin {
         target = "Lnet/minecraft/world/World;getLevelProperties()Lnet/minecraft/world/WorldProperties;"
     ), locals = LocalCapture.CAPTURE_FAILHARD
     )
-    public void onRespawnPlayer(ServerPlayerEntity player, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir,
+    public void onRespawnPlayer(ServerPlayerEntity oldServerPlayerEntity, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir,
         BlockPos  blockPos,
         float  f,
         boolean  bl,
@@ -47,6 +47,6 @@ public abstract class PlayerManagerMixin {
         ServerWorld  serverWorld2,
         ServerPlayerEntity  serverPlayerEntity
     ) {
-        PlayerRespawnCallback.EVENT.invoker().onPlayerRespawn(serverPlayerEntity);
+        PlayerRespawnCallback.EVENT.invoker().onPlayerRespawn(oldServerPlayerEntity, serverPlayerEntity);
     }
 }

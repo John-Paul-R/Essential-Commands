@@ -6,11 +6,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public interface PlayerRespawnCallback {
     public Event<PlayerRespawnCallback> EVENT = EventFactory.createArrayBacked(PlayerRespawnCallback.class,
-            (listeners) -> (player) -> {
+            (listeners) -> (oldPlayer, newPlayer) -> {
                 for (PlayerRespawnCallback event : listeners) {
-                    event.onPlayerRespawn(player);
+                    event.onPlayerRespawn(oldPlayer, newPlayer);
                 }
             });
 
-    void onPlayerRespawn(ServerPlayerEntity player);
+    void onPlayerRespawn(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer);
 }

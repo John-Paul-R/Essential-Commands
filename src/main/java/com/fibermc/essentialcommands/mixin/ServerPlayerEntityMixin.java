@@ -5,11 +5,14 @@ import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
+import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import org.gradle.internal.impldep.org.apache.maven.settings.Server;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -103,4 +106,9 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
         ecPlayerData = playerData;
     }
 
+    // Teleport hook (for /back)
+    @Inject(method = "teleport", at = @At("HEAD"))
+    public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
+        this.getEcPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity)(Object)this));
+    }
 }
