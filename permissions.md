@@ -34,7 +34,7 @@ Command | Permission | Description
 /nickname reveal \<player-nickname>         | `essentialcommands.nickname.reveal`   | Get list of players with the provided nickname (String, case-insensitive).
 N/A | `essentialcommands.nickname.style.color` | Allows setting colorful nicknames.
 N/A | `essentialcommands.nickname.style.fancy` | Allows setting nicknames that have special formatting (italic, bold, etc.)
-N/A | `essentialcommands.nickname.style.hover` | Allows setting nicknames that execute an action on hover.
+N/A | `essentialcommands.nickname.style.hover` | Allows setting nicknames that show text on hover.
 N/A | `essentialcommands.nickname.style.click` | Allows setting nicknames that execute an action on click.
 /essentialcommands config reload    | `essentialcommands.config.reload`   |   Reload essentialcommands config.
 

@@ -43,6 +43,7 @@ public class Config {
     public static boolean OPS_BYPASS_TELEPORT_RULES;
     public static boolean NICKNAMES_IN_PLAYER_LIST;
     public static Text NICKNAME_PREFIX;
+    public static int NICKNAME_MAX_LENGTH;
 
 
     private static final String KEY_FORMATTING_DEFAULT = "formatting_default";
@@ -66,6 +67,7 @@ public class Config {
     private static final String KEY_OPS_BYPASS_TELEPORT_RULES = "ops_bypass_teleport_rules";
     private static final String KEY_NICKNAMES_IN_PLAYER_LIST = "nicknames_in_player_list";
     private static final String KEY_NICKNAME_PREFIX = "nickname_prefix";
+    private static final String KEY_NICKNAME_MAX_LENGTH = "nickname_max_length";
 
     public static void loadOrCreateProperties() {
         props = new SortedProperties();
@@ -108,6 +110,7 @@ public class Config {
         OPS_BYPASS_TELEPORT_RULES = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_OPS_BYPASS_TELEPORT_RULES, String.valueOf(true)));
         NICKNAMES_IN_PLAYER_LIST  = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_NICKNAMES_IN_PLAYER_LIST, String.valueOf(true)));
         NICKNAME_PREFIX     = parseTextOrDefault(                   (String) props.get(KEY_NICKNAME_PREFIX), "{\"text\":\"~\",\"color\":\"red\"}");
+        NICKNAME_MAX_LENGTH = parseInt(                             (String) props.getOrDefault(KEY_NICKNAME_MAX_LENGTH, String.valueOf(32)));
 
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
@@ -139,6 +142,7 @@ public class Config {
         props.putIfAbsent(KEY_OPS_BYPASS_TELEPORT_RULES,            String.valueOf(OPS_BYPASS_TELEPORT_RULES));
         props.putIfAbsent(KEY_NICKNAMES_IN_PLAYER_LIST,             String.valueOf(NICKNAMES_IN_PLAYER_LIST));
         props.putIfAbsent(KEY_NICKNAME_PREFIX,                      Text.Serializer.toJson(NICKNAME_PREFIX));
+        props.putIfAbsent(KEY_NICKNAME_MAX_LENGTH,                  String.valueOf(NICKNAME_MAX_LENGTH));
 
     }
 

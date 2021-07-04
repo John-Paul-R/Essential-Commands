@@ -42,7 +42,7 @@ public class NicknameText extends LiteralText {
             (sourcePerms.color || (style.getColor() == null)),
             (sourcePerms.fancy || !(style.isBold() || style.isItalic() || style.isObfuscated() || style.isStrikethrough() || style.isUnderlined()) || !style.getFont().equals(new Identifier("minecraft:default"))),
             (sourcePerms.click || (style.getClickEvent() == null)),
-            (sourcePerms.click || (style.getHoverEvent() == null))
+            (sourcePerms.hover || (style.getHoverEvent() == null))
         );
     }
 
