@@ -59,8 +59,6 @@ public class PlayerTeleporter {
             }
         }
 
-        pData.setPreviousLocation(new MinecraftLocation(player));
-
         execTeleport(player, dest);
     }
     public static void teleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
