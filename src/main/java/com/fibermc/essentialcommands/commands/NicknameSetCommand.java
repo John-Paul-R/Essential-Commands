@@ -53,15 +53,22 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
                     ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
                 , new UUID(0, 0));
         } else {
-            String failReason = switch (successCode) {
-                case -1 -> "Player has insufficient permissions for specified nickname.";
-                case -2 -> String.format(
-                    "Length of supplied nickname (%s) exceeded max nickname length (%s)",
-                    nicknameText.getString().length(),
-                    Config.NICKNAME_MAX_LENGTH
-                );
-                default -> "Unknown";
-            };
+            String failReason;
+            switch (successCode) {
+                case -1:
+                    failReason = "Player has insufficient permissions for specified nickname.";
+                    break;
+                case -2:
+                    failReason = String.format(
+                        "Length of supplied nickname (%s) exceeded max nickname length (%s)",
+                        nicknameText.getString().length(),
+                        Config.NICKNAME_MAX_LENGTH
+                    );
+                    break;
+                default:
+                    failReason = "Unknown";
+                    break;
+            }
             senderPlayerEntity.sendSystemMessage(
                 new LiteralText("Nickname could not be set to '").setStyle(Config.FORMATTING_ERROR)
                     .append(nicknameText)
