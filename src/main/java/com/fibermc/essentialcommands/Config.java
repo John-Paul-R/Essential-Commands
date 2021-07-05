@@ -31,6 +31,7 @@ public class Config {
     public static boolean ENABLE_TPA;
     public static boolean ENABLE_WARP;
     public static boolean ENABLE_NICK;
+    public static boolean ENABLE_RTP;
     public static int HOME_LIMIT;
     public static double TELEPORT_COOLDOWN;
     public static double TELEPORT_DELAY;
@@ -44,7 +45,8 @@ public class Config {
     public static boolean NICKNAMES_IN_PLAYER_LIST;
     public static Text NICKNAME_PREFIX;
     public static int NICKNAME_MAX_LENGTH;
-
+    public static int RTP_RADIUS;
+    public static int RTP_COOLDOWN;
 
     private static final String KEY_FORMATTING_DEFAULT = "formatting_default";
     private static final String KEY_FORMATTING_ACCENT = "formatting_accent";
@@ -55,6 +57,7 @@ public class Config {
     private static final String KEY_ENABLE_TPA = "enable_tpa";
     private static final String KEY_ENABLE_WARP = "enable_warp";
     private static final String KEY_ENABLE_NICK = "enable_nick";
+    private static final String KEY_ENABLE_RTP = "enable_rtp";
     private static final String KEY_HOME_LIMIT = "home_limit";
     private static final String KEY_TELEPORT_COOLDOWN = "teleport_cooldown";
     private static final String KEY_TELEPORT_DELAY = "teleport_delay";
@@ -68,6 +71,8 @@ public class Config {
     private static final String KEY_NICKNAMES_IN_PLAYER_LIST = "nicknames_in_player_list";
     private static final String KEY_NICKNAME_PREFIX = "nickname_prefix";
     private static final String KEY_NICKNAME_MAX_LENGTH = "nickname_max_length";
+    private static final String KEY_RTP_RADIUS = "rtp_radius";
+    private static final String KEY_RTP_COOLDOWN = "rtp_cooldown";
 
     public static void loadOrCreateProperties() {
         props = new SortedProperties();
@@ -98,6 +103,7 @@ public class Config {
         ENABLE_TPA          = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_TPA, String.valueOf(true)));
         ENABLE_WARP         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_WARP, String.valueOf(true)));
         ENABLE_NICK         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_NICK, String.valueOf(true)));
+        ENABLE_RTP          = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_RTP, String.valueOf(true)));
         HOME_LIMIT          = parseInt(                             (String) props.getOrDefault(KEY_HOME_LIMIT, String.valueOf(-1)));
         TELEPORT_COOLDOWN   = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_COOLDOWN, String.valueOf(1D)));
         TELEPORT_DELAY      = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_DELAY, String.valueOf(0D)));
@@ -111,6 +117,8 @@ public class Config {
         NICKNAMES_IN_PLAYER_LIST  = Boolean.parseBoolean(           (String) props.getOrDefault(KEY_NICKNAMES_IN_PLAYER_LIST, String.valueOf(true)));
         NICKNAME_PREFIX     = parseTextOrDefault(                   (String) props.get(KEY_NICKNAME_PREFIX), "{\"text\":\"~\",\"color\":\"red\"}");
         NICKNAME_MAX_LENGTH = parseInt(                             (String) props.getOrDefault(KEY_NICKNAME_MAX_LENGTH, String.valueOf(32)));
+        RTP_RADIUS =          parseInt(                             (String) props.getOrDefault(KEY_RTP_RADIUS, String.valueOf(1000)));
+        RTP_COOLDOWN =        parseInt(                             (String) props.getOrDefault(KEY_RTP_COOLDOWN, String.valueOf(30)));
 
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
@@ -130,6 +138,7 @@ public class Config {
         props.putIfAbsent(KEY_ENABLE_TPA,                           String.valueOf(ENABLE_TPA));
         props.putIfAbsent(KEY_ENABLE_WARP,                          String.valueOf(ENABLE_WARP));
         props.putIfAbsent(KEY_ENABLE_NICK,                          String.valueOf(ENABLE_NICK));
+        props.putIfAbsent(KEY_ENABLE_RTP,                           String.valueOf(ENABLE_RTP));
         props.putIfAbsent(KEY_HOME_LIMIT,                           String.valueOf(HOME_LIMIT));
         props.putIfAbsent(KEY_TELEPORT_COOLDOWN,                    String.valueOf(TELEPORT_COOLDOWN));
         props.putIfAbsent(KEY_TELEPORT_DELAY,                       String.valueOf(TELEPORT_DELAY));
@@ -143,6 +152,8 @@ public class Config {
         props.putIfAbsent(KEY_NICKNAMES_IN_PLAYER_LIST,             String.valueOf(NICKNAMES_IN_PLAYER_LIST));
         props.putIfAbsent(KEY_NICKNAME_PREFIX,                      Text.Serializer.toJson(NICKNAME_PREFIX));
         props.putIfAbsent(KEY_NICKNAME_MAX_LENGTH,                  String.valueOf(NICKNAME_MAX_LENGTH));
+        props.putIfAbsent(KEY_RTP_RADIUS,                           String.valueOf(RTP_RADIUS));
+        props.putIfAbsent(KEY_RTP_COOLDOWN,                         String.valueOf(RTP_COOLDOWN));
 
     }
 

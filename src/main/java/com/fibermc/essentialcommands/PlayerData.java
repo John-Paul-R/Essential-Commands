@@ -38,6 +38,9 @@ public class PlayerData extends PersistentState {
     // Nickname
     private Text nickname;
 
+    // RTP Cooldown
+    private int rtpNextUsableTime;
+
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
         this.pUuid = player.getUuid();
@@ -218,5 +221,13 @@ public class PlayerData extends PersistentState {
 
     public void save() {
         super.save(saveFile);
+    }
+
+    public void setRtpNextUsableTime(int i) {
+        this.rtpNextUsableTime = i;
+    }
+
+    public int getRtpNextUsableTime() {
+        return rtpNextUsableTime;
     }
 }
