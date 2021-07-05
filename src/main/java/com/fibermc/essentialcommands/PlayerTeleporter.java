@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -38,7 +37,7 @@ public class PlayerTeleporter {
         }
     }
     public static void requestTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, String destName) {
-        requestTeleport(((PlayerEntityAccess)playerEntity).getEcPlayerData(), dest, destName);
+        requestTeleport(((ServerPlayerEntityAccess)playerEntity).getEcPlayerData(), dest, destName);
     }
     public static void teleport(QueuedTeleport queuedTeleport) {
         queuedTeleport.complete();
@@ -63,7 +62,7 @@ public class PlayerTeleporter {
     }
     public static void teleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
         if (ManagerLocator.playerDataEnabled())
-            teleport(((PlayerEntityAccess)playerEntity).getEcPlayerData(), dest);
+            teleport(((ServerPlayerEntityAccess)playerEntity).getEcPlayerData(), dest);
         else
             execTeleport(playerEntity, dest);
     }

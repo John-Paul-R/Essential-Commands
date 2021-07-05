@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerConnectCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
@@ -12,7 +12,6 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.gradle.internal.impldep.org.apache.maven.settings.Server;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -70,7 +69,7 @@ public class PlayerDataManager {
     // EVENTS
     public static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
         PlayerData playerData = INSTANCE.addPlayerData(player);
-        ((PlayerEntityAccess) player).setEcPlayerData(playerData);
+        ((ServerPlayerEntityAccess) player).setEcPlayerData(playerData);
         INSTANCE.initPlayerDataFile(player);
     }
 
@@ -80,13 +79,13 @@ public class PlayerDataManager {
     }
 
     private static void onPlayerRespawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
-        PlayerData pData = ((PlayerEntityAccess) oldPlayerEntity).getEcPlayerData();
+        PlayerData pData = ((ServerPlayerEntityAccess) oldPlayerEntity).getEcPlayerData();
         pData.updatePlayer(newPlayerEntity);
-        ((PlayerEntityAccess) newPlayerEntity).setEcPlayerData(pData);
+        ((ServerPlayerEntityAccess) newPlayerEntity).setEcPlayerData(pData);
     }
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
-        PlayerData pData = ((PlayerEntityAccess) playerEntity).getEcPlayerData();
+        PlayerData pData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
         if (Config.ALLOW_BACK_ON_DEATH)
             pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
     }

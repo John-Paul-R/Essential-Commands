@@ -2,7 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -22,7 +22,7 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         int out = 1;
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
-        PlayerData senderPlayerData = ((PlayerEntityAccess)senderPlayer).getEcPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess)senderPlayer).getEcPlayerData();
         //Store home name
         String homeName = StringArgumentType.getString(context, "home_name");
 

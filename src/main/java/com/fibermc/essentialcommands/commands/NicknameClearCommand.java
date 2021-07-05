@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -26,7 +26,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
             targetPlayer = senderPlayerEntity;
         }
 
-        PlayerEntityAccess targetPlayerEntityAccess = (PlayerEntityAccess) targetPlayer;
+        ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
         targetPlayerEntityAccess.getEcPlayerData().setNickname(null);
 
         //inform command sender that the nickname has been set
