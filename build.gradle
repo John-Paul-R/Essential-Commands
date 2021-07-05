@@ -43,6 +43,10 @@ allprojects {
 		testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_jupiter_version}"
 		testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_jupiter_version}"
 
+		// JIJ Dependencies
+		modApi 	'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
+		include	'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
+
 		// Subprojects
 		subprojects.each {
 			implementation project(":${it.name}")
@@ -81,7 +85,7 @@ allprojects {
 	repositories {
 		mavenCentral()
 		maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
-		maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
+//		maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
 		// Add repositories to retrieve artifacts from in here.
 		// You should only use this when depending on other mods because
 		// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
