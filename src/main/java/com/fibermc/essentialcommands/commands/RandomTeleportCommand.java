@@ -31,6 +31,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        int resultCode = -1;
         //TODO Add OP/Permission bypass for RTP cooldown.
         if (Config.RTP_COOLDOWN > 0) {
             ServerCommandSource source = context.getSource();
@@ -39,7 +40,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             // if cooldown has expired
             if (playerData.getRtpNextUsableTime() < ticks) {
                 playerData.setRtpNextUsableTime(ticks + Config.RTP_COOLDOWN*20);
-                exec(context);
+                resultCode = exec(context);
             } else {
                 source.getPlayer().sendSystemMessage(
                     new LiteralText("")
@@ -50,21 +51,27 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                 );
             }
         } else {
-            exec(context);
+            resultCode = exec(context);
         }
 
-
-        return 0;
+        return resultCode;
     }
 
     private static boolean isValidSpawnPosition(ServerWorld world, double x, double y, double z) {
-
+        // TODO This should be memoized. Cuts exec time in 1/2.
         BlockState targetBlockState = world.getBlockState(new BlockPos(x, y, z));
         BlockState footBlockState = world.getBlockState(new BlockPos(x, y-1, z));
         return targetBlockState.isAir() && footBlockState.getMaterial().isSolid();
     }
 
     private static int exec(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        return exec(ctx, 0);
+    }
+
+    private static int exec(CommandContext<ServerCommandSource> ctx, int timesRun) throws CommandSyntaxException {
+        if (timesRun > Config.RTP_MAX_ATTEMPTS) {
+            return -1;
+        }
         ServerPlayerEntity player = ctx.getSource().getPlayer();
         ServerWorld world = ctx.getSource().getWorld();
         // Calculate position on circle perimeter
@@ -90,8 +97,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         new_y = blockHitResult.getBlockPos().getY() + 1;
 
         EssentialCommands.LOGGER.info("Time taken to calculate if RTP location is valid: " + timer.stop());
+
+        // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
+        //  Addressed by adding timesRun limit.
         if (world.isWater(new BlockPos(new_x, new_y-2, new_z))) {
-            return exec(ctx);
+            return exec(ctx, timesRun + 1);
         }
 
         // Teleport the player

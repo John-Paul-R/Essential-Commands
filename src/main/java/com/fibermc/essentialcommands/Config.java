@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.util.StringBuilderPlus;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.text.Style;
@@ -13,8 +12,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Map;
 import java.util.Objects;
 
 public class Config {
@@ -47,6 +44,7 @@ public class Config {
     public static int NICKNAME_MAX_LENGTH;
     public static int RTP_RADIUS;
     public static int RTP_COOLDOWN;
+    public static int RTP_MAX_ATTEMPTS;
 
     private static final String KEY_FORMATTING_DEFAULT = "formatting_default";
     private static final String KEY_FORMATTING_ACCENT = "formatting_accent";
@@ -73,6 +71,7 @@ public class Config {
     private static final String KEY_NICKNAME_MAX_LENGTH = "nickname_max_length";
     private static final String KEY_RTP_RADIUS = "rtp_radius";
     private static final String KEY_RTP_COOLDOWN = "rtp_cooldown";
+    private static final String KEY_RTP_MAX_ATTEMPTS = "rtp_max_attempts";
 
     public static void loadOrCreateProperties() {
         props = new SortedProperties();
@@ -119,6 +118,7 @@ public class Config {
         NICKNAME_MAX_LENGTH = parseInt(                             (String) props.getOrDefault(KEY_NICKNAME_MAX_LENGTH, String.valueOf(32)));
         RTP_RADIUS =          parseInt(                             (String) props.getOrDefault(KEY_RTP_RADIUS, String.valueOf(1000)));
         RTP_COOLDOWN =        parseInt(                             (String) props.getOrDefault(KEY_RTP_COOLDOWN, String.valueOf(30)));
+        RTP_MAX_ATTEMPTS =    parseInt(                             (String) props.getOrDefault(KEY_RTP_MAX_ATTEMPTS, String.valueOf(15)));
 
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
@@ -154,6 +154,7 @@ public class Config {
         props.putIfAbsent(KEY_NICKNAME_MAX_LENGTH,                  String.valueOf(NICKNAME_MAX_LENGTH));
         props.putIfAbsent(KEY_RTP_RADIUS,                           String.valueOf(RTP_RADIUS));
         props.putIfAbsent(KEY_RTP_COOLDOWN,                         String.valueOf(RTP_COOLDOWN));
+        props.putIfAbsent(KEY_RTP_MAX_ATTEMPTS,                     String.valueOf(RTP_MAX_ATTEMPTS));
 
     }
 
