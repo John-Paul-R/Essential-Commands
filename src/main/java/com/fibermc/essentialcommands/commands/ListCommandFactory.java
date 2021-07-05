@@ -26,7 +26,7 @@ public class ListCommandFactory {
             ));
             context.getSource().sendFeedback(
                 responseText,
-                false
+                Config.BROADCAST_TO_OPS
             );
             return 0;
         };

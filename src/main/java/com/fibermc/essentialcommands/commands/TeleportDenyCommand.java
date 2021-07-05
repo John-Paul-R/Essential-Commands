@@ -12,8 +12,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
 
-import java.util.UUID;
-
 public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
     public TeleportDenyCommand() {}
@@ -39,8 +37,9 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
             //Send message to command sender confirming that request has been accepted
             source.sendFeedback(
-                    new LiteralText("Teleport request denied.").setStyle(Config.FORMATTING_DEFAULT)
-                , false);
+                new LiteralText("Teleport request denied.").setStyle(Config.FORMATTING_DEFAULT)
+                , Config.BROADCAST_TO_OPS
+            );
             return 1;
         } else {
             //throw new CommandSyntaxException(type, message)

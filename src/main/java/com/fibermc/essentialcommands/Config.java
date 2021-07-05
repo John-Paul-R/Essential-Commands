@@ -45,6 +45,7 @@ public class Config {
     public static int RTP_RADIUS;
     public static int RTP_COOLDOWN;
     public static int RTP_MAX_ATTEMPTS;
+    public static boolean BROADCAST_TO_OPS;
 
     private static final String KEY_FORMATTING_DEFAULT = "formatting_default";
     private static final String KEY_FORMATTING_ACCENT = "formatting_accent";
@@ -72,6 +73,7 @@ public class Config {
     private static final String KEY_RTP_RADIUS = "rtp_radius";
     private static final String KEY_RTP_COOLDOWN = "rtp_cooldown";
     private static final String KEY_RTP_MAX_ATTEMPTS = "rtp_max_attempts";
+    private static final String KEY_BROADCAST_TO_OPS = "broadcast_to_ops";
 
     public static void loadOrCreateProperties() {
         props = new SortedProperties();
@@ -119,6 +121,7 @@ public class Config {
         RTP_RADIUS =          parseInt(                             (String) props.getOrDefault(KEY_RTP_RADIUS, String.valueOf(1000)));
         RTP_COOLDOWN =        parseInt(                             (String) props.getOrDefault(KEY_RTP_COOLDOWN, String.valueOf(30)));
         RTP_MAX_ATTEMPTS =    parseInt(                             (String) props.getOrDefault(KEY_RTP_MAX_ATTEMPTS, String.valueOf(15)));
+        BROADCAST_TO_OPS    = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_BROADCAST_TO_OPS, String.valueOf(false)));
 
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
@@ -155,6 +158,7 @@ public class Config {
         props.putIfAbsent(KEY_RTP_RADIUS,                           String.valueOf(RTP_RADIUS));
         props.putIfAbsent(KEY_RTP_COOLDOWN,                         String.valueOf(RTP_COOLDOWN));
         props.putIfAbsent(KEY_RTP_MAX_ATTEMPTS,                     String.valueOf(RTP_MAX_ATTEMPTS));
+        props.putIfAbsent(KEY_BROADCAST_TO_OPS,                     String.valueOf(BROADCAST_TO_OPS));
 
     }
 

@@ -34,6 +34,7 @@ nickname_prefix                    | {"text":"~","color":"red"} | MinecraftText
 rtp_radius                         | 1000           | integer
 rtp_cooldown                       | 30             | integer
 rtp_max_attempts                   | 15             | integer
+broadcast_to_ops                   | false          | boolean
 
 *Note: if `use_permissions_api` is set to true, OPs are treated as having all permissions (thus making the `ops_bypass_teleport_rules` config option do nothing).*
 

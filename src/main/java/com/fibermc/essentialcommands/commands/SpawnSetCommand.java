@@ -34,7 +34,7 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
         source.sendFeedback(
             new LiteralText("Spawn set at ").setStyle(Config.FORMATTING_DEFAULT)
                 .append(loc.toLiteralTextSimple().setStyle(Config.FORMATTING_ACCENT))
-            , false);
+            , Config.BROADCAST_TO_OPS);
 
         return successCode;
     }

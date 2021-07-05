@@ -36,7 +36,7 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
                 new LiteralText("Home ").setStyle(Config.FORMATTING_DEFAULT)
                     .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
                     .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
-                , false);
+                , Config.BROADCAST_TO_OPS);
         } else {
             source.sendError(
                 new LiteralText("Home ").setStyle(Config.FORMATTING_ERROR)

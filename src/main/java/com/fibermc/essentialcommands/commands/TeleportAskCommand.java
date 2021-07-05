@@ -45,7 +45,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
                 .setStyle(Config.FORMATTING_DEFAULT)
                 .append(new LiteralText(targetPlayer.getEntityName())
                     .setStyle(Config.FORMATTING_ACCENT))
-            , false
+            , Config.BROADCAST_TO_OPS
         );
         
         return 1;

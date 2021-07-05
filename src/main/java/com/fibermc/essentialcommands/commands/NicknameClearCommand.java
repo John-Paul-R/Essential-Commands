@@ -35,7 +35,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
                 .append(new LiteralText("Nickname set to '").setStyle(Config.FORMATTING_DEFAULT))
                 .append(new LiteralText(senderPlayerEntity.getGameProfile().getName())
                 ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
-            , false);
+            , Config.BROADCAST_TO_OPS);
 
         return 1;
     }

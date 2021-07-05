@@ -29,20 +29,20 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
 
         boolean wasSuccessful = worldDataManager.delWarp(warpName);
 
-        //inform command sender that the home has been removed
+        //inform command sender that the warp has been removed
         if (wasSuccessful) {
             source.sendFeedback(
                 new LiteralText("Warp ").setStyle(Config.FORMATTING_DEFAULT)
                     .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
                     .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
-                , false);
+                , Config.BROADCAST_TO_OPS);
             out = 1;
         } else {
             source.sendFeedback(
                 new LiteralText("Warp ").setStyle(Config.FORMATTING_ERROR)
                     .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
                     .append(new LiteralText(" could not be deleted. (Correct spelling?)").setStyle(Config.FORMATTING_ERROR))
-                , false);
+                , Config.BROADCAST_TO_OPS);
         }
 
 

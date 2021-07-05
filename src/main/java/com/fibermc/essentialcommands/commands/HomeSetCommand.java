@@ -38,7 +38,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
                 new LiteralText("Home '").setStyle(Config.FORMATTING_DEFAULT)
                     .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
                     .append(new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT)),
-                false
+                Config.BROADCAST_TO_OPS
             );
         } else if (successCode==0) {
             source.sendError(

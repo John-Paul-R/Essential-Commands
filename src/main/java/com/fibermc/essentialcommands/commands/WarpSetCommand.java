@@ -34,7 +34,7 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
             new LiteralText("Warp '").setStyle(Config.FORMATTING_DEFAULT)
                 .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
                 .append(new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT))
-            , false);
+            , Config.BROADCAST_TO_OPS);
 
         return 1;
     }

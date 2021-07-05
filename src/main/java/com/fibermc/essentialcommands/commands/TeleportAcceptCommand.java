@@ -50,7 +50,7 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
             //Send message to command sender confirming that request has been accepted
             source.sendFeedback(
                 new LiteralText("Teleport request accepted.").setStyle(Config.FORMATTING_DEFAULT)
-                , false);
+                , Config.BROADCAST_TO_OPS);
             return 1;
         } else {
             //throw new CommandSyntaxException(type, message)

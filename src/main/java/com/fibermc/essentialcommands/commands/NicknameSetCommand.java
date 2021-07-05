@@ -52,7 +52,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
                         (nicknameText != null) ?
                             nicknameText : new LiteralText(senderPlayerEntity.getGameProfile().getName())
                     ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
-                , false);
+                , Config.BROADCAST_TO_OPS);
         } else {
             String failReason = switch (successCode) {
                 case -1 -> "Player has insufficient permissions for specified nickname.";
