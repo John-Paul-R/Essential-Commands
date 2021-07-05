@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -39,7 +39,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
             nicknameText = Texts.parse(context.getSource(), nickname, senderPlayerEntity, 0);
         }
 
-        PlayerEntityAccess targetPlayerEntityAccess = (PlayerEntityAccess) targetPlayer;
+        ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
         int successCode = targetPlayerEntityAccess.getEcPlayerData().setNickname(nicknameText);
 
         //inform command sender that the nickname has been set

@@ -4,7 +4,7 @@ import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.QueuedPlayerTeleport;
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -25,7 +25,7 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store Target Player
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
-        PlayerData targetPlayerData = ((PlayerEntityAccess)targetPlayer).getEcPlayerData();
+        PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
         if (targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {

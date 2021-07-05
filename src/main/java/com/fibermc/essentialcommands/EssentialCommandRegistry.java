@@ -245,6 +245,19 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(nickNode);
                 }
 
+                if (Config.ENABLE_RTP) {
+                    LiteralArgumentBuilder<ServerCommandSource> rtpBuilder = CommandManager.literal("randomteleport");
+                    rtpBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
+                        .executes(new RandomTeleportCommand());
+
+                    LiteralCommandNode<ServerCommandSource> rtpNode = rtpBuilder.build();
+
+                    rootNode.addChild(rtpNode);
+                    rootNode.addChild(CommandManager.literal("rtp").redirect(rtpNode).build());
+                    essentialCommandsRootNode.addChild(rtpNode);
+                }
+
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
 
                 LiteralCommandNode<ServerCommandSource> configReloadNode = CommandManager.literal("reload")

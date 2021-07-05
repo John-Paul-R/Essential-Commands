@@ -3,7 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -23,7 +23,7 @@ public class BackCommand implements Command<ServerCommandSource> {
         int out = 0;
         //Store command sender
         ServerPlayerEntity player = context.getSource().getPlayer();
-        PlayerData playerData = ((PlayerEntityAccess)player).getEcPlayerData();
+        PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
 
         //Get previous location
         MinecraftLocation loc = playerData.getPreviousLocation();

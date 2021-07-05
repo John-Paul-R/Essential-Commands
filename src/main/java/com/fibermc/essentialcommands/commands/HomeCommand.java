@@ -2,7 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.LiteralMessage;
@@ -24,7 +24,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
         int out;
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
-        PlayerData senderPlayerData = ((PlayerEntityAccess)senderPlayer).getEcPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess)senderPlayer).getEcPlayerData();
         //Store home name
         String homeName = StringArgumentType.getString(context, "home_name");
 

@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -95,8 +94,8 @@ public class TeleportRequestManager {
     }
 
     public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer) {
-        PlayerData requestSenderData = ((PlayerEntityAccess)requestSender).getEcPlayerData();
-        PlayerData targetPlayerData = ((PlayerEntityAccess)targetPlayer).getEcPlayerData();
+        PlayerData requestSenderData = ((ServerPlayerEntityAccess)requestSender).getEcPlayerData();
+        PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         final int TRD = Config.TELEPORT_REQUEST_DURATION * TPS;//sec * ticks per sec
         requestSenderData.setTpTimer(TRD);
@@ -106,7 +105,7 @@ public class TeleportRequestManager {
     }
 
     public void startTpCooldown(ServerPlayerEntity player) {
-        PlayerData pData = ((PlayerEntityAccess)player).getEcPlayerData();
+        PlayerData pData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
 
         final int TC = (int)(Config.TELEPORT_COOLDOWN * TPS);
         pData.setTpCooldown(TC);
@@ -114,7 +113,7 @@ public class TeleportRequestManager {
     }
 
     public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, String destName) {
-        queueTeleport(new QueuedLocationTeleport(((PlayerEntityAccess)player).getEcPlayerData(), dest, destName));
+        queueTeleport(new QueuedLocationTeleport(((ServerPlayerEntityAccess)player).getEcPlayerData(), dest, destName));
     }
 
 

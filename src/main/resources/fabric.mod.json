@@ -15,7 +15,7 @@
     "discord": "https://discord.jpcode.dev"
   },
 
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/essential_commands/icon.png",
 
   "environment": "*",

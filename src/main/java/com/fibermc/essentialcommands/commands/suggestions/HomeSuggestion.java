@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands.suggestions;
 
-import com.fibermc.essentialcommands.access.PlayerEntityAccess;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -17,6 +17,6 @@ public class HomeSuggestion {
     }
 
     public static List<String> getSuggestionsList(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        return new ArrayList<>(((PlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData().getHomeNames());
+        return new ArrayList<>(((ServerPlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData().getHomeNames());
     }
 }

@@ -33,6 +33,7 @@ public class ECPerms {
         public static final String nickname_style_fancy = "essentialcommands.nickname.style.fancy";
         public static final String nickname_style_hover = "essentialcommands.nickname.style.hover";
         public static final String nickname_style_click = "essentialcommands.nickname.style.click";
+        public static final String randomteleport = "essentialcommands.randomteleport";
         public static final String config_reload = "essentialcommands.config.reload";
         public static final String bypass_teleport_delay = "essentialcommands.bypass.teleport_delay";
         public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";
