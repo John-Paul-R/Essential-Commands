@@ -8,6 +8,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,7 +89,7 @@ public class TeleportRequestManager {
                 delayedQueuedTeleportMap.remove(playerEntity.getUuid());
                 playerEntity.sendSystemMessage(
                     new LiteralText("Teleport interrupted. Reason: Damage Taken").setStyle(Config.FORMATTING_ERROR),
-                    new UUID(0, 0)
+                    Util.NIL_UUID
                 );
             } catch (NullPointerException ignored) {}
         }
@@ -127,7 +128,7 @@ public class TeleportRequestManager {
             prevValue.getPlayerData().getPlayer().sendSystemMessage(
                 new LiteralText("Teleport request canceled. Reason: New teleport started!")
                     .setStyle(Config.FORMATTING_DEFAULT),
-                new UUID(0,0)
+                Util.NIL_UUID
             );
         }
 

@@ -41,8 +41,8 @@ public class RealNameCommand implements Command<ServerCommandSource> {
             }
 
         }
-        context.getSource().getPlayer().sendSystemMessage(
-            responseText, new UUID(0,0)
+        context.getSource().sendFeedback(
+            responseText, false
         );
 
         return 0;

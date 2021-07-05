@@ -21,6 +21,7 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
         int out = 0;
+        ServerCommandSource source = context.getSource();
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store home name
@@ -30,18 +31,18 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
 
         //inform command sender that the home has been removed
         if (wasSuccessful) {
-            senderPlayer.sendSystemMessage(
-                    new LiteralText("Warp ").setStyle(Config.FORMATTING_DEFAULT)
-                            .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
-                    , new UUID(0, 0));
+            source.sendFeedback(
+                new LiteralText("Warp ").setStyle(Config.FORMATTING_DEFAULT)
+                    .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
+                , false);
             out = 1;
         } else {
-            senderPlayer.sendSystemMessage(
-                    new LiteralText("Warp ").setStyle(Config.FORMATTING_ERROR)
-                            .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(" could not be deleted. (Correct spelling?)").setStyle(Config.FORMATTING_ERROR))
-                    , new UUID(0, 0));
+            source.sendFeedback(
+                new LiteralText("Warp ").setStyle(Config.FORMATTING_ERROR)
+                    .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(" could not be deleted. (Correct spelling?)").setStyle(Config.FORMATTING_ERROR))
+                , false);
         }
 
 

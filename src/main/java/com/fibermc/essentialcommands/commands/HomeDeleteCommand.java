@@ -20,8 +20,9 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         int out = 1;
+        ServerCommandSource source = context.getSource();
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayer = source.getPlayer();
         PlayerData senderPlayerData = ((ServerPlayerEntityAccess)senderPlayer).getEcPlayerData();
         //Store home name
         String homeName = StringArgumentType.getString(context, "home_name");
@@ -31,17 +32,17 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
 
         //inform command sender that the home has been removed
         if (wasSuccessful) {
-            senderPlayer.sendSystemMessage(
-                    new LiteralText("Home ").setStyle(Config.FORMATTING_DEFAULT)
-                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
-                    , new UUID(0, 0));
+            source.sendFeedback(
+                new LiteralText("Home ").setStyle(Config.FORMATTING_DEFAULT)
+                    .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
+                , false);
         } else {
-            senderPlayer.sendSystemMessage(
-                    new LiteralText("Home ").setStyle(Config.FORMATTING_ERROR)
-                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
-                            .append(new LiteralText(" could not be deleted.").setStyle(Config.FORMATTING_ERROR))
-                    , new UUID(0, 0));
+            source.sendError(
+                new LiteralText("Home ").setStyle(Config.FORMATTING_ERROR)
+                    .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(" could not be deleted.").setStyle(Config.FORMATTING_ERROR))
+            );
             out = 0;
         }
 

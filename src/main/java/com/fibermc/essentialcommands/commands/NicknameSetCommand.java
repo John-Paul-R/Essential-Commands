@@ -21,8 +21,9 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        ServerCommandSource source = context.getSource();
         //Store command sender
-        ServerPlayerEntity senderPlayerEntity = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayerEntity = source.getPlayer();
 
         ServerPlayerEntity targetPlayer;
         try {
@@ -44,14 +45,14 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
 
         //inform command sender that the nickname has been set
         if (successCode >= 0) {
-            senderPlayerEntity.sendSystemMessage(
+            source.sendFeedback(
                 new LiteralText("")
                     .append(new LiteralText("Nickname set to '").setStyle(Config.FORMATTING_DEFAULT))
                     .append(
                         (nicknameText != null) ?
                             nicknameText : new LiteralText(senderPlayerEntity.getGameProfile().getName())
                     ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
-                , new UUID(0, 0));
+                , false);
         } else {
             String failReason = switch (successCode) {
                 case -1 -> "Player has insufficient permissions for specified nickname.";
@@ -62,14 +63,12 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
                 );
                 default -> "Unknown";
             };
-            senderPlayerEntity.sendSystemMessage(
+            source.sendError(
                 new LiteralText("Nickname could not be set to '").setStyle(Config.FORMATTING_ERROR)
                     .append(nicknameText)
                     .append(new LiteralText("'. Reason: ").setStyle(Config.FORMATTING_ERROR))
                     .append(new LiteralText(failReason).setStyle(Config.FORMATTING_ERROR))
-//                    .append(new LiteralText(String.valueOf(Config.HOME_LIMIT)).setStyle(Config.FORMATTING_ACCENT))
-//                    .append(new LiteralText(") reached.").setStyle(Config.FORMATTING_ERROR))
-                , new UUID(0, 0));
+            );
         }
 
         return successCode;

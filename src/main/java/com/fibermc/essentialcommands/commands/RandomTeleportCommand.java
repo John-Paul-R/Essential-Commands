@@ -54,12 +54,10 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                 thread.start();
                 resultCode = 1;
             } else {
-                player.sendSystemMessage(
-                    new LiteralText("")
-                        .append(new LiteralText("Could not execute command `/rtp`. Reason: command is on cooldown. (").setStyle(Config.FORMATTING_ERROR))
-                        .append(new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT))
-                        .append(new LiteralText(" seconds remaining.)").setStyle(Config.FORMATTING_ERROR)),
-                    new UUID(0,0)
+                source.sendError(new LiteralText("")
+                    .append(new LiteralText("Could not execute command `/rtp`. Reason: command is on cooldown. (").setStyle(Config.FORMATTING_ERROR))
+                    .append(new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(" seconds remaining.)").setStyle(Config.FORMATTING_ERROR))
                 );
                 resultCode = -2;
             }
