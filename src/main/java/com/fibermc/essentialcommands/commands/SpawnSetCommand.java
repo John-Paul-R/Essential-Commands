@@ -20,8 +20,9 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
 
+        ServerCommandSource source = context.getSource();
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayer = source.getPlayer();
 
         int successCode = 1;
 
@@ -30,10 +31,10 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
         worldDataManager.setSpawn(loc);
 
         //inform command sender that the home has been set
-        senderPlayer.sendSystemMessage(
+        source.sendFeedback(
             new LiteralText("Spawn set at ").setStyle(Config.FORMATTING_DEFAULT)
                 .append(loc.toLiteralTextSimple().setStyle(Config.FORMATTING_ACCENT))
-            , new UUID(0, 0));
+            , Config.BROADCAST_TO_OPS);
 
         return successCode;
     }

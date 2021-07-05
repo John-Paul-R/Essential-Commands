@@ -19,7 +19,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Store command sender
         ServerPlayerEntity senderPlayerEntity = context.getSource().getPlayer();
-        ServerPlayerEntity targetPlayer = null;
+        ServerPlayerEntity targetPlayer;
         try {
             targetPlayer = EntityArgumentType.getPlayer(context, "target");
         } catch (IllegalArgumentException e) {
@@ -30,12 +30,12 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
         targetPlayerEntityAccess.getEcPlayerData().setNickname(null);
 
         //inform command sender that the nickname has been set
-        senderPlayerEntity.sendSystemMessage(
+        context.getSource().sendFeedback(
             new LiteralText("")
                 .append(new LiteralText("Nickname set to '").setStyle(Config.FORMATTING_DEFAULT))
                 .append(new LiteralText(senderPlayerEntity.getGameProfile().getName())
                 ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
-            , new UUID(0, 0));
+            , Config.BROADCAST_TO_OPS);
 
         return 1;
     }

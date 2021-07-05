@@ -23,8 +23,9 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
         int out;
+        ServerCommandSource source = context.getSource();
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayer = source.getPlayer();
         //Store home name
         String warpName = StringArgumentType.getString(context, "warp_name");
 

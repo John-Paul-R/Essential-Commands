@@ -16,6 +16,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import org.gradle.internal.impldep.org.apache.maven.settings.Server;
 
 import java.util.Random;
 import java.util.UUID;
@@ -32,26 +33,37 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         int resultCode = -1;
+
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        ServerWorld world = context.getSource().getWorld();
+
+        Thread thread = new Thread("RTP Location Calculator Thread") {
+            public void run() {
+                exec(player, world);
+            }
+        };
+
         //TODO Add OP/Permission bypass for RTP cooldown.
         if (Config.RTP_COOLDOWN > 0) {
             ServerCommandSource source = context.getSource();
             int ticks = source.getMinecraftServer().getTicks();
-            PlayerData playerData = ((ServerPlayerEntityAccess)source.getPlayer()).getEcPlayerData();
+            PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
             // if cooldown has expired
             if (playerData.getRtpNextUsableTime() < ticks) {
                 playerData.setRtpNextUsableTime(ticks + Config.RTP_COOLDOWN*20);
-                resultCode = exec(context);
+                thread.start();
+                resultCode = 1;
             } else {
-                source.getPlayer().sendSystemMessage(
-                    new LiteralText("")
-                        .append(new LiteralText("Could not execute command `/rtp`. Reason: command is on cooldown. (").setStyle(Config.FORMATTING_ERROR))
-                        .append(new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT))
-                        .append(new LiteralText(" seconds remaining.)").setStyle(Config.FORMATTING_ERROR)),
-                    new UUID(0,0)
+                source.sendError(new LiteralText("")
+                    .append(new LiteralText("Could not execute command `/rtp`. Reason: command is on cooldown. (").setStyle(Config.FORMATTING_ERROR))
+                    .append(new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT))
+                    .append(new LiteralText(" seconds remaining.)").setStyle(Config.FORMATTING_ERROR))
                 );
+                resultCode = -2;
             }
         } else {
-            resultCode = exec(context);
+            thread.start();
+            resultCode = 1;
         }
 
         return resultCode;
@@ -64,16 +76,14 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return targetBlockState.isAir() && footBlockState.getMaterial().isSolid();
     }
 
-    private static int exec(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
-        return exec(ctx, 0);
+    private static int exec(ServerPlayerEntity playerEntity, ServerWorld world) {
+        return exec(playerEntity, world, 0);
     }
 
-    private static int exec(CommandContext<ServerCommandSource> ctx, int timesRun) throws CommandSyntaxException {
+    private static int exec(ServerPlayerEntity player, ServerWorld world, int timesRun) {
         if (timesRun > Config.RTP_MAX_ATTEMPTS) {
             return -1;
         }
-        ServerPlayerEntity player = ctx.getSource().getPlayer();
-        ServerWorld world = ctx.getSource().getWorld();
         // Calculate position on circle perimeter
         int r = Config.RTP_RADIUS;
         double angle = (new Random()).nextDouble()*2*Math.PI;
@@ -85,6 +95,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         double new_z = spawnLocation.pos.z + delta_z;
 
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
+        // TODO Can maybe run a loop that checks every-other block? (player is 2 blocks high)
         int new_y;
         Stopwatch timer = Stopwatch.createStarted();
         BlockHitResult blockHitResult = world.raycast(new RaycastContext(
@@ -101,7 +112,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
         //  Addressed by adding timesRun limit.
         if (world.isWater(new BlockPos(new_x, new_y-2, new_z))) {
-            return exec(ctx, timesRun + 1);
+            return exec(player, world, timesRun + 1);
         }
 
         // Teleport the player

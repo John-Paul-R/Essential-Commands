@@ -12,6 +12,7 @@ import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Util;
 
 import java.util.UUID;
 
@@ -21,8 +22,9 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
     
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        ServerCommandSource source = context.getSource();
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayer = source.getPlayer();
         //Store Target Player
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
         PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
@@ -33,7 +35,7 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
                 new LiteralText("Teleport request accepted.").setStyle(Config.FORMATTING_DEFAULT)
-                , new UUID(0, 0));
+                , Util.NIL_UUID);
 
             //Conduct teleportation
             PlayerTeleporter.requestTeleport(new QueuedPlayerTeleport(
@@ -46,15 +48,15 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
             targetPlayerData.setTpTimer(-1);
 
             //Send message to command sender confirming that request has been accepted
-            senderPlayer.sendSystemMessage(
-                    new LiteralText("Teleport request accepted.").setStyle(Config.FORMATTING_DEFAULT)
-                , new UUID(0, 0));
+            source.sendFeedback(
+                new LiteralText("Teleport request accepted.").setStyle(Config.FORMATTING_DEFAULT)
+                , Config.BROADCAST_TO_OPS);
             return 1;
         } else {
             //throw new CommandSyntaxException(type, message)
-            senderPlayer.sendSystemMessage(
-                    new LiteralText("ERROR: Teleport failed.").setStyle(Config.FORMATTING_ERROR)
-                , new UUID(0, 0));
+            source.sendError(
+                new LiteralText("Teleport failed.").setStyle(Config.FORMATTING_ERROR)
+            );
             return 0;
         }
     }

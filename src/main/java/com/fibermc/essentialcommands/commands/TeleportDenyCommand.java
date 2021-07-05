@@ -10,8 +10,7 @@ import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-
-import java.util.UUID;
+import net.minecraft.util.Util;
 
 public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
@@ -19,9 +18,9 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-
+        ServerCommandSource source = context.getSource();
         //Store command sender
-         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+         ServerPlayerEntity senderPlayer = source.getPlayer();
         //Store Target Player
          ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
          PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
@@ -31,15 +30,16 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
                 new LiteralText("Teleport request denied.").setStyle(Config.FORMATTING_DEFAULT)
-                , new UUID(0, 0));
+                , Util.NIL_UUID);
             
             //Clean up TPAsk
             targetPlayerData.setTpTimer(-1);
 
             //Send message to command sender confirming that request has been accepted
-            senderPlayer.sendSystemMessage(
-                    new LiteralText("Teleport request denied.").setStyle(Config.FORMATTING_DEFAULT)
-                , new UUID(0, 0));
+            source.sendFeedback(
+                new LiteralText("Teleport request denied.").setStyle(Config.FORMATTING_DEFAULT)
+                , Config.BROADCAST_TO_OPS
+            );
             return 1;
         } else {
             //throw new CommandSyntaxException(type, message)

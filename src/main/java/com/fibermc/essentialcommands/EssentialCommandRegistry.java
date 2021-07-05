@@ -246,16 +246,18 @@ public class EssentialCommandRegistry {
                 }
 
                 if (Config.ENABLE_RTP) {
-                    LiteralArgumentBuilder<ServerCommandSource> rtpBuilder = CommandManager.literal("randomteleport");
-                    rtpBuilder
+                    LiteralCommandNode<ServerCommandSource> rtpNode = dispatcher.register(
+                        CommandManager.literal("randomteleport")
+                            .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
+                            .executes(new RandomTeleportCommand())
+                    );
+
+                    dispatcher.register(CommandManager.literal("rtp")
                         .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
-                        .executes(new RandomTeleportCommand());
-
-                    LiteralCommandNode<ServerCommandSource> rtpNode = rtpBuilder.build();
-
-                    rootNode.addChild(rtpNode);
-                    rootNode.addChild(CommandManager.literal("rtp").redirect(rtpNode).build());
+                        .executes(new RandomTeleportCommand())
+                    );
                     essentialCommandsRootNode.addChild(rtpNode);
+
                 }
 
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();

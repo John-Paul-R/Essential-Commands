@@ -24,9 +24,9 @@ public class ListCommandFactory {
                 new LiteralText(", ").setStyle(Config.FORMATTING_DEFAULT),
                 Config.FORMATTING_ACCENT
             ));
-            context.getSource().getPlayer().sendSystemMessage(
+            context.getSource().sendFeedback(
                 responseText,
-                new UUID(0, 0)
+                Config.BROADCAST_TO_OPS
             );
             return 0;
         };

@@ -32,6 +32,7 @@ Command | Permission | Description
 /nickname clear                             | `essentialcommands.nickname.self`     | Clear your own nickname.
 /nickname clear \<target-player>            | `essentialcommands.nickname.others`   | Clear target player's nickname.
 /nickname reveal \<player-nickname>         | `essentialcommands.nickname.reveal`   | Get list of players with the provided nickname (String, case-insensitive).
+/randomteleport \|\| /rtp     | `essentialcommands.randomteleport`    | Teleport to a random location a preset (in config) distance from the spawn.
 N/A | `essentialcommands.nickname.style.color` | Allows setting colorful nicknames.
 N/A | `essentialcommands.nickname.style.fancy` | Allows setting nicknames that have special formatting (italic, bold, etc.)
 N/A | `essentialcommands.nickname.style.hover` | Allows setting nicknames that show text on hover.

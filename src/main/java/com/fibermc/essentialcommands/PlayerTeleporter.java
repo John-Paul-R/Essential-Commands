@@ -32,7 +32,7 @@ public class PlayerTeleporter {
                     .append(new LiteralText(" in ").setStyle(Config.FORMATTING_DEFAULT))
                     .append(new LiteralText(String.format("%.1f", Config.TELEPORT_DELAY)).setStyle(Config.FORMATTING_ACCENT))
                     .append(new LiteralText(" seconds...")).setStyle(Config.FORMATTING_DEFAULT),
-                new UUID(0,0)
+                Util.NIL_UUID
             );
         }
     }
@@ -77,7 +77,7 @@ public class PlayerTeleporter {
             new LiteralText("Teleported to ").setStyle(Config.FORMATTING_DEFAULT)
                 .append(dest.toLiteralTextSimple().setStyle(Config.FORMATTING_ACCENT))
                 .append(new LiteralText(".").setStyle(Config.FORMATTING_DEFAULT)),
-            new UUID(0,0)
+            Util.NIL_UUID
         );
     }
 

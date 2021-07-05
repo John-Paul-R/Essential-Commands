@@ -20,8 +20,9 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
 
+        ServerCommandSource source = context.getSource();
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayer = source.getPlayer();
         //Store home name
         String warpName = StringArgumentType.getString(context, "warp_name");
 
@@ -29,11 +30,11 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
         worldDataManager.setWarp(warpName, new MinecraftLocation(senderPlayer));
 
         //inform command sender that the home has been set
-        senderPlayer.sendSystemMessage(
-                new LiteralText("Warp '").setStyle(Config.FORMATTING_DEFAULT)
-                        .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
-                        .append(new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT))
-                , new UUID(0, 0));
+        source.sendFeedback(
+            new LiteralText("Warp '").setStyle(Config.FORMATTING_DEFAULT)
+                .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
+                .append(new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT))
+            , Config.BROADCAST_TO_OPS);
 
         return 1;
     }
