@@ -10,6 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * TeleportRequestManager
@@ -20,7 +21,7 @@ public class TeleportRequestManager {
     private final PlayerDataManager dataManager;
     private final LinkedList<PlayerData> activeTpRequestList;
     private final LinkedList<PlayerData> tpCooldownList;
-    private final HashMap<UUID, QueuedTeleport> delayedTeleportQueue;
+    private final ConcurrentHashMap<UUID, QueuedTeleport> delayedTeleportQueue;
 
     private static TeleportRequestManager INSTANCE;
 
@@ -29,7 +30,7 @@ public class TeleportRequestManager {
         this.dataManager = dataManager;
         activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
-        delayedTeleportQueue = new HashMap<>();
+        delayedTeleportQueue = new ConcurrentHashMap<>();
     }
 
     public static TeleportRequestManager getInstance() {
