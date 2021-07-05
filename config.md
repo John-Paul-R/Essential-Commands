@@ -18,6 +18,7 @@ enable_spawn                       | true           | boolean
 enable_tpa                         | true           | boolean
 enable_warp                        | true           | boolean
 enable_nick                        | true           | boolean
+enable_rtp                         | true           | boolean
 home_limit                         | 1              | integer
 ~~teleport_cooldown~~              | 1.0            | double (seconds)
 teleport_delay                     | 0.0            | double (seconds)
@@ -30,6 +31,9 @@ allow_teleport_between_dimensions  | true           | boolean
 ops_bypass_teleport_rules          | true           | boolean
 nicknames_in_player_list           | true           | boolean
 nickname_prefix                    | {"text":"~","color":"red"} | MinecraftText
+rtp_radius                         | 1000           | integer
+rtp_cooldown                       | 30             | integer
+rtp_max_attempts                   | 15             | integer
 
 *Note: if `use_permissions_api` is set to true, OPs are treated as having all permissions (thus making the `ops_bypass_teleport_rules` config option do nothing).*
 

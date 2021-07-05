@@ -97,6 +97,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         double new_z = spawnLocation.pos.z + delta_z;
 
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
+        // TODO Can maybe run a loop that checks every-other block? (player is 2 blocks high)
         int new_y;
         Stopwatch timer = Stopwatch.createStarted();
         BlockHitResult blockHitResult = world.raycast(new RaycastContext(

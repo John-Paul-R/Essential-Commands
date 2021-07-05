@@ -21,7 +21,7 @@ public class TeleportRequestManager {
     private final PlayerDataManager dataManager;
     private final LinkedList<PlayerData> activeTpRequestList;
     private final LinkedList<PlayerData> tpCooldownList;
-    private final ConcurrentHashMap<UUID, QueuedTeleport> delayedTeleportQueue;
+    private final ConcurrentHashMap<UUID, QueuedTeleport> delayedQueuedTeleportMap;
 
     private static TeleportRequestManager INSTANCE;
 
@@ -30,7 +30,7 @@ public class TeleportRequestManager {
         this.dataManager = dataManager;
         activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
-        delayedTeleportQueue = new ConcurrentHashMap<>();
+        delayedQueuedTeleportMap = new ConcurrentHashMap<>();
     }
 
     public static TeleportRequestManager getInstance() {
@@ -68,7 +68,7 @@ public class TeleportRequestManager {
             }
         }
 
-        Iterator<Map.Entry<UUID, QueuedTeleport>> tpQueueIter = delayedTeleportQueue.entrySet().iterator();
+        Iterator<Map.Entry<UUID, QueuedTeleport>> tpQueueIter = delayedQueuedTeleportMap.entrySet().iterator();
         while (tpQueueIter.hasNext()) {
             Map.Entry<UUID, QueuedTeleport> entry = tpQueueIter.next();
             QueuedTeleport queuedTeleport = entry.getValue();
@@ -85,7 +85,7 @@ public class TeleportRequestManager {
             try {
                 Objects.requireNonNull( ((ServerPlayerEntityAccess)playerEntity).endEcQueuedTeleport());
 
-                delayedTeleportQueue.remove(playerEntity.getUuid());
+                delayedQueuedTeleportMap.remove(playerEntity.getUuid());
                 playerEntity.sendSystemMessage(
                     new LiteralText("Teleport interrupted. Reason: Damage Taken").setStyle(Config.FORMATTING_ERROR),
                     new UUID(0, 0)
@@ -119,7 +119,7 @@ public class TeleportRequestManager {
 
 
     public void queueTeleport(QueuedTeleport queuedTeleport) {
-        QueuedTeleport prevValue = delayedTeleportQueue.put(
+        QueuedTeleport prevValue = delayedQueuedTeleportMap.put(
             queuedTeleport.getPlayerData().getPlayer().getUuid(),
             queuedTeleport
         );
