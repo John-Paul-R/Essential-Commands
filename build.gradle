@@ -262,5 +262,11 @@ def static getenv(path = ".env") {
 }
 
 def getChangelog() {
-	return project.file('./changelog.md').getText('UTF-8')
+	try {
+		return new File('./changelog.md').getText('UTF-8')
+
+	} catch (FileNotFoundException e) {
+		e.printStackTrace();
+	}
+	return "null";
 }
