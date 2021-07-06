@@ -62,6 +62,11 @@ See the [full List of Commands & Permissions](https://github.com/John-Paul-R/Ess
   - /nickname clear
   - /nickname reveal \<nickname>
 
+### Random Teleport (/wild equivalent)
+
+  - /randomteleport 
+  - /rtp
+
 ### Config
 
   - /essentialcommands config reload
