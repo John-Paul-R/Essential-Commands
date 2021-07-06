@@ -1,0 +1,104 @@
+plugins {
+    id 'groovy'
+    id 'java-gradle-plugin'
+    id 'fabric-loom' version '0.8-SNAPSHOT'
+}
+
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+
+allprojects {
+    apply plugin: 'fabric-loom'
+    apply plugin: 'idea'
+
+    group = project.maven_group
+    version = project.mod_version
+    archivesBaseName = "${project.mod_id}"//-mc${project.minecraft_version}
+
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
+
+    // Declare dependencies
+    dependencies {
+        // Fabric
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+        // Mods
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+//		modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
+        modImplementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+
+        // Code Quality
+        compileOnly "org.jetbrains:annotations:${project.jetbrains_annotations_version}"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_jupiter_version}"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_jupiter_version}"
+
+        // JIJ Dependencies
+        modApi 	'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
+        include	'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
+
+        // Subprojects
+        subprojects.each {
+            implementation project(":${it.name}")
+            include project("${it.name}:") // nest within distribution
+        }
+    }
+
+    // Perform tests using the JUnit test suite
+    test {
+        useJUnitPlatform()
+    }
+
+    // Produce a sources distribution
+    java {
+        withSourcesJar()
+    }
+
+    // Add the licence to all distributions
+    tasks.withType(Jar).configureEach {
+        it.from rootProject.file('LICENCE')
+    }
+
+    // Process any resources
+    processResources {
+        inputs.property 'id', project.mod_id
+        inputs.property 'name', project.mod_name
+        inputs.property 'version', project.version
+
+        // fabric.mod.json
+        filesMatching('fabric.mod.json') {
+            expand(['id': project.mod_id, 'name': project.mod_name, 'version': project.version])
+        }
+    }
+
+    // Add any additional repositories
+    repositories {
+        mavenCentral()
+        maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
+//		maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
+        // Add repositories to retrieve artifacts from in here.
+        // You should only use this when depending on other mods because
+        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+        // for more information about repositories.
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    }
+
+}
+
+tasks.withType(JavaCompile).configureEach {
+    // ensure that the encoding is set to UTF-8, no matter what the system default is
+    // this fixes some edge cases with special characters not displaying correctly
+    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+    // If Javadoc is generated, this must be specified in that task too.
+    it.options.encoding = "UTF-8"
+
+    // Minecraft 1.17 (21w19a) upwards uses Java 16.
+    it.options.release = 16
+}
