@@ -25,3 +25,8 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew -b build-github-action.gradle build
+    - name: Upload all build artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: all-build-artifacts
+        path: build/libs
