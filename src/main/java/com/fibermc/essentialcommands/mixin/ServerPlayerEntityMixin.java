@@ -73,11 +73,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     public void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
         try {
             if (this.getEcPlayerData().getNickname() != null) {
-
-                cir.setReturnValue(new LiteralText("")
-                    .append(Config.NICKNAME_PREFIX)
-                    .append(this.getEcPlayerData().getNickname())
-                );
+                cir.setReturnValue(this.getEcPlayerData().getFullNickname());
                 cir.cancel();
             }
         } catch (NullPointerException e) {

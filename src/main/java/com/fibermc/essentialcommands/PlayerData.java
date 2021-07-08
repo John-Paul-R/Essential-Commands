@@ -1,11 +1,14 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.google.common.collect.Maps;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.world.PersistentState;
@@ -37,6 +40,7 @@ public class PlayerData extends PersistentState {
 
     // Nickname
     private Text nickname;
+    private MutableText fullNickname;
 
     // RTP Cooldown
     private int rtpNextUsableTime;
@@ -129,6 +133,7 @@ public class PlayerData extends PersistentState {
         this.homes = homes;
         if (dataTag.contains("nickname")){
             this.nickname = Text.Serializer.fromJson(dataTag.getString("nickname"));
+            reloadFullNickname();
         }
     }
 
@@ -186,11 +191,15 @@ public class PlayerData extends PersistentState {
     public MutableText getNickname() {
         return Objects.nonNull(nickname) ? nickname.shallowCopy() : null;
     }
+    public MutableText getFullNickname() {
+        return Objects.nonNull(fullNickname) ? fullNickname : null;
+    }
 
     public int setNickname(Text nickname) {
         // Reset nickname
         if (nickname == null) {
             this.nickname = null;
+            reloadFullNickname();
             return 1;
         }
         // Ensure nickname does not exceed max length
@@ -216,6 +225,7 @@ public class PlayerData extends PersistentState {
 
         // Set nickname
         this.nickname = nickname;
+        reloadFullNickname();
         PlayerDataManager.getInstance().markNicknameDirty(this);
         this.markDirty();
         // Return codes based on fail/success
@@ -233,5 +243,28 @@ public class PlayerData extends PersistentState {
 
     public int getRtpNextUsableTime() {
         return rtpNextUsableTime;
+    }
+
+    public void reloadFullNickname() {
+        MutableText baseName = new LiteralText(this.getPlayer().getGameProfile().getName());
+        MutableText tempFullNickname = new LiteralText("");
+        // Note: this doesn't ever display if nickname is null,
+        //  because our mixin to getDisplayName does a null check on getNickname
+        if (this.nickname != null) {
+            tempFullNickname
+                .append(Config.NICKNAME_PREFIX)
+                .append(this.nickname );
+        } else {
+            tempFullNickname
+                .append(baseName);
+        }
+
+        if (Config.NICK_REVEAL_ON_HOVER) {
+            tempFullNickname.setStyle(tempFullNickname.getStyle().withHoverEvent(
+                HoverEvent.Action.SHOW_TEXT.buildHoverEvent(baseName)
+            ));
+        }
+
+        this.fullNickname = tempFullNickname;
     }
 }
