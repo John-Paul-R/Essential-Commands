@@ -1,7 +1,12 @@
 package com.fibermc.essentialcommands.util;
 
+import com.fibermc.essentialcommands.EssentialCommands;
+import com.google.gson.JsonParseException;
+import eu.pb4.placeholders.TextParser;
 import net.minecraft.text.*;
+import org.apache.logging.log4j.Level;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class TextUtil {
@@ -80,4 +85,31 @@ public class TextUtil {
         return originalText.setStyle(outStyle);
     }
 
+
+    private static final Collection<StringToTextParser> textParsers = new ArrayList<>();
+    /**
+     * Parsers should be registered in order of most-restrictive to least restrictive.
+     */
+    public static void registerTextParser(StringToTextParser parser) {
+        textParsers.add(parser);
+    }
+
+    static {
+        registerTextParser(Text.Serializer::fromJson);
+        registerTextParser(TextParser::parse);
+    }
+    public static Text parseText(String textStr) {
+        Text outText = null;
+        for (StringToTextParser parser : textParsers) {
+            try {
+                outText = parser.parseText(textStr);
+            } catch (JsonParseException e) {
+                EssentialCommands.log(Level.INFO, String.format("Failed to parse string '%s' as MinecraftText, trying Fabric Placeholder API...", textStr));
+            }
+
+            if (outText != null)
+                break;
+        }
+        return outText;
+    }
 }

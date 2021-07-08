@@ -40,8 +40,10 @@ allprojects {
 		testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_jupiter_version}"
 
 		// JIJ Dependencies
-		modApi 	'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
-		include	'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
+		modApi 	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+		include	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+		modApi  "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+		include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
 
 		// Subprojects
 		subprojects.each {
@@ -88,6 +90,8 @@ allprojects {
 		// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 		// for more information about repositories.
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+		maven { url 'https://maven.nucleoid.xyz' }
+		// Used by FabricPlaceholderAPI
 	}
 
 }

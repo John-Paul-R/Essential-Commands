@@ -5,6 +5,7 @@ import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -16,6 +17,8 @@ import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
+
+import java.util.function.Predicate;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
@@ -209,15 +212,21 @@ public class EssentialCommandRegistry {
                     LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
                     LiteralArgumentBuilder<ServerCommandSource> nickRevealBuilder = CommandManager.literal("reveal");
 
-                    nickSetBuilder
-                        .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))
+                    Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.nickname_self, 2);
+                    Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 4);
+                    nickSetBuilder.requires(permissionSelf)
                         .then(argument("nickname", TextArgumentType.text())
                             .executes(new NicknameSetCommand())
                         ).then(argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require(ECPerms.Registry.nickname_others, 4))
+                            .requires(permissionOther)
                             .then(argument("nickname", TextArgumentType.text())
                                 .executes(new NicknameSetCommand())
-                        ));
+                            ).then(argument("nickname_placeholder_api", StringArgumentType.greedyString())
+                                .executes(NicknameSetCommand::runStringToText)
+                            )
+                        ).then(argument("nickname_placeholder_api", StringArgumentType.greedyString())
+                            .executes(NicknameSetCommand::runStringToText)
+                        );
 
                     nickClearBuilder
                         .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))

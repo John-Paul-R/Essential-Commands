@@ -2,7 +2,9 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -14,8 +16,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
 
-import java.util.UUID;
-
 public class NicknameSetCommand implements Command<ServerCommandSource>  {
     public NicknameSetCommand() {}
 
@@ -25,13 +25,6 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
         //Store command sender
         ServerPlayerEntity senderPlayerEntity = source.getPlayer();
 
-        ServerPlayerEntity targetPlayer;
-        try {
-            targetPlayer = EntityArgumentType.getPlayer(context, "target");
-        } catch (IllegalArgumentException e) {
-            targetPlayer = senderPlayerEntity;
-        }
-
         //Get specified new nickname
         Text nickname = TextArgumentType.getTextArgument(context, "nickname");
         MutableText nicknameText = null;
@@ -39,6 +32,31 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
         if ( nickname != null && !"".equals(nickname.getString()) ) {
             nicknameText = Texts.parse(context.getSource(), nickname, senderPlayerEntity, 0);
         }
+
+        return exec(context, nicknameText);
+    }
+
+    public static int runStringToText(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        NicknameSetCommand.exec(context, TextUtil.parseText(StringArgumentType.getString(context, "nickname_placeholder_api")));
+        return 1;
+    }
+
+    public static ServerPlayerEntity getTargetPlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        ServerPlayerEntity targetPlayer;
+        try {
+            targetPlayer = EntityArgumentType.getPlayer(context, "target");
+        } catch (IllegalArgumentException e) {
+            targetPlayer = context.getSource().getPlayer();
+        }
+        return targetPlayer;
+    }
+
+    public static int exec(CommandContext<ServerCommandSource> context, Text nicknameText) throws CommandSyntaxException {
+        ServerCommandSource source = context.getSource();
+        //Store command sender
+        ServerPlayerEntity senderPlayerEntity = context.getSource().getPlayer();
+
+        ServerPlayerEntity targetPlayer = getTargetPlayer(context);
 
         ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
         int successCode = targetPlayerEntityAccess.getEcPlayerData().setNickname(nicknameText);

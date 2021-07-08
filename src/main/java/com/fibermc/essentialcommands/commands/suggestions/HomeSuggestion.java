@@ -19,10 +19,16 @@ public class HomeSuggestion {
             getSuggestionsList(context));
     }
 
+    /**
+     * Gets a list of suggested strings to be used with Brigader
+     */
     public static List<String> getSuggestionsList(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         return new ArrayList<>(((ServerPlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData().getHomeNames());
     }
 
+    /**
+     * Gets a set of suggestion entries to be used with ListCommandFactory
+      */
     public static Set<Map.Entry<String, MinecraftLocation>> getSuggestionEntries(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         return ((ServerPlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData().getHomeEntries();
     }

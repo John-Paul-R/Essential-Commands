@@ -14,6 +14,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
 
+import static com.fibermc.essentialcommands.util.TextUtil.parseText;
+
 public class Config {
 
     private static SortedProperties props;
@@ -223,10 +225,6 @@ public class Config {
             );
         }
         return outText;
-    }
-
-    private static Text parseText(String textStr) {
-        return Text.Serializer.fromJson(textStr);
     }
 
     public static void storeProperties() {
