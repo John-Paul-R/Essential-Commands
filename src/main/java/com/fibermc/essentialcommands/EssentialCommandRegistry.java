@@ -11,16 +11,14 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import groovyjarjarantlr.collections.List;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
 
-import java.util.UUID;
+import java.util.function.Predicate;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
@@ -108,7 +106,8 @@ public class EssentialCommandRegistry {
                         .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                         .executes(ListCommandFactory.create(
                             "Your current homes are: ",
-                            HomeSuggestion::getSuggestionsList
+                            "home tp",
+                            HomeSuggestion::getSuggestionEntries
                         ));
 
                     LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder.build();
@@ -164,7 +163,8 @@ public class EssentialCommandRegistry {
                         .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                         .executes(ListCommandFactory.create(
                             "The available server Warps are: ",
-                            (context) -> ManagerLocator.INSTANCE.getWorldDataManager().getWarpNames()
+                            "warp tp",
+                            (context) -> ManagerLocator.INSTANCE.getWorldDataManager().getWarpEntries()
                         ));
 
 
@@ -212,15 +212,21 @@ public class EssentialCommandRegistry {
                     LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
                     LiteralArgumentBuilder<ServerCommandSource> nickRevealBuilder = CommandManager.literal("reveal");
 
-                    nickSetBuilder
-                        .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))
+                    Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.nickname_self, 2);
+                    Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 4);
+                    nickSetBuilder.requires(permissionSelf)
                         .then(argument("nickname", TextArgumentType.text())
                             .executes(new NicknameSetCommand())
                         ).then(argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require(ECPerms.Registry.nickname_others, 4))
+                            .requires(permissionOther)
                             .then(argument("nickname", TextArgumentType.text())
                                 .executes(new NicknameSetCommand())
-                        ));
+                            ).then(argument("nickname_placeholder_api", StringArgumentType.greedyString())
+                                .executes(NicknameSetCommand::runStringToText)
+                            )
+                        ).then(argument("nickname_placeholder_api", StringArgumentType.greedyString())
+                            .executes(NicknameSetCommand::runStringToText)
+                        );
 
                     nickClearBuilder
                         .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))

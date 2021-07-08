@@ -1,15 +1,24 @@
 package com.fibermc.essentialcommands.util;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import com.fibermc.essentialcommands.EssentialCommands;
+import com.google.gson.JsonParseException;
+import eu.pb4.placeholders.TextParser;
+import net.minecraft.text.*;
+import org.apache.logging.log4j.Level;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class TextUtil {
 
 
+    public static MutableText concat(Text... arr) {
+        MutableText out = new LiteralText("");
+        for (Text text : arr) {
+            out.append(text);
+        }
+        return out;
+    }
 /**
   * <p>Joins the elements of the provided array into a single Text
   * containing the provided list of elements.</p>
@@ -73,4 +82,41 @@ public class TextUtil {
         return buf;
     }
 
+    public static Text clickableTeleport(MutableText originalText, String destinationName, String commandBaseString) {
+        String teleportCommand = String.format("%s %s", commandBaseString, destinationName);
+
+        Style outStyle = originalText.getStyle()
+            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, teleportCommand))
+            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to teleport to " + destinationName +".")));
+
+        return originalText.setStyle(outStyle);
+    }
+
+
+    private static final Collection<StringToTextParser> textParsers = new ArrayList<>();
+    /**
+     * Parsers should be registered in order of most-restrictive to least restrictive.
+     */
+    public static void registerTextParser(StringToTextParser parser) {
+        textParsers.add(parser);
+    }
+
+    static {
+        registerTextParser(Text.Serializer::fromJson);
+        registerTextParser(TextParser::parse);
+    }
+    public static Text parseText(String textStr) {
+        Text outText = null;
+        for (StringToTextParser parser : textParsers) {
+            try {
+                outText = parser.parseText(textStr);
+            } catch (JsonParseException e) {
+                EssentialCommands.log(Level.INFO, String.format("Failed to parse string '%s' as MinecraftText, trying Fabric Placeholder API...", textStr));
+            }
+
+            if (outText != null)
+                break;
+        }
+        return outText;
+    }
 }

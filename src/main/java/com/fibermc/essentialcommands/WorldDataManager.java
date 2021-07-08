@@ -1,14 +1,10 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.PersistentState;
 import org.apache.logging.log4j.Level;
@@ -21,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class WorldDataManager extends PersistentState {
     private HashMap<String, MinecraftLocation> warps;
@@ -125,6 +123,9 @@ public class WorldDataManager extends PersistentState {
 
     public List<String> getWarpNames() {
         return new ArrayList<>(this.warps.keySet());
+    }
+    public Set<Entry<String, MinecraftLocation>> getWarpEntries() {
+        return this.warps.entrySet();
     }
 
     public void setSpawn(MinecraftLocation location) {

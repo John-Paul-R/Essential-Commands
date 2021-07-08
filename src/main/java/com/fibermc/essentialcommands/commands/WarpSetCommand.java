@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -30,11 +31,11 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
         worldDataManager.setWarp(warpName, new MinecraftLocation(senderPlayer));
 
         //inform command sender that the home has been set
-        source.sendFeedback(
-            new LiteralText("Warp '").setStyle(Config.FORMATTING_DEFAULT)
-                .append(new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT))
-                .append(new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT))
-            , Config.BROADCAST_TO_OPS);
+        source.sendFeedback(TextUtil.concat(
+            new LiteralText("Warp '").setStyle(Config.FORMATTING_DEFAULT),
+            new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT),
+            new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT)
+        ), Config.BROADCAST_TO_OPS);
 
         return 1;
     }

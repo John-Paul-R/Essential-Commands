@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -33,16 +34,17 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             source.sendFeedback(
-                new LiteralText("Home ").setStyle(Config.FORMATTING_DEFAULT)
-                    .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT))
-                , Config.BROADCAST_TO_OPS);
+                TextUtil.concat(
+                    new LiteralText("Home ").setStyle(Config.FORMATTING_DEFAULT),
+                    new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
+                    new LiteralText(" has been deleted.").setStyle(Config.FORMATTING_DEFAULT)
+                ), Config.BROADCAST_TO_OPS);
         } else {
-            source.sendError(
-                new LiteralText("Home ").setStyle(Config.FORMATTING_ERROR)
-                    .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText(" could not be deleted.").setStyle(Config.FORMATTING_ERROR))
-            );
+            source.sendError(TextUtil.concat(
+                new LiteralText("Home ").setStyle(Config.FORMATTING_ERROR),
+                new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
+                new LiteralText(" could not be deleted.").setStyle(Config.FORMATTING_ERROR)
+            ));
             out = 0;
         }
 

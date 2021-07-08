@@ -11,18 +11,14 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
-
-
 allprojects {
 	apply plugin: 'fabric-loom'
 	apply plugin: 'idea'
 
 	group = project.maven_group
-	version = project.mod_version
-	archivesBaseName = "${project.mod_id}"//-mc${project.minecraft_version}
+	String full_version = "${project.mod_version}-mc${project.minecraft_version}"
+	version = full_version
+	archivesBaseName = "${project.mod_id}"
 
 	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
 
@@ -44,8 +40,10 @@ allprojects {
 		testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_jupiter_version}"
 
 		// JIJ Dependencies
-		modApi 	'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
-		include	'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
+		modApi 	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+		include	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+		modApi  "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+		include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
 
 		// Subprojects
 		subprojects.each {
@@ -92,6 +90,8 @@ allprojects {
 		// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 		// for more information about repositories.
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+		maven { url 'https://maven.nucleoid.xyz' }
+		// Used by FabricPlaceholderAPI
 	}
 
 }
@@ -230,14 +230,14 @@ githubRelease {
 	// You get this from your user settings > developer settings > Personal Access Tokens
 	owner project.gh_owner // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
 	repo project.gh_repo // by default this is set to your project name
-	tagName project.mod_version // by default this is set to "v${project.version}"
+	tagName project.version // by default this is set to "v${project.version}"
 	targetCommitish "1.16" // by default this is set to "master"
-	releaseName project.mod_version // Release title, by default this is the same as the tagName
+	releaseName project.version // Release title, by default this is the same as the tagName
 	body getChangelog() // by default this is empty
 	draft false // by default this is false
 	prerelease false // by default this is false
 	releaseAssets jar.destinationDirectory.getAsFileTree().matching {
-		include "**/*${project.mod_version}.jar"
+		include "**/*${project.version}.jar"
 //		include "**/*${project.mod_version}-sources.jar"
 	}// this points to which files you want to upload as assets with your release
 	//jar.outputs.getFiles().asPath//
