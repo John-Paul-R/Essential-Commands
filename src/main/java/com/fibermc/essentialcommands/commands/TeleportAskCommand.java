@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.TeleportRequestManager;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -27,26 +28,22 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
 
         //inform target player of tp request via chat
-        targetPlayer.sendSystemMessage(
-            new LiteralText(senderPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT)
-                .append(new LiteralText(" has requested to teleport to you.")
-                    .setStyle(Config.FORMATTING_DEFAULT))
-                .append(new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny"
-                    +" this request.").setStyle(Config.FORMATTING_DEFAULT))
-            , Util.NIL_UUID
+        targetPlayer.sendSystemMessage(TextUtil.concat(
+            new LiteralText(senderPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT),
+            new LiteralText(" has requested to teleport to you.").setStyle(Config.FORMATTING_DEFAULT),
+            new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny"
+                    +" this request.").setStyle(Config.FORMATTING_DEFAULT)
+            ), Util.NIL_UUID
         );
         
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer);
 
         //inform command sender that request has been sent
-        context.getSource().sendFeedback(
-            new LiteralText("Teleport request has been sent to ")
-                .setStyle(Config.FORMATTING_DEFAULT)
-                .append(new LiteralText(targetPlayer.getEntityName())
-                    .setStyle(Config.FORMATTING_ACCENT))
-            , Config.BROADCAST_TO_OPS
-        );
+        context.getSource().sendFeedback(TextUtil.concat(
+            new LiteralText("Teleport request has been sent to ").setStyle(Config.FORMATTING_DEFAULT),
+            new LiteralText(targetPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT)
+        ), Config.BROADCAST_TO_OPS);
         
         return 1;
     }

@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.google.common.base.Stopwatch;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -54,11 +55,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                 thread.start();
                 resultCode = 1;
             } else {
-                source.sendError(new LiteralText("")
-                    .append(new LiteralText("Could not execute command `/rtp`. Reason: command is on cooldown. (").setStyle(Config.FORMATTING_ERROR))
-                    .append(new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText(" seconds remaining.)").setStyle(Config.FORMATTING_ERROR))
-                );
+                source.sendError(TextUtil.concat(
+                    new LiteralText("Could not execute command `/rtp`. Reason: command is on cooldown. (").setStyle(Config.FORMATTING_ERROR),
+                    new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT),
+                    new LiteralText(" seconds remaining.)").setStyle(Config.FORMATTING_ERROR)
+                ));
                 resultCode = -2;
             }
         } else {

@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -30,12 +31,11 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
         targetPlayerEntityAccess.getEcPlayerData().setNickname(null);
 
         //inform command sender that the nickname has been set
-        context.getSource().sendFeedback(
-            new LiteralText("")
-                .append(new LiteralText("Nickname set to '").setStyle(Config.FORMATTING_DEFAULT))
-                .append(new LiteralText(senderPlayerEntity.getGameProfile().getName())
-                ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
-            , Config.BROADCAST_TO_OPS);
+        context.getSource().sendFeedback(TextUtil.concat(
+            new LiteralText("Nickname set to '").setStyle(Config.FORMATTING_DEFAULT),
+            new LiteralText(senderPlayerEntity.getGameProfile().getName()),
+            new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT)
+        ), Config.BROADCAST_TO_OPS);
 
         return 1;
     }

@@ -4,6 +4,7 @@ import com.fibermc.essentialcommands.Config;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -41,13 +42,13 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
                 Config.BROADCAST_TO_OPS
             );
         } else if (successCode==0) {
-            source.sendError(
-                new LiteralText("Home '").setStyle(Config.FORMATTING_ERROR)
-                    .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText("' could not be set. Home limit (").setStyle(Config.FORMATTING_ERROR))
-                    .append(new LiteralText(String.valueOf(Config.HOME_LIMIT)).setStyle(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText(") reached.").setStyle(Config.FORMATTING_ERROR))
-            );
+            source.sendError(TextUtil.concat(
+                new LiteralText("Home '").setStyle(Config.FORMATTING_ERROR),
+                new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
+                new LiteralText("' could not be set. Home limit (").setStyle(Config.FORMATTING_ERROR),
+                new LiteralText(String.valueOf(Config.HOME_LIMIT)).setStyle(Config.FORMATTING_ACCENT),
+                new LiteralText(") reached.").setStyle(Config.FORMATTING_ERROR)
+            ));
         }
 
 

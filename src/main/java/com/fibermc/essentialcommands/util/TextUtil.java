@@ -12,6 +12,13 @@ import java.util.Collection;
 public class TextUtil {
 
 
+    public static MutableText concat(Text... arr) {
+        MutableText out = new LiteralText("");
+        for (Text text : arr) {
+            out.append(text);
+        }
+        return out;
+    }
 /**
   * <p>Joins the elements of the provided array into a single Text
   * containing the provided list of elements.</p>

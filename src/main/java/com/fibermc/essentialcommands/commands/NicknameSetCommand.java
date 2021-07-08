@@ -63,14 +63,11 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
 
         //inform command sender that the nickname has been set
         if (successCode >= 0) {
-            source.sendFeedback(
-                new LiteralText("")
-                    .append(new LiteralText("Nickname set to '").setStyle(Config.FORMATTING_DEFAULT))
-                    .append(
-                        (nicknameText != null) ?
-                            nicknameText : new LiteralText(senderPlayerEntity.getGameProfile().getName())
-                    ).append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT))
-                , Config.BROADCAST_TO_OPS);
+            source.sendFeedback(TextUtil.concat(
+                new LiteralText("Nickname set to '").setStyle(Config.FORMATTING_DEFAULT),
+                (nicknameText != null) ? nicknameText : new LiteralText(senderPlayerEntity.getGameProfile().getName()),
+                new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT)
+            ), Config.BROADCAST_TO_OPS);
         } else {
             String failReason = switch (successCode) {
                 case -1 -> "Player has insufficient permissions for specified nickname.";
@@ -81,12 +78,12 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
                 );
                 default -> "Unknown";
             };
-            source.sendError(
-                new LiteralText("Nickname could not be set to '").setStyle(Config.FORMATTING_ERROR)
-                    .append(nicknameText)
-                    .append(new LiteralText("'. Reason: ").setStyle(Config.FORMATTING_ERROR))
-                    .append(new LiteralText(failReason).setStyle(Config.FORMATTING_ERROR))
-            );
+            source.sendError(TextUtil.concat(
+                new LiteralText("Nickname could not be set to '").setStyle(Config.FORMATTING_ERROR),
+                nicknameText,
+                new LiteralText("'. Reason: ").setStyle(Config.FORMATTING_ERROR),
+                new LiteralText(failReason).setStyle(Config.FORMATTING_ERROR)
+            ));
         }
 
         return successCode;
