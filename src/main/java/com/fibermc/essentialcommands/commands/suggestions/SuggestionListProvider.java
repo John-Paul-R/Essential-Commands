@@ -4,10 +4,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 
+import java.util.Collection;
 import java.util.List;
 
 @FunctionalInterface
-public interface SuggestedStringsListProvider {
-    List<String> getSuggestionsList(final CommandContext<ServerCommandSource> context) throws CommandSyntaxException;
+public interface SuggestionListProvider<T> {
+    Collection<T> getSuggestionList(final CommandContext<ServerCommandSource> context) throws CommandSyntaxException;
 }
-

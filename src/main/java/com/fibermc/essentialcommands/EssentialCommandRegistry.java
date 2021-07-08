@@ -5,22 +5,17 @@ import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import groovyjarjarantlr.collections.List;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-
-import java.util.UUID;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
@@ -108,7 +103,8 @@ public class EssentialCommandRegistry {
                         .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                         .executes(ListCommandFactory.create(
                             "Your current homes are: ",
-                            HomeSuggestion::getSuggestionsList
+                            "home tp",
+                            HomeSuggestion::getSuggestionEntries
                         ));
 
                     LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder.build();
@@ -164,7 +160,8 @@ public class EssentialCommandRegistry {
                         .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                         .executes(ListCommandFactory.create(
                             "The available server Warps are: ",
-                            (context) -> ManagerLocator.INSTANCE.getWorldDataManager().getWarpNames()
+                            "warp tp",
+                            (context) -> ManagerLocator.INSTANCE.getWorldDataManager().getWarpEntries()
                         ));
 
 

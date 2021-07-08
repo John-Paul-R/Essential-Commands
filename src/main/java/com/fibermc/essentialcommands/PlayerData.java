@@ -107,6 +107,10 @@ public class PlayerData extends PersistentState {
         return homes.keySet();
     }
 
+    public Set<Map.Entry<String, MinecraftLocation>> getHomeEntries() {
+        return homes.entrySet();
+    }
+
     public MinecraftLocation getHomeLocation(String homeName) {
         return homes.get(homeName);
     }

@@ -1,9 +1,6 @@
 package com.fibermc.essentialcommands.util;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 
 import java.util.Collection;
 
@@ -71,6 +68,16 @@ public class TextUtil {
             }
         }
         return buf;
+    }
+
+    public static Text clickableTeleport(MutableText originalText, String destinationName, String commandBaseString) {
+        String teleportCommand = String.format("%s %s", commandBaseString, destinationName);
+
+        Style outStyle = originalText.getStyle()
+            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, teleportCommand))
+            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to teleport to " + destinationName +".")));
+
+        return originalText.setStyle(outStyle);
     }
 
 }
