@@ -5,7 +5,6 @@ import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -266,7 +265,21 @@ public class EssentialCommandRegistry {
 
                 }
 
-                LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
+                if (Config.ENABLE_FLY) {
+                    LiteralCommandNode<ServerCommandSource> flyNode = dispatcher.register(
+                        CommandManager.literal("fly")
+                            .requires(ECPerms.require(ECPerms.Registry.fly_self, 2))
+                            .executes(new FlyCommand())
+                            .then(argument("target_player", EntityArgumentType.player())
+                                .requires(ECPerms.require(ECPerms.Registry.fly_others, 4))
+                                .executes(new FlyCommand())
+                            )
+                    );
+
+                    essentialCommandsRootNode.addChild(flyNode);
+                }
+
+                    LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
 
                 LiteralCommandNode<ServerCommandSource> configReloadNode = CommandManager.literal("reload")
                     .executes((context) -> {
