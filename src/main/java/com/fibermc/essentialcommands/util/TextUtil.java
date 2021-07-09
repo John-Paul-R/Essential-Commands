@@ -103,7 +103,21 @@ public class TextUtil {
 
     static {
         registerTextParser(Text.Serializer::fromJson);
-        registerTextParser(TextParser::parse);
+        int javaVersion = Util.getJavaVersion();
+        if (javaVersion >= 16) {
+            EssentialCommands.log(Level.INFO, String.format(
+                "Detected Java version %d. Enabling Java %d features.",
+                javaVersion,
+                16
+            ));
+            registerTextParser(TextParser::parse);
+        } else {
+            EssentialCommands.log(Level.WARN, String.format(
+                "Detected Java version %d. Some features require Java %d. Some text formatting features will be disabled.",
+                javaVersion,
+                16
+            ));
+        }
     }
     public static Text parseText(String textStr) {
         Text outText = null;
