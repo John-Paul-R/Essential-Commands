@@ -290,6 +290,16 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(workbenchNode);
                 }
 
+                if (Config.ENABLE_ENDERCHEST) {
+                    LiteralCommandNode<ServerCommandSource> enderchestNode = dispatcher.register(
+                        CommandManager.literal("enderchest")
+                            .requires(ECPerms.require(ECPerms.Registry.enderchest, 2))
+                            .executes(new EnderchestCommand())
+                    );
+
+                    essentialCommandsRootNode.addChild(enderchestNode);
+                }
+
 
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
 

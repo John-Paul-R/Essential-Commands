@@ -34,6 +34,7 @@ public class Config {
     public static boolean ENABLE_RTP;
     public static boolean ENABLE_FLY;
     public static boolean ENABLE_WORKBENCH;
+    public static boolean ENABLE_ENDERCHEST;
     public static int HOME_LIMIT;
     public static double TELEPORT_COOLDOWN;
     public static double TELEPORT_DELAY;
@@ -62,6 +63,7 @@ public class Config {
     private static final Option<Boolean> _ENABLE_RTP =          new Option<>("enable_rtp", true, Boolean::parseBoolean);
     private static final Option<Boolean> _ENABLE_FLY =          new Option<>("enable_fly", true, Boolean::parseBoolean);
     private static final Option<Boolean> _ENABLE_WORKBENCH =    new Option<>("enable_workbench", true, Boolean::parseBoolean);
+    private static final Option<Boolean> _ENABLE_ENDERCHEST =   new Option<>("enable_enderchest", true, Boolean::parseBoolean);
     private static final Option<Integer> _HOME_LIMIT =                  new Option<>("home_limit", 1, Config::parseInt);
     private static final Option<Double>  _TELEPORT_COOLDOWN =           new Option<>("teleport_cooldown", 1.0, Config::parseDouble);
     private static final Option<Double>  _TELEPORT_DELAY =              new Option<>("teleport_delay", 0.0, Config::parseDouble);
@@ -119,6 +121,7 @@ public class Config {
         ENABLE_RTP          = _ENABLE_RTP.loadAndSave(props).getValue();
         ENABLE_FLY          = _ENABLE_FLY.loadAndSave(props).getValue();
         ENABLE_WORKBENCH    = _ENABLE_WORKBENCH.loadAndSave(props).getValue();
+        ENABLE_ENDERCHEST    = _ENABLE_ENDERCHEST.loadAndSave(props).getValue();
         HOME_LIMIT          = _HOME_LIMIT.loadAndSave(props).getValue();
         TELEPORT_COOLDOWN   = _TELEPORT_COOLDOWN.loadAndSave(props).getValue();
         TELEPORT_DELAY      = _TELEPORT_DELAY.loadAndSave(props).getValue();
