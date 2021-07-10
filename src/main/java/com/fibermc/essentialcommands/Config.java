@@ -32,6 +32,7 @@ public class Config {
     public static boolean ENABLE_NICK;
     public static boolean ENABLE_RTP;
     public static boolean ENABLE_FLY;
+    public static boolean ENABLE_WORKBENCH;
     public static int HOME_LIMIT;
     public static double TELEPORT_COOLDOWN;
     public static double TELEPORT_DELAY;
@@ -62,6 +63,7 @@ public class Config {
     private static final String KEY_ENABLE_NICK = "enable_nick";
     private static final String KEY_ENABLE_RTP = "enable_rtp";
     private static final String KEY_ENABLE_FLY = "enable_fly";
+    private static final String KEY_ENABLE_WORKBENCH = "enable_workbench";
     private static final String KEY_HOME_LIMIT = "home_limit";
     private static final String KEY_TELEPORT_COOLDOWN = "teleport_cooldown";
     private static final String KEY_TELEPORT_DELAY = "teleport_delay";
@@ -112,6 +114,7 @@ public class Config {
         ENABLE_NICK         = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_NICK, String.valueOf(true)));
         ENABLE_RTP          = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_RTP, String.valueOf(true)));
         ENABLE_FLY          = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_FLY, String.valueOf(true)));
+        ENABLE_WORKBENCH    = Boolean.parseBoolean(                 (String) props.getOrDefault(KEY_ENABLE_WORKBENCH, String.valueOf(true)));
         HOME_LIMIT          = parseInt(                             (String) props.getOrDefault(KEY_HOME_LIMIT, String.valueOf(-1)));
         TELEPORT_COOLDOWN   = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_COOLDOWN, String.valueOf(1D)));
         TELEPORT_DELAY      = parseDouble(                          (String) props.getOrDefault(KEY_TELEPORT_DELAY, String.valueOf(0D)));
@@ -151,6 +154,7 @@ public class Config {
         props.putIfAbsent(KEY_ENABLE_NICK,                          String.valueOf(ENABLE_NICK));
         props.putIfAbsent(KEY_ENABLE_RTP,                           String.valueOf(ENABLE_RTP));
         props.putIfAbsent(KEY_ENABLE_FLY,                           String.valueOf(ENABLE_FLY));
+        props.putIfAbsent(KEY_ENABLE_WORKBENCH,                     String.valueOf(ENABLE_WORKBENCH));
         props.putIfAbsent(KEY_HOME_LIMIT,                           String.valueOf(HOME_LIMIT));
         props.putIfAbsent(KEY_TELEPORT_COOLDOWN,                    String.valueOf(TELEPORT_COOLDOWN));
         props.putIfAbsent(KEY_TELEPORT_DELAY,                       String.valueOf(TELEPORT_DELAY));

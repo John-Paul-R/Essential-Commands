@@ -279,7 +279,18 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(flyNode);
                 }
 
-                    LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
+                if (Config.ENABLE_WORKBENCH) {
+                    LiteralCommandNode<ServerCommandSource> workbenchNode = dispatcher.register(
+                        CommandManager.literal("workbench")
+                            .requires(ECPerms.require(ECPerms.Registry.workbench, 2))
+                            .executes(new WorkbenchCommand())
+                    );
+
+                    essentialCommandsRootNode.addChild(workbenchNode);
+                }
+
+
+                LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
 
                 LiteralCommandNode<ServerCommandSource> configReloadNode = CommandManager.literal("reload")
                     .executes((context) -> {
