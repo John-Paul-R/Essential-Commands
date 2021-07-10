@@ -19,6 +19,9 @@ enable_tpa                          | true           | boolean
 enable_warp                         | true           | boolean
 enable_nick                         | true           | boolean
 enable_rtp                          | true           | boolean
+enable_fly                          | true           | boolean
+enable_workbench                    | true           | boolean
+enable_enderchest                   | true           | boolean
 home_limit                          | 1              | integer
 ~~teleport_cooldown~~               | 1.0            | double (seconds)
 teleport_delay                      | 0.0            | double (seconds)

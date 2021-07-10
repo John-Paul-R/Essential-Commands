@@ -45,7 +45,6 @@ See the [full List of Commands & Permissions](https://github.com/John-Paul-R/Ess
   - /home tp \<home-name>
   - /home delete \<home-name>
 
-
 ### Warps
 
   - /warp set \<warp-name>
@@ -64,8 +63,15 @@ See the [full List of Commands & Permissions](https://github.com/John-Paul-R/Ess
 
 ### Random Teleport (/wild equivalent)
 
-  - /randomteleport 
+  - /randomteleport
   - /rtp
+
+### Kitchen sink
+
+  - /fly
+  - /fly \<target-player>
+  - /workbench
+  - /enderchest
 
 ### Config
 

@@ -33,6 +33,10 @@ Command | Permission | Description
 /nickname clear \<target-player>            | `essentialcommands.nickname.others`   | Clear target player's nickname.
 /nickname reveal \<player-nickname>         | `essentialcommands.nickname.reveal`   | Get list of players with the provided nickname (String, case-insensitive).
 /randomteleport \|\| /rtp     | `essentialcommands.randomteleport`    | Teleport to a random location a preset (in config) distance from the spawn.
+/fly                    | `essentialcommands.fly.self`      | Toggle ability to fly for self.
+/fly \<target-player>   | `essentialcommands.fly.others`    | Toggle ability to fly for target player.
+/workbench              | `essentialcommands.workbench`     | Open a crafting table screen.
+/enderchest             | `essentialcommands.enderchest`    | Open your enderchest screen.
 N/A | `essentialcommands.nickname.style.color` | Allows setting colorful nicknames.
 N/A | `essentialcommands.nickname.style.fancy` | Allows setting nicknames that have special formatting (italic, bold, etc.)
 N/A | `essentialcommands.nickname.style.hover` | Allows setting nicknames that show text on hover.
