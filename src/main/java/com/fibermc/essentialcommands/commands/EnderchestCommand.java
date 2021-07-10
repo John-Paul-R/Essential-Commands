@@ -25,7 +25,7 @@ public class EnderchestCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity senderPlayer = source.getPlayer();
 
         senderPlayer.openHandledScreen(createScreenHandlerFactory(senderPlayer.getEntityWorld(), senderPlayer.getBlockPos()));
-        senderPlayer.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
+        senderPlayer.incrementStat(Stats.OPEN_ENDERCHEST);
 
         source.sendFeedback(
             new LiteralText("Opened Ender Chest. ").setStyle(Config.FORMATTING_DEFAULT),
