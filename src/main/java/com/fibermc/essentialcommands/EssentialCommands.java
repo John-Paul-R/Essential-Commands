@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 //import net.fabricmc.api.DedicatedServerModInitializer;
+import com.fibermc.essentialcommands.config.Config;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.server.MinecraftServer;

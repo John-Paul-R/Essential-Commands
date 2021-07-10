@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.config.Config;
 import net.minecraft.server.MinecraftServer;
 
 public class ManagerLocator {

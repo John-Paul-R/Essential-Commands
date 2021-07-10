@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
@@ -11,8 +11,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-
-import java.util.UUID;
 
 public class BackCommand implements Command<ServerCommandSource> {
 

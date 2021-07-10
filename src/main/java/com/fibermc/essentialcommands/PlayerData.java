@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.google.common.collect.Maps;
 import net.minecraft.nbt.NbtCompound;

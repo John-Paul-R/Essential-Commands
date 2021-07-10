@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.WorldDataManager;
 import com.fibermc.essentialcommands.util.TextUtil;
@@ -11,8 +11,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-
-import java.util.UUID;
 
 public class WarpDeleteCommand implements Command<ServerCommandSource> {
 

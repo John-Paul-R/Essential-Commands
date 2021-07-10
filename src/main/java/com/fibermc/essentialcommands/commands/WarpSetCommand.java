@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
@@ -10,8 +11,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-
-import java.util.UUID;
 
 public class WarpSetCommand implements Command<ServerCommandSource> {
 

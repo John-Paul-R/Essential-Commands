@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.config;
 
 import org.jetbrains.annotations.NotNull;
 

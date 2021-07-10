@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.TeleportRequestManager;
 import com.fibermc.essentialcommands.util.TextUtil;
@@ -12,8 +12,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
-
-import java.util.UUID;
 
 public class TeleportAskCommand implements Command<ServerCommandSource> {
 

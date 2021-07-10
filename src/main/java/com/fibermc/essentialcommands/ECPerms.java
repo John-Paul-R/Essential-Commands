@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.config.Config;
 import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.util.TriState;
