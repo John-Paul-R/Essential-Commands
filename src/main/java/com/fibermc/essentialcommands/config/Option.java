@@ -9,10 +9,6 @@ public class Option<T> {
     private final ValueParser<T> parser;
     private T value;
 
-    public Option(String key, T defaultValue) {
-        this(key, defaultValue, (strValue) -> (T)strValue);
-    }
-
     public Option(String key, T defaultValue, ValueParser<T> parser) {
         this.key = key;
         this.defaultValue = defaultValue;

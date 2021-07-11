@@ -196,41 +196,47 @@ public class PlayerData extends PersistentState {
     }
 
     public int setNickname(Text nickname) {
+        int resultCode = 0;
         // Reset nickname
         if (nickname == null) {
             this.nickname = null;
-            reloadFullNickname();
-            return 1;
-        }
-        // Ensure nickname does not exceed max length
-        if (nickname.getString().length() > Config.NICKNAME_MAX_LENGTH) {
-            return -2;
-        }
-        // Ensure player has permissions required to set the specified nickname
-        boolean hasRequiredPerms = NicknameText.checkPerms(nickname, this.player.getCommandSource());
-        if (!hasRequiredPerms) {
+            resultCode = 1;
             EssentialCommands.LOGGER.info(String.format(
-                "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
-                this.player.getGameProfile().getName(),
-                nickname
+                    "Cleared %s's nickname",
+                    this.player.getGameProfile().getName()
             ));
-            return -1;
         } else {
-            EssentialCommands.LOGGER.info(String.format(
-                "Set %s's nickname to '%s'.",
-                this.player.getGameProfile().getName(),
-                nickname
-            ));
+            // Ensure nickname does not exceed max length
+            if (nickname.getString().length() > Config.NICKNAME_MAX_LENGTH) {
+                return -2;
+            }
+            // Ensure player has permissions required to set the specified nickname
+            boolean hasRequiredPerms = NicknameText.checkPerms(nickname, this.player.getCommandSource());
+            if (!hasRequiredPerms) {
+                EssentialCommands.LOGGER.info(String.format(
+                        "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
+                        this.player.getGameProfile().getName(),
+                        nickname
+                ));
+                return -1;
+            } else {
+                EssentialCommands.LOGGER.info(String.format(
+                        "Set %s's nickname to '%s'.",
+                        this.player.getGameProfile().getName(),
+                        nickname
+                ));
+            }
+
+            // Set nickname
+            this.nickname = nickname;
         }
 
-        // Set nickname
-        this.nickname = nickname;
         reloadFullNickname();
         PlayerDataManager.getInstance().markNicknameDirty(this);
         this.markDirty();
         // Return codes based on fail/success
         //  ex: caused by profanity filter.
-        return 0;
+        return resultCode;
     }
 
     public void save() {
