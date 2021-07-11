@@ -8,9 +8,6 @@ plugins {
 	id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
-
 allprojects {
 	apply plugin: 'fabric-loom'
 	apply plugin: 'idea'
@@ -226,6 +223,7 @@ tasks.getByName("githubRelease").each { task -> configure(task) {
 }}
 githubRelease {
 	Map env = getenv()
+	group = "upload"
 	token env.get("GITHUB") as String // This is your personal access token with Repo permissions
 	// You get this from your user settings > developer settings > Personal Access Tokens
 	owner project.gh_owner // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
@@ -266,7 +264,7 @@ def getChangelog() {
 		return new File('./changelog.md').getText('UTF-8')
 
 	} catch (FileNotFoundException e) {
-		e.printStackTrace();
+		logger.warn('./changelog.md not found.')
 	}
 	return "null";
 }
