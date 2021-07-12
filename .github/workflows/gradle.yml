@@ -1,32 +1,74 @@
 # This workflow will build a Java project with Gradle
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Java CI with Gradle
+name: Build with Gradle
 
 on:
   push:
     branches: [ master ]
+    paths:
+      - '**/src/**'
+      - '**/build.gradle'
+      - '**/gradle.properties'
+      - '**/settings.gradle'
+      - .github/workflows/build.yml
+      - LICENCE
+
   pull_request:
     branches: [ master ]
+    paths:
+      - '**/src/**'
+      - '**/build.gradle'
+      - '**/gradle.properties'
+      - '**/settings.gradle'
+      - .github/workflows/build.yml
+      - LICENCE
 
 jobs:
   build:
+    name: Build
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 16
-      uses: actions/setup-java@v2
-      with:
-        java-version: '16'
-        distribution: 'adopt'
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew -b build-github-action.gradle build
-    - name: Upload all build artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: all-build-artifacts
-        path: build/libs
+      - name: ✨ Checkout repository
+        uses: actions/checkout@v2
+
+      - name: 🛂 Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: 🏗 Set up JDK 16
+        uses: actions/setup-java@v2
+        with:
+          java-version: 16
+          distribution: adopt
+
+      - name: 📷 Begin Gradle cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: 🔨 Build artifacts
+        run: gradle -b build-github-action.gradle clean build
+
+      - name: 📦 Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: '**/build/libs/'
+
+      - name: 📝 Upload reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: reports
+          path: '**/build/reports/'
+
+      - name: 🧨 Cleanup Gradle cache
+        run: |
+          rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          rm -f ~/.gradle/caches/modules-2/gc.properties
