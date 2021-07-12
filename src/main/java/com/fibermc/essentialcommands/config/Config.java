@@ -110,7 +110,7 @@ public class Config {
         FORMATTING_DEFAULT  = parseStyleOrDefault((String) props.get(KEY_FORMATTING_DEFAULT), "gold");
         FORMATTING_ACCENT   = parseStyleOrDefault((String) props.get(KEY_FORMATTING_ACCENT),  "light_purple");
         FORMATTING_ERROR    = parseStyleOrDefault((String) props.get(KEY_FORMATTING_ERROR),   "red");
-        NICKNAME_PREFIX     = parseTextOrDefault((String) props.get(KEY_NICKNAME_PREFIX), "{\"text\":\"~\",\"color:\"red\"}");
+        NICKNAME_PREFIX     = parseTextOrDefault((String) props.get(KEY_NICKNAME_PREFIX), "{\"text\":\"~\",\"color\":\"red\"}");
 
         ENABLE_BACK         = _ENABLE_BACK.loadAndSave(props).getValue();
         ENABLE_HOME         = _ENABLE_HOME.loadAndSave(props).getValue();
