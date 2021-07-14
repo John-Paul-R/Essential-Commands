@@ -9,6 +9,8 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
 import java.util.*;
@@ -115,7 +117,7 @@ public class TeleportRequestManager {
         tpCooldownList.add(pData);
     }
 
-    public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, String destName) {
+    public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, MutableText destName) {
         queueTeleport(new QueuedLocationTeleport(((ServerPlayerEntityAccess)player).getEcPlayerData(), dest, destName));
     }
 

@@ -10,6 +10,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 
+
 public class SpawnSetCommand implements Command<ServerCommandSource> {
 
     public SpawnSetCommand() {}
@@ -30,7 +31,7 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
 
         //inform command sender that the home has been set
         source.sendFeedback(
-            new LiteralText("Spawn set at ").setStyle(Config.FORMATTING_DEFAULT)
+            ECText.getInstance().getText("cmd.spawn.set.feedback").setStyle(Config.FORMATTING_DEFAULT)
                 .append(loc.toLiteralTextSimple().setStyle(Config.FORMATTING_ACCENT))
             , Config.BROADCAST_TO_OPS);
 

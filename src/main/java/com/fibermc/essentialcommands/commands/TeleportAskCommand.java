@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.TeleportRequestManager;
@@ -11,6 +12,7 @@ import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+
 import net.minecraft.util.Util;
 
 public class TeleportAskCommand implements Command<ServerCommandSource> {
@@ -28,11 +30,8 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         //inform target player of tp request via chat
         targetPlayer.sendSystemMessage(TextUtil.concat(
             new LiteralText(senderPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT),
-            new LiteralText(" has requested to teleport to you.").setStyle(Config.FORMATTING_DEFAULT),
-            new LiteralText("\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny"
-                    +" this request.").setStyle(Config.FORMATTING_DEFAULT)
-            ), Util.NIL_UUID
-        );
+            ECText.getInstance().getText("cmd.tpask.receive").setStyle(Config.FORMATTING_DEFAULT)
+        ), Util.NIL_UUID);
         
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer);

@@ -14,6 +14,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
+
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -55,9 +56,9 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                 resultCode = 1;
             } else {
                 source.sendError(TextUtil.concat(
-                    new LiteralText("Could not execute command `/rtp`. Reason: command is on cooldown. (").setStyle(Config.FORMATTING_ERROR),
+                    ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(Config.FORMATTING_ERROR),
                     new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT),
-                    new LiteralText(" seconds remaining.)").setStyle(Config.FORMATTING_ERROR)
+                    ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(Config.FORMATTING_ERROR)
                 ));
                 resultCode = -2;
             }
@@ -107,7 +108,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         ));
         new_y = blockHitResult.getBlockPos().getY() + 1;
 
-        EssentialCommands.LOGGER.info("Time taken to calculate if RTP location is valid: " + timer.stop());
+        EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time," + timer.stop()).getString());
 
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
         //  Addressed by adding timesRun limit.
@@ -119,7 +120,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         PlayerTeleporter.requestTeleport(
             player,
             new MinecraftLocation(world.getRegistryKey(), new_x, new_y, new_z, 0, 0),
-            "random location"
+            ECText.getInstance().getText("cmd.rtp.location_name")
         );
 
         return 1;

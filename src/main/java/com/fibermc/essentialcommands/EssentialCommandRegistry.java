@@ -6,6 +6,7 @@ import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggest
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.config.Config;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -105,7 +106,7 @@ public class EssentialCommandRegistry {
                     homeListBuilder
                         .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                         .executes(ListCommandFactory.create(
-                            "Your current homes are: ",
+                            ECText.getInstance().get("cmd.home.list.start"),
                             "home tp",
                             HomeSuggestion::getSuggestionEntries
                         ));
@@ -162,7 +163,7 @@ public class EssentialCommandRegistry {
                     warpListBuilder
                         .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                         .executes(ListCommandFactory.create(
-                            "The available server Warps are: ",
+                            ECText.getInstance().get("cmd.warp.list.start"),
                             "warp tp",
                             (context) -> ManagerLocator.INSTANCE.getWorldDataManager().getWarpEntries()
                         ));
@@ -307,7 +308,10 @@ public class EssentialCommandRegistry {
                     .executes((context) -> {
                         Config.loadOrCreateProperties();
                         context.getSource().sendFeedback(
-                            new LiteralText("[Essential Commands] Config Reloaded."),
+                                TextUtil.concat(
+                                    ECText.getInstance().getText("essentialcommands.fullprefix"),
+                                    ECText.getInstance().getText("cmd.config.reload")
+                                ),
                             true
                         );
                         return 1;

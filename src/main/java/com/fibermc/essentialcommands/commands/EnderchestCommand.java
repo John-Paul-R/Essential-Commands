@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.config.Config;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -10,7 +11,6 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -28,7 +28,7 @@ public class EnderchestCommand implements Command<ServerCommandSource> {
         senderPlayer.incrementStat(Stats.OPEN_ENDERCHEST);
 
         source.sendFeedback(
-            new LiteralText("Opened Ender Chest. ").setStyle(Config.FORMATTING_DEFAULT),
+            ECText.getInstance().getText("cmd.enderchest.feedback").setStyle(Config.FORMATTING_DEFAULT),
             Config.BROADCAST_TO_OPS
         );
 
@@ -38,7 +38,7 @@ public class EnderchestCommand implements Command<ServerCommandSource> {
     private NamedScreenHandlerFactory createScreenHandlerFactory(World world, BlockPos pos) {
         return new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> {
             return GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, player.getEnderChestInventory());
-        }, new LiteralText("EC Ender Chest"));
+        }, ECText.getInstance().getText("cmd.enderchest.container_ui_name"));
 
     }
 

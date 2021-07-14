@@ -1,16 +1,17 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.config.Config;
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.WorldDataManager;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+
 
 public class SpawnCommand implements Command<ServerCommandSource> {
 
@@ -30,10 +31,10 @@ public class SpawnCommand implements Command<ServerCommandSource> {
         // Teleport & chat message
         if (loc != null) {
             //Teleport player to home location
-            PlayerTeleporter.requestTeleport(senderPlayer, loc, "spawn");
+            PlayerTeleporter.requestTeleport(senderPlayer, loc, ECText.getInstance().getText("cmd.spawn.location_name"));
             out = 1;
         } else {
-            context.getSource().sendError(new LiteralText("Spawn not set.").setStyle(Config.FORMATTING_ERROR));
+            context.getSource().sendError(ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set").setStyle(Config.FORMATTING_ERROR));
             out = -2;
         }
 

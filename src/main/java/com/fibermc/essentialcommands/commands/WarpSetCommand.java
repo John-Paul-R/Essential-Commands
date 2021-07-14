@@ -1,6 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.WorldDataManager;
 import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
@@ -11,6 +13,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+
 
 public class WarpSetCommand implements Command<ServerCommandSource> {
 
@@ -31,9 +34,9 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
 
         //inform command sender that the home has been set
         source.sendFeedback(TextUtil.concat(
-            new LiteralText("Warp '").setStyle(Config.FORMATTING_DEFAULT),
+            ECText.getInstance().getText("cmd.warp.feedback.1").setStyle(Config.FORMATTING_DEFAULT),
             new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT),
-            new LiteralText("' set.").setStyle(Config.FORMATTING_DEFAULT)
+            ECText.getInstance().getText("cmd.warp.set.feedback.2").setStyle(Config.FORMATTING_DEFAULT)
         ), Config.BROADCAST_TO_OPS);
 
         return 1;

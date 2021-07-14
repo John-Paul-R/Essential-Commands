@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
@@ -10,6 +11,7 @@ import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+
 
 public class FlyCommand implements Command<ServerCommandSource> {
 
@@ -43,9 +45,9 @@ public class FlyCommand implements Command<ServerCommandSource> {
 
         source.sendFeedback(
             TextUtil.concat(
-                new LiteralText("Flight ").setStyle(Config.FORMATTING_DEFAULT),
+                ECText.getInstance().getText("cmd.fly.feedback.1").setStyle(Config.FORMATTING_DEFAULT),
                 new LiteralText(playerAbilities.allowFlying ? "enabled" : "disabled").setStyle(Config.FORMATTING_ACCENT),
-                new LiteralText(" for ").setStyle(Config.FORMATTING_DEFAULT),
+                ECText.getInstance().getText("cmd.fly.feedback.2").setStyle(Config.FORMATTING_DEFAULT),
                 target.getDisplayName(),
                 new LiteralText(".").setStyle(Config.FORMATTING_DEFAULT)
             ),
