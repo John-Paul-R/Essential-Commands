@@ -41,7 +41,7 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
                 ), Config.BROADCAST_TO_OPS);
         } else {
             source.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.home.delete.feedback.1").setStyle(Config.FORMATTING_ERROR),
+                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(Config.FORMATTING_ERROR),
                 new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
                 ECText.getInstance().getText("cmd.home.delete.error.2").setStyle(Config.FORMATTING_ERROR)
             ));

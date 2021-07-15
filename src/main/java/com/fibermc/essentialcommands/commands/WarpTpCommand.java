@@ -39,7 +39,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
             PlayerTeleporter.requestTeleport(senderPlayer, loc, ECText.getInstance().getText("cmd.warp.location_name", warpName));
             out = 1;
         } else {
-            Message msg = ECText.getInstance().getText("cmd.warp.tp.error.not_found");
+            Message msg = ECText.getInstance().getText("cmd.warp.tp.error.not_found", warpName);
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
         }
 

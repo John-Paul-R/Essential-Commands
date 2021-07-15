@@ -30,7 +30,7 @@
   "cmd.spawn.tp.error.no_spawn_set": "Spawn not set.",
   "cmd.spawn.set.feedback": "Spawn set at ",
   "cmd.tpaccept.feedback": "Teleport request accepted.",
-  "cmd.tpaccept.fail": "Teleport failed.",
+  "cmd.tpa_reply.error.no_request_from_target": "No pending teleport request from the specified player.",
   "cmd.tpask.receive": " has requested to teleport to you.\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny this request.",
   "cmd.tpask.send": "Teleport request has been sent to ",
   "cmd.tpdeny.feedback": "Teleport request denied.",

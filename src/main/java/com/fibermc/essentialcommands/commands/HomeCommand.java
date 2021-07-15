@@ -43,7 +43,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
 //                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
 //                            .append(new LiteralText("' could be found.").setStyle(Config.FORMATTING_ERROR))
 //                    , new UUID(0, 0));
-            Message msg = ECText.getInstance().getText("cmd.home.tp.error.not_found");
+            Message msg = ECText.getInstance().getText("cmd.home.tp.error.not_found", homeName);
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
 
 

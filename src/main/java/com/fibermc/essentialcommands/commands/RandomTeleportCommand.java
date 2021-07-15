@@ -108,7 +108,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         ));
         new_y = blockHitResult.getBlockPos().getY() + 1;
 
-        EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time," + timer.stop()).getString());
+        EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time", timer.stop()).getString());
 
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
         //  Addressed by adding timesRun limit.

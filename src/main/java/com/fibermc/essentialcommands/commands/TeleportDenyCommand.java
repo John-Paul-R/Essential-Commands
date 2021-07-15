@@ -42,8 +42,10 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
             );
             return 1;
         } else {
-            //throw new CommandSyntaxException(type, message)
-            return 0;
+            source.sendError(
+                    ECText.getInstance().getText("cmd.tpa_reply.error.no_request_from_target").setStyle(Config.FORMATTING_ERROR)
+            );
+            return -1;
         }
     }
 }

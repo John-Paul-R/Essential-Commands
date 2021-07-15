@@ -28,7 +28,7 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
         PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
-        if (targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
+        if (targetPlayerData.getTpTarget() != null && targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
 
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
@@ -51,11 +51,10 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
                 , Config.BROADCAST_TO_OPS);
             return 1;
         } else {
-            //throw new CommandSyntaxException(type, message)
             source.sendError(
-                ECText.getInstance().getText("cmd.tpaccept.fail").setStyle(Config.FORMATTING_ERROR)
+                ECText.getInstance().getText("cmd.tpa_reply.error.no_request_from_target").setStyle(Config.FORMATTING_ERROR)
             );
-            return 0;
+            return -1;
         }
     }
 
