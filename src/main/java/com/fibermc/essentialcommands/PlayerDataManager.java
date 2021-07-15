@@ -60,6 +60,9 @@ public class PlayerDataManager {
                 server.getPlayerManager().getPlayerList().forEach(playerEntity -> {
                     playerEntity.networkHandler.sendPacket(playerListPacket);
                 });
+
+                changedNicknamePlayers.forEach((playerEntity -> ((ServerPlayerEntityAccess)playerEntity).getEcPlayerData().save()));
+
                 this.changedNicknames.clear();
             }
 
