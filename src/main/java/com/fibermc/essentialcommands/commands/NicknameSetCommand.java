@@ -22,19 +22,8 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
-        //Store command sender
-        ServerPlayerEntity senderPlayerEntity = source.getPlayer();
-
         //Get specified new nickname
-        Text nickname = TextArgumentType.getTextArgument(context, "nickname");
-        MutableText nicknameText = null;
-        // If nickname is not null and not empty string
-        if ( nickname != null && !"".equals(nickname.getString()) ) {
-            nicknameText = Texts.parse(context.getSource(), nickname, senderPlayerEntity, 0);
-        }
-
-        return exec(context, nicknameText);
+        return exec(context, TextArgumentType.getTextArgument(context, "nickname"));
     }
 
     public static int runStringToText(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -54,8 +43,6 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
 
     public static int exec(CommandContext<ServerCommandSource> context, Text nicknameText) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
-        //Store command sender
-        ServerPlayerEntity senderPlayerEntity = context.getSource().getPlayer();
 
         ServerPlayerEntity targetPlayer = getTargetPlayer(context);
 
@@ -66,7 +53,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
         if (successCode >= 0) {
             source.sendFeedback(TextUtil.concat(
                 ECText.getInstance().getText("cmd.nickname.set.feedback").setStyle(Config.FORMATTING_DEFAULT),
-                (nicknameText != null) ? nicknameText : new LiteralText(senderPlayerEntity.getGameProfile().getName()),
+                (nicknameText != null) ? nicknameText : new LiteralText(targetPlayer.getGameProfile().getName()),
                 ECText.getInstance().getText("generic.quote_fullstop").setStyle(Config.FORMATTING_DEFAULT)
             ), Config.BROADCAST_TO_OPS);
         } else {
