@@ -17,7 +17,8 @@ allprojects {
     apply plugin: 'idea'
 
     group = project.maven_group
-    version = project.mod_version
+    String full_version = "${project.mod_version}-mc${project.minecraft_version}+${getTimestamp()}"
+    version = full_version
     archivesBaseName = "${project.mod_id}"//-mc${project.minecraft_version}
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
@@ -104,4 +105,8 @@ tasks.withType(JavaCompile).configureEach {
 
     // Minecraft 1.17 (21w19a) upwards uses Java 16.
     it.options.release = 16
+}
+
+def getTimestamp() {
+    return new Date().format('yyyyMMddHHmmss')
 }
