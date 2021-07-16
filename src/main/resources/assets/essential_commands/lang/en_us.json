@@ -23,6 +23,7 @@
   "cmd.rtp.error.pre": "Could not execute command '/rtp'. Reason: ",
   "cmd.rtp.error.cooldown.1": "Command is on cooldown. (",
   "cmd.rtp.error.cooldown.2": " seconds remaining.)",
+  "cmd.rtp.error.no_spawn_set": "Spawn not set. (RTP chooses a random location a preset distance from spawn.)",
   "cmd.rtp.location_name": "random location",
   "cmd.rtp.log.location_validate_time": "Time taken to calculate if RTP location is valid: %s",
   "cmd.realname.feedback.none_match": "No online players match the nickname '",
