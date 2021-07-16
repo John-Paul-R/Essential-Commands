@@ -30,14 +30,21 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
         String warpName = StringArgumentType.getString(context, "warp_name");
 
         //Add warp
-        worldDataManager.setWarp(warpName, new MinecraftLocation(senderPlayer));
-
-        //inform command sender that the home has been set
-        source.sendFeedback(TextUtil.concat(
-            ECText.getInstance().getText("cmd.warp.feedback.1").setStyle(Config.FORMATTING_DEFAULT),
-            new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT),
-            ECText.getInstance().getText("cmd.warp.set.feedback.2").setStyle(Config.FORMATTING_DEFAULT)
-        ), Config.BROADCAST_TO_OPS);
+        try {
+            worldDataManager.setWarp(warpName, new MinecraftLocation(senderPlayer));
+            //inform command sender that the home has been set
+            source.sendFeedback(TextUtil.concat(
+                    ECText.getInstance().getText("cmd.warp.feedback.1").setStyle(Config.FORMATTING_DEFAULT),
+                    new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT),
+                    ECText.getInstance().getText("cmd.warp.set.feedback.2").setStyle(Config.FORMATTING_DEFAULT)
+            ), Config.BROADCAST_TO_OPS);
+        } catch (CommandSyntaxException e) {
+            source.sendError(TextUtil.concat(
+                    ECText.getInstance().getText("cmd.warp.feedback.1").setStyle(Config.FORMATTING_ERROR),
+                    new LiteralText(warpName).setStyle(Config.FORMATTING_ACCENT),
+                    ECText.getInstance().getText("cmd.warp.set.error.exists.2").setStyle(Config.FORMATTING_ERROR)
+            ));
+        }
 
         return 1;
     }

@@ -38,17 +38,9 @@ public class HomeCommand implements Command<ServerCommandSource> {
             PlayerTeleporter.requestTeleport(senderPlayerData, loc, ECText.getInstance().getText("cmd.home.location_name", homeName));
             out = 1;
         } else {
-//            senderPlayer.sendSystemMessage(
-//                    new LiteralText("No home with the name '").setStyle(Config.FORMATTING_ERROR)
-//                            .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
-//                            .append(new LiteralText("' could be found.").setStyle(Config.FORMATTING_ERROR))
-//                    , new UUID(0, 0));
             Message msg = ECText.getInstance().getText("cmd.home.tp.error.not_found", homeName);
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
-
-
         }
-
 
         return out;
     }
