@@ -166,7 +166,7 @@ task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after buil
 	// On fabric, use 'remapJar' instead of 'jar'
 
 	uploadFile = jar.outputs.getFiles().asPath // This is the java jar task. If it can't find the jar, try 'jar.outputs.getFiles().asPath' in place of 'jar'
-	addGameVersion(minecraft_version) // Call this multiple times to add multiple game versions. There are tools that can help you generate the list of versions
+	project.mr_game_versions.split(',').each { addGameVersion it } // Call this multiple times to add multiple game versions. There are tools that can help you generate the list of versions
 	changelog = getChangelog()
 	addLoader('fabric')
 
