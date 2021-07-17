@@ -29,10 +29,10 @@ public final class EssentialCommands implements ModInitializer {
 		//init mod stuff
 		ManagerLocator managers = new ManagerLocator();
 		managers.init();
-		ServerLifecycleEvents.SERVER_STARTED.register((MinecraftServer server) -> {
+		ServerLifecycleEvents.SERVER_STARTING.register((MinecraftServer server) -> {
 			managers.onServerStart(server);
-//			server.
 		});
+
 		ECPerms.init();
 		
 		//Register Mod

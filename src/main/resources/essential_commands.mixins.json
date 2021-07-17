@@ -6,6 +6,7 @@
     "PlayerEntityMixin",
     "PlayerManagerMixin",
     "ServerPlayerEntityMixin",
+    "ServerScoreboardMixin",
     "WorldSaveHandlerMixin"
   ],
   "client": [

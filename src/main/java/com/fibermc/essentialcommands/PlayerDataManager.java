@@ -12,24 +12,25 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PlayerDataManager {
 
     private final ConcurrentHashMap<UUID, PlayerData> dataMap;
-    private List<PlayerData> changedNicknames;
+    private final List<PlayerData> changedNicknames;
+    private final List<String> changedTeams;
     private static PlayerDataManager INSTANCE;
 
     public PlayerDataManager() {
         INSTANCE = this;
         this.changedNicknames = new LinkedList<>();
+        this.changedTeams = new LinkedList<>();
         this.dataMap = new ConcurrentHashMap<>();
     }
 
@@ -48,26 +49,32 @@ public class PlayerDataManager {
     public void markNicknameDirty(PlayerData playerData) {
         changedNicknames.add(playerData);
     }
+
+    public void markNicknameDirty(String playerName) {
+        changedTeams.add(playerName);
+    }
+
     public void tick(MinecraftServer server) {
+        if (Config.NICKNAMES_IN_PLAYER_LIST && server.getTicks() % (20*5) == 0) {
+            if (this.changedNicknames.size() + this.changedTeams.size() > 0) {
+                PlayerManager serverPlayerManager = server.getPlayerManager();
 
-        if (Config.NICKNAMES_IN_PLAYER_LIST && server.getTicks() % 600 == 0) {
-            if (this.changedNicknames.size() > 0) {
-                List<ServerPlayerEntity> changedNicknamePlayers = changedNicknames.stream().map(PlayerData::getPlayer).collect(Collectors.toList());
-                PlayerListS2CPacket playerListPacket = new PlayerListS2CPacket(
-                    PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME,
-                    changedNicknamePlayers
-                );
-                server.getPlayerManager().getPlayerList().forEach(playerEntity -> {
-                    playerEntity.networkHandler.sendPacket(playerListPacket);
-                });
+                Set<ServerPlayerEntity> allChangedNicknamePlayers = Stream.concat(
+                    changedNicknames.stream().map(PlayerData::getPlayer),
+                    changedTeams.stream().map(serverPlayerManager::getPlayer)
+                ).filter(Objects::nonNull).collect(Collectors.toSet());
 
-                changedNicknamePlayers.forEach((playerEntity -> ((ServerPlayerEntityAccess)playerEntity).getEcPlayerData().save()));
+                server.getPlayerManager().sendToAll(new PlayerListS2CPacket(
+                        PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME,
+                        allChangedNicknamePlayers
+                ));
+
+                changedNicknames.forEach(PlayerData::save);
 
                 this.changedNicknames.clear();
+                this.changedTeams.clear();
             }
-
         }
-
     }
 
     // EVENTS

@@ -7,8 +7,11 @@ import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -73,7 +76,18 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     public void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
         try {
             if (this.getEcPlayerData().getNickname() != null) {
-                cir.setReturnValue(this.getEcPlayerData().getFullNickname());
+                MutableText nickname = this.getEcPlayerData().getFullNickname();
+                // Re-add "whisper" click event unless the nickname has a click event set.
+                Style nicknameStyle = nickname.getStyle();
+                if (nicknameStyle.getClickEvent() == null) {
+                    nickname.setStyle(nicknameStyle.withClickEvent(cir.getReturnValue().getStyle().getClickEvent()));
+                }
+                // Send nickname (styled appropriately for player team) as return value for getDisplayName().
+                ServerPlayerEntity serverPlayerEntity = ((ServerPlayerEntity)(Object)this);
+                cir.setReturnValue(Team.decorateName(
+                        serverPlayerEntity.getScoreboard().getPlayerTeam(serverPlayerEntity.getEntityName()),
+                        nickname
+                ));
                 cir.cancel();
             }
         } catch (NullPointerException e) {
