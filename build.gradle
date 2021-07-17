@@ -42,8 +42,8 @@ allprojects {
 		// JIJ Dependencies
 		modApi 	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
 		include	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
-		modApi  "eu.pb4:placeholder-api:${project.placeholder_api_version}"
-		include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+		modApi 	'eu.pb4:placeholder-api-ec:1.0.1+1.16'
+		include 'eu.pb4:placeholder-api-ec:1.0.1+1.16'
 
 		// Subprojects
 		subprojects.each {
@@ -82,6 +82,7 @@ allprojects {
 	// Add any additional repositories
 	repositories {
 		mavenCentral()
+		mavenLocal()
 		maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
 //		maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
 		// Add repositories to retrieve artifacts from in here.
@@ -92,6 +93,9 @@ allprojects {
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 		maven { url 'https://maven.nucleoid.xyz' }
 		// Used by FabricPlaceholderAPI
+		flatDir {
+			dirs 'libs'
+		}
 	}
 
 }

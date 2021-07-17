@@ -104,18 +104,18 @@ public class TextUtil {
     static {
         registerTextParser(Text.Serializer::fromJson);
         int javaVersion = Util.getJavaVersion();
-        if (javaVersion >= 16) {
+        if (javaVersion >= 11) {
             EssentialCommands.log(Level.INFO, String.format(
                 "Detected Java version %d. Enabling Java %d features.",
                 javaVersion,
-                16
+                11
             ));
             registerTextParser(TextParser::parse);
         } else {
             EssentialCommands.log(Level.WARN, String.format(
                 "Detected Java version %d. Some features require Java %d. Some text formatting features will be disabled.",
                 javaVersion,
-                16
+                11
             ));
         }
     }
