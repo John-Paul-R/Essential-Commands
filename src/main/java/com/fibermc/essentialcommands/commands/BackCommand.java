@@ -1,18 +1,17 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 
-import java.util.UUID;
 
 public class BackCommand implements Command<ServerCommandSource> {
 
@@ -31,12 +30,12 @@ public class BackCommand implements Command<ServerCommandSource> {
         //chat message
         if (loc != null) {
             //Teleport player to home location
-            PlayerTeleporter.requestTeleport(playerData, loc, "previous location");
+            PlayerTeleporter.requestTeleport(playerData, loc, ECText.getInstance().getText("cmd.back.location_name"));
 
             out=1;
         } else {
             context.getSource().sendError(
-                new LiteralText("Could not execute 'back' command. No previous location found.").setStyle(Config.FORMATTING_ERROR)
+                ECText.getInstance().getText("cmd.back.error.no_prev_location").setStyle(Config.FORMATTING_ERROR)
             );
         }
 

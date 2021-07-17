@@ -1,11 +1,10 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-import com.google.common.collect.Maps;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
@@ -34,7 +33,7 @@ public class PlayerData extends PersistentState {
     private LinkedList<PlayerData> tpAskers;
 
     // HOMES
-    HashMap<String, MinecraftLocation> homes;
+    NamedLocationStorage homes;
     private MinecraftLocation previousLocation;
     private int tpCooldown;
 
@@ -53,7 +52,7 @@ public class PlayerData extends PersistentState {
         tpTimer = -1;
         tpTarget = null;
         tpAskers = new LinkedList<PlayerData>();
-        homes = new HashMap<String, MinecraftLocation>();
+        homes = new NamedLocationStorage();
     }
 
     public int getTpTimer() {
@@ -97,12 +96,14 @@ public class PlayerData extends PersistentState {
     }
 
     // Homes
-    public int addHome(String homeName, MinecraftLocation minecraftLocation) {
-        int outCode = 0;
+    public int addHome(String homeName, MinecraftLocation minecraftLocation) throws CommandSyntaxException {
+        int outCode;
         if (Config.HOME_LIMIT == -1 || this.homes.size() < Config.HOME_LIMIT) {
-            homes.put(homeName, minecraftLocation);
+            homes.putCommand(homeName, minecraftLocation);
             this.markDirty();
             outCode = 1;
+        } else {
+            outCode = -1;
         }
 
         return outCode;
@@ -120,8 +121,7 @@ public class PlayerData extends PersistentState {
         return homes.get(homeName);
     }
 
-    // IO
-//    @Override
+
     @Override
     public void fromTag(NbtCompound tag) {
         fromNbt(tag);
@@ -130,13 +130,14 @@ public class PlayerData extends PersistentState {
     public void fromNbt(NbtCompound tag) {
         NbtCompound dataTag = tag.getCompound("data");
         this.pUuid = dataTag.getUuid("playerUuid");
-        NbtList homesNbtList = dataTag.getList("homes", 10);
-        HashMap<String, MinecraftLocation> homes = Maps.newHashMap();
-        for (NbtElement t : homesNbtList) {
-            NbtCompound homeTag = (NbtCompound) t;
-            homes.put(homeTag.getString("homeName"), new MinecraftLocation(homeTag));
+
+        NamedLocationStorage homes = new NamedLocationStorage();
+        NbtElement homesTag = dataTag.get("homes");
+        if (homesTag != null) {
+            homes.loadNbt(homesTag);
         }
         this.homes = homes;
+
         if (dataTag.contains("nickname")){
             this.nickname = Text.Serializer.fromJson(dataTag.getString("nickname"));
             reloadFullNickname();
@@ -146,13 +147,10 @@ public class PlayerData extends PersistentState {
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
         tag.putUuid("playerUuid", pUuid);
-        NbtList homesNbtList = new NbtList();
-        homes.forEach((String key, MinecraftLocation homeLocation) -> {
-            NbtCompound homeTag = homeLocation.writeNbt(new NbtCompound());
-            homeTag.putString("homeName", key);
-            homesNbtList.add(homeTag);
-        });
-        tag.put("homes", homesNbtList);
+
+        NbtCompound homesNbt = new NbtCompound();
+        homes.writeNbt(homesNbt);
+        tag.put("homes", homesNbt);
 
         tag.putString("nickname", Text.Serializer.toJson(nickname));
 
@@ -202,41 +200,47 @@ public class PlayerData extends PersistentState {
     }
 
     public int setNickname(Text nickname) {
+        int resultCode = 0;
         // Reset nickname
         if (nickname == null) {
             this.nickname = null;
-            reloadFullNickname();
-            return 1;
-        }
-        // Ensure nickname does not exceed max length
-        if (nickname.getString().length() > Config.NICKNAME_MAX_LENGTH) {
-            return -2;
-        }
-        // Ensure player has permissions required to set the specified nickname
-        boolean hasRequiredPerms = NicknameText.checkPerms(nickname, this.player.getCommandSource());
-        if (!hasRequiredPerms) {
+            resultCode = 1;
             EssentialCommands.LOGGER.info(String.format(
-                "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
-                this.player.getGameProfile().getName(),
-                nickname
+                    "Cleared %s's nickname",
+                    this.player.getGameProfile().getName()
             ));
-            return -1;
         } else {
-            EssentialCommands.LOGGER.info(String.format(
-                "Set %s's nickname to '%s'.",
-                this.player.getGameProfile().getName(),
-                nickname
-            ));
+            // Ensure nickname does not exceed max length
+            if (nickname.getString().length() > Config.NICKNAME_MAX_LENGTH) {
+                return -2;
+            }
+            // Ensure player has permissions required to set the specified nickname
+            boolean hasRequiredPerms = NicknameText.checkPerms(nickname, this.player.getCommandSource());
+            if (!hasRequiredPerms) {
+                EssentialCommands.LOGGER.info(String.format(
+                        "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
+                        this.player.getGameProfile().getName(),
+                        nickname
+                ));
+                return -1;
+            } else {
+                EssentialCommands.LOGGER.info(String.format(
+                        "Set %s's nickname to '%s'.",
+                        this.player.getGameProfile().getName(),
+                        nickname
+                ));
+            }
+
+            // Set nickname
+            this.nickname = nickname;
         }
 
-        // Set nickname
-        this.nickname = nickname;
         reloadFullNickname();
         PlayerDataManager.getInstance().markNicknameDirty(this);
         this.markDirty();
         // Return codes based on fail/success
         //  ex: caused by profanity filter.
-        return 0;
+        return resultCode;
     }
 
     public void save() {

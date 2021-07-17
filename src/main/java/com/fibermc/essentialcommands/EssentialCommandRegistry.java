@@ -5,6 +5,7 @@ import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -46,20 +47,20 @@ public class EssentialCommandRegistry {
                     LiteralArgumentBuilder<ServerCommandSource> tpAcceptBuilder = CommandManager.literal("tpaccept");
                     LiteralArgumentBuilder<ServerCommandSource> tpDenyBuilder = CommandManager.literal("tpdeny");
 
-                    tpAskBuilder.then(
-                        argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
+                    tpAskBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
+                        .then(argument("target", EntityArgumentType.player())
                             .executes(new TeleportAskCommand()));
 
-                    tpAcceptBuilder.then(
-                        argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
+                    tpAcceptBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
+                        .then(argument("target", EntityArgumentType.player())
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportAcceptCommand()));
 
-                    tpDenyBuilder.then(
-                        argument("target", EntityArgumentType.player())
-                            .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
+                    tpDenyBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
+                        .then(argument("target", EntityArgumentType.player())
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportDenyCommand()));
 
@@ -85,32 +86,34 @@ public class EssentialCommandRegistry {
                     LiteralArgumentBuilder<ServerCommandSource> homeDeleteBuilder = CommandManager.literal("delete");
                     LiteralArgumentBuilder<ServerCommandSource> homeListBuilder = CommandManager.literal("list");
 
-                    homeSetBuilder.then(
-                        argument("home_name", StringArgumentType.word())
-                            .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
+                    homeSetBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
+                        .then(argument("home_name", StringArgumentType.word())
                             .executes(new HomeSetCommand()));
 
-                    homeTpBuilder.then(
-                        argument("home_name", StringArgumentType.word())
-                            .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
+                    homeTpBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
+                        .then(argument("home_name", StringArgumentType.word())
                             .suggests(HomeSuggestion.suggestedStrings())
                             .executes(new HomeCommand()));
 
-                    homeDeleteBuilder.then(
-                        argument("home_name", StringArgumentType.word())
-                            .requires(ECPerms.require(ECPerms.Registry.home_delete, 0))
+                    homeDeleteBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.home_delete, 0))
+                        .then(argument("home_name", StringArgumentType.word())
                             .suggests(HomeSuggestion.suggestedStrings())
                             .executes(new HomeDeleteCommand()));
 
                     homeListBuilder
                         .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                         .executes(ListCommandFactory.create(
-                            "Your current homes are: ",
+                            ECText.getInstance().get("cmd.home.list.start"),
                             "home tp",
                             HomeSuggestion::getSuggestionEntries
                         ));
 
-                    LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder.build();
+                    LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder
+                            .requires(ECPerms.requireAny(ECPerms.Registry.Group.home_group, 0))
+                            .build();
                     homeNode.addChild(homeTpBuilder.build());
                     homeNode.addChild(homeSetBuilder.build());
                     homeNode.addChild(homeDeleteBuilder.build());
@@ -142,33 +145,35 @@ public class EssentialCommandRegistry {
                     LiteralArgumentBuilder<ServerCommandSource> warpDeleteBuilder = CommandManager.literal("delete");
                     LiteralArgumentBuilder<ServerCommandSource> warpListBuilder = CommandManager.literal("list");
 
-                    warpSetBuilder.then(
-                        argument("warp_name", StringArgumentType.word())
-                            .requires(ECPerms.require(ECPerms.Registry.warp_set, 4))
+                    warpSetBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.warp_set, 4))
+                        .then(argument("warp_name", StringArgumentType.word())
                             .executes(new WarpSetCommand()));
 
                     warpTpBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.warp_tp, 0))
                         .then(argument("warp_name", StringArgumentType.word())
-                            .requires(ECPerms.require(ECPerms.Registry.warp_tp, 0))
                             .suggests(WarpSuggestion.suggestedStrings())
                             .executes(new WarpTpCommand()));
 
                     warpDeleteBuilder
+                        .requires(ECPerms.require(ECPerms.Registry.warp_delete, 4))
                         .then(argument("warp_name", StringArgumentType.word())
-                            .requires(ECPerms.require(ECPerms.Registry.warp_delete, 4))
                             .suggests(WarpSuggestion.suggestedStrings())
                             .executes(new WarpDeleteCommand()));
 
                     warpListBuilder
-                        .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
+                        .requires(ECPerms.require(ECPerms.Registry.warp_tp, 0))
                         .executes(ListCommandFactory.create(
-                            "The available server Warps are: ",
+                            ECText.getInstance().get("cmd.warp.list.start"),
                             "warp tp",
                             (context) -> ManagerLocator.INSTANCE.getWorldDataManager().getWarpEntries()
                         ));
 
 
-                    LiteralCommandNode<ServerCommandSource> warpNode = warpBuilder.build();
+                    LiteralCommandNode<ServerCommandSource> warpNode = warpBuilder
+                            .requires(ECPerms.requireAny(ECPerms.Registry.Group.warp_group, 0))
+                            .build();
                     warpNode.addChild(warpTpBuilder.build());
                     warpNode.addChild(warpSetBuilder.build());
                     warpNode.addChild(warpDeleteBuilder.build());
@@ -242,7 +247,9 @@ public class EssentialCommandRegistry {
                             .executes(new RealNameCommand())
                         );
 
-                    LiteralCommandNode<ServerCommandSource> nickNode = nickBuilder.build();
+                    LiteralCommandNode<ServerCommandSource> nickNode = nickBuilder
+                            .requires(ECPerms.requireAny(ECPerms.Registry.Group.nickname_group, 2))
+                            .build();
                     nickNode.addChild(nickSetBuilder.build());
                     nickNode.addChild(nickClearBuilder.build());
                     nickNode.addChild(nickRevealBuilder.build());
@@ -266,13 +273,53 @@ public class EssentialCommandRegistry {
 
                 }
 
-                LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config").build();
+                if (Config.ENABLE_FLY) {
+                    LiteralCommandNode<ServerCommandSource> flyNode = dispatcher.register(
+                        CommandManager.literal("fly")
+                            .requires(ECPerms.require(ECPerms.Registry.fly_self, 2))
+                            .executes(new FlyCommand())
+                            .then(argument("target_player", EntityArgumentType.player())
+                                .requires(ECPerms.require(ECPerms.Registry.fly_others, 4))
+                                .executes(new FlyCommand())
+                            )
+                    );
+
+                    essentialCommandsRootNode.addChild(flyNode);
+                }
+
+                if (Config.ENABLE_WORKBENCH) {
+                    LiteralCommandNode<ServerCommandSource> workbenchNode = dispatcher.register(
+                        CommandManager.literal("workbench")
+                            .requires(ECPerms.require(ECPerms.Registry.workbench, 2))
+                            .executes(new WorkbenchCommand())
+                    );
+
+                    essentialCommandsRootNode.addChild(workbenchNode);
+                }
+
+                if (Config.ENABLE_ENDERCHEST) {
+                    LiteralCommandNode<ServerCommandSource> enderchestNode = dispatcher.register(
+                        CommandManager.literal("enderchest")
+                            .requires(ECPerms.require(ECPerms.Registry.enderchest, 2))
+                            .executes(new EnderchestCommand())
+                    );
+
+                    essentialCommandsRootNode.addChild(enderchestNode);
+                }
+
+
+                LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
+                        .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
+                        .build();
 
                 LiteralCommandNode<ServerCommandSource> configReloadNode = CommandManager.literal("reload")
                     .executes((context) -> {
                         Config.loadOrCreateProperties();
                         context.getSource().sendFeedback(
-                            new LiteralText("[Essential Commands] Config Reloaded."),
+                                TextUtil.concat(
+                                    ECText.getInstance().getText("essentialcommands.fullprefix"),
+                                    ECText.getInstance().getText("cmd.config.reload")
+                                ),
                             true
                         );
                         return 1;

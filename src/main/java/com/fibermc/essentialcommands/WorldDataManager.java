@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
@@ -21,7 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class WorldDataManager extends PersistentState {
-    private HashMap<String, MinecraftLocation> warps;
+    private NamedLocationStorage warps;
     private MinecraftLocation spawnLocation;
     private Path saveDir;
     private File worldDataFile;
@@ -30,8 +31,10 @@ public class WorldDataManager extends PersistentState {
     private final String WARPS_KEY = "warps";
 
     public WorldDataManager() {
+
         super("ec-world-data-manager");
-        warps = new HashMap<String, MinecraftLocation>();
+        warps = new NamedLocationStorage();
+
         spawnLocation = null;
     }
 
@@ -74,9 +77,7 @@ public class WorldDataManager extends PersistentState {
         else
             this.spawnLocation = tempSpawnLocation;
         NbtCompound warpsNbt = tag.getCompound(WARPS_KEY);
-        warpsNbt.getKeys().forEach((key) -> {
-            warps.put(key, new MinecraftLocation(warpsNbt.getCompound(key)));
-        });
+        warps.loadNbt(warpsNbt);
     }
 
     public void save() {
@@ -95,19 +96,17 @@ public class WorldDataManager extends PersistentState {
             spawnNbt = new NbtCompound();
         tag.put(SPAWN_KEY, spawnNbt);
 
-                // Warps to NBT
+        // Warps to NBT
         NbtCompound warpsNbt = new NbtCompound();
-        warps.forEach((key, value) -> {
-            warpsNbt.put(key, value.asNbt());
-        });
+        warps.writeNbt(warpsNbt);
         tag.put(WARPS_KEY, warpsNbt);
 
         return tag;
     }
 
     // Command Actions
-    public void setWarp(String warpName, MinecraftLocation location) {
-        warps.put(warpName, location);
+    public void setWarp(String warpName, MinecraftLocation location) throws CommandSyntaxException {
+        warps.putCommand(warpName, location);
         this.markDirty();
         this.save();
     }

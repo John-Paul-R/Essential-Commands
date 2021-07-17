@@ -1,11 +1,11 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.WorldDataManager;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -13,6 +13,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+
 
 public class WarpTpCommand implements Command<ServerCommandSource> {
 
@@ -35,10 +36,10 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
         // Teleport & chat message
         if (loc != null) {
             //Teleport player to home location
-            PlayerTeleporter.requestTeleport(senderPlayer, loc, "warp:" + warpName);
+            PlayerTeleporter.requestTeleport(senderPlayer, loc, ECText.getInstance().getText("cmd.warp.location_name", warpName));
             out = 1;
         } else {
-            Message msg = new LiteralMessage("No warp with the name '" + warpName + "' could be found.");
+            Message msg = ECText.getInstance().getText("cmd.warp.tp.error.not_found", warpName);
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
         }
 

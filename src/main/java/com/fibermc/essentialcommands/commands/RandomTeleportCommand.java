@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.google.common.base.Stopwatch;
@@ -13,14 +14,13 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
+
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-import org.gradle.internal.impldep.org.apache.maven.settings.Server;
 
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * Heavily referenced from
@@ -40,7 +40,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         Thread thread = new Thread("RTP Location Calculator Thread") {
             public void run() {
-                exec(player, world);
+                try {
+                    exec(context.getSource(), world);
+                } catch (CommandSyntaxException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
@@ -56,9 +60,9 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                 resultCode = 1;
             } else {
                 source.sendError(TextUtil.concat(
-                    new LiteralText("Could not execute command `/rtp`. Reason: command is on cooldown. (").setStyle(Config.FORMATTING_ERROR),
+                    ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(Config.FORMATTING_ERROR),
                     new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT),
-                    new LiteralText(" seconds remaining.)").setStyle(Config.FORMATTING_ERROR)
+                    ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(Config.FORMATTING_ERROR)
                 ));
                 resultCode = -2;
             }
@@ -77,11 +81,20 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return targetBlockState.isAir() && footBlockState.getMaterial().isSolid();
     }
 
-    private static int exec(ServerPlayerEntity playerEntity, ServerWorld world) {
-        return exec(playerEntity, world, 0);
+    private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
+        // Position relative to EC spawn locaiton.
+        MinecraftLocation center = ManagerLocator.INSTANCE.getWorldDataManager().getSpawn();
+        if (center == null) {
+            source.sendError(TextUtil.concat(
+                    ECText.getInstance().getText("cmd.rtp.error.pre"),
+                    ECText.getInstance().getText("cmd.rtp.error.no_spawn_set")
+            ));
+            return -1;
+        }
+        return exec(source.getPlayer(), world, center, 0);
     }
 
-    private static int exec(ServerPlayerEntity player, ServerWorld world, int timesRun) {
+    private static int exec(ServerPlayerEntity player, ServerWorld world, MinecraftLocation center, int timesRun) {
         if (timesRun > Config.RTP_MAX_ATTEMPTS) {
             return -1;
         }
@@ -90,10 +103,9 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         double angle = (new Random()).nextDouble()*2*Math.PI;
         double delta_x = r * Math.cos(angle);
         double delta_z = r * Math.sin(angle);
-        // Position relative to EC spawn locaiton.
-        MinecraftLocation spawnLocation = ManagerLocator.INSTANCE.getWorldDataManager().getSpawn();
-        double new_x = spawnLocation.pos.x + delta_x;
-        double new_z = spawnLocation.pos.z + delta_z;
+
+        double new_x = center.pos.x + delta_x;
+        double new_z = center.pos.z + delta_z;
 
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
         // TODO Can maybe run a loop that checks every-other block? (player is 2 blocks high)
@@ -108,19 +120,19 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         ));
         new_y = blockHitResult.getBlockPos().getY() + 1;
 
-        EssentialCommands.LOGGER.info("Time taken to calculate if RTP location is valid: " + timer.stop());
+        EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time", timer.stop()).getString());
 
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
         //  Addressed by adding timesRun limit.
         if (world.isWater(new BlockPos(new_x, new_y-2, new_z))) {
-            return exec(player, world, timesRun + 1);
+            return exec(player, world, center, timesRun + 1);
         }
 
         // Teleport the player
         PlayerTeleporter.requestTeleport(
             player,
             new MinecraftLocation(world.getRegistryKey(), new_x, new_y, new_z, 0, 0),
-            "random location"
+            ECText.getInstance().getText("cmd.rtp.location_name")
         );
 
         return 1;

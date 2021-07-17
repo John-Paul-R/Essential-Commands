@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.config.Config;
 import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.util.TriState;
@@ -11,7 +12,7 @@ import java.util.function.Predicate;
 
 public class ECPerms {
 
-//`essentialcommands.<command>.<subcommand>`
+    //`essentialcommands.<command>.<subcommand>`
 //            `essentialcommands.<command>.*`
     public static final class Registry {
         public static final String tpa = "essentialcommands.tpa";
@@ -26,18 +27,31 @@ public class ECPerms {
         public static final String back = "essentialcommands.back";
         public static final String spawn_tp = "essentialcommands.spawn.tp";
         public static final String spawn_set = "essentialcommands.spawn.set";
-        public static final String nickname_self =   "essentialcommands.nickname.self";
-        public static final String nickname_others =   "essentialcommands.nickname.others";
-        public static final String nickname_reveal =   "essentialcommands.nickname.reveal";
+        public static final String nickname_self = "essentialcommands.nickname.self";
+        public static final String nickname_others = "essentialcommands.nickname.others";
+        public static final String nickname_reveal = "essentialcommands.nickname.reveal";
         public static final String nickname_style_color = "essentialcommands.nickname.style.color";
         public static final String nickname_style_fancy = "essentialcommands.nickname.style.fancy";
         public static final String nickname_style_hover = "essentialcommands.nickname.style.hover";
         public static final String nickname_style_click = "essentialcommands.nickname.style.click";
         public static final String randomteleport = "essentialcommands.randomteleport";
+        public static final String fly_self = "essentialcommands.fly.self";
+        public static final String fly_others = "essentialcommands.fly.others";
+        public static final String workbench = "essentialcommands.workbench";
+        public static final String enderchest = "essentialcommands.enderchest";
         public static final String config_reload = "essentialcommands.config.reload";
         public static final String bypass_teleport_delay = "essentialcommands.bypass.teleport_delay";
         public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";
         public static final String bypass_teleport_interrupt_on_damaged = "essentialcommands.bypass.teleport_interrupt_on_damaged";
+        public static final class Group {
+            public static final String[] tpa_group = {tpa, tpaccept, tpdeny};
+            public static final String[] home_group = {home_set, home_tp, home_delete};
+            public static final String[] warp_group = {warp_set, warp_tp, warp_delete};
+            public static final String[] spawn_group = {spawn_tp, spawn_set};
+            public static final String[] nickname_group = {nickname_self, nickname_others, nickname_reveal};
+            public static final String[] fly_group = {fly_self, fly_others};
+            public static final String[] config_group = {config_reload};
+        }
     }
 
     static void init() {
@@ -60,15 +74,29 @@ public class ECPerms {
         return player -> check(player, permission, defaultRequireLevel);
     }
 
+    static @NotNull Predicate<ServerCommandSource> requireAny(@NotNull String[] permissions, int defaultRequireLevel) {
+        return player -> checkAny(player, permissions, defaultRequireLevel);
+    }
+
     static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
         if (Config.USE_PERMISSIONS_API) {
             return Permissions.getPermissionValue(source, permission).orElse(false);
         } else {
-            return (source.hasPermissionLevel(defaultRequireLevel) ? TriState.TRUE : TriState.FALSE).orElse(false);
+            return (source.hasPermissionLevel(defaultRequireLevel) ? TriState.TRUE:TriState.FALSE).orElse(false);
         }
     }
 
     static boolean check(@NotNull CommandSource source, @NotNull String permission) {
         return check(source, permission, 4);
     }
+
+    static boolean checkAny(@NotNull CommandSource source, @NotNull String[] permissions, int defaultRequireLevel) {
+        for (String permission : permissions) {
+            if (check(source, permission, defaultRequireLevel)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

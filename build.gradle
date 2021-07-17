@@ -8,9 +8,6 @@ plugins {
 	id "com.github.breadmoirai.github-release" version "2.2.12"
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
-
 allprojects {
 	apply plugin: 'fabric-loom'
 	apply plugin: 'idea'
@@ -20,7 +17,7 @@ allprojects {
 	version = full_version
 	archivesBaseName = "${project.mod_id}"
 
-	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
+	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
 
 	// Declare dependencies
 	dependencies {
@@ -173,7 +170,7 @@ task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after buil
 	// On fabric, use 'remapJar' instead of 'jar'
 
 	uploadFile = jar.outputs.getFiles().asPath // This is the java jar task. If it can't find the jar, try 'jar.outputs.getFiles().asPath' in place of 'jar'
-	addGameVersion(minecraft_version) // Call this multiple times to add multiple game versions. There are tools that can help you generate the list of versions
+	project.mr_game_versions.split(',').each { addGameVersion it } // Call this multiple times to add multiple game versions. There are tools that can help you generate the list of versions
 	changelog = getChangelog()
 	addLoader('fabric')
 
@@ -230,6 +227,7 @@ tasks.getByName("githubRelease").each { task -> configure(task) {
 }}
 githubRelease {
 	Map env = getenv()
+	group = "upload"
 	token env.get("GITHUB") as String // This is your personal access token with Repo permissions
 	// You get this from your user settings > developer settings > Personal Access Tokens
 	owner project.gh_owner // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
@@ -270,7 +268,7 @@ def getChangelog() {
 		return new File('./changelog.md').getText('UTF-8')
 
 	} catch (FileNotFoundException e) {
-		e.printStackTrace();
+		logger.warn('./changelog.md not found.')
 	}
 	return "null";
 }

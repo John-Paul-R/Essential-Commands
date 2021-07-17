@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;

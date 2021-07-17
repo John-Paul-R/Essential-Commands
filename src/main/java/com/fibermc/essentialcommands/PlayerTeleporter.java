@@ -1,19 +1,21 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Util;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 
-import java.util.UUID;
+import net.minecraft.util.Util;
 
 /**
  * Teleporter
  */
 public class PlayerTeleporter {
 
-    public static void requestTeleport(PlayerData pData, MinecraftLocation dest, String destName) {
+    public static void requestTeleport(PlayerData pData, MinecraftLocation dest, MutableText destName) {
         requestTeleport(new QueuedLocationTeleport(pData, dest, destName));
     }
     public static void requestTeleport(QueuedTeleport queuedTeleport) {
@@ -27,16 +29,16 @@ public class PlayerTeleporter {
             ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             player.sendSystemMessage(
-                new LiteralText("Teleporting to ").setStyle(Config.FORMATTING_DEFAULT)
-                    .append(new LiteralText(queuedTeleport.getDestName()).setStyle(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText(" in ").setStyle(Config.FORMATTING_DEFAULT))
+                ECText.getInstance().getText("teleport.queued.1").setStyle(Config.FORMATTING_DEFAULT)
+                    .append(queuedTeleport.getDestName().setStyle(Config.FORMATTING_ACCENT))
+                    .append(ECText.getInstance().getText("teleport.queued.2").setStyle(Config.FORMATTING_DEFAULT))
                     .append(new LiteralText(String.format("%.1f", Config.TELEPORT_DELAY)).setStyle(Config.FORMATTING_ACCENT))
-                    .append(new LiteralText(" seconds...")).setStyle(Config.FORMATTING_DEFAULT),
+                    .append(ECText.getInstance().getText("teleport.queued.3")).setStyle(Config.FORMATTING_DEFAULT),
                 Util.NIL_UUID
             );
         }
     }
-    public static void requestTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, String destName) {
+    public static void requestTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
         requestTeleport(((ServerPlayerEntityAccess)playerEntity).getEcPlayerData(), dest, destName);
     }
     public static void teleport(QueuedTeleport queuedTeleport) {
@@ -51,7 +53,7 @@ public class PlayerTeleporter {
             // If this teleport is between dimensions
             if (dest.dim != player.getServerWorld().getRegistryKey()) {
                 player.sendSystemMessage(
-                    new LiteralText("Teleport failed. Reason: Interdimensional teleportation disabled.").setStyle(Config.FORMATTING_ERROR),
+                    ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled").setStyle(Config.FORMATTING_ERROR),
                     Util.NIL_UUID
                 );
                 return;
@@ -74,7 +76,7 @@ public class PlayerTeleporter {
             dest.headYaw, dest.pitch
         );
         playerEntity.sendSystemMessage(
-            new LiteralText("Teleported to ").setStyle(Config.FORMATTING_DEFAULT)
+            ECText.getInstance().getText("teleport.done.1").setStyle(Config.FORMATTING_DEFAULT)
                 .append(dest.toLiteralTextSimple().setStyle(Config.FORMATTING_ACCENT))
                 .append(new LiteralText(".").setStyle(Config.FORMATTING_DEFAULT)),
             Util.NIL_UUID

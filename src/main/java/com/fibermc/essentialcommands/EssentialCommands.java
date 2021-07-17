@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 //import net.fabricmc.api.DedicatedServerModInitializer;
+import com.fibermc.essentialcommands.config.Config;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.server.MinecraftServer;
@@ -28,10 +29,10 @@ public final class EssentialCommands implements ModInitializer {
 		//init mod stuff
 		ManagerLocator managers = new ManagerLocator();
 		managers.init();
-		ServerLifecycleEvents.SERVER_STARTED.register((MinecraftServer server) -> {
+		ServerLifecycleEvents.SERVER_STARTING.register((MinecraftServer server) -> {
 			managers.onServerStart(server);
-//			server.
 		});
+
 		ECPerms.init();
 		
 		//Register Mod

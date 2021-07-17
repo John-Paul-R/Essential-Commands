@@ -1,8 +1,9 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.Config;
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerDataManager;
+import com.fibermc.essentialcommands.config.Config;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -12,7 +13,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 
 import java.util.List;
-import java.util.UUID;
 
 public class RealNameCommand implements Command<ServerCommandSource> {
     @Override
@@ -25,15 +25,15 @@ public class RealNameCommand implements Command<ServerCommandSource> {
         // If no players matched the provided nickname
         if (nicknamePlayers.size() == 0) {
             responseText
-                .append(new LiteralText("No online players match the nickname '").setStyle(Config.FORMATTING_DEFAULT))
+                .append(ECText.getInstance().getText("cmd.realname.feedback.none_match").setStyle(Config.FORMATTING_DEFAULT))
                 .append(new LiteralText(nicknameStr).setStyle(Config.FORMATTING_ACCENT))
-                .append(new LiteralText("'.").setStyle(Config.FORMATTING_DEFAULT));
+                .append(ECText.getInstance().getText("generic.quote_fullstop").setStyle(Config.FORMATTING_DEFAULT));
 
         } else {
             responseText
-                .append(new LiteralText("The following player(s) match the nickname '").setStyle(Config.FORMATTING_DEFAULT))
+                .append(ECText.getInstance().getText("cmd.realname.feedback.matching.1").setStyle(Config.FORMATTING_DEFAULT))
                 .append(new LiteralText(nicknameStr).setStyle(Config.FORMATTING_ACCENT))
-                .append(new LiteralText("':").setStyle(Config.FORMATTING_DEFAULT));
+                .append(ECText.getInstance().getText("cmd.realname.feedback.matching.2").setStyle(Config.FORMATTING_DEFAULT));
 
             for (PlayerData nicknamePlayer : nicknamePlayers) {
                 responseText.append("\n  ");
