@@ -41,6 +41,8 @@ allprojects {
 		include	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
 		modApi 	'eu.pb4:placeholder-api-ec:1.0.1+1.16'
 		include 'eu.pb4:placeholder-api-ec:1.0.1+1.16'
+		modImplementation group: 'net.devtech', name: 'grossfabrichacks', version: '6.1'
+		include group: 'net.devtech', name: 'grossfabrichacks', version: '6.1'
 
 		// Subprojects
 		subprojects.each {
@@ -89,6 +91,10 @@ allprojects {
 		// for more information about repositories.
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 		maven { url 'https://maven.nucleoid.xyz' }
+
+		// GrossFabricHacks
+		maven { url = 'https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master/' }
+
 		// Used by FabricPlaceholderAPI
 		flatDir {
 			dirs 'libs'

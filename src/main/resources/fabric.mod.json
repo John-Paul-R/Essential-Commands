@@ -22,6 +22,9 @@
   "entrypoints": {
     "main": [
       "com.fibermc.essentialcommands.EssentialCommands"
+    ],
+    "gfh:prePreLaunch": [
+      "com.fibermc.essentialcommands.GFHEntrypoint"
     ]
   },
   "mixins": [
