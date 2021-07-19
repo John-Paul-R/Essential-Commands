@@ -26,7 +26,7 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
          PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
-        if (targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
+        if (targetPlayerData.getTpTarget() != null && targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
                 ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)

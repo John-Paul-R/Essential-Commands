@@ -60,7 +60,12 @@
   "generic.error.unknown": "An unknown error occured while executing the command.",
   "generic.enabled": "enabled",
   "generic.disabled": "disabled",
+  "generic.confirm": "Confirm",
+  "generic.deny": "Deny",
+  "generic.accept": "Accept",
+
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
   "cmd.config.reload": "Config Reloaded."
+
 }
