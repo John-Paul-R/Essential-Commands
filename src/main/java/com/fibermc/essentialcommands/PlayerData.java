@@ -54,6 +54,25 @@ public class PlayerData extends PersistentState {
         homes = new NamedLocationStorage();
     }
 
+    /**
+     * DO NOT USE FOR LOGGED-IN PLAYERS.
+     * This constructor should ONLY be used for temporarily
+     * handling data of offline players.
+     * @param playerUuid
+     * @param homes
+     * @param saveFile
+     */
+    public PlayerData(UUID playerUuid, NamedLocationStorage homes, File saveFile) {
+//        this.player = player;
+        this.pUuid = playerUuid;
+        this.saveFile = saveFile;
+        tpTimer = -1;
+        tpTarget = null;
+        tpAskers = new LinkedList<PlayerData>();
+        this.homes = homes;
+    }
+
+
     public int getTpTimer() {
         return tpTimer;
     }
@@ -133,7 +152,11 @@ public class PlayerData extends PersistentState {
 
         if (dataTag.contains("nickname")){
             this.nickname = Text.Serializer.fromJson(dataTag.getString("nickname"));
-            reloadFullNickname();
+            try {
+                reloadFullNickname();
+            } catch (NullPointerException ignore) {
+                EssentialCommands.LOGGER.warn("Could not refresh player full nickanme, as ServerPlayerEntity was null in PlayerData.");
+            }
         }
     }
 

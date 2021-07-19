@@ -1,11 +1,17 @@
 package com.fibermc.essentialcommands;
 
+import java.io.FileNotFoundException;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.util.function.Predicate;
+
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.config.Config;
+import com.fibermc.essentialcommands.util.EssentialsXParser;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -328,6 +334,24 @@ public class EssentialCommandRegistry {
                     ).build();
                 configNode.addChild(configReloadNode);
                 essentialCommandsRootNode.addChild(configNode);
+
+                essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
+                    .requires(source -> source.hasPermissionLevel(4))
+                    .executes((source) -> {
+                        Path mcDir = source.getSource().getMinecraftServer().getRunDirectory().toPath();
+                        try {
+                            EssentialsXParser.convertPlayerDataDir(
+                                    mcDir.resolve("plugins/Essentials/userdata").toFile(),
+                                    mcDir.resolve("world/modplayerdata").toFile(),
+                                    source.getSource().getMinecraftServer()
+                            );
+                            source.getSource().sendFeedback(new LiteralText("Successfully converted data dirs."), Config.BROADCAST_TO_OPS);
+                        } catch (NotDirectoryException | FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        return 0;
+                    }).build()
+                );
 
                 rootNode.addChild(essentialCommandsRootNode);
             }

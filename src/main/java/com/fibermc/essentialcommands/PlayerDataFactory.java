@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 public class PlayerDataFactory {
 
@@ -31,6 +32,31 @@ public class PlayerDataFactory {
         pData.markDirty();
         return pData;
     }
+
+    public static PlayerData create(NamedLocationStorage homes, File saveFile) {
+        String fileName = saveFile.getName();
+        UUID playerUuid = UUID.fromString(fileName.substring(0, fileName.indexOf(".dat")));
+        PlayerData pData = new PlayerData(playerUuid, homes, saveFile);
+        if (Files.exists(saveFile.toPath()) && saveFile.length() != 0) {
+            try {
+                NbtCompound NbtCompound3 = NbtIo.readCompressed(new FileInputStream(saveFile));
+                pData.fromNbt(NbtCompound3);
+                // If a EC data already existed, the homes we just initialized the pData with (from paramater) just got overwritten.
+                // Now, add them back if their keys do not already exist in the set we just loaded from EC save file.
+                homes.forEach((name, minecraftLocation) -> pData.homes.putIfAbsent(name, minecraftLocation));
+                //Testing:
+
+            } catch (IOException e) {
+                EssentialCommands.log(Level.WARN, "Failed to load essential_commands player data for {"+playerUuid+"}");
+                e.printStackTrace();
+            }
+        }
+
+        pData.markDirty();
+        return pData;
+    }
+
+
     public static PlayerData create(ServerPlayerEntity player) {
         return create(player, getPlayerDataFile(player));
     }
