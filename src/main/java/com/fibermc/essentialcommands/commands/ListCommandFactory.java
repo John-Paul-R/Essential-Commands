@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -31,11 +32,15 @@ public class ListCommandFactory {
                 entry.getKey(),
                 String.format("/%s", commandExecText))
             ).collect(Collectors.toList());
-            
-            responseText.append(TextUtil.join(
-                suggestionTextList,
-                new LiteralText(", ").setStyle(Config.FORMATTING_DEFAULT)
-            ));
+
+            if (suggestionTextList.size() > 0) {
+                responseText.append(TextUtil.join(
+                    suggestionTextList,
+                    new LiteralText(", ").setStyle(Config.FORMATTING_DEFAULT)
+                ));
+            } else {
+                responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty").setStyle(Config.FORMATTING_ERROR));
+            }
             context.getSource().sendFeedback(
                 responseText,
                 Config.BROADCAST_TO_OPS

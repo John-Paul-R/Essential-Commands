@@ -47,6 +47,7 @@
   "cmd.warp.list.start": "The available server Warps are: ",
   "cmd.workbench.feedback": "Opened workbench.",
   "cmd.workbench.container_ui_name": "EC Workbench",
+  "cmd.list.feedback.empty": "No locations found.",
 
   "teleport.error.interdimensional_teleport_disabled": "Teleport failed. Reason: Interdimensional teleportation disabled.",
   "teleport.queued.1": "Teleporting to ",
