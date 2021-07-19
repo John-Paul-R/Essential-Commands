@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.TeleportRequestManager;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.config.Config;
 import com.mojang.brigadier.Command;
@@ -31,15 +32,18 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
             targetPlayer.sendSystemMessage(
                 ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)
                 , Util.NIL_UUID);
-            
-            //Clean up TPAsk
-            targetPlayerData.setTpTimer(-1);
 
             //Send message to command sender confirming that request has been accepted
             source.sendFeedback(
                 ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)
                 , Config.BROADCAST_TO_OPS
             );
+
+            //Clean up TPAsk
+            targetPlayerData.setTpTimer(-1);
+            // Remove the tp request, as it has been completed.
+            TeleportRequestManager.getInstance().endTpRequest(senderPlayer);
+
             return 1;
         } else {
             source.sendError(

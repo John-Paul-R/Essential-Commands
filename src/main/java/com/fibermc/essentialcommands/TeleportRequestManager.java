@@ -10,7 +10,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
 import java.util.*;
@@ -46,19 +45,27 @@ public class TeleportRequestManager {
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> TeleportRequestManager.INSTANCE.tick(server));
     }
 
+    public void endTpRequest(ServerPlayerEntity requesterPlayer) {
+        PlayerData requesterPlayerData = ((ServerPlayerEntityAccess) requesterPlayer).getEcPlayerData();
+        endTpRequest(requesterPlayerData);
+        this.activeTpRequestList.remove(requesterPlayerData);
+    }
+    private void endTpRequest(PlayerData requesterPlayerData) {
+        PlayerData target = requesterPlayerData.getTpTarget();
+        if (target != null) {
+            target.removeTpAsker(requesterPlayerData);
+            requesterPlayerData.setTpTarget(null);
+        }
+    }
+
     public void tick(MinecraftServer server) {
-        ListIterator<PlayerData> iter;
+        ListIterator<PlayerData> iter = activeTpRequestList.listIterator();
         //decrement the tp timer for all players that have put in a tp request
-        iter = activeTpRequestList.listIterator();
         while (iter.hasNext()) {
-            PlayerData e = iter.next();
-            e.tickTpTimer();
-            if (e.getTpTimer() < 0) {
-                PlayerData target = e.getTpTarget();
-                if (target!=null) {
-                    target.removeTpAsker(e);
-                    e.setTpTarget(null);
-                }
+            PlayerData requesterPlayerData = iter.next();
+            requesterPlayerData.tickTpTimer();
+            if (requesterPlayerData.getTpTimer() < 0) {
+                endTpRequest(requesterPlayerData);
                 iter.remove();
             }
         }
