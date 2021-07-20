@@ -296,7 +296,7 @@ public class EssentialCommandRegistry {
                 if (Config.ENABLE_WORKBENCH) {
                     LiteralCommandNode<ServerCommandSource> workbenchNode = dispatcher.register(
                         CommandManager.literal("workbench")
-                            .requires(ECPerms.require(ECPerms.Registry.workbench, 2))
+                            .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
                             .executes(new WorkbenchCommand())
                     );
 
@@ -306,7 +306,7 @@ public class EssentialCommandRegistry {
                 if (Config.ENABLE_ENDERCHEST) {
                     LiteralCommandNode<ServerCommandSource> enderchestNode = dispatcher.register(
                         CommandManager.literal("enderchest")
-                            .requires(ECPerms.require(ECPerms.Registry.enderchest, 2))
+                            .requires(ECPerms.require(ECPerms.Registry.enderchest, 0))
                             .executes(new EnderchestCommand())
                     );
 
