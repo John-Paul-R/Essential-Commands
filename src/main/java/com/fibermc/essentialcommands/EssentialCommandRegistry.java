@@ -49,37 +49,42 @@ public class EssentialCommandRegistry {
                 //Make some new nodes
                 //Tpa
                 if (Config.ENABLE_TPA) {
-                    LiteralArgumentBuilder<ServerCommandSource> tpAskBuilder = CommandManager.literal("tpa");
-                    LiteralArgumentBuilder<ServerCommandSource> tpAcceptBuilder = CommandManager.literal("tpaccept");
-                    LiteralArgumentBuilder<ServerCommandSource> tpDenyBuilder = CommandManager.literal("tpdeny");
-
-                    tpAskBuilder
+                    LiteralCommandNode<ServerCommandSource> tpAskNode = CommandManager.literal("tpa")
                         .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                         .then(argument("target", EntityArgumentType.player())
-                            .executes(new TeleportAskCommand()));
+                            .executes(new TeleportAskCommand())
+                        ).build();
 
-                    tpAcceptBuilder
+                    LiteralCommandNode<ServerCommandSource> tpAcceptNode = CommandManager.literal("tpaccept")
                         .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                         .then(argument("target", EntityArgumentType.player())
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
-                            .executes(new TeleportAcceptCommand()));
+                            .executes(new TeleportAcceptCommand())
+                        ).build();
 
-                    tpDenyBuilder
+                    LiteralCommandNode<ServerCommandSource> tpDenyNode = CommandManager.literal("tpdeny")
                         .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                         .then(argument("target", EntityArgumentType.player())
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
-                            .executes(new TeleportDenyCommand()));
+                            .executes(new TeleportDenyCommand())
+                        ).build();
 
-                    LiteralCommandNode<ServerCommandSource> tpAskNode = tpAskBuilder.build();
-                    LiteralCommandNode<ServerCommandSource> tpAcceptNode = tpAcceptBuilder.build();
-                    LiteralCommandNode<ServerCommandSource> tpDenyNode = tpDenyBuilder.build();
+                    LiteralCommandNode<ServerCommandSource> tpAskHereNode = CommandManager.literal("tpahere")
+                            .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
+                            .then(argument("target", EntityArgumentType.player())
+                                    .executes(new TeleportAskHereCommand())
+                            ).build();
 
                     rootNode.addChild(tpAskNode);
                     rootNode.addChild(tpAcceptNode);
                     rootNode.addChild(tpDenyNode);
+                    rootNode.addChild(tpAskHereNode);
+
                     essentialCommandsRootNode.addChild(tpAskNode);
                     essentialCommandsRootNode.addChild(tpAcceptNode);
                     essentialCommandsRootNode.addChild(tpDenyNode);
+                    essentialCommandsRootNode.addChild(tpAskHereNode);
+
 
                 }
 
@@ -351,6 +356,11 @@ public class EssentialCommandRegistry {
                         }
                         return 0;
                     }).build()
+                );
+
+                essentialCommandsRootNode.addChild(CommandManager.literal("test")
+                        .executes(configReloadNode.getCommand())
+                        .build()
                 );
 
                 rootNode.addChild(essentialCommandsRootNode);

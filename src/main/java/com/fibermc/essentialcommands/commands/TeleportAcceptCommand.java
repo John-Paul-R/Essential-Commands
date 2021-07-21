@@ -25,7 +25,8 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
         PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
-        if (targetPlayerData.getTpTarget() != null && targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
+        TeleportRequest teleportRequest = targetPlayerData.getSentTeleportRequest();
+        if (teleportRequest != null && teleportRequest.getTargetPlayer().equals(senderPlayer)) {
 
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
@@ -33,11 +34,7 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
                 , Util.NIL_UUID);
 
             //Conduct teleportation
-            PlayerTeleporter.requestTeleport(new QueuedPlayerTeleport(
-                targetPlayerData,
-                senderPlayer,
-                senderPlayer.getDisplayName()
-            ));
+            teleportRequest.queue();
 
             //Send message to command sender confirming that request has been accepted
             source.sendFeedback(
@@ -47,7 +44,7 @@ public class TeleportAcceptCommand implements Command<ServerCommandSource> {
             //Clean up TPAsk
             targetPlayerData.setTpTimer(-1);
             // Remove the tp request, as it has been completed.
-            TeleportRequestManager.getInstance().endTpRequest(senderPlayer);
+            TeleportRequestManager.getInstance().endTpRequest(teleportRequest);
 
             return 1;
         } else {

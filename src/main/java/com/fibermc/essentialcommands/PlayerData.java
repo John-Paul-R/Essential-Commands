@@ -26,11 +26,11 @@ public class PlayerData extends PersistentState {
     // Remaining time before current tp Ask (sent by this player) expires.
     private int tpTimer;
     // Target of tpAsk
-    private PlayerData tpTarget;
+    private TeleportRequest teleportRequest;
 
     // players that have Asked to tp to this player
     // This list exists for autofilling the 'tpaccept' command
-    private LinkedList<PlayerData> tpAskers;
+    private final LinkedHashMap<UUID, TeleportRequest> incomingTeleportRequests;
 
     // HOMES
     NamedLocationStorage homes;
@@ -49,8 +49,7 @@ public class PlayerData extends PersistentState {
         this.pUuid = player.getUuid();
         this.saveFile = saveFile;
         tpTimer = -1;
-        tpTarget = null;
-        tpAskers = new LinkedList<PlayerData>();
+        incomingTeleportRequests = new LinkedHashMap<>();
         homes = new NamedLocationStorage();
     }
 
@@ -67,8 +66,7 @@ public class PlayerData extends PersistentState {
         this.pUuid = playerUuid;
         this.saveFile = saveFile;
         tpTimer = -1;
-        tpTarget = null;
-        tpAskers = new LinkedList<PlayerData>();
+        incomingTeleportRequests = new LinkedHashMap<>();
         this.homes = homes;
     }
 
@@ -85,28 +83,32 @@ public class PlayerData extends PersistentState {
         tpTimer--;
     }
 
-    public PlayerData getTpTarget() {
-        return tpTarget;
+    public TeleportRequest getSentTeleportRequest() {
+        return teleportRequest;
     }
 
-    public void setTpTarget(PlayerData tpTarget) {
-        this.tpTarget = tpTarget;
+    public void setSentTeleportRequest(TeleportRequest request) {
+        this.teleportRequest = request;
     }
 
-    public LinkedList<PlayerData> getTpAskers() {
-        return tpAskers;
+    public LinkedHashMap<UUID, TeleportRequest> getIncomingTeleportRequests() {
+        return incomingTeleportRequests;
     }
 
-    public boolean hasBeenAskedByPlayer(PlayerData tpAsker) {
-        return tpAskers.contains(tpAsker);
+    public TeleportRequest getIncomingTeleportRequest(PlayerData tpAsker) {
+        return incomingTeleportRequests.get(tpAsker.getPlayer().getUuid());
     }
 
-    public void addTpAsker(PlayerData tpAsker) {
-        this.tpAskers.add(tpAsker);
+    public TeleportRequest getIncomingTeleportRequest(UUID tpAsker) {
+        return incomingTeleportRequests.get(tpAsker);
+    }
+
+    public void addIncomingTeleportRequest(TeleportRequest teleportRequest) {
+        this.incomingTeleportRequests.put(teleportRequest.getSenderPlayer().getUuid(), teleportRequest);
     }
 
     public void removeTpAsker(PlayerData tpAsker) {
-        this.tpAskers.remove(tpAsker);
+        this.incomingTeleportRequests.remove(tpAsker.getPlayer().getUuid());
     }
 
     public ServerPlayerEntity getPlayer() {

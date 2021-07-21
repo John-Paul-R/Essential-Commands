@@ -22,7 +22,7 @@ public class TeleportRequestManager {
 
     private static final int TPS = 20;
     private final PlayerDataManager dataManager;
-    private final LinkedList<PlayerData> activeTpRequestList;
+    private final LinkedList<TeleportRequest> activeTpRequestList;
     private final LinkedList<PlayerData> tpCooldownList;
     private final ConcurrentHashMap<UUID, QueuedTeleport> delayedQueuedTeleportMap;
 
@@ -31,7 +31,7 @@ public class TeleportRequestManager {
     public TeleportRequestManager(PlayerDataManager dataManager) {
         INSTANCE = this;
         this.dataManager = dataManager;
-        activeTpRequestList = new LinkedList<>();
+        activeTpRequestList = new LinkedList<TeleportRequest>();
         tpCooldownList = new LinkedList<>();
         delayedQueuedTeleportMap = new ConcurrentHashMap<>();
     }
@@ -45,37 +45,37 @@ public class TeleportRequestManager {
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> TeleportRequestManager.INSTANCE.tick(server));
     }
 
-    public void endTpRequest(ServerPlayerEntity requesterPlayer) {
-        PlayerData requesterPlayerData = ((ServerPlayerEntityAccess) requesterPlayer).getEcPlayerData();
-        endTpRequest(requesterPlayerData);
-        this.activeTpRequestList.remove(requesterPlayerData);
+    public void endTpRequest(TeleportRequest teleportRequest) {
+        endTpRequestFinal(teleportRequest);
+        this.activeTpRequestList.remove(teleportRequest);
     }
-    private void endTpRequest(PlayerData requesterPlayerData) {
-        PlayerData target = requesterPlayerData.getTpTarget();
+    private void endTpRequestFinal(TeleportRequest teleportRequest) {
+        PlayerData target = teleportRequest.getTargetPlayerData();
         if (target != null) {
-            target.removeTpAsker(requesterPlayerData);
-            requesterPlayerData.setTpTarget(null);
+            target.removeTpAsker(teleportRequest.getSenderPlayerData());
+            teleportRequest.getSenderPlayerData().setSentTeleportRequest(null);
         }
     }
 
     public void tick(MinecraftServer server) {
-        ListIterator<PlayerData> iter = activeTpRequestList.listIterator();
+        ListIterator<TeleportRequest> tpRequestIterator = activeTpRequestList.listIterator();
         //decrement the tp timer for all players that have put in a tp request
-        while (iter.hasNext()) {
-            PlayerData requesterPlayerData = iter.next();
+        while (tpRequestIterator.hasNext()) {
+            TeleportRequest teleportRequest = tpRequestIterator.next();
+            PlayerData requesterPlayerData = ((ServerPlayerEntityAccess) teleportRequest.getSenderPlayer()).getEcPlayerData();
             requesterPlayerData.tickTpTimer();
             if (requesterPlayerData.getTpTimer() < 0) {
-                endTpRequest(requesterPlayerData);
-                iter.remove();
+                endTpRequestFinal(teleportRequest);
+                tpRequestIterator.remove();
             }
         }
 
-        iter = tpCooldownList.listIterator();
-        while (iter.hasNext()) {
-            PlayerData e = iter.next();
+        ListIterator<PlayerData> toCooldownIterator = tpCooldownList.listIterator();
+        while (toCooldownIterator.hasNext()) {
+            PlayerData e = toCooldownIterator.next();
             e.tickTpCooldown();
             if (e.getTpCooldown() < 0) {
-                iter.remove();
+                toCooldownIterator.remove();
             }
         }
 
@@ -105,15 +105,16 @@ public class TeleportRequestManager {
         }
     }
 
-    public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer) {
+    public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer, TeleportRequest.Type requestType) {
         PlayerData requestSenderData = ((ServerPlayerEntityAccess)requestSender).getEcPlayerData();
         PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         final int TRD = Config.TELEPORT_REQUEST_DURATION * TPS;//sec * ticks per sec
         requestSenderData.setTpTimer(TRD);
-        requestSenderData.setTpTarget(targetPlayerData);
-        targetPlayerData.addTpAsker(requestSenderData);
-        activeTpRequestList.add(requestSenderData);
+        TeleportRequest teleportRequest = new TeleportRequest(requestSender, targetPlayer, requestType);
+        requestSenderData.setSentTeleportRequest(teleportRequest);
+        targetPlayerData.addIncomingTeleportRequest(teleportRequest);
+        activeTpRequestList.add(teleportRequest);
     }
 
     public void startTpCooldown(ServerPlayerEntity player) {

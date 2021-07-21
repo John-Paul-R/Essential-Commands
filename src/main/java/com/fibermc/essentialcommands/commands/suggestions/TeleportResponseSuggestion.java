@@ -11,8 +11,8 @@ public class TeleportResponseSuggestion {
     //Brigader Suggestions
     public static SuggestionProvider<ServerCommandSource> suggestedStrings() {
         return (context, builder) -> ListSuggestion.getSuggestionsBuilder(builder,
-            ((ServerPlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData().getTpAskers()
-                .stream().map((entry) -> entry.getPlayer().getGameProfile().getName())
+            ((ServerPlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData().getIncomingTeleportRequests().values()
+                .stream().map((entry) -> entry.getSenderPlayer().getGameProfile().getName())
                 .collect(Collectors.toList())
         );
     }
