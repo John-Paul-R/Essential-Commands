@@ -1,11 +1,17 @@
 package com.fibermc.essentialcommands;
 
+import java.io.FileNotFoundException;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.util.function.Predicate;
+
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.config.Config;
+import com.fibermc.essentialcommands.util.EssentialsXParser;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -43,37 +49,42 @@ public class EssentialCommandRegistry {
                 //Make some new nodes
                 //Tpa
                 if (Config.ENABLE_TPA) {
-                    LiteralArgumentBuilder<ServerCommandSource> tpAskBuilder = CommandManager.literal("tpa");
-                    LiteralArgumentBuilder<ServerCommandSource> tpAcceptBuilder = CommandManager.literal("tpaccept");
-                    LiteralArgumentBuilder<ServerCommandSource> tpDenyBuilder = CommandManager.literal("tpdeny");
-
-                    tpAskBuilder
+                    LiteralCommandNode<ServerCommandSource> tpAskNode = CommandManager.literal("tpa")
                         .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                         .then(argument("target", EntityArgumentType.player())
-                            .executes(new TeleportAskCommand()));
+                            .executes(new TeleportAskCommand())
+                        ).build();
 
-                    tpAcceptBuilder
+                    LiteralCommandNode<ServerCommandSource> tpAcceptNode = CommandManager.literal("tpaccept")
                         .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                         .then(argument("target", EntityArgumentType.player())
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
-                            .executes(new TeleportAcceptCommand()));
+                            .executes(new TeleportAcceptCommand())
+                        ).build();
 
-                    tpDenyBuilder
+                    LiteralCommandNode<ServerCommandSource> tpDenyNode = CommandManager.literal("tpdeny")
                         .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                         .then(argument("target", EntityArgumentType.player())
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
-                            .executes(new TeleportDenyCommand()));
+                            .executes(new TeleportDenyCommand())
+                        ).build();
 
-                    LiteralCommandNode<ServerCommandSource> tpAskNode = tpAskBuilder.build();
-                    LiteralCommandNode<ServerCommandSource> tpAcceptNode = tpAcceptBuilder.build();
-                    LiteralCommandNode<ServerCommandSource> tpDenyNode = tpDenyBuilder.build();
+                    LiteralCommandNode<ServerCommandSource> tpAskHereNode = CommandManager.literal("tpahere")
+                            .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
+                            .then(argument("target", EntityArgumentType.player())
+                                    .executes(new TeleportAskHereCommand())
+                            ).build();
 
                     rootNode.addChild(tpAskNode);
                     rootNode.addChild(tpAcceptNode);
                     rootNode.addChild(tpDenyNode);
+                    rootNode.addChild(tpAskHereNode);
+
                     essentialCommandsRootNode.addChild(tpAskNode);
                     essentialCommandsRootNode.addChild(tpAcceptNode);
                     essentialCommandsRootNode.addChild(tpDenyNode);
+                    essentialCommandsRootNode.addChild(tpAskHereNode);
+
 
                 }
 
@@ -290,7 +301,7 @@ public class EssentialCommandRegistry {
                 if (Config.ENABLE_WORKBENCH) {
                     LiteralCommandNode<ServerCommandSource> workbenchNode = dispatcher.register(
                         CommandManager.literal("workbench")
-                            .requires(ECPerms.require(ECPerms.Registry.workbench, 2))
+                            .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
                             .executes(new WorkbenchCommand())
                     );
 
@@ -300,7 +311,7 @@ public class EssentialCommandRegistry {
                 if (Config.ENABLE_ENDERCHEST) {
                     LiteralCommandNode<ServerCommandSource> enderchestNode = dispatcher.register(
                         CommandManager.literal("enderchest")
-                            .requires(ECPerms.require(ECPerms.Registry.enderchest, 2))
+                            .requires(ECPerms.require(ECPerms.Registry.enderchest, 0))
                             .executes(new EnderchestCommand())
                     );
 
@@ -328,6 +339,31 @@ public class EssentialCommandRegistry {
                     ).build();
                 configNode.addChild(configReloadNode);
                 essentialCommandsRootNode.addChild(configNode);
+
+                if (Config.ENABLE_ESSENTIALSX_CONVERT) {
+                    essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
+                        .requires(source -> source.hasPermissionLevel(4))
+                        .executes((source) -> {
+                            Path mcDir = source.getSource().getMinecraftServer().getRunDirectory().toPath();
+                            try {
+                                EssentialsXParser.convertPlayerDataDir(
+                                        mcDir.resolve("plugins/Essentials/userdata").toFile(),
+                                        mcDir.resolve("world/modplayerdata").toFile(),
+                                        source.getSource().getMinecraftServer()
+                                );
+                                source.getSource().sendFeedback(new LiteralText("Successfully converted data dirs."), Config.BROADCAST_TO_OPS);
+                            } catch (NotDirectoryException | FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                            return 0;
+                        }).build()
+                    );
+                }
+
+//                essentialCommandsRootNode.addChild(CommandManager.literal("test")
+//                        .executes(configReloadNode.getCommand())
+//                        .build()
+//                );
 
                 rootNode.addChild(essentialCommandsRootNode);
             }

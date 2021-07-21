@@ -12,9 +12,9 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Util;
 
-public class TeleportAskCommand implements Command<ServerCommandSource> {
+public class TeleportAskHereCommand implements Command<ServerCommandSource> {
 
-    public TeleportAskCommand() {}
+    public TeleportAskHereCommand() {}
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -26,8 +26,8 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
 
         //inform target player of tp request via chat
         targetPlayer.sendSystemMessage(TextUtil.concat(
-            new LiteralText(senderPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT),
-            ECText.getInstance().getText("cmd.tpask.receive").setStyle(Config.FORMATTING_DEFAULT)
+                new LiteralText(senderPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT),
+                ECText.getInstance().getText("cmd.tpaskhere.receive").setStyle(Config.FORMATTING_DEFAULT)
         ), Util.NIL_UUID);
 
         String senderName = context.getSource().getPlayer().getGameProfile().getName();
@@ -38,16 +38,16 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
                 new LiteralText("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(Config.FORMATTING_ACCENT),
                 new LiteralText("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(Config.FORMATTING_ERROR)
         ).send();
-        
+
         //Mark TPRequest Sender as having requested a teleport
-        tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_TO);
+        tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_HERE);
 
         //inform command sender that request has been sent
         context.getSource().sendFeedback(TextUtil.concat(
-            new LiteralText("Teleport request has been sent to ").setStyle(Config.FORMATTING_DEFAULT),
-            new LiteralText(targetPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT)
+                new LiteralText("Teleport request has been sent to ").setStyle(Config.FORMATTING_DEFAULT),
+                new LiteralText(targetPlayer.getEntityName()).setStyle(Config.FORMATTING_ACCENT)
         ), Config.BROADCAST_TO_OPS);
-        
+
         return 1;
     }
 }

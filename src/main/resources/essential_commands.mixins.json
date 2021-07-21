@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_11",
   "mixins": [
     "CommandNodeMixin",
+    "PersistentStateManagerInvoker",
     "PlayerEntityMixin",
     "PlayerManagerMixin",
     "ServerPlayerEntityMixin",

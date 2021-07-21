@@ -2,6 +2,8 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.TeleportRequest;
+import com.fibermc.essentialcommands.TeleportRequestManager;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.config.Config;
 import com.mojang.brigadier.Command;
@@ -26,20 +28,24 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
          PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
-        if (targetPlayerData.getTpTarget().getPlayer().equals(senderPlayer)) {
+        TeleportRequest teleportRequest = targetPlayerData.getSentTeleportRequest();
+        if (teleportRequest != null && teleportRequest.getTargetPlayer().equals(senderPlayer)) {
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
                 ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)
                 , Util.NIL_UUID);
-            
-            //Clean up TPAsk
-            targetPlayerData.setTpTimer(-1);
 
             //Send message to command sender confirming that request has been accepted
             source.sendFeedback(
                 ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)
                 , Config.BROADCAST_TO_OPS
             );
+
+            //Clean up TPAsk
+            targetPlayerData.setTpTimer(-1);
+            // Remove the tp request, as it has been completed.
+            TeleportRequestManager.getInstance().endTpRequest(teleportRequest);
+
             return 1;
         } else {
             source.sendError(

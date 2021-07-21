@@ -2,7 +2,7 @@ package com.fibermc.essentialcommands;
 
 import net.devtech.grossfabrichacks.entrypoints.PrePreLaunch;
 import net.devtech.grossfabrichacks.instrumentation.InstrumentationApi;
-import org.apache.log4j.LogManager;
+import org.apache.logging.log4j.LogManager;
 
 public class GFHEntrypoint implements PrePreLaunch {
 

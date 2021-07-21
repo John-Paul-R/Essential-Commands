@@ -41,8 +41,11 @@ allprojects {
 		include	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
 		modApi 	'eu.pb4:placeholder-api-ec:1.0.1+1.16'
 		include 'eu.pb4:placeholder-api-ec:1.0.1+1.16'
-		modImplementation group: 'net.devtech', name: 'grossfabrichacks', version: '6.1'
-		include group: 'net.devtech', name: 'grossfabrichacks', version: '6.1'
+		modImplementation group: 'net.devtech', name: 'grossfabrichacks', version: project.gfh_version
+		include group: 'net.devtech', name: 'grossfabrichacks', version: project.gfh_version
+		modImplementation 	'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'
+		include 			'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'
+
 
 		// Subprojects
 		subprojects.each {

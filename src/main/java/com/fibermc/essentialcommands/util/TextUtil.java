@@ -5,9 +5,11 @@ import com.google.gson.JsonParseException;
 import eu.pb4.placeholders.TextParser;
 import net.minecraft.text.*;
 import org.apache.logging.log4j.Level;
+import org.lwjgl.system.CallbackI;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 public class TextUtil {
 
@@ -53,7 +55,7 @@ public class TextUtil {
         }
         return join(textCollection.toArray(new Text[0]), separator, 0, textCollection.size());
     }
-    public static Text joinStrings(Collection<String> stringCollection, Text separator, Style stringsFormatting) {
+    public static Text join(Collection<String> stringCollection, Text separator, Style stringsFormatting) {
         if (stringCollection == null) {
             return null;
         }
@@ -62,6 +64,38 @@ public class TextUtil {
             separator, 0, stringCollection.size()
         );
     }
+
+    public static String joinStrings(Collection<String> stringCollection, String separator) {
+        if (stringCollection == null) {
+            return null;
+        }
+        return joinStrings(
+                stringCollection.toArray(String[]::new),
+                separator, 0, stringCollection.size()
+        );
+    }
+
+    public static String joinStrings(String[] array, String separator, int startIndex, int endIndex) {
+        if (array == null) {
+            return null;
+        }
+        int bufSize = (endIndex - startIndex);
+        if (bufSize <= 0) {
+            return null;
+        }
+        StringBuilder buf = new StringBuilder();
+        for (int i = startIndex; i < endIndex; i++) {
+            if (i > startIndex) {
+                buf.append(separator);
+            }
+            if (array[i] != null) {
+                buf.append(array[i]);
+            }
+        }
+        return buf.toString();
+    }
+
+
     public static Text join(Text[] array, Text separator, int startIndex, int endIndex) {
         if (array == null) {
             return null;
@@ -80,6 +114,36 @@ public class TextUtil {
             }
         }
         return buf;
+    }
+
+    public static Text spaceBetween(Text[] array, int totalWidth, int padding) {
+        int totalTextSize = 0;
+        ArrayList<String> strings = new ArrayList<>(array.length);
+        for (Text txt : array) {
+            String str = txt.getString();
+            strings.add(str);
+            totalTextSize += str.length();
+        }
+
+        // No room for spacing
+        if (totalTextSize > totalWidth) {
+            return concat(array);
+        }
+
+        MutableText outText = new LiteralText("");//new ArrayList<>(strings.size() * 2 - 1);
+        String lrPadStr = " ".repeat(padding);
+        String spaceStr = " ".repeat((totalWidth - padding * 2 - totalTextSize) / (array.length - 1));
+        outText.append(new LiteralText(lrPadStr));
+
+        for (int i = 0; i < array.length; i++) {
+            outText.append(array[i]);
+            if (i != array.length - 1)
+                outText.append(new LiteralText(spaceStr));
+        }
+
+        outText.append(new LiteralText(lrPadStr));
+
+        return outText;
     }
 
     public static Text clickableTeleport(MutableText originalText, String destinationName, String commandBaseString) {
