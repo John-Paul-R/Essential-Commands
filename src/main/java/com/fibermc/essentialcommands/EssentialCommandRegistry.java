@@ -340,28 +340,30 @@ public class EssentialCommandRegistry {
                 configNode.addChild(configReloadNode);
                 essentialCommandsRootNode.addChild(configNode);
 
-                essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
-                    .requires(source -> source.hasPermissionLevel(4))
-                    .executes((source) -> {
-                        Path mcDir = source.getSource().getMinecraftServer().getRunDirectory().toPath();
-                        try {
-                            EssentialsXParser.convertPlayerDataDir(
-                                    mcDir.resolve("plugins/Essentials/userdata").toFile(),
-                                    mcDir.resolve("world/modplayerdata").toFile(),
-                                    source.getSource().getMinecraftServer()
-                            );
-                            source.getSource().sendFeedback(new LiteralText("Successfully converted data dirs."), Config.BROADCAST_TO_OPS);
-                        } catch (NotDirectoryException | FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        return 0;
-                    }).build()
-                );
+                if (Config.ENABLE_ESSENTIALSX_CONVERT) {
+                    essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
+                        .requires(source -> source.hasPermissionLevel(4))
+                        .executes((source) -> {
+                            Path mcDir = source.getSource().getMinecraftServer().getRunDirectory().toPath();
+                            try {
+                                EssentialsXParser.convertPlayerDataDir(
+                                        mcDir.resolve("plugins/Essentials/userdata").toFile(),
+                                        mcDir.resolve("world/modplayerdata").toFile(),
+                                        source.getSource().getMinecraftServer()
+                                );
+                                source.getSource().sendFeedback(new LiteralText("Successfully converted data dirs."), Config.BROADCAST_TO_OPS);
+                            } catch (NotDirectoryException | FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                            return 0;
+                        }).build()
+                    );
+                }
 
-                essentialCommandsRootNode.addChild(CommandManager.literal("test")
-                        .executes(configReloadNode.getCommand())
-                        .build()
-                );
+//                essentialCommandsRootNode.addChild(CommandManager.literal("test")
+//                        .executes(configReloadNode.getCommand())
+//                        .build()
+//                );
 
                 rootNode.addChild(essentialCommandsRootNode);
             }
