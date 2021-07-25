@@ -4,7 +4,6 @@ import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.Message;
@@ -15,7 +14,6 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.Map;
 import java.util.Set;
 
 
@@ -36,16 +34,17 @@ public class HomeCommand implements Command<ServerCommandSource> {
     }
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        Set<Map.Entry<String, MinecraftLocation>> entries = HomeSuggestion.getSuggestionEntries(context);
-        if (entries.size() > 1) {
+        PlayerData playerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
+        Set<String> homeNames = playerData.getHomeNames();
+        if (homeNames.size() > 1) {
             throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.home.tp.error.shortcut_more_than_one"));
-        } else if (entries.size() < 1) {
+        } else if (homeNames.size() < 1) {
             throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.home.tp.error.shortcut_none_exist"));
         }
 
         return exec(
-                ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData(),
-                entries.stream().findAny().get().getKey()
+                playerData,
+                homeNames.stream().findAny().get()
         );
     }
 
