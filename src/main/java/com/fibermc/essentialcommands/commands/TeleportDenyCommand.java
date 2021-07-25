@@ -14,31 +14,26 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Util;
 
-public class TeleportDenyCommand implements Command<ServerCommandSource> {
+public class TeleportDenyCommand extends TeleportResponseCommand {
 
     public TeleportDenyCommand() {}
 
-    @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    protected int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer) {
         ServerCommandSource source = context.getSource();
-        //Store command sender
-         ServerPlayerEntity senderPlayer = source.getPlayer();
-        //Store Target Player
-         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
-         PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
+        PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
         TeleportRequest teleportRequest = targetPlayerData.getSentTeleportRequest();
         if (teleportRequest != null && teleportRequest.getTargetPlayer().equals(senderPlayer)) {
             //inform target player that teleport has been accepted via chat
             targetPlayer.sendSystemMessage(
-                ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)
-                , Util.NIL_UUID);
+                    ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)
+                    , Util.NIL_UUID);
 
             //Send message to command sender confirming that request has been accepted
             source.sendFeedback(
-                ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)
-                , Config.BROADCAST_TO_OPS
+                    ECText.getInstance().getText("cmd.tpdeny.feedback").setStyle(Config.FORMATTING_DEFAULT)
+                    , Config.BROADCAST_TO_OPS
             );
 
             //Clean up TPAsk
@@ -53,5 +48,6 @@ public class TeleportDenyCommand implements Command<ServerCommandSource> {
             );
             return -1;
         }
+
     }
 }
