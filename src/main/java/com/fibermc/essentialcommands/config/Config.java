@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.config;
 
+import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.util.StringBuilderPlus;
 import com.google.gson.JsonParser;
@@ -8,13 +9,19 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import static com.fibermc.essentialcommands.ECPerms.makeNumericPermissionGroup;
 import static com.fibermc.essentialcommands.util.TextUtil.parseText;
 
 public class Config {
@@ -36,7 +43,7 @@ public class Config {
     public static boolean ENABLE_WORKBENCH;
     public static boolean ENABLE_ENDERCHEST;
     public static boolean ENABLE_ESSENTIALSX_CONVERT;
-    public static int HOME_LIMIT;
+    public static List<Integer> HOME_LIMIT;
     public static double TELEPORT_COOLDOWN;
     public static double TELEPORT_DELAY;
     public static boolean ALLOW_BACK_ON_DEATH;
@@ -66,7 +73,7 @@ public class Config {
     private static final Option<Boolean> _ENABLE_WORKBENCH =    new Option<>("enable_workbench", true, Boolean::parseBoolean);
     private static final Option<Boolean> _ENABLE_ENDERCHEST =   new Option<>("enable_enderchest", true, Boolean::parseBoolean);
     private static final Option<Boolean> _ENABLE_ESSENTIALSX_CONVERT =   new Option<>("enable_experimental_essentialsx_converter", false, Boolean::parseBoolean);
-    private static final Option<Integer> _HOME_LIMIT =                  new Option<>("home_limit", 1, Config::parseInt);
+    private static final Option<List<Integer>> _HOME_LIMIT =    new Option<>("home_limit", List.of(1, 2, 5), arrayParser(Config::parseInt));
     private static final Option<Double>  _TELEPORT_COOLDOWN =           new Option<>("teleport_cooldown", 1.0, Config::parseDouble);
     private static final Option<Double>  _TELEPORT_DELAY =              new Option<>("teleport_delay", 0.0, Config::parseDouble);
     private static final Option<Boolean> _ALLOW_BACK_ON_DEATH =         new Option<>("allow_back_on_death", false, Boolean::parseBoolean);
@@ -88,6 +95,13 @@ public class Config {
     private static final String KEY_FORMATTING_ACCENT = "formatting_accent";
     private static final String KEY_FORMATTING_ERROR = "formatting_error";
     private static final String KEY_NICKNAME_PREFIX = "nickname_prefix";
+
+//    static {
+//        _HOME_LIMIT.CHANGE_EVENT.register((newValue ->
+//                ECPerms.Registry.Group.home_limit_group = makeNumericPermissionGroup("essentialcommands.home.limit", newValue))
+//        );
+        // ATM, this does not execute on 1st run, because of default values...
+//    }
 
     public static void loadOrCreateProperties() {
         props = new SortedProperties();
@@ -126,6 +140,7 @@ public class Config {
         ENABLE_ENDERCHEST    = _ENABLE_ENDERCHEST.loadAndSave(props).getValue();
         ENABLE_ESSENTIALSX_CONVERT = _ENABLE_ESSENTIALSX_CONVERT.loadAndSave(props).getValue();
         HOME_LIMIT          = _HOME_LIMIT.loadAndSave(props).getValue();
+        ECPerms.Registry.Group.home_limit_group = makeNumericPermissionGroup("essentialcommands.home.limit", HOME_LIMIT);
         TELEPORT_COOLDOWN   = _TELEPORT_COOLDOWN.loadAndSave(props).getValue();
         TELEPORT_DELAY      = _TELEPORT_DELAY.loadAndSave(props).getValue();
         ALLOW_BACK_ON_DEATH = _ALLOW_BACK_ON_DEATH.loadAndSave(props).getValue();
@@ -242,6 +257,7 @@ public class Config {
         }
         return -1;
     }
+
     private static double parseDouble(String s) {
         try {
             return Double.parseDouble(s);
@@ -250,6 +266,29 @@ public class Config {
         }
         return -1;
     }
+
+    @Contract(pure = true)
+    private static <T> @NotNull ValueParser<List<T>> csvParser(ValueParser<T> valueParser) {
+        return (String value) -> parseCsv(value, valueParser);
+    }
+
+    private static <T> List<T> parseCsv(@NotNull String csvString, @NotNull ValueParser<T> valueParser) {
+        return Arrays.stream(csvString.split(",")).sequential().map(String::trim)
+                .map(valueParser::parseValue).collect(Collectors.toList());
+    }
+
+    @Contract(pure = true)
+    private static <T> @NotNull ValueParser<List<T>> arrayParser(ValueParser<T> valueParser) {
+        return (String value) -> parseArray(value, valueParser);
+    }
+
+    private static <T> List<T> parseArray(@NotNull String arrayString, @NotNull ValueParser<T> valueParser) {
+        return parseCsv(
+            arrayString.substring(arrayString.indexOf('[') + 1, arrayString.indexOf(']')),
+            valueParser
+        );
+    }
+
     private static void logNumberParseError(String num, String type) {
         EssentialCommands.log(Level.WARN, String.format(
             "Invalid number format for type '%s' in config. Value provided: '%s'", type, num

@@ -51,16 +51,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
                     .append(ECText.getInstance().getText("cmd.home.set.feedback.2").setStyle(Config.FORMATTING_DEFAULT)),
                 Config.BROADCAST_TO_OPS
             );
-        } else if (successCode == -1) {
-            source.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(Config.FORMATTING_ERROR),
-                new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
-                ECText.getInstance().getText("cmd.home.set.error.limit.2").setStyle(Config.FORMATTING_ERROR),
-                new LiteralText(String.valueOf(Config.HOME_LIMIT)).setStyle(Config.FORMATTING_ACCENT),
-                ECText.getInstance().getText("cmd.home.set.error.limit.3").setStyle(Config.FORMATTING_ERROR)
-            ));
         }
-
 
         return successCode;
     }

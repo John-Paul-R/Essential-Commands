@@ -2,7 +2,9 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -10,6 +12,8 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 import net.minecraft.world.PersistentState;
 
 import java.io.File;
@@ -117,16 +121,27 @@ public class PlayerData extends PersistentState {
 
     // Homes
     public int addHome(String homeName, MinecraftLocation minecraftLocation) throws CommandSyntaxException {
-        int outCode;
-        if (Config.HOME_LIMIT == -1 || this.homes.size() < Config.HOME_LIMIT) {
+        int outCode = 0;
+        int playerMaxHomes = ECPerms.getHighestNumericPermission(this.player.getCommandSource(), ECPerms.Registry.Group.home_limit_group);
+        if (this.homes.size() < playerMaxHomes) {
             homes.putCommand(homeName, minecraftLocation);
             this.markDirty();
             outCode = 1;
         } else {
-            outCode = -1;
+            this.sendError(TextUtil.concat(
+                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(Config.FORMATTING_ERROR),
+                new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
+                ECText.getInstance().getText("cmd.home.set.error.limit.2").setStyle(Config.FORMATTING_ERROR),
+                new LiteralText(String.valueOf(playerMaxHomes)).setStyle(Config.FORMATTING_ACCENT),
+                ECText.getInstance().getText("cmd.home.set.error.limit.3").setStyle(Config.FORMATTING_ERROR)
+            ));
         }
 
         return outCode;
+    }
+
+    public void sendError(Text message) {
+        this.player.sendSystemMessage((new LiteralText("")).append(message).formatted(Formatting.RED), Util.NIL_UUID);
     }
 
     public Set<String> getHomeNames() {
