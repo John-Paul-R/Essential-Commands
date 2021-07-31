@@ -8,6 +8,8 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.function.Predicate;
 
 public class ECPerms {
@@ -51,6 +53,7 @@ public class ECPerms {
             public static final String[] nickname_group = {nickname_self, nickname_others, nickname_reveal};
             public static final String[] fly_group = {fly_self, fly_others};
             public static final String[] config_group = {config_reload};
+            public static String[] home_limit_group;
         }
     }
 
@@ -98,5 +101,43 @@ public class ECPerms {
         }
         return false;
     }
+
+    private static int getNumericValue(String permission) {
+        return Integer.parseInt(permission.substring(permission.lastIndexOf('.') + 1));
+    }
+
+    static int getHighestNumericPermission(@NotNull CommandSource source, @NotNull String[] permissionGroup) {
+        // No effective numeric limits for ops.
+        if (isSuperAdmin(source)) {
+            return Integer.MAX_VALUE;
+        }
+        // If permissions API is disabled, min int value in permission group is used for all non-op players.
+        if (!Config.USE_PERMISSIONS_API) {
+            return Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
+        }
+
+        // If permissions api is enabled, find the highest numeric permission node that the user has & return its
+        // numeric value.
+        int highestValue;
+        if (Config.GRANT_LOWEST_NUMERIC_BY_DEFAULT) {
+            // Grant min perm value in group by default, if none are set.
+            highestValue = Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
+        } else {
+            // Set value to -1 in the case where the user has no relevant permissions set.
+            highestValue = -1;
+        }
+        for (String permission: permissionGroup) {
+            if (check(source, permission)) {
+                highestValue = Math.max(highestValue, getNumericValue(permission));
+            }
+        }
+        return highestValue;
+    }
+
+    public static String[] makeNumericPermissionGroup(String basePermission, Collection<Integer> numericValues) {
+        String trueBasePermission = basePermission.endsWith(".") ? basePermission : basePermission + ".";
+        return numericValues.stream().map(el -> trueBasePermission.concat(el.toString())).toArray(String[]::new);
+    }
+
 
 }

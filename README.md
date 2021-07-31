@@ -43,6 +43,7 @@ See the [full List of Commands & Permissions](https://github.com/John-Paul-R/Ess
 ### Teleport requests
 
   - /tpa \<target-player>
+  - /tpahere \<target-player>
   - /tpaccept \<target-player>
   - /tpdeny \<target-player>
 

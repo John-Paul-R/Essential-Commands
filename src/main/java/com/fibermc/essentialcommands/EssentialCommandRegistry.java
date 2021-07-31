@@ -1,10 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import java.io.FileNotFoundException;
-import java.nio.file.NotDirectoryException;
-import java.nio.file.Path;
-import java.util.function.Predicate;
-
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
@@ -25,6 +20,9 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 
+import java.io.FileNotFoundException;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
 import java.util.function.Predicate;
 
 import static net.minecraft.server.command.CommandManager.argument;
@@ -57,6 +55,7 @@ public class EssentialCommandRegistry {
 
                     LiteralCommandNode<ServerCommandSource> tpAcceptNode = CommandManager.literal("tpaccept")
                         .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
+                        .executes(new TeleportAcceptCommand()::runDefault)
                         .then(argument("target", EntityArgumentType.player())
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportAcceptCommand())
@@ -64,6 +63,7 @@ public class EssentialCommandRegistry {
 
                     LiteralCommandNode<ServerCommandSource> tpDenyNode = CommandManager.literal("tpdeny")
                         .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
+                        .executes(new TeleportDenyCommand()::runDefault)
                         .then(argument("target", EntityArgumentType.player())
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportDenyCommand())
@@ -104,6 +104,7 @@ public class EssentialCommandRegistry {
 
                     homeTpBuilder
                         .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
+                        .executes(new HomeCommand()::runDefault)
                         .then(argument("home_name", StringArgumentType.word())
                             .suggests(HomeSuggestion.suggestedStrings())
                             .executes(new HomeCommand()));

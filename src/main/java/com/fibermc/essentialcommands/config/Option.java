@@ -1,5 +1,9 @@
 package com.fibermc.essentialcommands.config;
 
+import com.fibermc.essentialcommands.events.OptionChangedCallback;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+
 import java.util.Properties;
 
 public class Option<T> {
@@ -8,6 +12,14 @@ public class Option<T> {
     private final T defaultValue;
     private final ValueParser<T> parser;
     private T value;
+
+    public final Event<OptionChangedCallback<T>> CHANGE_EVENT = EventFactory.createArrayBacked(OptionChangedCallback.class,
+        (listeners) -> (newValue) -> {
+            for (OptionChangedCallback<T> event : listeners) {
+                event.onOptionChanged(newValue);
+            }
+        }
+    );
 
     public Option(String key, T defaultValue, ValueParser<T> parser) {
         this.key = key;
@@ -22,7 +34,11 @@ public class Option<T> {
     }
 
     public Option<T> loadFrom(Properties props) {
+        T prevValue = this.value;
         this.value = parser.parseValue(String.valueOf(props.getOrDefault(this.key, String.valueOf(this.defaultValue))));
+        if (!(prevValue == null || prevValue.equals(this.value))) {
+            CHANGE_EVENT.invoker().onOptionChanged(this.value);
+        }
         return this;
     }
 
