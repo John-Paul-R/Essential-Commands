@@ -111,6 +111,12 @@ public class ECPerms {
         if (isSuperAdmin(source)) {
             return Integer.MAX_VALUE;
         }
+
+        // If ONLY -1 is present as possibility, treat as no effective limit.
+        if (permissionGroup.length == 1 && getNumericValue(permissionGroup[0]) == -1) {
+            return Integer.MAX_VALUE;
+        }
+
         // If permissions API is disabled, min int value in permission group is used for all non-op players.
         if (!Config.USE_PERMISSIONS_API) {
             return Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
