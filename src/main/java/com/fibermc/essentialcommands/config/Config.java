@@ -100,12 +100,11 @@ public class Config {
     private static final String KEY_FORMATTING_ERROR = "formatting_error";
     private static final String KEY_NICKNAME_PREFIX = "nickname_prefix";
 
-//    static {
-//        _HOME_LIMIT.CHANGE_EVENT.register((newValue ->
-//                ECPerms.Registry.Group.home_limit_group = makeNumericPermissionGroup("essentialcommands.home.limit", newValue))
-//        );
-        // ATM, this does not execute on 1st run, because of default values...
-//    }
+    static {
+        _HOME_LIMIT.CHANGE_EVENT.register((newValue ->
+                ECPerms.Registry.Group.home_limit_group = makeNumericPermissionGroup("essentialcommands.home.limit", newValue))
+        );
+    }
 
     public static void loadOrCreateProperties() {
         props = new SortedProperties();
@@ -145,7 +144,6 @@ public class Config {
         ENABLE_ESSENTIALSX_CONVERT = _ENABLE_ESSENTIALSX_CONVERT.loadAndSave(props).getValue();
         ENABLE_TOP          = _ENABLE_TOP.loadAndSave(props).getValue();
         HOME_LIMIT          = _HOME_LIMIT.loadAndSave(props).getValue();
-        ECPerms.Registry.Group.home_limit_group = makeNumericPermissionGroup("essentialcommands.home.limit", HOME_LIMIT);
         TELEPORT_COOLDOWN   = _TELEPORT_COOLDOWN.loadAndSave(props).getValue();
         TELEPORT_DELAY      = _TELEPORT_DELAY.loadAndSave(props).getValue();
         ALLOW_BACK_ON_DEATH = _ALLOW_BACK_ON_DEATH.loadAndSave(props).getValue();

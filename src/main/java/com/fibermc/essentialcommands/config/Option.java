@@ -36,7 +36,7 @@ public class Option<T> {
     public Option<T> loadFrom(Properties props) {
         T prevValue = this.value;
         this.value = parser.parseValue(String.valueOf(props.getOrDefault(this.key, String.valueOf(this.defaultValue))));
-        if (!(prevValue == null || prevValue.equals(this.value))) {
+        if (!this.value.equals(prevValue)) {
             CHANGE_EVENT.invoker().onOptionChanged(this.value);
         }
         return this;
