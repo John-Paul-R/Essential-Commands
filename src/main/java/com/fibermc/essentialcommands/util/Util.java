@@ -9,7 +9,13 @@ public class Util {
             int dot = version.indexOf(".");
             if(dot != -1) { version = version.substring(0, dot); }
         }
-        return Integer.parseInt(version);
+        int versionNum = 0;
+        try {
+            versionNum = Integer.parseInt(version.replaceAll("[^0-9]", ""));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return versionNum;
     }
 
 }
