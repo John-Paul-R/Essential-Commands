@@ -1,10 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.*;
-import com.fibermc.essentialcommands.commands.suggestions.HomeSuggestion;
-import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
-import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
-import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
+import com.fibermc.essentialcommands.commands.suggestions.*;
 import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
 import com.fibermc.essentialcommands.util.TextUtil;
@@ -21,9 +18,13 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 
 import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
@@ -332,23 +333,46 @@ public class EssentialCommandRegistry {
 
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
                         .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
-                        .build();
+                        .then(CommandManager.literal("reload")
+                            .executes((context) -> {
+                                Config.loadOrCreateProperties();
+                                context.getSource().sendFeedback(
+                                    TextUtil.concat(
+                                        ECText.getInstance().getText("essentialcommands.fullprefix"),
+                                        ECText.getInstance().getText("cmd.config.reload")
+                                    ),
+                                true
+                                );
+                                return 1;
+                            }).requires(
+                                    ECPerms.require(ECPerms.Registry.config_reload, 4)
+                            ).build())
+                        .then(CommandManager.literal("display")
+                            .requires(ECPerms.require(ECPerms.Registry.config_reload, 4))
+                            .executes((context) -> {
+                                Config.loadOrCreateProperties();
+                                context.getSource().sendFeedback(
+                                    Config.stateAsText(),
+                                    false
+                                );
+                                return 1;
+                            })
+                            .then(CommandManager.argument("config_property", StringArgumentType.word())
+                                .suggests(ListSuggestion.of(Config.getPubFieldNames()))
+                                .executes(context -> {
+                                    try {
+                                        context.getSource().sendFeedback(Config.getFieldValueAsText(
+                                                StringArgumentType.getString(context, "config_property")
+                                        ), false);
+                                    } catch (NoSuchFieldException e) {
+                                        e.printStackTrace();
+                                    }
 
-                LiteralCommandNode<ServerCommandSource> configReloadNode = CommandManager.literal("reload")
-                    .executes((context) -> {
-                        Config.loadOrCreateProperties();
-                        context.getSource().sendFeedback(
-                                TextUtil.concat(
-                                    ECText.getInstance().getText("essentialcommands.fullprefix"),
-                                    ECText.getInstance().getText("cmd.config.reload")
-                                ),
-                            true
-                        );
-                        return 1;
-                    }).requires(
-                        ECPerms.require(ECPerms.Registry.config_reload, 4)
-                    ).build();
-                configNode.addChild(configReloadNode);
+                                    return 1;
+                                })
+                            )
+                        ).build();
+
                 essentialCommandsRootNode.addChild(configNode);
 
                 if (Config.ENABLE_ESSENTIALSX_CONVERT) {

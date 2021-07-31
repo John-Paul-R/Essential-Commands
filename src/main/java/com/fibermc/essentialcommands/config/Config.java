@@ -3,22 +3,26 @@ package com.fibermc.essentialcommands.config;
 import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.util.StringBuilderPlus;
+import com.fibermc.essentialcommands.util.TextUtil;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.fibermc.essentialcommands.ECPerms.makeNumericPermissionGroup;
@@ -162,6 +166,19 @@ public class Config {
         NICK_REVEAL_ON_HOVER= _NICK_REVEAL_ON_HOVER.loadAndSave(props).getValue();
         GRANT_LOWEST_NUMERIC_BY_DEFAULT = _GRANT_LOWEST_NUMERIC_BY_DEFAULT.loadAndSave(props).getValue();
 
+//        Cursed reflection reloading of all properties.
+//        Arrays.stream(Config.class.getDeclaredFields())
+//                .filter(field -> Modifier.isPublic(field.getModifiers()))
+//                .forEach(field -> {
+//                    String privFieldName = "_" + field.getName();
+//                    try {
+//                        ((Option<?>) Config.class.getField(privFieldName).get(Config.class)).loadAndSave(props);
+//
+//                    } catch (IllegalAccessException | NoSuchFieldException e) {
+//                        e.printStackTrace();
+//                    }
+//                });
+
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
             Objects.requireNonNull(FORMATTING_ACCENT);
@@ -299,4 +316,64 @@ public class Config {
             "Invalid number format for type '%s' in config. Value provided: '%s'", type, num
         ));
     }
+
+    public static @NotNull Text stateAsText() {
+        LiteralText result = new LiteralText("");
+        String newLine = "\n";//System.getProperty("line.separator");
+
+        result.append( new LiteralText("Essential Commands Config {").setStyle(Config.FORMATTING_ACCENT) );
+        result.append(newLine);
+        LiteralText propsText = new LiteralText("");
+        result.append(propsText);
+
+        //print field names paired with their values
+        for ( Field field : pubFields ) {
+            try {
+                if (Modifier.isPublic(field.getModifiers())) {
+                    propsText.append(fieldAsText(field).append(newLine));
+                }
+            } catch ( IllegalAccessException ex ) {
+                ex.printStackTrace();
+            }
+        }
+        result.append(new LiteralText("}").setStyle(Config.FORMATTING_ACCENT));
+
+        return result;
+
+    }
+
+    private static final List<String> pubFieldNames;
+    private static final List<Field> pubFields;
+    static {
+        pubFieldNames = Arrays.stream(Config.class.getDeclaredFields())
+            .filter(field -> Modifier.isPublic(field.getModifiers()))
+            .map(Field::getName)
+            .sorted()
+            .collect(Collectors.toList());
+        pubFields = Arrays.stream(Config.class.getDeclaredFields())
+            .filter(field -> Modifier.isPublic(field.getModifiers()))
+            .sorted(Comparator.comparing(Field::getName))
+            .collect(Collectors.toList());
+
+    }
+
+    public static List<String> getPubFieldNames() {
+        return pubFieldNames;
+    }
+
+    private static MutableText fieldAsText(Field field) throws IllegalAccessException {
+        return TextUtil.concat(
+                new LiteralText(field.getName() + ": ").setStyle(Config.FORMATTING_DEFAULT),
+                new LiteralText(field.get(Config.class).toString())
+        );
+    }
+    public static @Nullable MutableText getFieldValueAsText(String fieldName) throws NoSuchFieldException {
+        try {
+            return fieldAsText(Config.class.getField(fieldName));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
