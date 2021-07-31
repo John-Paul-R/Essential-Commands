@@ -61,6 +61,7 @@ public class Config {
     public static int RTP_MAX_ATTEMPTS;
     public static boolean BROADCAST_TO_OPS;
     public static boolean NICK_REVEAL_ON_HOVER;
+    public static boolean GRANT_LOWEST_NUMERIC_BY_DEFAULT;
 
     private static final Option<Boolean> _ENABLE_BACK =         new Option<>("enable_back", true, Boolean::parseBoolean);
     private static final Option<Boolean> _ENABLE_HOME =         new Option<>("enable_home", true, Boolean::parseBoolean);
@@ -90,6 +91,7 @@ public class Config {
     private static final Option<Integer> _RTP_MAX_ATTEMPTS = new Option<>("rtp_max_attempts", 15, Config::parseInt);
     private static final Option<Boolean> _BROADCAST_TO_OPS = new Option<>("broadcast_to_ops", false, Boolean::parseBoolean);
     private static final Option<Boolean> _NICK_REVEAL_ON_HOVER = new Option<>("nick_reveal_on_hover", true, Boolean::parseBoolean);
+    private static final Option<Boolean> _GRANT_LOWEST_NUMERIC_BY_DEFAULT = new Option<>("grant_lowest_numeric_by_default", true, Boolean::parseBoolean);
 
     private static final String KEY_FORMATTING_DEFAULT = "formatting_default";
     private static final String KEY_FORMATTING_ACCENT = "formatting_accent";
@@ -157,6 +159,7 @@ public class Config {
         RTP_MAX_ATTEMPTS =    _RTP_MAX_ATTEMPTS.loadAndSave(props).getValue();
         BROADCAST_TO_OPS    = _BROADCAST_TO_OPS.loadAndSave(props).getValue();
         NICK_REVEAL_ON_HOVER= _NICK_REVEAL_ON_HOVER.loadAndSave(props).getValue();
+        GRANT_LOWEST_NUMERIC_BY_DEFAULT = _GRANT_LOWEST_NUMERIC_BY_DEFAULT.loadAndSave(props).getValue();
 
         try {
             Objects.requireNonNull(FORMATTING_DEFAULT);
@@ -283,8 +286,9 @@ public class Config {
     }
 
     private static <T> List<T> parseArray(@NotNull String arrayString, @NotNull ValueParser<T> valueParser) {
+        int endIdx = arrayString.indexOf(']');
         return parseCsv(
-            arrayString.substring(arrayString.indexOf('[') + 1, arrayString.indexOf(']')),
+            arrayString.substring(arrayString.indexOf('[') + 1, endIdx == -1 ? arrayString.length() : endIdx),
             valueParser
         );
     }

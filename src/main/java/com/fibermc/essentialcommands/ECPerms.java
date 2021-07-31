@@ -118,7 +118,14 @@ public class ECPerms {
 
         // If permissions api is enabled, find the highest numeric permission node that the user has & return its
         // numeric value.
-        int highestValue = -1;
+        int highestValue;
+        if (Config.GRANT_LOWEST_NUMERIC_BY_DEFAULT) {
+            // Grant min perm value in group by default, if none are set.
+            highestValue = Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
+        } else {
+            // Set value to -1 in the case where the user has no relevant permissions set.
+            highestValue = -1;
+        }
         for (String permission: permissionGroup) {
             if (check(source, permission)) {
                 highestValue = Math.max(highestValue, getNumericValue(permission));
