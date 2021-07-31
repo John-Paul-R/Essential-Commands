@@ -319,6 +319,16 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(enderchestNode);
                 }
 
+                if (Config.ENABLE_TOP) {
+                    LiteralCommandNode<ServerCommandSource> topNode = dispatcher.register(
+                        CommandManager.literal("top")
+                            .requires(ECPerms.require(ECPerms.Registry.top, 2))
+                            .executes(new TopCommand())
+                    );
+
+                    essentialCommandsRootNode.addChild(topNode);
+                }
+
 
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
                         .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
