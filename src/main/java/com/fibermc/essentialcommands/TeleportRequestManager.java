@@ -52,7 +52,7 @@ public class TeleportRequestManager {
     private void endTpRequestFinal(TeleportRequest teleportRequest) {
         PlayerData target = teleportRequest.getTargetPlayerData();
         if (target != null) {
-            target.removeTpAsker(teleportRequest.getSenderPlayerData());
+            target.removeIncomingTeleportRequest(teleportRequest.getSenderPlayer().getUuid());
             teleportRequest.getSenderPlayerData().setSentTeleportRequest(null);
         }
     }

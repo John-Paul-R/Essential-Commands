@@ -61,12 +61,15 @@ public class PlayerData extends PersistentState {
      * DO NOT USE FOR LOGGED-IN PLAYERS.
      * This constructor should ONLY be used for temporarily
      * handling data of offline players.
-     * @param playerUuid
-     * @param homes
-     * @param saveFile
+     *
+     * getPlayer() will always return null on an instance created in this fashion,
+     * and any operations that would require a ServerPlayerEntity will fail.
+     *
+     * @param playerUuid UUID of the player whose data we want to grab or modify.
+     * @param homes NamedLocationStorage of the player's homes (fills field)
+     * @param saveFile The save file for this PlayerData instance.
      */
     public PlayerData(UUID playerUuid, NamedLocationStorage homes, File saveFile) {
-//        this.player = player;
         this.pUuid = playerUuid;
         this.saveFile = saveFile;
         tpTimer = -1;
@@ -99,10 +102,6 @@ public class PlayerData extends PersistentState {
         return incomingTeleportRequests;
     }
 
-    public TeleportRequest getIncomingTeleportRequest(PlayerData tpAsker) {
-        return incomingTeleportRequests.get(tpAsker.getPlayer().getUuid());
-    }
-
     public TeleportRequest getIncomingTeleportRequest(UUID tpAsker) {
         return incomingTeleportRequests.get(tpAsker);
     }
@@ -111,8 +110,8 @@ public class PlayerData extends PersistentState {
         this.incomingTeleportRequests.put(teleportRequest.getSenderPlayer().getUuid(), teleportRequest);
     }
 
-    public void removeTpAsker(PlayerData tpAsker) {
-        this.incomingTeleportRequests.remove(tpAsker.getPlayer().getUuid());
+    public void removeIncomingTeleportRequest(UUID tpAsker) {
+        this.incomingTeleportRequests.remove(tpAsker);
     }
 
     public ServerPlayerEntity getPlayer() {

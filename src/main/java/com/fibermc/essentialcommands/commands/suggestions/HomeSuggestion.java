@@ -15,8 +15,7 @@ import java.util.Set;
 public class HomeSuggestion {
     //Brigader Suggestions
     public static SuggestionProvider<ServerCommandSource> suggestedStrings() {
-        return (context, builder) -> ListSuggestion.getSuggestionsBuilder(builder,
-            getSuggestionsList(context));
+        return ListSuggestion.ofContext(HomeSuggestion::getSuggestionsList);
     }
 
     /**

@@ -358,7 +358,7 @@ public class EssentialCommandRegistry {
                                 return 1;
                             })
                             .then(CommandManager.argument("config_property", StringArgumentType.word())
-                                .suggests(ListSuggestion.of(Config.getPubFieldNames()))
+                                .suggests(ListSuggestion.of(Config::getPubFieldNames))
                                 .executes(context -> {
                                     try {
                                         context.getSource().sendFeedback(Config.getFieldValueAsText(
