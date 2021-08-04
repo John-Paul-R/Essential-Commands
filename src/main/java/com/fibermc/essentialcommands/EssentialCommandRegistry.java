@@ -71,7 +71,7 @@ public class EssentialCommandRegistry {
                         ).build();
 
                     LiteralCommandNode<ServerCommandSource> tpAskHereNode = CommandManager.literal("tpahere")
-                            .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
+                            .requires(ECPerms.require(ECPerms.Registry.tpahere, 0))
                             .then(argument("target", EntityArgumentType.player())
                                     .executes(new TeleportAskHereCommand())
                             ).build();

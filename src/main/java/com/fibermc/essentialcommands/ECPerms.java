@@ -18,6 +18,7 @@ public class ECPerms {
 //            `essentialcommands.<command>.*`
     public static final class Registry {
         public static final String tpa = "essentialcommands.tpa";
+        public static final String tpahere = "essentialcommands.tpahere";
         public static final String tpaccept = "essentialcommands.tpaccept";
         public static final String tpdeny = "essentialcommands.tpdeny";
         public static final String home_set = "essentialcommands.home.set";
@@ -47,7 +48,7 @@ public class ECPerms {
         public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";
         public static final String bypass_teleport_interrupt_on_damaged = "essentialcommands.bypass.teleport_interrupt_on_damaged";
         public static final class Group {
-            public static final String[] tpa_group = {tpa, tpaccept, tpdeny};
+            public static final String[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};
             public static final String[] home_group = {home_set, home_tp, home_delete};
             public static final String[] warp_group = {warp_set, warp_tp, warp_delete};
             public static final String[] spawn_group = {spawn_tp, spawn_set};
