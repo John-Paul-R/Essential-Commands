@@ -5,9 +5,11 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerTickScheduler;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -47,6 +49,8 @@ public class PlayerData extends PersistentState {
 
     // RTP Cooldown
     private int rtpNextUsableTime;
+
+    private boolean persistFlight;
 
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
@@ -174,6 +178,15 @@ public class PlayerData extends PersistentState {
                 EssentialCommands.LOGGER.warn("Could not refresh player full nickanme, as ServerPlayerEntity was null in PlayerData.");
             }
         }
+
+        if (dataTag.contains("persistFlight")) {
+            this.persistFlight = dataTag.getBoolean("persistFlight");
+        }
+
+        if (this.player != null) {
+            updatePlayer(this.player);
+        }
+
     }
 
     @Override
@@ -185,6 +198,8 @@ public class PlayerData extends PersistentState {
         tag.put("homes", homesNbt);
 
         tag.putString("nickname", Text.Serializer.toJson(nickname));
+
+        tag.putBoolean("persistFlight", persistFlight);
 
         return tag;
     }
@@ -210,6 +225,17 @@ public class PlayerData extends PersistentState {
 
     public void updatePlayer(ServerPlayerEntity serverPlayerEntity) {
         this.player = serverPlayerEntity;
+
+        if (this.persistFlight) {
+            PlayerDataManager.scheduleTask(this::updateFlight);
+        }
+    }
+
+    public void updateFlight() {
+        PlayerAbilities abilities = this.player.getAbilities();
+        abilities.allowFlying = true;
+        abilities.flying = true;
+        this.player.sendAbilitiesUpdate();
     }
 
     public void tickTpCooldown() {
@@ -308,5 +334,14 @@ public class PlayerData extends PersistentState {
         }
 
         this.fullNickname = tempFullNickname;
+    }
+
+    public boolean isPersistFlight() {
+        return persistFlight;
+    }
+
+    public void setPersistFlight(boolean persistFlight) {
+        this.persistFlight = persistFlight;
+        this.markDirty();
     }
 }

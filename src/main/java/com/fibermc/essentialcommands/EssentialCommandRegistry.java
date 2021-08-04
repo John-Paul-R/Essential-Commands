@@ -6,6 +6,7 @@ import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -294,6 +295,9 @@ public class EssentialCommandRegistry {
                             .then(argument("target_player", EntityArgumentType.player())
                                 .requires(ECPerms.require(ECPerms.Registry.fly_others, 4))
                                 .executes(new FlyCommand())
+                                .then(argument("permanent", BoolArgumentType.bool())
+                                    .executes(new FlyCommand())
+                                )
                             )
                     );
 

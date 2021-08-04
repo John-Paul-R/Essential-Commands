@@ -13,6 +13,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.world.GameMode;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,6 +43,11 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
                 damageSource
             );
         }
+    }
+
+    @Inject(method = "changeGameMode", at = @At("RETURN"))
+    public void onChangeGameMode(GameMode gameMode, CallbackInfoReturnable<Boolean> cir) {
+        ((ServerPlayerEntityAccess) this).getEcPlayerData().updateFlight();
     }
 
     @Override

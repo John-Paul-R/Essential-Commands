@@ -25,12 +25,14 @@ public class PlayerDataManager {
     private final ConcurrentHashMap<UUID, PlayerData> dataMap;
     private final List<PlayerData> changedNicknames;
     private final List<String> changedTeams;
+    private final List<Runnable> nextTickTasks;
     private static PlayerDataManager INSTANCE;
 
     public PlayerDataManager() {
         INSTANCE = this;
         this.changedNicknames = new LinkedList<>();
         this.changedTeams = new LinkedList<>();
+        this.nextTickTasks = new LinkedList<>();
         this.dataMap = new ConcurrentHashMap<>();
     }
 
@@ -75,6 +77,19 @@ public class PlayerDataManager {
                 this.changedTeams.clear();
             }
         }
+
+        if (!nextTickTasks.isEmpty()) {
+            Iterator<Runnable> tasks = nextTickTasks.listIterator();
+            while (tasks.hasNext()) {
+                tasks.next().run();
+                tasks.remove();
+            }
+        }
+
+    }
+
+    public static void scheduleTask(Runnable task) {
+        INSTANCE.nextTickTasks.add(task);
     }
 
     // EVENTS
