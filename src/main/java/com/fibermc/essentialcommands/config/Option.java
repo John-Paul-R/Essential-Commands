@@ -1,10 +1,10 @@
 package com.fibermc.essentialcommands.config;
 
-import com.fibermc.essentialcommands.events.OptionChangedCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 
 import java.util.Properties;
+import java.util.function.Consumer;
 
 public class Option<T> {
 
@@ -13,10 +13,10 @@ public class Option<T> {
     private final ValueParser<T> parser;
     private T value;
 
-    public final Event<OptionChangedCallback<T>> CHANGE_EVENT = EventFactory.createArrayBacked(OptionChangedCallback.class,
+    public final Event<Consumer<T>> CHANGE_EVENT = EventFactory.createArrayBacked(Consumer.class,
         (listeners) -> (newValue) -> {
-            for (OptionChangedCallback<T> event : listeners) {
-                event.onOptionChanged(newValue);
+            for (Consumer<T> event : listeners) {
+                event.accept(newValue);
             }
         }
     );
@@ -37,7 +37,7 @@ public class Option<T> {
         T prevValue = this.value;
         this.value = parser.parseValue(String.valueOf(props.getOrDefault(this.key, String.valueOf(this.defaultValue))));
         if (!this.value.equals(prevValue)) {
-            CHANGE_EVENT.invoker().onOptionChanged(this.value);
+            CHANGE_EVENT.invoker().accept(this.value);
         }
         return this;
     }
