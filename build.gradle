@@ -84,9 +84,10 @@ allprojects {
 	// Add any additional repositories
 	repositories {
 		mavenCentral()
-		mavenLocal()
 		maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
-//		maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
+		// GrossFabricHacks
+		maven { url = 'https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master/' }
+		maven { url 'https://maven.jpcode.dev' }
 		// Add repositories to retrieve artifacts from in here.
 		// You should only use this when depending on other mods because
 		// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -94,9 +95,6 @@ allprojects {
 		// for more information about repositories.
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 		maven { url 'https://maven.nucleoid.xyz' }
-
-		// GrossFabricHacks
-		maven { url = 'https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master/' }
 
 		// Used by FabricPlaceholderAPI
 		flatDir {
