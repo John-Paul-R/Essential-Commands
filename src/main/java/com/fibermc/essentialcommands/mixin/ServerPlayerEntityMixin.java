@@ -1,8 +1,10 @@
 package com.fibermc.essentialcommands.mixin;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.EssentialCommands;
+import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.PlayerDataFactory;
+import com.fibermc.essentialcommands.QueuedTeleport;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -22,6 +24,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
@@ -69,7 +73,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
 
     @Inject(method = "getPlayerListName", at = @At("RETURN"), cancellable = true)
     public void getPlayerListName(CallbackInfoReturnable<Text> cir) {
-        if (Config.NICKNAMES_IN_PLAYER_LIST) {
+        if (CONFIG.NICKNAMES_IN_PLAYER_LIST.getValue()) {
             cir.setReturnValue(((ServerPlayerEntity)(Object)this).getDisplayName());
             cir.cancel();
         }

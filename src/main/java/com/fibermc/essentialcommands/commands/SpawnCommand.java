@@ -4,13 +4,14 @@ import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.WorldDataManager;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 
 public class SpawnCommand implements Command<ServerCommandSource> {
@@ -34,7 +35,7 @@ public class SpawnCommand implements Command<ServerCommandSource> {
             PlayerTeleporter.requestTeleport(senderPlayer, loc, ECText.getInstance().getText("cmd.spawn.location_name"));
             out = 1;
         } else {
-            context.getSource().sendError(ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set").setStyle(Config.FORMATTING_ERROR));
+            context.getSource().sendError(ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set").setStyle(CONFIG.FORMATTING_ERROR.getValue()));
             out = -2;
         }
 

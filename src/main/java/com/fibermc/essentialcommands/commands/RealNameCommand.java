@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerDataManager;
-import com.fibermc.essentialcommands.config.Config;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -13,6 +12,8 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 
 import java.util.List;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class RealNameCommand implements Command<ServerCommandSource> {
     @Override
@@ -25,15 +26,15 @@ public class RealNameCommand implements Command<ServerCommandSource> {
         // If no players matched the provided nickname
         if (nicknamePlayers.size() == 0) {
             responseText
-                .append(ECText.getInstance().getText("cmd.realname.feedback.none_match").setStyle(Config.FORMATTING_DEFAULT))
-                .append(new LiteralText(nicknameStr).setStyle(Config.FORMATTING_ACCENT))
-                .append(ECText.getInstance().getText("generic.quote_fullstop").setStyle(Config.FORMATTING_DEFAULT));
+                .append(ECText.getInstance().getText("cmd.realname.feedback.none_match").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
+                .append(new LiteralText(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                .append(ECText.getInstance().getText("generic.quote_fullstop").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
 
         } else {
             responseText
-                .append(ECText.getInstance().getText("cmd.realname.feedback.matching.1").setStyle(Config.FORMATTING_DEFAULT))
-                .append(new LiteralText(nicknameStr).setStyle(Config.FORMATTING_ACCENT))
-                .append(ECText.getInstance().getText("cmd.realname.feedback.matching.2").setStyle(Config.FORMATTING_DEFAULT));
+                .append(ECText.getInstance().getText("cmd.realname.feedback.matching.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
+                .append(new LiteralText(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                .append(ECText.getInstance().getText("cmd.realname.feedback.matching.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
 
             for (PlayerData nicknamePlayer : nicknamePlayers) {
                 responseText.append("\n  ");
@@ -42,7 +43,7 @@ public class RealNameCommand implements Command<ServerCommandSource> {
 
         }
         context.getSource().sendFeedback(
-            responseText, Config.BROADCAST_TO_OPS
+            responseText, CONFIG.BROADCAST_TO_OPS.getValue()
         );
 
         return 0;

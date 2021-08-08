@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -14,6 +13,8 @@ import net.minecraft.util.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 /**
  * TeleportRequestManager
@@ -92,13 +93,13 @@ public class TeleportRequestManager {
     }
 
     public void onPlayerDamaged(ServerPlayerEntity playerEntity, DamageSource damageSource) {
-        if (Config.TELEPORT_INTERRUPT_ON_DAMAGED && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)) {
+        if (CONFIG.TELEPORT_INTERRUPT_ON_DAMAGED.getValue() && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)) {
             try {
                 Objects.requireNonNull( ((ServerPlayerEntityAccess)playerEntity).endEcQueuedTeleport());
 
                 delayedQueuedTeleportMap.remove(playerEntity.getUuid());
                 playerEntity.sendSystemMessage(
-                    new LiteralText("Teleport interrupted. Reason: Damage Taken").setStyle(Config.FORMATTING_ERROR),
+                    new LiteralText("Teleport interrupted. Reason: Damage Taken").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
                     Util.NIL_UUID
                 );
             } catch (NullPointerException ignored) {}
@@ -109,7 +110,7 @@ public class TeleportRequestManager {
         PlayerData requestSenderData = ((ServerPlayerEntityAccess)requestSender).getEcPlayerData();
         PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
-        final int TRD = Config.TELEPORT_REQUEST_DURATION * TPS;//sec * ticks per sec
+        final int TRD = CONFIG.TELEPORT_REQUEST_DURATION.getValue() * TPS;//sec * ticks per sec
         requestSenderData.setTpTimer(TRD);
         TeleportRequest teleportRequest = new TeleportRequest(requestSender, targetPlayer, requestType);
         requestSenderData.setSentTeleportRequest(teleportRequest);
@@ -120,7 +121,7 @@ public class TeleportRequestManager {
     public void startTpCooldown(ServerPlayerEntity player) {
         PlayerData pData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
 
-        final int TC = (int)(Config.TELEPORT_COOLDOWN * TPS);
+        final int TC = (int)(CONFIG.TELEPORT_COOLDOWN.getValue() * TPS);
         pData.setTpCooldown(TC);
         tpCooldownList.add(pData);
     }
@@ -138,7 +139,7 @@ public class TeleportRequestManager {
         if (Objects.nonNull(prevValue)) {
             prevValue.getPlayerData().getPlayer().sendSystemMessage(
                 new LiteralText("Teleport request canceled. Reason: New teleport started!")
-                    .setStyle(Config.FORMATTING_DEFAULT),
+                    .setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
                 Util.NIL_UUID
             );
         }

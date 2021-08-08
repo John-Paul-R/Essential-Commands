@@ -1,14 +1,16 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
-import com.fibermc.essentialcommands.config.Config;
+import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.WorldDataManager;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 
 public class SpawnSetCommand implements Command<ServerCommandSource> {
@@ -31,9 +33,9 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
 
         //inform command sender that the home has been set
         source.sendFeedback(
-            ECText.getInstance().getText("cmd.spawn.set.feedback").setStyle(Config.FORMATTING_DEFAULT)
-                .append(loc.toLiteralTextSimple().setStyle(Config.FORMATTING_ACCENT))
-            , Config.BROADCAST_TO_OPS);
+            ECText.getInstance().getText("cmd.spawn.set.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+                .append(loc.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+            , CONFIG.BROADCAST_TO_OPS.getValue());
 
         return successCode;
     }

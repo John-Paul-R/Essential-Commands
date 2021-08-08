@@ -2,7 +2,6 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.suggestions.*;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
@@ -19,14 +18,11 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 
 import java.io.FileNotFoundException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
 
 /**
@@ -48,7 +44,7 @@ public class EssentialCommandRegistry {
 
                 //Make some new nodes
                 //Tpa
-                if (Config.ENABLE_TPA) {
+                if (CONFIG.ENABLE_TPA.getValue()) {
                     LiteralCommandNode<ServerCommandSource> tpAskNode = CommandManager.literal("tpa")
                         .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                         .then(argument("target", EntityArgumentType.player())
@@ -92,7 +88,7 @@ public class EssentialCommandRegistry {
 
 
                 //Homes
-                if (Config.ENABLE_HOME) {
+                if (CONFIG.ENABLE_HOME.getValue()) {
                     LiteralArgumentBuilder<ServerCommandSource> homeBuilder = CommandManager.literal("home");
                     LiteralArgumentBuilder<ServerCommandSource> homeSetBuilder = CommandManager.literal("set");
                     LiteralArgumentBuilder<ServerCommandSource> homeTpBuilder = CommandManager.literal("tp");
@@ -139,7 +135,7 @@ public class EssentialCommandRegistry {
 
 
                 //Back
-                if (Config.ENABLE_BACK) {
+                if (CONFIG.ENABLE_BACK.getValue()) {
                     LiteralArgumentBuilder<ServerCommandSource> backBuilder = CommandManager.literal("back");
                     backBuilder
                         .requires(ECPerms.require(ECPerms.Registry.back, 0))
@@ -152,7 +148,7 @@ public class EssentialCommandRegistry {
                 }
 
                 //Warp
-                if (Config.ENABLE_WARP) {
+                if (CONFIG.ENABLE_WARP.getValue()) {
                     LiteralArgumentBuilder<ServerCommandSource> warpBuilder = CommandManager.literal("warp");
                     LiteralArgumentBuilder<ServerCommandSource> warpSetBuilder = CommandManager.literal("set");
                     LiteralArgumentBuilder<ServerCommandSource> warpTpBuilder = CommandManager.literal("tp");
@@ -199,7 +195,7 @@ public class EssentialCommandRegistry {
                 }
 
                 //Spawn
-                if (Config.ENABLE_SPAWN) {
+                if (CONFIG.ENABLE_SPAWN.getValue()) {
                     LiteralArgumentBuilder<ServerCommandSource> spawnBuilder = CommandManager.literal("spawn");
                     LiteralArgumentBuilder<ServerCommandSource> spawnSetBuilder = CommandManager.literal("set");
                     LiteralArgumentBuilder<ServerCommandSource> spawnTpBuilder = CommandManager.literal("tp");
@@ -225,7 +221,7 @@ public class EssentialCommandRegistry {
                 }
 
                 //Nickname
-                if (Config.ENABLE_NICK) {
+                if (CONFIG.ENABLE_NICK.getValue()) {
                     LiteralArgumentBuilder<ServerCommandSource> nickBuilder = CommandManager.literal("nickname");
                     LiteralArgumentBuilder<ServerCommandSource> nickSetBuilder = CommandManager.literal("set");
                     LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
@@ -272,7 +268,7 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(nickNode);
                 }
 
-                if (Config.ENABLE_RTP) {
+                if (CONFIG.ENABLE_RTP.getValue()) {
                     LiteralCommandNode<ServerCommandSource> rtpNode = dispatcher.register(
                         CommandManager.literal("randomteleport")
                             .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
@@ -287,7 +283,7 @@ public class EssentialCommandRegistry {
 
                 }
 
-                if (Config.ENABLE_FLY) {
+                if (CONFIG.ENABLE_FLY.getValue()) {
                     LiteralCommandNode<ServerCommandSource> flyNode = dispatcher.register(
                         CommandManager.literal("fly")
                             .requires(ECPerms.require(ECPerms.Registry.fly_self, 2))
@@ -304,7 +300,7 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(flyNode);
                 }
 
-                if (Config.ENABLE_WORKBENCH) {
+                if (CONFIG.ENABLE_WORKBENCH.getValue()) {
                     LiteralCommandNode<ServerCommandSource> workbenchNode = dispatcher.register(
                         CommandManager.literal("workbench")
                             .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
@@ -314,7 +310,7 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(workbenchNode);
                 }
 
-                if (Config.ENABLE_ENDERCHEST) {
+                if (CONFIG.ENABLE_ENDERCHEST.getValue()) {
                     LiteralCommandNode<ServerCommandSource> enderchestNode = dispatcher.register(
                         CommandManager.literal("enderchest")
                             .requires(ECPerms.require(ECPerms.Registry.enderchest, 0))
@@ -324,7 +320,7 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(enderchestNode);
                 }
 
-                if (Config.ENABLE_TOP) {
+                if (CONFIG.ENABLE_TOP.getValue()) {
                     LiteralCommandNode<ServerCommandSource> topNode = dispatcher.register(
                         CommandManager.literal("top")
                             .requires(ECPerms.require(ECPerms.Registry.top, 2))
@@ -339,7 +335,7 @@ public class EssentialCommandRegistry {
                         .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
                         .then(CommandManager.literal("reload")
                             .executes((context) -> {
-                                Config.loadOrCreateProperties();
+                                CONFIG.loadOrCreateProperties();
                                 context.getSource().sendFeedback(
                                     TextUtil.concat(
                                         ECText.getInstance().getText("essentialcommands.fullprefix"),
@@ -354,18 +350,18 @@ public class EssentialCommandRegistry {
                         .then(CommandManager.literal("display")
                             .requires(ECPerms.require(ECPerms.Registry.config_reload, 4))
                             .executes((context) -> {
-                                Config.loadOrCreateProperties();
+                                CONFIG.loadOrCreateProperties();
                                 context.getSource().sendFeedback(
-                                    Config.stateAsText(),
+                                    CONFIG.stateAsText(),
                                     false
                                 );
                                 return 1;
                             })
                             .then(CommandManager.argument("config_property", StringArgumentType.word())
-                                .suggests(ListSuggestion.of(Config::getPubFieldNames))
+                                .suggests(ListSuggestion.of(CONFIG::getPublicFieldNames))
                                 .executes(context -> {
                                     try {
-                                        context.getSource().sendFeedback(Config.getFieldValueAsText(
+                                        context.getSource().sendFeedback(CONFIG.getFieldValueAsText(
                                                 StringArgumentType.getString(context, "config_property")
                                         ), false);
                                     } catch (NoSuchFieldException e) {
@@ -379,7 +375,7 @@ public class EssentialCommandRegistry {
 
                 essentialCommandsRootNode.addChild(configNode);
 
-                if (Config.ENABLE_ESSENTIALSX_CONVERT) {
+                if (CONFIG.ENABLE_ESSENTIALSX_CONVERT.getValue()) {
                     essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
                         .requires(source -> source.hasPermissionLevel(4))
                         .executes((source) -> {
@@ -390,7 +386,7 @@ public class EssentialCommandRegistry {
                                         mcDir.resolve("world/modplayerdata").toFile(),
                                         source.getSource().getMinecraftServer()
                                 );
-                                source.getSource().sendFeedback(new LiteralText("Successfully converted data dirs."), Config.BROADCAST_TO_OPS);
+                                source.getSource().sendFeedback(new LiteralText("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS.getValue());
                             } catch (NotDirectoryException | FileNotFoundException e) {
                                 e.printStackTrace();
                             }

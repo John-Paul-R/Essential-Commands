@@ -1,7 +1,8 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.config.Config;
 import net.minecraft.server.MinecraftServer;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class ManagerLocator {
 
@@ -17,19 +18,20 @@ public class ManagerLocator {
 
     static boolean playerDataEnabled() {
         return (
-            Config.ENABLE_HOME  ||
-            Config.ENABLE_TPA   ||
-            Config.ENABLE_BACK  ||
-            Config.ENABLE_WARP  ||
-            Config.ENABLE_SPAWN
+            CONFIG.ENABLE_HOME.getValue()  ||
+            CONFIG.ENABLE_TPA.getValue()   ||
+            CONFIG.ENABLE_BACK.getValue()  ||
+            CONFIG.ENABLE_WARP.getValue()  ||
+            CONFIG.ENABLE_SPAWN.getValue() ||
+            CONFIG.ENABLE_NICK.getValue()
         );
 
     }
     static boolean teleportRequestEnabled() {
-        return (Config.ENABLE_TPA);
+        return (CONFIG.ENABLE_TPA.getValue());
     }
     static boolean warpEnabled() {
-        return (Config.ENABLE_TPA || Config.ENABLE_SPAWN);
+        return (CONFIG.ENABLE_TPA.getValue() || CONFIG.ENABLE_SPAWN.getValue());
     }
 
     public void init() {

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.fibermc.essentialcommands.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

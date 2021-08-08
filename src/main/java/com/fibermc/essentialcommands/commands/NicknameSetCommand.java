@@ -2,7 +2,6 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -15,7 +14,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.Texts;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class NicknameSetCommand implements Command<ServerCommandSource>  {
     public NicknameSetCommand() {}
@@ -52,25 +52,25 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
         //inform command sender that the nickname has been set
         if (successCode >= 0) {
             source.sendFeedback(TextUtil.concat(
-                ECText.getInstance().getText("cmd.nickname.set.feedback").setStyle(Config.FORMATTING_DEFAULT),
+                ECText.getInstance().getText("cmd.nickname.set.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
                 (nicknameText != null) ? nicknameText : new LiteralText(targetPlayer.getGameProfile().getName()),
-                ECText.getInstance().getText("generic.quote_fullstop").setStyle(Config.FORMATTING_DEFAULT)
-            ), Config.BROADCAST_TO_OPS);
+                ECText.getInstance().getText("generic.quote_fullstop").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+            ), CONFIG.BROADCAST_TO_OPS.getValue());
         } else {
             MutableText failReason = switch (successCode) {
                 case -1 -> ECText.getInstance().getText("cmd.nickname.set.error.perms");
                 case -2 -> ECText.getInstance().getText(
                     "cmd.nickname.set.error.length",
                     nicknameText.getString().length(),
-                    Config.NICKNAME_MAX_LENGTH
+                    CONFIG.NICKNAME_MAX_LENGTH.getValue()
                 );
                 default -> ECText.getInstance().getText("generic.error.unknown");
             };
             source.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.nickname.set.error.1").setStyle(Config.FORMATTING_ERROR),
+                ECText.getInstance().getText("cmd.nickname.set.error.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
                 nicknameText,
-                ECText.getInstance().getText("cmd.nickname.set.error.2").setStyle(Config.FORMATTING_ERROR),
-                failReason.setStyle(Config.FORMATTING_ERROR)
+                ECText.getInstance().getText("cmd.nickname.set.error.2").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                failReason.setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ));
         }
 

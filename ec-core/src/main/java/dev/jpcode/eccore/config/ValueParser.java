@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.config;
+package dev.jpcode.eccore.config;
 
 @FunctionalInterface
 public interface ValueParser<T> {

@@ -2,7 +2,6 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.google.common.base.Stopwatch;
@@ -14,13 +13,14 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
-
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
 import java.util.Random;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 /**
  * Heavily referenced from
@@ -49,20 +49,20 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         };
 
         //TODO Add OP/Permission bypass for RTP cooldown.
-        if (Config.RTP_COOLDOWN > 0) {
+        if (CONFIG.RTP_COOLDOWN.getValue() > 0) {
             ServerCommandSource source = context.getSource();
             int ticks = source.getMinecraftServer().getTicks();
             PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
             // if cooldown has expired
             if (playerData.getRtpNextUsableTime() < ticks) {
-                playerData.setRtpNextUsableTime(ticks + Config.RTP_COOLDOWN*20);
+                playerData.setRtpNextUsableTime(ticks + CONFIG.RTP_COOLDOWN.getValue()*20);
                 thread.start();
                 resultCode = 1;
             } else {
                 source.sendError(TextUtil.concat(
-                    ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(Config.FORMATTING_ERROR),
-                    new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(Config.FORMATTING_ACCENT),
-                    ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(Config.FORMATTING_ERROR)
+                    ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                    new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                    ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
                 ));
                 resultCode = -2;
             }
@@ -95,11 +95,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     }
 
     private static int exec(ServerPlayerEntity player, ServerWorld world, MinecraftLocation center, int timesRun) {
-        if (timesRun > Config.RTP_MAX_ATTEMPTS) {
+        if (timesRun > CONFIG.RTP_MAX_ATTEMPTS.getValue()) {
             return -1;
         }
         // Calculate position on circle perimeter
-        int r = Config.RTP_RADIUS;
+        int r = CONFIG.RTP_RADIUS.getValue();
         double angle = (new Random()).nextDouble()*2*Math.PI;
         double delta_x = r * Math.cos(angle);
         double delta_z = r * Math.sin(angle);

@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.config.Config;
 import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.util.TriState;
@@ -11,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class ECPerms {
 
@@ -60,7 +61,7 @@ public class ECPerms {
     }
 
     static void init() {
-        if (Config.USE_PERMISSIONS_API) {
+        if (CONFIG.USE_PERMISSIONS_API.getValue()) {
             PermissionCheckEvent.EVENT.register((source, permission) -> {
                 if (isSuperAdmin(source)) {
                     return TriState.TRUE;
@@ -84,7 +85,7 @@ public class ECPerms {
     }
 
     static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
-        if (Config.USE_PERMISSIONS_API) {
+        if (CONFIG.USE_PERMISSIONS_API.getValue()) {
             return Permissions.getPermissionValue(source, permission).orElse(false);
         } else {
             return (source.hasPermissionLevel(defaultRequireLevel) ? TriState.TRUE:TriState.FALSE).orElse(false);
@@ -120,14 +121,14 @@ public class ECPerms {
         }
 
         // If permissions API is disabled, min int value in permission group is used for all non-op players.
-        if (!Config.USE_PERMISSIONS_API) {
+        if (!CONFIG.USE_PERMISSIONS_API.getValue()) {
             return Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
         }
 
         // If permissions api is enabled, find the highest numeric permission node that the user has & return its
         // numeric value.
         int highestValue;
-        if (Config.GRANT_LOWEST_NUMERIC_BY_DEFAULT) {
+        if (CONFIG.GRANT_LOWEST_NUMERIC_BY_DEFAULT.getValue()) {
             // Grant min perm value in group by default, if none are set.
             highestValue = Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
         } else {

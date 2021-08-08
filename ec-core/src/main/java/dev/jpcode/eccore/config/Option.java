@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.config;
+package dev.jpcode.eccore.config;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -11,9 +11,10 @@ public class Option<T> {
     private final String key;
     private final T defaultValue;
     private final ValueParser<T> parser;
+    private final StringSerializer<T> serializer;
     private T value;
 
-    public final Event<Consumer<T>> CHANGE_EVENT = EventFactory.createArrayBacked(Consumer.class,
+    public final Event<Consumer<T>> changeEvent = EventFactory.createArrayBacked(Consumer.class,
         (listeners) -> (newValue) -> {
             for (Consumer<T> event : listeners) {
                 event.accept(newValue);
@@ -21,10 +22,15 @@ public class Option<T> {
         }
     );
 
-    public Option(String key, T defaultValue, ValueParser<T> parser) {
+    public Option(String key, T defaultValue, ValueParser<T> parser, StringSerializer<T> serializer) {
         this.key = key;
         this.defaultValue = defaultValue;
         this.parser = parser;
+        this.serializer = serializer;
+    }
+
+    public Option(String key, T defaultValue, ValueParser<T> parser) {
+        this(key, defaultValue, parser, String::valueOf);
     }
 
     public Option<T> loadAndSave(Properties props) {
@@ -35,15 +41,15 @@ public class Option<T> {
 
     public Option<T> loadFrom(Properties props) {
         T prevValue = this.value;
-        this.value = parser.parseValue(String.valueOf(props.getOrDefault(this.key, String.valueOf(this.defaultValue))));
+        this.value = parser.parseValue(String.valueOf(props.getOrDefault(this.key, serializer.serialize(this.defaultValue))));
         if (!this.value.equals(prevValue)) {
-            CHANGE_EVENT.invoker().accept(this.value);
+            changeEvent.invoker().accept(this.value);
         }
         return this;
     }
 
     public void saveIfAbsent(Properties props) {
-        props.putIfAbsent(this.key, String.valueOf(this.value));
+        props.putIfAbsent(this.key, serializer.serialize(this.value));
     }
 
     public T getValue() {

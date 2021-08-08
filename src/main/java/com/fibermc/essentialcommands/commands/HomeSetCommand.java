@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
@@ -13,6 +12,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 
 public class HomeSetCommand implements Command<ServerCommandSource> {
@@ -35,9 +36,9 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
              successCode = pData.addHome(homeName, new MinecraftLocation(senderPlayer));
         } catch (CommandSyntaxException e) {
             source.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(Config.FORMATTING_ERROR),
-                new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
-                ECText.getInstance().getText("cmd.home.set.error.exists.2").setStyle(Config.FORMATTING_ERROR)
+                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                new LiteralText(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                ECText.getInstance().getText("cmd.home.set.error.exists.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ));
         }
 
@@ -46,10 +47,10 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been set
         if (successCode == 1) {
             source.sendFeedback(
-                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(Config.FORMATTING_DEFAULT)
-                    .append(new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT))
-                    .append(ECText.getInstance().getText("cmd.home.set.feedback.2").setStyle(Config.FORMATTING_DEFAULT)),
-                Config.BROADCAST_TO_OPS
+                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+                    .append(new LiteralText(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                    .append(ECText.getInstance().getText("cmd.home.set.feedback.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())),
+                CONFIG.BROADCAST_TO_OPS.getValue()
             );
         }
 

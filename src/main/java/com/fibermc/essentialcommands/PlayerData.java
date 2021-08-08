@@ -1,15 +1,12 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerTickScheduler;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -20,6 +17,8 @@ import net.minecraft.world.PersistentState;
 
 import java.io.File;
 import java.util.*;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class PlayerData extends PersistentState {
 
@@ -132,11 +131,11 @@ public class PlayerData extends PersistentState {
             outCode = 1;
         } else {
             this.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(Config.FORMATTING_ERROR),
-                new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
-                ECText.getInstance().getText("cmd.home.set.error.limit.2").setStyle(Config.FORMATTING_ERROR),
-                new LiteralText(String.valueOf(playerMaxHomes)).setStyle(Config.FORMATTING_ACCENT),
-                ECText.getInstance().getText("cmd.home.set.error.limit.3").setStyle(Config.FORMATTING_ERROR)
+                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                new LiteralText(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                ECText.getInstance().getText("cmd.home.set.error.limit.2").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                new LiteralText(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                ECText.getInstance().getText("cmd.home.set.error.limit.3").setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ));
         }
 
@@ -269,7 +268,7 @@ public class PlayerData extends PersistentState {
             ));
         } else {
             // Ensure nickname does not exceed max length
-            if (nickname.getString().length() > Config.NICKNAME_MAX_LENGTH) {
+            if (nickname.getString().length() > CONFIG.NICKNAME_MAX_LENGTH.getValue()) {
                 return -2;
             }
             // Ensure player has permissions required to set the specified nickname
@@ -320,14 +319,14 @@ public class PlayerData extends PersistentState {
         //  because our mixin to getDisplayName does a null check on getNickname
         if (this.nickname != null) {
             tempFullNickname
-                .append(Config.NICKNAME_PREFIX)
+                .append(CONFIG.NICKNAME_PREFIX.getValue())
                 .append(this.nickname );
         } else {
             tempFullNickname
                 .append(baseName);
         }
 
-        if (Config.NICK_REVEAL_ON_HOVER) {
+        if (CONFIG.NICK_REVEAL_ON_HOVER.getValue()) {
             tempFullNickname.setStyle(tempFullNickname.getStyle().withHoverEvent(
                 HoverEvent.Action.SHOW_TEXT.buildHoverEvent(baseName)
             ));
