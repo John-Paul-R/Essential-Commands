@@ -53,7 +53,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: 🔨 Build artifacts
-        run: gradle -b build-github-action.gradle clean build
+        run: gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
 
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v2
