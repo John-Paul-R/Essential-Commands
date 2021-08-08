@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.config.Config;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -13,6 +12,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class EnderchestCommand implements Command<ServerCommandSource> {
 
@@ -28,8 +29,8 @@ public class EnderchestCommand implements Command<ServerCommandSource> {
         senderPlayer.incrementStat(Stats.OPEN_ENDERCHEST);
 
         source.sendFeedback(
-            ECText.getInstance().getText("cmd.enderchest.feedback").setStyle(Config.FORMATTING_DEFAULT),
-            Config.BROADCAST_TO_OPS
+            ECText.getInstance().getText("cmd.enderchest.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+            CONFIG.BROADCAST_TO_OPS.getValue()
         );
 
         return 0;

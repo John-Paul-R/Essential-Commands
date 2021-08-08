@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.config.Config;
 import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.util.TriState;
@@ -12,12 +11,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+
 public class ECPerms {
 
     //`essentialcommands.<command>.<subcommand>`
 //            `essentialcommands.<command>.*`
     public static final class Registry {
         public static final String tpa = "essentialcommands.tpa";
+        public static final String tpahere = "essentialcommands.tpahere";
         public static final String tpaccept = "essentialcommands.tpaccept";
         public static final String tpdeny = "essentialcommands.tpdeny";
         public static final String home_set = "essentialcommands.home.set";
@@ -41,12 +43,13 @@ public class ECPerms {
         public static final String fly_others = "essentialcommands.fly.others";
         public static final String workbench = "essentialcommands.workbench";
         public static final String enderchest = "essentialcommands.enderchest";
+        public static final String top = "essentialcommands.top";
         public static final String config_reload = "essentialcommands.config.reload";
         public static final String bypass_teleport_delay = "essentialcommands.bypass.teleport_delay";
         public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";
         public static final String bypass_teleport_interrupt_on_damaged = "essentialcommands.bypass.teleport_interrupt_on_damaged";
         public static final class Group {
-            public static final String[] tpa_group = {tpa, tpaccept, tpdeny};
+            public static final String[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};
             public static final String[] home_group = {home_set, home_tp, home_delete};
             public static final String[] warp_group = {warp_set, warp_tp, warp_delete};
             public static final String[] spawn_group = {spawn_tp, spawn_set};
@@ -58,7 +61,7 @@ public class ECPerms {
     }
 
     static void init() {
-        if (Config.USE_PERMISSIONS_API) {
+        if (CONFIG.USE_PERMISSIONS_API.getValue()) {
             PermissionCheckEvent.EVENT.register((source, permission) -> {
                 if (isSuperAdmin(source)) {
                     return TriState.TRUE;
@@ -82,7 +85,7 @@ public class ECPerms {
     }
 
     static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
-        if (Config.USE_PERMISSIONS_API) {
+        if (CONFIG.USE_PERMISSIONS_API.getValue()) {
             return Permissions.getPermissionValue(source, permission).orElse(false);
         } else {
             return (source.hasPermissionLevel(defaultRequireLevel) ? TriState.TRUE:TriState.FALSE).orElse(false);
@@ -118,14 +121,14 @@ public class ECPerms {
         }
 
         // If permissions API is disabled, min int value in permission group is used for all non-op players.
-        if (!Config.USE_PERMISSIONS_API) {
+        if (!CONFIG.USE_PERMISSIONS_API.getValue()) {
             return Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
         }
 
         // If permissions api is enabled, find the highest numeric permission node that the user has & return its
         // numeric value.
         int highestValue;
-        if (Config.GRANT_LOWEST_NUMERIC_BY_DEFAULT) {
+        if (CONFIG.GRANT_LOWEST_NUMERIC_BY_DEFAULT.getValue()) {
             // Grant min perm value in group by default, if none are set.
             highestValue = Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
         } else {

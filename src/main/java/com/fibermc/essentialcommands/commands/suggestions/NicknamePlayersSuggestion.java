@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class NicknamePlayersSuggestion {
     //Brigader Suggestions
     public static SuggestionProvider<ServerCommandSource> suggestedStrings() {
-        return (context, builder) -> ListSuggestion.getSuggestionsBuilder(builder,
+        return ListSuggestion.ofContext(context ->
             PlayerDataManager.getInstance().getAllPlayerData().stream()
                 .map(PlayerData::getNickname)
                 .filter(Objects::nonNull)

@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.screen.CraftingCommandScreenHandler;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -15,6 +14,8 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class WorkbenchCommand implements Command<ServerCommandSource> {
 
@@ -30,8 +31,8 @@ public class WorkbenchCommand implements Command<ServerCommandSource> {
         senderPlayer.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
 
         source.sendFeedback(
-            new LiteralText("Opened workbench.").setStyle(Config.FORMATTING_DEFAULT),
-            Config.BROADCAST_TO_OPS
+            new LiteralText("Opened workbench.").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+            CONFIG.BROADCAST_TO_OPS.getValue()
         );
 
         return 0;

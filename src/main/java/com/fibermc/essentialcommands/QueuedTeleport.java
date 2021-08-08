@@ -1,11 +1,12 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public abstract class QueuedTeleport {
 
@@ -17,7 +18,7 @@ public abstract class QueuedTeleport {
     public QueuedTeleport(PlayerData playerData, Text destName) {
         this.playerData = playerData;
         this.destName = destName;
-        this.ticksRemaining = (int)(Config.TELEPORT_DELAY*20);
+        this.ticksRemaining = (int)(CONFIG.TELEPORT_DELAY.getValue()*20);
     }
 
     public QueuedTeleport(PlayerData playerData, Text destName, int delay) {

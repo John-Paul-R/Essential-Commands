@@ -1,30 +1,36 @@
-package com.fibermc.essentialcommands.config;
+package dev.jpcode.eccore.config;
 
-import com.fibermc.essentialcommands.events.OptionChangedCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 
 import java.util.Properties;
+import java.util.function.Consumer;
 
 public class Option<T> {
 
     private final String key;
     private final T defaultValue;
     private final ValueParser<T> parser;
+    private final StringSerializer<T> serializer;
     private T value;
 
-    public final Event<OptionChangedCallback<T>> CHANGE_EVENT = EventFactory.createArrayBacked(OptionChangedCallback.class,
+    public final Event<Consumer<T>> changeEvent = EventFactory.createArrayBacked(Consumer.class,
         (listeners) -> (newValue) -> {
-            for (OptionChangedCallback<T> event : listeners) {
-                event.onOptionChanged(newValue);
+            for (Consumer<T> event : listeners) {
+                event.accept(newValue);
             }
         }
     );
 
-    public Option(String key, T defaultValue, ValueParser<T> parser) {
+    public Option(String key, T defaultValue, ValueParser<T> parser, StringSerializer<T> serializer) {
         this.key = key;
         this.defaultValue = defaultValue;
         this.parser = parser;
+        this.serializer = serializer;
+    }
+
+    public Option(String key, T defaultValue, ValueParser<T> parser) {
+        this(key, defaultValue, parser, String::valueOf);
     }
 
     public Option<T> loadAndSave(Properties props) {
@@ -35,15 +41,15 @@ public class Option<T> {
 
     public Option<T> loadFrom(Properties props) {
         T prevValue = this.value;
-        this.value = parser.parseValue(String.valueOf(props.getOrDefault(this.key, String.valueOf(this.defaultValue))));
-        if (!(prevValue == null || prevValue.equals(this.value))) {
-            CHANGE_EVENT.invoker().onOptionChanged(this.value);
+        this.value = parser.parseValue(String.valueOf(props.getOrDefault(this.key, serializer.serialize(this.defaultValue))));
+        if (!this.value.equals(prevValue)) {
+            changeEvent.invoker().accept(this.value);
         }
         return this;
     }
 
     public void saveIfAbsent(Properties props) {
-        props.putIfAbsent(this.key, String.valueOf(this.value));
+        props.putIfAbsent(this.key, serializer.serialize(this.value));
     }
 
     public T getValue() {

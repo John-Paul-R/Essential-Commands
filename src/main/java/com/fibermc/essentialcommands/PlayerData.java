@@ -1,10 +1,9 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -18,6 +17,8 @@ import net.minecraft.world.PersistentState;
 
 import java.io.File;
 import java.util.*;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class PlayerData extends PersistentState {
 
@@ -48,6 +49,8 @@ public class PlayerData extends PersistentState {
     // RTP Cooldown
     private int rtpNextUsableTime;
 
+    private boolean persistFlight;
+
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         super(player.getUuid().toString());
         this.player = player;
@@ -62,13 +65,16 @@ public class PlayerData extends PersistentState {
      * DO NOT USE FOR LOGGED-IN PLAYERS.
      * This constructor should ONLY be used for temporarily
      * handling data of offline players.
-     * @param playerUuid
-     * @param homes
-     * @param saveFile
+     *
+     * getPlayer() will always return null on an instance created in this fashion,
+     * and any operations that would require a ServerPlayerEntity will fail.
+     *
+     * @param playerUuid UUID of the player whose data we want to grab or modify.
+     * @param homes NamedLocationStorage of the player's homes (fills field)
+     * @param saveFile The save file for this PlayerData instance.
      */
     public PlayerData(UUID playerUuid, NamedLocationStorage homes, File saveFile) {
         super(playerUuid.toString());
-//        this.player = player;
         this.pUuid = playerUuid;
         this.saveFile = saveFile;
         tpTimer = -1;
@@ -101,10 +107,6 @@ public class PlayerData extends PersistentState {
         return incomingTeleportRequests;
     }
 
-    public TeleportRequest getIncomingTeleportRequest(PlayerData tpAsker) {
-        return incomingTeleportRequests.get(tpAsker.getPlayer().getUuid());
-    }
-
     public TeleportRequest getIncomingTeleportRequest(UUID tpAsker) {
         return incomingTeleportRequests.get(tpAsker);
     }
@@ -113,8 +115,8 @@ public class PlayerData extends PersistentState {
         this.incomingTeleportRequests.put(teleportRequest.getSenderPlayer().getUuid(), teleportRequest);
     }
 
-    public void removeTpAsker(PlayerData tpAsker) {
-        this.incomingTeleportRequests.remove(tpAsker.getPlayer().getUuid());
+    public void removeIncomingTeleportRequest(UUID tpAsker) {
+        this.incomingTeleportRequests.remove(tpAsker);
     }
 
     public ServerPlayerEntity getPlayer() {
@@ -131,11 +133,11 @@ public class PlayerData extends PersistentState {
             outCode = 1;
         } else {
             this.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(Config.FORMATTING_ERROR),
-                new LiteralText(homeName).setStyle(Config.FORMATTING_ACCENT),
-                ECText.getInstance().getText("cmd.home.set.error.limit.2").setStyle(Config.FORMATTING_ERROR),
-                new LiteralText(String.valueOf(playerMaxHomes)).setStyle(Config.FORMATTING_ACCENT),
-                ECText.getInstance().getText("cmd.home.set.error.limit.3").setStyle(Config.FORMATTING_ERROR)
+                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                new LiteralText(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                ECText.getInstance().getText("cmd.home.set.error.limit.2").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                new LiteralText(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                ECText.getInstance().getText("cmd.home.set.error.limit.3").setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ));
         }
 
@@ -183,6 +185,15 @@ public class PlayerData extends PersistentState {
                 EssentialCommands.LOGGER.warn("Could not refresh player full nickanme, as ServerPlayerEntity was null in PlayerData.");
             }
         }
+
+        if (dataTag.contains("persistFlight")) {
+            this.persistFlight = dataTag.getBoolean("persistFlight");
+        }
+
+        if (this.player != null) {
+            updatePlayer(this.player);
+        }
+
     }
 
     @Override
@@ -194,6 +205,8 @@ public class PlayerData extends PersistentState {
         tag.put("homes", homesNbt);
 
         tag.putString("nickname", Text.Serializer.toJson(nickname));
+
+        tag.putBoolean("persistFlight", persistFlight);
 
         return tag;
     }
@@ -219,6 +232,17 @@ public class PlayerData extends PersistentState {
 
     public void updatePlayer(ServerPlayerEntity serverPlayerEntity) {
         this.player = serverPlayerEntity;
+
+        if (this.persistFlight) {
+            PlayerDataManager.scheduleTask(this::updateFlight);
+        }
+    }
+
+    public void updateFlight() {
+        PlayerAbilities abilities = this.player.abilities;
+        abilities.allowFlying = true;
+        abilities.flying = true;
+        this.player.sendAbilitiesUpdate();
     }
 
     public void tickTpCooldown() {
@@ -252,7 +276,7 @@ public class PlayerData extends PersistentState {
             ));
         } else {
             // Ensure nickname does not exceed max length
-            if (nickname.getString().length() > Config.NICKNAME_MAX_LENGTH) {
+            if (nickname.getString().length() > CONFIG.NICKNAME_MAX_LENGTH.getValue()) {
                 return -2;
             }
             // Ensure player has permissions required to set the specified nickname
@@ -303,19 +327,28 @@ public class PlayerData extends PersistentState {
         //  because our mixin to getDisplayName does a null check on getNickname
         if (this.nickname != null) {
             tempFullNickname
-                .append(Config.NICKNAME_PREFIX)
+                .append(CONFIG.NICKNAME_PREFIX.getValue())
                 .append(this.nickname );
         } else {
             tempFullNickname
                 .append(baseName);
         }
 
-        if (Config.NICK_REVEAL_ON_HOVER) {
+        if (CONFIG.NICK_REVEAL_ON_HOVER.getValue()) {
             tempFullNickname.setStyle(tempFullNickname.getStyle().withHoverEvent(
                 HoverEvent.Action.SHOW_TEXT.buildHoverEvent(baseName)
             ));
         }
 
         this.fullNickname = tempFullNickname;
+    }
+
+    public boolean isPersistFlight() {
+        return persistFlight;
+    }
+
+    public void setPersistFlight(boolean persistFlight) {
+        this.persistFlight = persistFlight;
+        this.markDirty();
     }
 }

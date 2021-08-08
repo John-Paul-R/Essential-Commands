@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static com.fibermc.essentialcommands.util.TextUtil.clickableTeleport;
 
 public class ListCommandFactory {
@@ -24,11 +24,11 @@ public class ListCommandFactory {
     public static Command<ServerCommandSource> create(String responsePreText, String commandExecText, SuggestionListProvider<Entry<String, MinecraftLocation>> suggestionsProvider) {
         return (CommandContext<ServerCommandSource> context) -> {
             MutableText responseText = new LiteralText("");
-            responseText.append(new LiteralText(responsePreText).setStyle(Config.FORMATTING_DEFAULT));
+            responseText.append(new LiteralText(responsePreText).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
             Collection<Entry<String, MinecraftLocation>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
             List<Text> suggestionTextList = suggestionsList.stream().map((entry) -> clickableTeleport(
-                new LiteralText(entry.getKey()).setStyle(Config.FORMATTING_ACCENT),
+                new LiteralText(entry.getKey()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                 entry.getKey(),
                 String.format("/%s", commandExecText))
             ).collect(Collectors.toList());
@@ -36,14 +36,14 @@ public class ListCommandFactory {
             if (suggestionTextList.size() > 0) {
                 responseText.append(TextUtil.join(
                     suggestionTextList,
-                    new LiteralText(", ").setStyle(Config.FORMATTING_DEFAULT)
+                    new LiteralText(", ").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
                 ));
             } else {
-                responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty").setStyle(Config.FORMATTING_ERROR));
+                responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty").setStyle(CONFIG.FORMATTING_ERROR.getValue()));
             }
             context.getSource().sendFeedback(
                 responseText,
-                Config.BROADCAST_TO_OPS
+                CONFIG.BROADCAST_TO_OPS.getValue()
             );
             return 0;
         };

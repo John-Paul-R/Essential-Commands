@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+
+  "name": "${name}",
+  "description": "The core lib for Essential Commands and some other mods by John-Paul-R (JP79194).",
+  "authors": [
+    {
+      "name": "John Paul R. (JP79194)",
+      "contact": {
+        "homepage": "https://www.jpcode.dev",
+        "discord": "https://discord.jpcode.dev"
+      }
+    }
+  ],
+  "contact": {
+    "homepage": "https://www.jpcode.dev/minecraft/fabric-mods",
+    "issues": "https://github.com/John-Paul-R/Essential-Commands/issues",
+    "sources": "https://github.com/John-Paul-R/Essential-Commands",
+    "discord": "https://discord.jpcode.dev"
+  },
+
+  "license": "MIT",
+  "icon": "assets/ec-core/icon.jpg",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+    ]
+  },
+  "mixins": [
+    "eccore.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "fabric-permissions-api-v0": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  },
+  "jars": []
+}

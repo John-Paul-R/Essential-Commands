@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.config;
+package dev.jpcode.eccore.config;
 
 import org.jetbrains.annotations.NotNull;
 

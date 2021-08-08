@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.events.PlayerConnectCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
@@ -20,17 +19,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+
 public class PlayerDataManager {
 
     private final ConcurrentHashMap<UUID, PlayerData> dataMap;
     private final List<PlayerData> changedNicknames;
     private final List<String> changedTeams;
+    private final List<Runnable> nextTickTasks;
     private static PlayerDataManager INSTANCE;
 
     public PlayerDataManager() {
         INSTANCE = this;
         this.changedNicknames = new LinkedList<>();
         this.changedTeams = new LinkedList<>();
+        this.nextTickTasks = new LinkedList<>();
         this.dataMap = new ConcurrentHashMap<>();
     }
 
@@ -55,7 +58,7 @@ public class PlayerDataManager {
     }
 
     public void tick(MinecraftServer server) {
-        if (Config.NICKNAMES_IN_PLAYER_LIST && server.getTicks() % (20*5) == 0) {
+        if (CONFIG.NICKNAMES_IN_PLAYER_LIST.getValue() && server.getTicks() % (20*5) == 0) {
             if (this.changedNicknames.size() + this.changedTeams.size() > 0) {
                 PlayerManager serverPlayerManager = server.getPlayerManager();
 
@@ -75,6 +78,19 @@ public class PlayerDataManager {
                 this.changedTeams.clear();
             }
         }
+
+        if (!nextTickTasks.isEmpty()) {
+            Iterator<Runnable> tasks = nextTickTasks.listIterator();
+            while (tasks.hasNext()) {
+                tasks.next().run();
+                tasks.remove();
+            }
+        }
+
+    }
+
+    public static void scheduleTask(Runnable task) {
+        INSTANCE.nextTickTasks.add(task);
     }
 
     // EVENTS
@@ -97,7 +113,7 @@ public class PlayerDataManager {
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
         PlayerData pData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
-        if (Config.ALLOW_BACK_ON_DEATH)
+        if (CONFIG.ALLOW_BACK_ON_DEATH.getValue())
             pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
     }
 

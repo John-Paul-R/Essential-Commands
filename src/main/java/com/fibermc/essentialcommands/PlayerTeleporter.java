@@ -1,14 +1,13 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.config.Config;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-
 import net.minecraft.util.Util;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 /**
  * Teleporter
@@ -23,17 +22,17 @@ public class PlayerTeleporter {
 //        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
-        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || Config.TELEPORT_DELAY <= 0) {
+        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY.getValue() <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
             ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             player.sendSystemMessage(
-                ECText.getInstance().getText("teleport.queued.1").setStyle(Config.FORMATTING_DEFAULT)
-                    .append(queuedTeleport.getDestName().setStyle(Config.FORMATTING_ACCENT))
-                    .append(ECText.getInstance().getText("teleport.queued.2").setStyle(Config.FORMATTING_DEFAULT))
-                    .append(new LiteralText(String.format("%.1f", Config.TELEPORT_DELAY)).setStyle(Config.FORMATTING_ACCENT))
-                    .append(ECText.getInstance().getText("teleport.queued.3")).setStyle(Config.FORMATTING_DEFAULT),
+                ECText.getInstance().getText("teleport.queued.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+                    .append(queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                    .append(ECText.getInstance().getText("teleport.queued.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
+                    .append(new LiteralText(String.format("%.1f", CONFIG.TELEPORT_DELAY.getValue())).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                    .append(ECText.getInstance().getText("teleport.queued.3")).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
                 Util.NIL_UUID
             );
         }
@@ -49,11 +48,11 @@ public class PlayerTeleporter {
         ServerPlayerEntity player = pData.getPlayer();
 
         // If teleporting between dimensions is disabled and player doesn't have TP rules override
-        if (!Config.ALLOW_TELEPORT_BETWEEN_DIMENSIONS && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
+        if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS.getValue() && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
             if (dest.dim != player.getServerWorld().getRegistryKey()) {
                 player.sendSystemMessage(
-                    ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled").setStyle(Config.FORMATTING_ERROR),
+                    ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
                     Util.NIL_UUID
                 );
                 return;
@@ -76,16 +75,16 @@ public class PlayerTeleporter {
             dest.headYaw, dest.pitch
         );
         playerEntity.sendSystemMessage(
-            ECText.getInstance().getText("teleport.done.1").setStyle(Config.FORMATTING_DEFAULT)
-                .append(dest.toLiteralTextSimple().setStyle(Config.FORMATTING_ACCENT))
-                .append(new LiteralText(".").setStyle(Config.FORMATTING_DEFAULT)),
+            ECText.getInstance().getText("teleport.done.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+                .append(dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                .append(new LiteralText(".").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())),
             Util.NIL_UUID
         );
     }
 
     public static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
         return (
-            (player.hasPermissionLevel(4) && Config.OPS_BYPASS_TELEPORT_RULES)
+            (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES.getValue())
             || ECPerms.check(player.getCommandSource(), permission, 5)
         );
 
