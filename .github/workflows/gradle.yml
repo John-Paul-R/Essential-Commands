@@ -11,7 +11,7 @@ on:
       - '**/build.gradle'
       - '**/gradle.properties'
       - '**/settings.gradle'
-      - .github/workflows/build.yml
+      - .github/workflows/gradle.yml
       - LICENCE
 
   pull_request:
@@ -21,7 +21,7 @@ on:
       - '**/build.gradle'
       - '**/gradle.properties'
       - '**/settings.gradle'
-      - .github/workflows/build.yml
+      - .github/workflows/gradle.yml
       - LICENCE
 
 jobs:
