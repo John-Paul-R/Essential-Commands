@@ -38,9 +38,16 @@ public class EssentialCommandRegistry {
                 //TODO Command literals still get registered, they just don't do anything if disabled. Fix this.
                 RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
 
-                LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode =
-                    CommandManager.literal("essentialcommands").build();
+                LiteralCommandNode<ServerCommandSource> ecInfoNode = CommandManager.literal("info")
+                        .executes(new ModInfoCommand())
+                        .build();
 
+                LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode =
+                    CommandManager.literal("essentialcommands")
+                            .executes(ecInfoNode.getCommand())
+                            .build();
+
+                essentialCommandsRootNode.addChild(ecInfoNode);
 
                 //Make some new nodes
                 //Tpa
@@ -329,7 +336,6 @@ public class EssentialCommandRegistry {
 
                     essentialCommandsRootNode.addChild(topNode);
                 }
-
 
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
                         .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
