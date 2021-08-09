@@ -5,6 +5,8 @@ import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import dev.jpcode.eccore.config.Config;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +16,7 @@ import java.nio.file.Path;
 
 
 public final class EssentialCommands implements ModInitializer {
+	public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer("essential_commands").get().getMetadata();
 	public static Logger LOGGER = LogManager.getLogger("EssentialCommands");
 	public static final EssentialCommandsConfig CONFIG = new EssentialCommandsConfig(
 			Path.of("./config/EssentialCommands.properties"),
