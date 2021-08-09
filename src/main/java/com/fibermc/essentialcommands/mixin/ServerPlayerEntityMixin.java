@@ -16,16 +16,19 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.WorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Objects;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
@@ -52,6 +55,17 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     @Inject(method = "changeGameMode", at = @At("RETURN"))
     public void onChangeGameMode(GameMode gameMode, CallbackInfoReturnable<Boolean> cir) {
         ((ServerPlayerEntityAccess) this).getEcPlayerData().updateFlight();
+    }
+
+    @Inject(method = "teleport", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/server/PlayerManager;sendPlayerStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
+    ), locals = LocalCapture.CAPTURE_FAILSOFT)
+    public void onTeleportBetweenWorlds(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci,
+                                        ServerWorld  serverWorld,
+                                        WorldProperties worldProperties
+    ) {
+        ((ServerPlayerEntityAccess) this).getEcPlayerData().updatePlayer((ServerPlayerEntity) (Object) this);
     }
 
     @Override

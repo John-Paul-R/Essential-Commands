@@ -54,11 +54,6 @@ public class FlyCommand implements Command<ServerCommandSource> {
         ((ServerPlayerEntityAccess) target).getEcPlayerData().setPersistFlight(permanent);
         target.sendAbilitiesUpdate();
 
-        // ToDo mixins for handling "persist" option. Also requires saving in PlayerData.
-        //   Lots of the necessary groundwork is already laid out in PlayerData. Should probably add a "persistant data"
-        //   template thing for PlayerData to streamline this process in the future. Or maybe just "tags"
-        //   Perhaps create a list of all fields in PlayerData that can and should be serialized && saved.
-
         source.sendFeedback(
             TextUtil.concat(
                 ECText.getInstance().getText("cmd.fly.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
