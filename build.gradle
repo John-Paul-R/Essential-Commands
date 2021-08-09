@@ -200,8 +200,8 @@ curseforge {
 		addArtifact sourcesJar
 		addArtifact jar
 		subprojects.each {
-			addArtifact it.remapJar
-			addArtifact it.sourcesJar
+//			addArtifact it.remapJar
+//			addArtifact it.sourcesJar
 			addArtifact it.jar
 		}
 		// Add any dependencies
