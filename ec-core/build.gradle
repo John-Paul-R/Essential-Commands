@@ -1,2 +1,25 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+}
+
 // Declare dependencies
 dependencies {}
+
+publishing {
+    // Declare all publications
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId project.mod_id
+            groupId project.maven_group
+            version project.version
+            // Main
+            artifact(remapJar) { builtBy remapJar }
+            // Sources
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+
+            }
+        }
+    }
+}

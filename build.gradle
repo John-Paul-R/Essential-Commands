@@ -121,6 +121,8 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			artifactId = project.mod_id
+			groupId = project.maven_group
+			version = project.version
 			// Main
 			artifact(remapJar) { builtBy remapJar }
 			// Sources
@@ -134,6 +136,9 @@ publishing {
 	// Add repositories to publish to
 	repositories {
 		// GitHub Packages (https://pkg.github.com)
+		mavenLocal {
+
+		}
 		maven {
 			name 'GitHub'
 			url "https://maven.pkg.github.com/${project.github_repo}"
@@ -247,6 +252,7 @@ githubRelease {
 	client // This is the okhttp client used for http requests
 }
 
+generatePomFileForMavenJavaPublication {}
 
 def static getenv(path = ".env") {
 	def env = [:]
