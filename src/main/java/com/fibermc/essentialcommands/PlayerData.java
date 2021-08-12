@@ -339,8 +339,10 @@ public class PlayerData extends PersistentState {
         return persistFlight;
     }
 
-    public void setPersistFlight(boolean persistFlight) {
-        this.persistFlight = persistFlight;
+    public void updatePersistFlight(boolean persistFlight) {
+        if (persistFlight) {
+            this.persistFlight = this.player.getAbilities().allowFlying;
+        }
         this.markDirty();
     }
 }
