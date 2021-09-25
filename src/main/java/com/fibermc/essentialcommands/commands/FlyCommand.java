@@ -78,7 +78,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
         source.sendFeedback(
             TextUtil.concat(
                 ECText.getInstance().getText("cmd.fly.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                new LiteralText(playerAbilities.allowFlying ? "enabled" : "disabled").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                new LiteralText(shouldEnableFly ? "enabled" : "disabled").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                 ECText.getInstance().getText("cmd.fly.feedback.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
                 target.getDisplayName(),
                 new LiteralText(".").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
