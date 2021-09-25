@@ -297,10 +297,8 @@ public class EssentialCommandRegistry {
                             .executes(new FlyCommand())
                             .then(argument("target_player", EntityArgumentType.player())
                                 .requires(ECPerms.require(ECPerms.Registry.fly_others, 4))
-                                .executes(new FlyCommand())
-                                .then(argument("permanent", BoolArgumentType.bool())
-                                    .executes(new FlyCommand())
-                                )
+                                .then(argument("flight_enabled", BoolArgumentType.bool())
+                                    .executes(new FlyCommand()))
                             )
                     );
 

@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
@@ -37,45 +38,40 @@ public class FlyCommand implements Command<ServerCommandSource> {
             targetPlayer = senderPlayer;
         }
 
-        boolean permanent;
+        boolean shouldEnableFly;
         try {
-            permanent = BoolArgumentType.getBool(context, "permanent");
+            // Prefer explicitly specified flight state from commands args...
+            shouldEnableFly = BoolArgumentType.getBool(context, "flight_enabled");
         } catch (IllegalArgumentException e) {
-            permanent = false;
+            try {
+                // Fall back to toggling the current PAL flight state granted by EC
+                shouldEnableFly = !VanillaAbilities.ALLOW_FLYING
+                        .getTracker(targetPlayer).isGrantedBy(ECAbilitySources.FLY_COMMAND);
+            } catch (NoClassDefFoundError ign) {
+                // If PAL is not found, fall back to toggling the current vanilla flight state.
+                shouldEnableFly = !targetPlayer.getAbilities().allowFlying;
+            }
         }
 
-        exec(source, targetPlayer, permanent);
+        exec(source, targetPlayer, shouldEnableFly);
         return 0;
     }
 
-    public static void exec(ServerCommandSource source, ServerPlayerEntity target, boolean permanent) {
+    public static void exec(ServerCommandSource source, ServerPlayerEntity target, boolean shouldEnableFly) {
         PlayerAbilities playerAbilities = target.getAbilities();
 
-        Consumer<PlayerAbilities> setAbilitiesOverride = (abilities) -> {
-            abilities.allowFlying = !abilities.allowFlying;
-            if (!abilities.allowFlying) {
-                abilities.flying = false;
-            }
-            target.sendAbilitiesUpdate();
-        };
+        PlayerData playerData = ((ServerPlayerEntityAccess) target).getEcPlayerData();
 
-        if (permanent) {
-            setAbilitiesOverride.accept(playerAbilities);
-        } else {
-            try {
-                boolean isFlightAllowed = VanillaAbilities.ALLOW_FLYING.getTracker(target).isGrantedBy(ECAbilitySources.FLY_COMMAND);
-                if (isFlightAllowed) {
-                    Pal.revokeAbility(target, VanillaAbilities.ALLOW_FLYING, ECAbilitySources.FLY_COMMAND);
-                } else {
-                    Pal.grantAbility(target, VanillaAbilities.ALLOW_FLYING, ECAbilitySources.FLY_COMMAND);
-                }
-                target.sendAbilitiesUpdate();
-            } catch (NoClassDefFoundError ign) {
-                setAbilitiesOverride.accept(playerAbilities);
+        try {
+            playerData.setFlight(shouldEnableFly);
+        } catch (NoClassDefFoundError ign) {
+            playerAbilities.allowFlying = shouldEnableFly;
+            if (!shouldEnableFly) {
+                playerAbilities.flying = false;
             }
         }
 
-        ((ServerPlayerEntityAccess) target).getEcPlayerData().updatePersistFlight(permanent);
+        target.sendAbilitiesUpdate();
 
         // Label boolean values in suggestions, or switch to single state value (present or it's not)
 

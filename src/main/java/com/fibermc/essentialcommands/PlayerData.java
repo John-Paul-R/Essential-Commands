@@ -3,6 +3,8 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.github.ladysnake.pal.Pal;
+import io.github.ladysnake.pal.VanillaAbilities;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -48,8 +50,6 @@ public class PlayerData extends PersistentState {
 
     // RTP Cooldown
     private int rtpNextUsableTime;
-
-    private boolean persistFlight;
 
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
@@ -178,10 +178,6 @@ public class PlayerData extends PersistentState {
             }
         }
 
-        if (dataTag.contains("persistFlight")) {
-            this.persistFlight = dataTag.getBoolean("persistFlight");
-        }
-
         if (this.player != null) {
             updatePlayer(this.player);
         }
@@ -197,8 +193,6 @@ public class PlayerData extends PersistentState {
         tag.put("homes", homesNbt);
 
         tag.putString("nickname", Text.Serializer.toJson(nickname));
-
-        tag.putBoolean("persistFlight", persistFlight);
 
         return tag;
     }
@@ -225,15 +219,28 @@ public class PlayerData extends PersistentState {
     public void updatePlayer(ServerPlayerEntity serverPlayerEntity) {
         this.player = serverPlayerEntity;
 
-        if (this.persistFlight) {
-            PlayerDataManager.scheduleTask(this::updateFlight);
-        }
+        // This is to fix a bug with ability to fly being lost upon being teleported to a new dim via /execute...tp.
+        PlayerDataManager.scheduleTask(this::updateFlight);
     }
 
-    public void updateFlight() {
+    private void updateFlight() {
+        this.player.sendAbilitiesUpdate();
+    }
+
+    public void setFlight(boolean canFly) {
+        setFlight(canFly, false);
+    }
+
+    public void setFlight(boolean canFly, boolean flyImmediately) {
         PlayerAbilities abilities = this.player.getAbilities();
-        abilities.allowFlying = true;
-        abilities.flying = true;
+        if (canFly) {
+            Pal.grantAbility(this.player, VanillaAbilities.ALLOW_FLYING, ECAbilitySources.FLY_COMMAND);
+            if (flyImmediately) {
+                abilities.flying = true;
+            }
+        } else {
+            Pal.revokeAbility(this.player, VanillaAbilities.ALLOW_FLYING, ECAbilitySources.FLY_COMMAND);
+        }
         this.player.sendAbilitiesUpdate();
     }
 
@@ -335,14 +342,4 @@ public class PlayerData extends PersistentState {
         this.fullNickname = tempFullNickname;
     }
 
-    public boolean isPersistFlight() {
-        return persistFlight;
-    }
-
-    public void updatePersistFlight(boolean persistFlight) {
-        if (persistFlight) {
-            this.persistFlight = this.player.getAbilities().allowFlying;
-        }
-        this.markDirty();
-    }
 }

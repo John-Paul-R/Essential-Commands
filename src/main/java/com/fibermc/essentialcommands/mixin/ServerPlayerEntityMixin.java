@@ -28,7 +28,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.Objects;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
@@ -54,7 +53,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
 
     @Inject(method = "changeGameMode", at = @At("RETURN"))
     public void onChangeGameMode(GameMode gameMode, CallbackInfoReturnable<Boolean> cir) {
-        ((ServerPlayerEntityAccess) this).getEcPlayerData().updateFlight();
+//        ((ServerPlayerEntityAccess) this).getEcPlayerData().updatePlayer(((ServerPlayerEntity) (Object) this));
     }
 
     @Inject(method = "teleport", at = @At(
