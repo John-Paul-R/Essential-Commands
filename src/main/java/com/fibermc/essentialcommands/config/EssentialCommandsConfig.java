@@ -8,7 +8,7 @@ import dev.jpcode.eccore.config.Option;
 import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import dev.jpcode.eccore.config.Option;
+
 import java.nio.file.Path;
 import java.util.List;
 
@@ -52,6 +52,7 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<Boolean> BROADCAST_TO_OPS =       new Option<>("broadcast_to_ops", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICK_REVEAL_ON_HOVER =   new Option<>("nick_reveal_on_hover", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> GRANT_LOWEST_NUMERIC_BY_DEFAULT = new Option<>("grant_lowest_numeric_by_default", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<String> LANGUAGE = new Option<>("language", "en_us", String::toString);
 
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);

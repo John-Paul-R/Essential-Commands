@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+
 public abstract class ECText {
 
 //    Map<String, String> textRegistry;
@@ -33,9 +35,9 @@ public abstract class ECText {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         Objects.requireNonNull(builder);
         BiConsumer<String, String> biConsumer = builder::put;
-        String var2 = "/assets/minecraft/lang/en_us.json";
+//        String var2 = "/assets/minecraft/lang/en_us.json";
 
-        final String resourceLocation = "/assets/essential_commands/lang/en_us.json";
+        final String resourceLocation = String.format("/assets/essential_commands/lang/%s.json", CONFIG.LANGUAGE);
         try {
             InputStream inputStream = ECText.class.getResourceAsStream(resourceLocation);
 
