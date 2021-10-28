@@ -45,6 +45,8 @@ allprojects {
 		include group: 'net.devtech', name: 'grossfabrichacks', version: project.gfh_version
 		modImplementation 	'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'
 		include 			'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'
+		modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
+		include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
 
 
 		// Subprojects
@@ -100,6 +102,15 @@ allprojects {
 		flatDir {
 			dirs 'libs'
 		}
+
+		maven {
+			name = 'Ladysnake Mods'
+			url = 'https://ladysnake.jfrog.io/artifactory/mods'
+			content {
+				includeGroup 'io.github.ladysnake'
+				includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+			}
+		}
 	}
 
 }
@@ -130,6 +141,8 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			artifactId = project.mod_id
+			groupId = project.maven_group
+			version = project.version
 			// Main
 			artifact(remapJar) { builtBy remapJar }
 			// Sources
@@ -143,6 +156,9 @@ publishing {
 	// Add repositories to publish to
 	repositories {
 		// GitHub Packages (https://pkg.github.com)
+		mavenLocal {
+
+		}
 		maven {
 			name 'GitHub'
 			url "https://maven.pkg.github.com/${project.github_repo}"
@@ -256,6 +272,7 @@ githubRelease {
 	client // This is the okhttp client used for http requests
 }
 
+generatePomFileForMavenJavaPublication {}
 
 def static getenv(path = ".env") {
 	def env = [:]

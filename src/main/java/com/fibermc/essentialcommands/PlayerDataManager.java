@@ -6,12 +6,17 @@ import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import eu.pb4.placeholders.PlaceholderAPI;
+import eu.pb4.placeholders.TextParser;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.*;
@@ -43,6 +48,15 @@ public class PlayerDataManager {
         PlayerDeathCallback.EVENT.register(PlayerDataManager::onPlayerDeath);
         PlayerRespawnCallback.EVENT.register(PlayerDataManager::onPlayerRespawn);
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> PlayerDataManager.getInstance().tick(server));
+        ServerPlayConnectionEvents.JOIN.register(PlayerDataManager::onPlayerConnected);
+    }
+
+    private static void onPlayerConnected(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
+        if (CONFIG.ENABLE_MOTD.getValue()) {
+            var text = TextParser.parse(CONFIG.MOTD.getValue());
+            var message = PlaceholderAPI.parseText(text, handler.getPlayer());
+            handler.getPlayer().getCommandSource().sendFeedback(message, false);
+        }
     }
 
     public static PlayerDataManager getInstance() {

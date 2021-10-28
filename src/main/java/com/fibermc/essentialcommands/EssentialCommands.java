@@ -17,6 +17,7 @@ import java.nio.file.Path;
 
 public final class EssentialCommands implements ModInitializer {
 	public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer("essential_commands").get().getMetadata();
+	public static final String MOD_ID = MOD_METADATA.getId();
 	public static Logger LOGGER = LogManager.getLogger("EssentialCommands");
 	public static final EssentialCommandsConfig CONFIG = new EssentialCommandsConfig(
 			Path.of("./config/EssentialCommands.properties"),

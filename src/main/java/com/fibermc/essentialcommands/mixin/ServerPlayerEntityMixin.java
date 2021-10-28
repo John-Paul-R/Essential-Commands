@@ -28,7 +28,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.Objects;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {

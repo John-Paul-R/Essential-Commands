@@ -18,6 +18,9 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
+
 public abstract class ECText {
 
 //    Map<String, String> textRegistry;
@@ -25,19 +28,29 @@ public abstract class ECText {
     private static final Pattern TOKEN_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]");
     public static final String DEFAULT_LANGUAGE = "en_us";
 
-    private static volatile ECText instance = create();
+    private static volatile ECText instance = create("en_us");
 
     private ECText() {}
 
-    private static ECText create() {
+    static {
+        CONFIG.LANGUAGE.changeEvent.register((langId) -> {
+            instance = create(langId);
+        });
+    }
+
+    private static ECText create(String langId) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         Objects.requireNonNull(builder);
         BiConsumer<String, String> biConsumer = builder::put;
-        String var2 = "/assets/minecraft/lang/en_us.json";
-
-        final String resourceLocation = "/assets/essential_commands/lang/en_us.json";
+//        String var2 = "/assets/minecraft/lang/en_us.json";
+        final String resourceFString = "/assets/essential_commands/lang/%s.json";
+        final String resourceLocation = String.format(resourceFString, langId);
         try {
             InputStream inputStream = ECText.class.getResourceAsStream(resourceLocation);
+            if (inputStream == null) {
+                LOGGER.info(String.format("No EC lang file for the language '%s' found. Defulting to 'en_us'.", langId));
+                inputStream = ECText.class.getResourceAsStream(String.format(resourceFString, "en_us"));
+            }
 
             try {
                 load(inputStream, biConsumer);
@@ -57,7 +70,7 @@ public abstract class ECText {
                 inputStream.close();
             }
         } catch (JsonParseException | IOException var8) {
-            EssentialCommands.LOGGER.error("Couldn't read strings from {}", resourceLocation, var8);
+            LOGGER.error("Couldn't read strings from {}", resourceLocation, var8);
         }
 
         final Map<String, String> map = builder.build();

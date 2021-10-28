@@ -47,6 +47,8 @@ allprojects {
         include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
         modImplementation 	'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'
         include 			'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'
+        modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
+        include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
 
         // Subprojects
         subprojects.each {
@@ -94,6 +96,14 @@ allprojects {
         // for more information about repositories.
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
         maven { url 'https://maven.nucleoid.xyz' }
+        maven {
+            name = 'Ladysnake Mods'
+            url = 'https://ladysnake.jfrog.io/artifactory/mods'
+            content {
+                includeGroup 'io.github.ladysnake'
+                includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+            }
+        }
     }
 
 }
