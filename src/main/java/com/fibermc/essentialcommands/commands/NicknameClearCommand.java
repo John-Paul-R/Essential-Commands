@@ -34,7 +34,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
         //inform command sender that the nickname has been set
         context.getSource().sendFeedback(TextUtil.concat(
             ECText.getInstance().getText("cmd.nickname.set.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            new LiteralText(senderPlayerEntity.getGameProfile().getName()),
+            new LiteralText(targetPlayer.getGameProfile().getName()),
             ECText.getInstance().getText("generic.quote_fullstop").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
         ), CONFIG.BROADCAST_TO_OPS.getValue());
 
