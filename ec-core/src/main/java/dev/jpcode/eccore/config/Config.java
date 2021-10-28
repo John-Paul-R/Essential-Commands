@@ -135,9 +135,10 @@ public abstract class Config {
     }
 
     private MutableText fieldAsText(Field field) throws IllegalAccessException {
+        var value = (Option)field.get(this);
         return new LiteralText("")
             .append(new LiteralText(field.getName() + ": ").setStyle(DEFAULT_STYLE))
-            .append(new LiteralText(field.get(this.getClass()).toString()));
+            .append(new LiteralText(value.getValue().toString()));
     }
 
     public @Nullable MutableText getFieldValueAsText(String fieldName) throws NoSuchFieldException {
