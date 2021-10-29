@@ -14,7 +14,7 @@ public final class CommandUtil {
     private CommandUtil() {}
 
     public static String getCommandString(ServerCommandSource source, CommandNode<ServerCommandSource> commandNode) {
-        CommandDispatcher<ServerCommandSource> dispatcher = source.getServer().getCommandManager().getDispatcher();
+        CommandDispatcher<ServerCommandSource> dispatcher = source.getMinecraftServer().getCommandManager().getDispatcher();
 
         return "/" + TextUtil.joinStrings(
                 dispatcher.getPath(commandNode),

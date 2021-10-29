@@ -231,7 +231,7 @@ public class PlayerData extends PersistentState {
         PlayerDataManager.scheduleTask(this::updateFlight);
     }
 
-    private void updateFlight() {
+    public void updateFlight() {
         this.player.sendAbilitiesUpdate();
     }
 
@@ -240,7 +240,7 @@ public class PlayerData extends PersistentState {
     }
 
     public void setFlight(boolean canFly, boolean flyImmediately) {
-        PlayerAbilities abilities = this.player.getAbilities();
+        PlayerAbilities abilities = this.player.abilities;
         if (canFly) {
             Pal.grantAbility(this.player, VanillaAbilities.ALLOW_FLYING, ECAbilitySources.FLY_COMMAND);
             if (flyImmediately) {

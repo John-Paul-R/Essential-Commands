@@ -48,7 +48,6 @@ allprojects {
 		modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
 		include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
 
-
 		// Subprojects
 		subprojects.each {
 			implementation project(":${it.name}")

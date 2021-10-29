@@ -64,7 +64,7 @@ public class PlayerDataFactory {
     private static File getPlayerDataFile(ServerPlayerEntity player) {
         String pUuid = player.getUuidAsString();
 
-        //Path mainDirectory = player.getServer().getRunDirectory().toPath();
+        //Path mainDirectory = player.getMinecraftServer().getRunDirectory().toPath();
         Path dataDirectoryPath;
         File playerDataFile = null;
         try {

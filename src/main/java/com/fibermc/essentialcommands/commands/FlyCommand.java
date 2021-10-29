@@ -49,7 +49,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
                         .getTracker(targetPlayer).isGrantedBy(ECAbilitySources.FLY_COMMAND);
             } catch (NoClassDefFoundError ign) {
                 // If PAL is not found, fall back to toggling the current vanilla flight state.
-                shouldEnableFly = !targetPlayer.getAbilities().allowFlying;
+                shouldEnableFly = !targetPlayer.abilities.allowFlying;
             }
         }
 
@@ -58,7 +58,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
     }
 
     public static void exec(ServerCommandSource source, ServerPlayerEntity target, boolean shouldEnableFly) {
-        PlayerAbilities playerAbilities = target.getAbilities();
+        PlayerAbilities playerAbilities = target.abilities;
 
         PlayerData playerData = ((ServerPlayerEntityAccess) target).getEcPlayerData();
 

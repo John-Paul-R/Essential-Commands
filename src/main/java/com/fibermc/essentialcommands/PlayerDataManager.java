@@ -6,7 +6,6 @@ import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-import eu.pb4.placeholders.PlaceholderAPI;
 import eu.pb4.placeholders.TextParser;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -54,8 +53,8 @@ public class PlayerDataManager {
     private static void onPlayerConnected(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
         if (CONFIG.ENABLE_MOTD.getValue()) {
             var text = TextParser.parse(CONFIG.MOTD.getValue());
-            var message = PlaceholderAPI.parseText(text, handler.getPlayer());
-            handler.getPlayer().getCommandSource().sendFeedback(message, false);
+            //var message = PlaceholderAPI.parseText(text, handler.getPlayer()); // Not supported in custom 1.16 version of placeholders.
+            handler.player.getCommandSource().sendFeedback(text, false);
         }
     }
 

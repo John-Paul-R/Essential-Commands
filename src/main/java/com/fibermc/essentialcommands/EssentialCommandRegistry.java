@@ -383,12 +383,12 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
                         .requires(source -> source.hasPermissionLevel(4))
                         .executes((source) -> {
-                            Path mcDir = source.getSource().getServer().getRunDirectory().toPath();
+                            Path mcDir = source.getSource().getMinecraftServer().getRunDirectory().toPath();
                             try {
                                 EssentialsXParser.convertPlayerDataDir(
                                         mcDir.resolve("plugins/Essentials/userdata").toFile(),
                                         mcDir.resolve("world/modplayerdata").toFile(),
-                                        source.getSource().getServer()
+                                        source.getSource().getMinecraftServer()
                                 );
                                 source.getSource().sendFeedback(new LiteralText("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS.getValue());
                             } catch (NotDirectoryException | FileNotFoundException e) {

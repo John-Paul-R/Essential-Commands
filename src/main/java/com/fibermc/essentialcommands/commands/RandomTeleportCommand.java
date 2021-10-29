@@ -51,7 +51,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         //TODO Add OP/Permission bypass for RTP cooldown.
         if (CONFIG.RTP_COOLDOWN.getValue() > 0) {
             ServerCommandSource source = context.getSource();
-            int ticks = source.getServer().getTicks();
+            int ticks = source.getMinecraftServer().getTicks();
             PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
             // if cooldown has expired
             if (playerData.getRtpNextUsableTime() < ticks) {

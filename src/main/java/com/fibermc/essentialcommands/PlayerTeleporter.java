@@ -19,7 +19,7 @@ public class PlayerTeleporter {
     }
     public static void requestTeleport(QueuedTeleport queuedTeleport) {
         ServerPlayerEntity player = queuedTeleport.getPlayerData().getPlayer();
-//        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
+//        if (pData.getTpCooldown() < 0 || player.getMinecraftServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
         if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY.getValue() <= 0) {
