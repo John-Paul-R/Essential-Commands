@@ -22,7 +22,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
+        WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         int out;
         ServerCommandSource source = context.getSource();
         //Store command sender

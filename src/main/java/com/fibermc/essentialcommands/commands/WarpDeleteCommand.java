@@ -21,7 +21,7 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
+        WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         int out = 0;
         ServerCommandSource source = context.getSource();
         //Store command sender

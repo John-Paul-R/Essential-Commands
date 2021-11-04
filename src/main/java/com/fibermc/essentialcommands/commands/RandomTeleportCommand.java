@@ -83,7 +83,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
         // Position relative to EC spawn locaiton.
-        MinecraftLocation center = ManagerLocator.INSTANCE.getWorldDataManager().getSpawn();
+        MinecraftLocation center = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
         if (center == null) {
             source.sendError(TextUtil.concat(
                     ECText.getInstance().getText("cmd.rtp.error.pre"),

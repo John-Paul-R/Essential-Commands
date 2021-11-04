@@ -19,7 +19,7 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        TeleportRequestManager tpMgr = ManagerLocator.INSTANCE.getTpManager();
+        TeleportRequestManager tpMgr = ManagerLocator.getInstance().getTpManager();
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store Target Player

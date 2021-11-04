@@ -8,6 +8,6 @@ import net.minecraft.server.command.ServerCommandSource;
 public class WarpSuggestion {
     //Brigader Suggestions
     public static SuggestionProvider<ServerCommandSource> suggestedStrings() {
-        return ListSuggestion.of(() -> ManagerLocator.INSTANCE.getWorldDataManager().getWarpNames());
+        return ListSuggestion.of(() -> ManagerLocator.getInstance().getWorldDataManager().getWarpNames());
     }
 }

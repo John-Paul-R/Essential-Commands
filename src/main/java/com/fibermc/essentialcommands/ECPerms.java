@@ -60,6 +60,9 @@ public class ECPerms {
         }
     }
 
+    /**
+     * Registers PermissionCheckEvent handler if permissions api enabled in config.
+     */
     static void init() {
         if (CONFIG.USE_PERMISSIONS_API.getValue()) {
             PermissionCheckEvent.EVENT.register((source, permission) -> {

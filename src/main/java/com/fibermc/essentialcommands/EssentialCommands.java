@@ -1,19 +1,17 @@
 package com.fibermc.essentialcommands;
 
 //import net.fabricmc.api.DedicatedServerModInitializer;
+
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
-import dev.jpcode.eccore.config.Config;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
-
 
 public final class EssentialCommands implements ModInitializer {
 	public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer("essential_commands").get().getMetadata();
@@ -38,13 +36,9 @@ public final class EssentialCommands implements ModInitializer {
 		CONFIG.loadOrCreateProperties();
 
 		//init mod stuff
-		ManagerLocator managers = new ManagerLocator();
+		ManagerLocator managers = ManagerLocator.getInstance();
 		managers.init();
-		ServerLifecycleEvents.SERVER_STARTING.register((MinecraftServer server) -> {
-			managers.onServerStart(server);
-//			I just do "./config" If you want toe( be more proper, you can do
-////				server.getRunDirectory().toPath().resolv"config")
-		});
+		ServerLifecycleEvents.SERVER_STARTING.register(managers::onServerStart);
 
 		ECPerms.init();
 		

@@ -184,7 +184,7 @@ public class EssentialCommandRegistry {
                         .executes(ListCommandFactory.create(
                             ECText.getInstance().get("cmd.warp.list.start"),
                             "warp tp",
-                            (context) -> ManagerLocator.INSTANCE.getWorldDataManager().getWarpEntries()
+                            (context) -> ManagerLocator.getInstance().getWorldDataManager().getWarpEntries()
                         ));
 
 

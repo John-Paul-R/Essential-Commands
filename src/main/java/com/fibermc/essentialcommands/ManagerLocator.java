@@ -12,9 +12,15 @@ public class ManagerLocator {
 
     public static ManagerLocator INSTANCE;
 
-    public ManagerLocator() {
+    private ManagerLocator() {
         INSTANCE = this;
     }
+
+    public static ManagerLocator getInstance() {
+        if (INSTANCE != null)
+            return INSTANCE;
+        return new ManagerLocator();
+    };
 
     static boolean playerDataEnabled() {
         return (

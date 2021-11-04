@@ -19,7 +19,7 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        WorldDataManager worldDataManager = ManagerLocator.INSTANCE.getWorldDataManager();
+        WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
 
         ServerCommandSource source = context.getSource();
         //Store command sender
