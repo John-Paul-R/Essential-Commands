@@ -9,6 +9,7 @@ import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -17,6 +18,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.WorldProperties;
+import org.gradle.internal.impldep.bsh.This;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -95,7 +97,8 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     @Unique
     public PlayerData ecPlayerData;
 
-    @Override//method = "getDisplayName", at = @At("RETURN"), cancellable = true
+    @Override
+    //This is implemented by PlayerEntity, so we mixin to the method in PlayerEntityMixin, then override it here
     public void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
         try {
             if (this.getEcPlayerData().getNickname() != null) {
@@ -124,7 +127,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
             return Objects.requireNonNull(ecPlayerData);
         } catch (NullPointerException e) {
             ServerPlayerEntity playerEntity = (ServerPlayerEntity)(Object)this;
-            EssentialCommands.LOGGER.warn(String.format("Player data did not exist for player with uuid '%s'. Creating it now.", playerEntity.getUuidAsString()));
+            EssentialCommands.LOGGER.warn(String.format("Player data did not exist for player with uuid '%s'. Loading it now.", playerEntity.getUuidAsString()));
             PlayerData playerData = PlayerDataFactory.create(playerEntity);
             setEcPlayerData(playerData);
             return playerData;
