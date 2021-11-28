@@ -32,7 +32,7 @@ public class MinecraftLocation {
     }
 
     public MinecraftLocation(ServerPlayerEntity player) {
-        this.dim = player.getServerWorld().getRegistryKey();
+        this.dim = player.getWorld().getRegistryKey();
         this.pos = Vec3d.ZERO.add(player.getPos());
         this.headYaw = player.getHeadYaw();
         this.pitch = player.getPitch();

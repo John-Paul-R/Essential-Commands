@@ -50,7 +50,7 @@ public class PlayerTeleporter {
         // If teleporting between dimensions is disabled and player doesn't have TP rules override
         if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS.getValue() && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
-            if (dest.dim != player.getServerWorld().getRegistryKey()) {
+            if (dest.dim != player.getWorld().getRegistryKey()) {
                 player.sendSystemMessage(
                     ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
                     Util.NIL_UUID

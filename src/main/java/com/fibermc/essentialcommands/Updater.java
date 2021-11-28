@@ -2,10 +2,9 @@ package com.fibermc.essentialcommands;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.util.version.VersionDeserializer;
+import net.fabricmc.loader.api.Version;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -40,8 +39,8 @@ public class Updater {
             UnaryOperator<String> stripMinecraftVersion = (String versionStr) -> versionStr.substring(0, versionStr.indexOf("-mc"));
             String currentVersionStr = modMetadata.getVersion().getFriendlyString();
             try {
-                SemanticVersion currentVers = VersionDeserializer.deserializeSemantic(stripMinecraftVersion.apply(currentVersionStr));
-                SemanticVersion latestVers = VersionDeserializer.deserializeSemantic(stripMinecraftVersion.apply(latestVersionStr));
+                Version currentVers = Version.parse(stripMinecraftVersion.apply(currentVersionStr));//VersionDeserializer.deserializeSemantic(stripMinecraftVersion.apply(currentVersionStr));
+                Version latestVers = Version.parse(stripMinecraftVersion.apply(latestVersionStr));
                 if (latestVers.compareTo(currentVers) > 0) {
                     String updateMessage = String.format(
                             "A new version of Essential Commands is available. Current: '%s' Latest: '%s'. Get the new version at %s",
