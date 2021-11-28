@@ -247,7 +247,7 @@ githubRelease {
 	owner project.gh_owner // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
 	repo project.gh_repo // by default this is set to your project name
 	tagName project.version // by default this is set to "v${project.version}"
-	targetCommitish "master" // by default this is set to "master"
+	targetCommitish "1.18" // by default this is set to "master"
 	releaseName project.version // Release title, by default this is the same as the tagName
 	body getChangelog() // by default this is empty
 	draft false // by default this is false
