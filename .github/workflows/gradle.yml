@@ -5,7 +5,7 @@ name: Build with Gradle
 
 on:
   push:
-    branches: [ master ]
+    branches: [ "1.18" ]
     paths:
       - '**/src/**'
       - '**/build.gradle'
@@ -15,7 +15,7 @@ on:
       - LICENCE
 
   pull_request:
-    branches: [ master ]
+    branches: [ "1.18" ]
     paths:
       - '**/src/**'
       - '**/build.gradle'
