@@ -21,7 +21,7 @@ allprojects {
     version = full_version
     archivesBaseName = "${project.mod_id}"//-mc${project.minecraft_version}
 
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
     // Declare dependencies
     dependencies {
