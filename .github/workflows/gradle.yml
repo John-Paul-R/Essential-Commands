@@ -9,6 +9,7 @@ on:
     paths:
       - '**/src/**'
       - '**/build.gradle'
+      - '**/build-github-action.gradle'
       - '**/gradle.properties'
       - '**/settings.gradle'
       - .github/workflows/gradle.yml
@@ -19,6 +20,7 @@ on:
     paths:
       - '**/src/**'
       - '**/build.gradle'
+      - '**/build-github-action.gradle'
       - '**/gradle.properties'
       - '**/settings.gradle'
       - .github/workflows/gradle.yml
