@@ -1,16 +1,8 @@
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
-    id 'fabric-loom' version '0.10-SNAPSHOT'
+    id 'fabric-loom' version '0.9-SNAPSHOT'
 }
-
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
-
 
 allprojects {
     apply plugin: 'fabric-loom'
@@ -52,7 +44,7 @@ allprojects {
 
         // Subprojects
         subprojects.each {
-            modImplementation project(":${it.name}")
+            implementation project(":${it.name}")
             include project("${it.name}:") // nest within distribution
         }
     }
