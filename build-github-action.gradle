@@ -52,7 +52,7 @@ allprojects {
 
         // Subprojects
         subprojects.each {
-            implementation project(":${it.name}")
+            modImplementation project(":${it.name}")
             include project("${it.name}:") // nest within distribution
         }
     }
