@@ -40,6 +40,7 @@
   "cmd.tpa_reply.error.no_request_from_target": "No pending teleport request from the specified player.",
   "cmd.tpask.receive": " has requested to teleport to you.\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny this request.",
   "cmd.tpask.send": "Teleport request has been sent to ",
+  "cmd.tpask.error.exists": "Request not sent. You already have a pending teleport request to ",
   "cmd.tpaskhere.receive": " has requested that you teleport to them.\nType '/tpaccept <name>' to accept or '/tpdeny <name>' to deny this request.",
   "cmd.tpdeny.feedback": "Teleport request denied.",
   "cmd.warp.feedback.1": "Warp '",

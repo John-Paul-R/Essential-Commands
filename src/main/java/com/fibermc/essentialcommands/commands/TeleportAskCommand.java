@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -24,6 +25,19 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store Target Player
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
+
+        // Don't allow spamming same target.
+        {
+            var existingTeleportRequest = ((ServerPlayerEntityAccess) senderPlayer)
+                .getEcPlayerData()
+                .getSentTeleportRequest();
+            if (existingTeleportRequest != null && existingTeleportRequest.getTargetPlayer().equals(targetPlayer)) {
+                senderPlayer.sendSystemMessage(TextUtil.concat(
+                    ECText.getInstance().getText("cmd.tpask.error.exists"),
+                    existingTeleportRequest.getTargetPlayer().getDisplayName()
+                ), Util.NIL_UUID);
+            }
+        }
 
         //inform target player of tp request via chat
         targetPlayer.sendSystemMessage(TextUtil.concat(
