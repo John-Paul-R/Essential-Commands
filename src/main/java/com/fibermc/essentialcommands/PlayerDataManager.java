@@ -109,14 +109,14 @@ public class PlayerDataManager {
 
     // EVENTS
     private static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
-        PlayerData playerData = INSTANCE.addPlayerData(player);
+        PlayerData playerData = getInstance().addPlayerData(player);
         ((ServerPlayerEntityAccess) player).setEcPlayerData(playerData);
-        INSTANCE.initPlayerDataFile(player);
+        getInstance().initPlayerDataFile(player);
     }
 
     private static void onPlayerLeave(ServerPlayerEntity player) {
         // Auto-saving should be handled by WorldSaveHandlerMixin. (PlayerData saves when MC server saves players)
-        INSTANCE.unloadPlayerData(player);
+        getInstance().unloadPlayerData(player);
     }
 
     private static void onPlayerRespawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
@@ -132,21 +132,13 @@ public class PlayerDataManager {
     }
 
     // SET / ADD
-    public PlayerData addPlayerData(ServerPlayerEntity player) {
-        PlayerData playerData = PlayerDataFactory.create(player);
+    private PlayerData addPlayerData(ServerPlayerEntity player) {
+        PlayerData playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
         dataMap.put(player.getUuid(), playerData);
         return playerData;
     }
 
-    public PlayerData getPlayerData(ServerPlayerEntity player) {
-        PlayerData playerData = dataMap.get(player.getUuid());
-
-        if (playerData == null) {
-            throw new NullPointerException(String.format("dataMap returned null for player with uuid %s", player.getUuid().toString()));
-        }
-        return playerData;
-    }
-    PlayerData getPlayerFromUUID(UUID playerID) {
+    PlayerData getPlayerDataFromUUID(UUID playerID) {
         return dataMap.get(playerID);
     }
 
@@ -156,7 +148,7 @@ public class PlayerDataManager {
     }
 
     private void initPlayerDataFile(ServerPlayerEntity player) {
-        PlayerData pData = this.getPlayerData(player);
+        PlayerData pData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
         pData.markDirty();
         pData.save();
     }

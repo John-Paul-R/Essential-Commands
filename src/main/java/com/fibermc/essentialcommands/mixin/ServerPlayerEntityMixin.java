@@ -121,15 +121,16 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
 
     @Override
     public PlayerData getEcPlayerData() {
-        try {
-            return Objects.requireNonNull(ecPlayerData);
-        } catch (NullPointerException e) {
-            ServerPlayerEntity playerEntity = (ServerPlayerEntity)(Object)this;
-            EssentialCommands.LOGGER.warn(String.format("Player data did not exist for player with uuid '%s'. Loading it now.", playerEntity.getUuidAsString()));
-            PlayerData playerData = PlayerDataFactory.create(playerEntity);
-            setEcPlayerData(playerData);
-            return playerData;
+        if (ecPlayerData != null) {
+            return ecPlayerData;
         }
+
+        ServerPlayerEntity playerEntity = (ServerPlayerEntity)(Object)this;
+        EssentialCommands.LOGGER.info(String.format(
+                "[Essential Commands] Loading PlayerData for player with uuid '%s'.", playerEntity.getUuidAsString()));
+        PlayerData playerData = PlayerDataFactory.create(playerEntity);
+        setEcPlayerData(playerData);
+        return playerData;
     }
 
     @Override
