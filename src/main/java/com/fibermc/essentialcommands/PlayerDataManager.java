@@ -60,7 +60,7 @@ public class PlayerDataManager {
     }
 
     public static PlayerDataManager getInstance() {
-        return INSTANCE;
+        return INSTANCE != null ? INSTANCE : new PlayerDataManager();
     }
 
     public void markNicknameDirty(PlayerData playerData) {
@@ -103,18 +103,18 @@ public class PlayerDataManager {
 
     }
 
-    public static void scheduleTask(Runnable task) {
-        INSTANCE.nextTickTasks.add(task);
+    public void scheduleTask(Runnable task) {
+        this.nextTickTasks.add(task);
     }
 
     // EVENTS
-    public static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
+    private static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
         PlayerData playerData = INSTANCE.addPlayerData(player);
         ((ServerPlayerEntityAccess) player).setEcPlayerData(playerData);
         INSTANCE.initPlayerDataFile(player);
     }
 
-    public static void onPlayerLeave(ServerPlayerEntity player) {
+    private static void onPlayerLeave(ServerPlayerEntity player) {
         // Auto-saving should be handled by WorldSaveHandlerMixin. (PlayerData saves when MC server saves players)
         INSTANCE.unloadPlayerData(player);
     }

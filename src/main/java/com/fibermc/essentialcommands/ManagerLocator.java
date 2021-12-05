@@ -51,7 +51,7 @@ public class ManagerLocator {
 
     public void onServerStart(MinecraftServer server) {
         if (playerDataEnabled()) {
-            this.playerDataManager = new PlayerDataManager();
+            this.playerDataManager = PlayerDataManager.getInstance();
         }
         if (teleportRequestEnabled()) {
             this.tpManager = new TeleportRequestManager(this.playerDataManager);
