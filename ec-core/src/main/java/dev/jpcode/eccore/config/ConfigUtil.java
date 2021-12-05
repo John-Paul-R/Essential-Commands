@@ -25,7 +25,6 @@ public final class ConfigUtil {
 
     // TODO do not delclair serializer objects out here. Pretty sure is bad for concurrent parsing.
     private static final Style.Serializer styleJsonDeserializer = new Style.Serializer();
-    private static final JsonParser jsonParser = new JsonParser();
 
     public static Style parseStyleOrDefault(String styleStr, String defaultStyleStr) {
         Style outStyle = null;
@@ -53,7 +52,7 @@ public final class ConfigUtil {
         if (outStyle == null) {
             try {
                 outStyle = styleJsonDeserializer.deserialize(
-                        jsonParser.parse(styleStr),
+                        JsonParser.parseString(styleStr),
                         null, null
                 );
             } catch (JsonSyntaxException e) {
