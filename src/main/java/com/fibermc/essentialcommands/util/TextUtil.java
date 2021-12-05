@@ -5,11 +5,9 @@ import com.google.gson.JsonParseException;
 import eu.pb4.placeholders.TextParser;
 import net.minecraft.text.*;
 import org.apache.logging.log4j.Level;
-import org.lwjgl.system.CallbackI;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 public class TextUtil {
 

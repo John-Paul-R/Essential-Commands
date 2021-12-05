@@ -24,8 +24,6 @@ import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 
 public class EssentialsXParser {

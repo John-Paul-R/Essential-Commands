@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.commands.suggestions;
 
 import com.fibermc.essentialcommands.ManagerLocator;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.server.command.ServerCommandSource;
 

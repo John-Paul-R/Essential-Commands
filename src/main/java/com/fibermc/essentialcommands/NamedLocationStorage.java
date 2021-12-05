@@ -22,10 +22,7 @@ public class NamedLocationStorage extends HashMap<String, MinecraftLocation> imp
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
-        this.forEach((key, value) -> {
-            nbt.put(key, value.asNbt());
-        });
-
+        this.forEach((key, value) -> nbt.put(key, value.asNbt()));
         return nbt;
     }
 
@@ -43,9 +40,7 @@ public class NamedLocationStorage extends HashMap<String, MinecraftLocation> imp
             }
         } else {
             NbtCompound nbtCompound = (NbtCompound) nbt;
-            nbtCompound.getKeys().forEach((key) -> {
-                super.put(key, new MinecraftLocation(nbtCompound.getCompound(key)));
-            });
+            nbtCompound.getKeys().forEach((key) -> super.put(key, new MinecraftLocation(nbtCompound.getCompound(key))));
         }
 
     }

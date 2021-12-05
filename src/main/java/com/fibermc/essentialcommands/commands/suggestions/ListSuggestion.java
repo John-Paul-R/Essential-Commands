@@ -31,16 +31,14 @@ public class ListSuggestion {
 
     @Contract(pure = true)
     public static @NotNull SuggestionProvider<ServerCommandSource> of(Supplier<Collection<String>> suggestionCollection) {
-        return (CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) -> {
-            return buildSuggestions(builder, suggestionCollection.get());
-        };
+        return (CommandContext<ServerCommandSource> context, SuggestionsBuilder builder)
+            -> buildSuggestions(builder, suggestionCollection.get());
     }
 
     @Contract(pure = true)
     public static <S> @NotNull SuggestionProvider<S> ofContext(ContextFunction<CommandContext<S>, Collection<String>> suggestionCollection) {
-        return (CommandContext<S> context, SuggestionsBuilder builder) -> {
-            return buildSuggestions(builder, suggestionCollection.apply(context));
-        };
+        return (CommandContext<S> context, SuggestionsBuilder builder)
+            -> buildSuggestions(builder, suggestionCollection.apply(context));
     }
 
 }

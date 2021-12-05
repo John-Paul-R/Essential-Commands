@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class WorldDataManager extends PersistentState {
-    private NamedLocationStorage warps;
+    private final NamedLocationStorage warps;
     private MinecraftLocation spawnLocation;
     private Path saveDir;
     private File worldDataFile;

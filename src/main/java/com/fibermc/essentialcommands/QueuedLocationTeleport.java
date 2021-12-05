@@ -2,7 +2,6 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 
 public class QueuedLocationTeleport extends QueuedTeleport {
 

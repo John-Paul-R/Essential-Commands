@@ -399,11 +399,6 @@ public class EssentialCommandRegistry {
                     );
                 }
 
-//                essentialCommandsRootNode.addChild(CommandManager.literal("test")
-//                        .executes(configReloadNode.getCommand())
-//                        .build()
-//                );
-
                 rootNode.addChild(essentialCommandsRootNode);
             }
         );

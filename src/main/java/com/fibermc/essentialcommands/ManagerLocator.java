@@ -20,7 +20,7 @@ public class ManagerLocator {
         if (INSTANCE != null)
             return INSTANCE;
         return new ManagerLocator();
-    };
+    }
 
     static boolean playerDataEnabled() {
         return (

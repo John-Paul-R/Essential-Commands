@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.Message;

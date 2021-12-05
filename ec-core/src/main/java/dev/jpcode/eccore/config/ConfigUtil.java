@@ -59,7 +59,6 @@ public final class ConfigUtil {
                 LOGGER.log(Level.ERROR, String.format(
                         "Malformed Style JSON in config: %s", styleStr
                 ));
-//                e.printStackTrace();
             }
 
         }
