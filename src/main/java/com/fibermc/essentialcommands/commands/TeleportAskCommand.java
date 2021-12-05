@@ -36,6 +36,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
                     ECText.getInstance().getText("cmd.tpask.error.exists"),
                     existingTeleportRequest.getTargetPlayer().getDisplayName()
                 ), Util.NIL_UUID);
+                return 0;
             }
         }
 
