@@ -56,6 +56,11 @@ public class TeleportRequest {
     }
 
     public void end() {
+        PlayerData target = this.getTargetPlayerData();
+        if (target != null) {
+            target.removeIncomingTeleportRequest(this.getSenderPlayer().getUuid());
+            this.getSenderPlayerData().setSentTeleportRequest(null);
+        }
         isEnded = true;
     }
 

@@ -47,15 +47,6 @@ public class TeleportRequestManager {
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> TeleportRequestManager.INSTANCE.tick(server));
     }
 
-    public void endTpRequest(TeleportRequest teleportRequest) {
-        PlayerData target = teleportRequest.getTargetPlayerData();
-        if (target != null) {
-            target.removeIncomingTeleportRequest(teleportRequest.getSenderPlayer().getUuid());
-            teleportRequest.getSenderPlayerData().setSentTeleportRequest(null);
-        }
-        teleportRequest.end();
-    }
-
     public void tick(MinecraftServer server) {
         // Remove any requests that have ended since the last tick.
         activeTpRequestList.removeIf(TeleportRequest::isEnded);
@@ -65,7 +56,7 @@ public class TeleportRequestManager {
             PlayerData requesterPlayerData = ((ServerPlayerEntityAccess) teleportRequest.getSenderPlayer()).getEcPlayerData();
             requesterPlayerData.tickTpTimer();
             if (requesterPlayerData.getTpTimer() < 0) {
-                endTpRequest(teleportRequest);
+                teleportRequest.end();
                 // Teleport expiry message to sender
                 teleportRequest.getSenderPlayer().sendSystemMessage(TextUtil.concat(
                     lang.getText("teleport.request.expired.1"),

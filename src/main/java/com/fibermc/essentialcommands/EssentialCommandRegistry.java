@@ -58,6 +58,11 @@ public class EssentialCommandRegistry {
                             .executes(new TeleportAskCommand())
                         ).build();
 
+                    LiteralCommandNode<ServerCommandSource> tpCancelNode = CommandManager.literal("tpcancel")
+                            .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
+                            .executes(new TeleportCancelCommand())
+                            .build();
+
                     LiteralCommandNode<ServerCommandSource> tpAcceptNode = CommandManager.literal("tpaccept")
                         .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                         .executes(new TeleportAcceptCommand()::runDefault)
@@ -81,15 +86,16 @@ public class EssentialCommandRegistry {
                             ).build();
 
                     rootNode.addChild(tpAskNode);
+                    rootNode.addChild(tpCancelNode);
                     rootNode.addChild(tpAcceptNode);
                     rootNode.addChild(tpDenyNode);
                     rootNode.addChild(tpAskHereNode);
 
                     essentialCommandsRootNode.addChild(tpAskNode);
+                    essentialCommandsRootNode.addChild(tpCancelNode);
                     essentialCommandsRootNode.addChild(tpAcceptNode);
                     essentialCommandsRootNode.addChild(tpDenyNode);
                     essentialCommandsRootNode.addChild(tpAskHereNode);
-
 
                 }
 

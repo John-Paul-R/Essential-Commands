@@ -40,7 +40,7 @@ public class TeleportAcceptCommand extends TeleportResponseCommand {
             //Clean up TPAsk
             targetPlayerData.setTpTimer(-1);
             // Remove the tp request, as it has been completed.
-            TeleportRequestManager.getInstance().endTpRequest(teleportRequest);
+            teleportRequest.end();
 
             return 1;
         } else {
