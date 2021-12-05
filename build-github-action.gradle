@@ -1,7 +1,11 @@
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
-    id 'fabric-loom' version '0.9-SNAPSHOT'
+    id 'fabric-loom' version '0.10-SNAPSHOT'
+}
+
+build {
+    dependsOn ':ec-core:build'
 }
 
 allprojects {
@@ -44,7 +48,7 @@ allprojects {
 
         // Subprojects
         subprojects.each {
-            implementation project(":${it.name}")
+            implementation project(path: ":${it.name}", configuration: "namedElements")
             include project("${it.name}:") // nest within distribution
         }
     }
