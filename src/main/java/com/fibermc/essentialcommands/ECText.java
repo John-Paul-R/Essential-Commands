@@ -80,11 +80,11 @@ public abstract class ECText {
             }
 
             public MutableText getText(String key) {
-                return new LiteralText(get(key));
+                return new LiteralText(get(key)).setStyle(CONFIG.FORMATTING_DEFAULT.getValue());
             }
 
             public MutableText getText(String key, Object... args) {
-                return new LiteralText(String.format(get(key), (Object[]) args));
+                return new LiteralText(String.format(get(key), (Object[]) args)).setStyle(CONFIG.FORMATTING_DEFAULT.getValue());
             }
 
             public boolean hasTranslation(String key) {
