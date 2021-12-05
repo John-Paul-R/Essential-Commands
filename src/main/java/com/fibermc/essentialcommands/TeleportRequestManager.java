@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import dev.jpcode.eccore.util.TextUtil;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
@@ -47,27 +48,38 @@ public class TeleportRequestManager {
     }
 
     public void endTpRequest(TeleportRequest teleportRequest) {
-        endTpRequestFinal(teleportRequest);
-        this.activeTpRequestList.remove(teleportRequest);
-    }
-    private void endTpRequestFinal(TeleportRequest teleportRequest) {
         PlayerData target = teleportRequest.getTargetPlayerData();
         if (target != null) {
             target.removeIncomingTeleportRequest(teleportRequest.getSenderPlayer().getUuid());
             teleportRequest.getSenderPlayerData().setSentTeleportRequest(null);
         }
+        teleportRequest.end();
     }
 
     public void tick(MinecraftServer server) {
-        ListIterator<TeleportRequest> tpRequestIterator = activeTpRequestList.listIterator();
-        //decrement the tp timer for all players that have put in a tp request
-        while (tpRequestIterator.hasNext()) {
-            TeleportRequest teleportRequest = tpRequestIterator.next();
+        // Remove any requests that have ended since the last tick.
+        activeTpRequestList.removeIf(TeleportRequest::isEnded);
+        var lang = ECText.getInstance();
+        // decrement the tp timer for all players that have put in a tp request
+        for (TeleportRequest teleportRequest : activeTpRequestList) {
             PlayerData requesterPlayerData = ((ServerPlayerEntityAccess) teleportRequest.getSenderPlayer()).getEcPlayerData();
             requesterPlayerData.tickTpTimer();
             if (requesterPlayerData.getTpTimer() < 0) {
-                endTpRequestFinal(teleportRequest);
-                tpRequestIterator.remove();
+                endTpRequest(teleportRequest);
+                // Teleport expiry message to sender
+                teleportRequest.getSenderPlayer().sendSystemMessage(TextUtil.concat(
+                    lang.getText("teleport.request.expired.1"),
+                    lang.getText("teleport.request.expired.sender.2"),
+                    teleportRequest.getTargetPlayer().getDisplayName(),
+                    lang.getText("teleport.request.expired.3")
+                ), Util.NIL_UUID);
+                // Teleport expiry message to receiver
+                teleportRequest.getTargetPlayer().sendSystemMessage(TextUtil.concat(
+                    lang.getText("teleport.request.expired.1"),
+                    lang.getText("teleport.request.expired.receiver.2"),
+                    teleportRequest.getSenderPlayer().getDisplayName(),
+                    lang.getText("teleport.request.expired.3")
+                ), Util.NIL_UUID);
             }
         }
 

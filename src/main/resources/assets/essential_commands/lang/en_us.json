@@ -60,6 +60,10 @@
   "teleport.queued.2": " in ",
   "teleport.queued.3": " seconds...",
   "teleport.done.1": "Teleported to ",
+  "teleport.request.expired.1": "Teleport request ",
+  "teleport.request.expired.sender.2": "to",
+  "teleport.request.expired.receiver.2":  "from",
+  "teleport.request.expired.3": " expired.",
 
   "generic.quote_fullstop": "'.",
   "generic.argument.target_player": "",

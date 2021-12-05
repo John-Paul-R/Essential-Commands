@@ -29,6 +29,7 @@ public class TeleportRequest {
     private final Type requestType;
     private final PlayerData senderPlayer;
     private final PlayerData targetPlayer;
+    private boolean isEnded = false;
 
     public TeleportRequest(ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer, Type requestType) {
         this.requestType = requestType;
@@ -55,7 +56,11 @@ public class TeleportRequest {
     }
 
     public void end() {
-        TeleportRequestManager.getInstance().endTpRequest(this);
+        isEnded = true;
+    }
+
+    public boolean isEnded() {
+        return isEnded;
     }
 
 }
