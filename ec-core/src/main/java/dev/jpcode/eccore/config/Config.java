@@ -42,12 +42,14 @@ public abstract class Config {
         File inFile = configPath.toFile();
 
         try {
+            inFile.getParentFile().mkdirs();
             boolean fileAlreadyExisted = !inFile.createNewFile();
             if (fileAlreadyExisted) {
                 props.load(new FileReader(inFile));
             }
         } catch (IOException e) {
             LOGGER.warn("Failed to load preferences.");
+            LOGGER.error(e.getMessage());
         }
         initProperties();
         storeProperties();
@@ -81,6 +83,7 @@ public abstract class Config {
             );
         } catch (IOException e) {
             LOGGER.warn("Failed to store preferences to disk.");
+            LOGGER.error(e.getMessage());
         }
 
     }

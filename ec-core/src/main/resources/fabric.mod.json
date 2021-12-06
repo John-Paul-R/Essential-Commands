@@ -30,7 +30,6 @@
     ]
   },
   "mixins": [
-    "eccore.mixins.json"
   ],
 
   "depends": {
