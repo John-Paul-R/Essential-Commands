@@ -17,6 +17,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
 
 import java.util.Random;
 
@@ -37,6 +38,14 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         ServerPlayerEntity player = context.getSource().getPlayer();
         ServerWorld world = context.getSource().getWorld();
+
+        if (!world.getRegistryKey().equals(World.OVERWORLD)) {
+            context.getSource().sendError(TextUtil.concat(
+                ECText.getInstance().getText("cmd.rtp.error.pre").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                ECText.getInstance().getText("cmdcmd.rtp.error.not_overworld").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+            ));
+            return -3;
+        }
 
         Thread thread = new Thread("RTP Location Calculator Thread") {
             public void run() {
