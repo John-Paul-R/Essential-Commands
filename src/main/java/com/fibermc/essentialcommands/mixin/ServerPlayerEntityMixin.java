@@ -94,30 +94,6 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     public PlayerData ecPlayerData;
 
     @Override
-    //This is implemented by PlayerEntity, so we mixin to the method in PlayerEntityMixin, then override it here
-    public void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
-        try {
-            if (this.getEcPlayerData().getNickname() != null) {
-                MutableText nickname = this.getEcPlayerData().getFullNickname();
-                // Re-add "whisper" click event unless the nickname has a click event set.
-                Style nicknameStyle = nickname.getStyle();
-                if (nicknameStyle.getClickEvent() == null) {
-                    nickname.setStyle(nicknameStyle.withClickEvent(cir.getReturnValue().getStyle().getClickEvent()));
-                }
-                // Send nickname (styled appropriately for player team) as return value for getDisplayName().
-                ServerPlayerEntity serverPlayerEntity = ((ServerPlayerEntity)(Object)this);
-                cir.setReturnValue(Team.decorateName(
-                        serverPlayerEntity.getScoreboard().getPlayerTeam(serverPlayerEntity.getEntityName()),
-                        nickname
-                ));
-                cir.cancel();
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public PlayerData getEcPlayerData() {
         if (ecPlayerData != null) {
             return ecPlayerData;
