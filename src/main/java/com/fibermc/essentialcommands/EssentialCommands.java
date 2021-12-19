@@ -41,7 +41,9 @@ public final class EssentialCommands implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTING.register(managers::onServerStart);
 
 		ECPerms.init();
-		
+
+		ECPlaceholderRegistry.regiser();
+
 		//Register Mod
 		EssentialCommandRegistry.register();
 
