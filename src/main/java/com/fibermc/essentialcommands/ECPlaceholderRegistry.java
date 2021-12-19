@@ -7,7 +7,7 @@ import net.minecraft.util.Identifier;
 
 class ECPlaceholderRegistry {
 
-    public static void regiser() {
+    public static void register() {
         var namespace = EssentialCommands.MOD_ID;
         PlaceholderAPI.register(
             new Identifier(namespace, "nickname"),

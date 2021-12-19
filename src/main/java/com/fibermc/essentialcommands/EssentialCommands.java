@@ -42,7 +42,7 @@ public final class EssentialCommands implements ModInitializer {
 
 		ECPerms.init();
 
-		ECPlaceholderRegistry.regiser();
+		ECPlaceholderRegistry.register();
 
 		//Register Mod
 		EssentialCommandRegistry.register();
