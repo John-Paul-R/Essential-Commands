@@ -311,6 +311,21 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(flyNode);
                 }
 
+                if (CONFIG.ENABLE_INVULN.getValue()) {
+                    LiteralCommandNode<ServerCommandSource> invulnNode = dispatcher.register(
+                        CommandManager.literal("invuln")
+                            .requires(ECPerms.require(ECPerms.Registry.invuln_self, 2))
+                            .executes(new InvulnCommand())
+                            .then(argument("target_player", EntityArgumentType.player())
+                                .requires(ECPerms.require(ECPerms.Registry.invuln_others, 4))
+                                .then(argument("invuln_enabled", BoolArgumentType.bool())
+                                    .executes(new InvulnCommand()))
+                            )
+                    );
+
+                    essentialCommandsRootNode.addChild(invulnNode);
+                }
+
                 if (CONFIG.ENABLE_WORKBENCH.getValue()) {
                     LiteralCommandNode<ServerCommandSource> workbenchNode = dispatcher.register(
                         CommandManager.literal("workbench")

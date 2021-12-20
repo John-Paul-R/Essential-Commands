@@ -30,6 +30,7 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<Boolean> ENABLE_NICK =            new Option<>("enable_nick", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_RTP =             new Option<>("enable_rtp", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_FLY =             new Option<>("enable_fly", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_INVULN =          new Option<>("enable_invuln", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_WORKBENCH =       new Option<>("enable_workbench", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_ENDERCHEST =      new Option<>("enable_enderchest", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_ESSENTIALSX_CONVERT = new Option<>("enable_experimental_essentialsx_converter", false, Boolean::parseBoolean);

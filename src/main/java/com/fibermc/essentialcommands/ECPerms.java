@@ -41,6 +41,8 @@ public class ECPerms {
         public static final String randomteleport = "essentialcommands.randomteleport";
         public static final String fly_self = "essentialcommands.fly.self";
         public static final String fly_others = "essentialcommands.fly.others";
+        public static final String invuln_self = "essentialcommands.invuln.self";
+        public static final String invuln_others = "essentialcommands.invuln.others";
         public static final String workbench = "essentialcommands.workbench";
         public static final String enderchest = "essentialcommands.enderchest";
         public static final String top = "essentialcommands.top";
