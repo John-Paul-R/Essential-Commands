@@ -20,7 +20,7 @@ public abstract class TeleportResponseCommand implements Command<ServerCommandSo
         return exec(
                 context,
                 context.getSource().getPlayer(),
-                EntityArgumentType.getPlayer(context, "target")
+                EntityArgumentType.getPlayer(context, "target_player")
         );
     }
 

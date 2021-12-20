@@ -23,7 +23,7 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store Target Player
-        ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
+        ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
 
         //inform target player of tp request via chat
         targetPlayer.sendSystemMessage(TextUtil.concat(

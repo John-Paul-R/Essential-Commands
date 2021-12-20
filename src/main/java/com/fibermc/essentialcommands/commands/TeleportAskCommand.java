@@ -24,7 +24,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         //Store Target Player
-        ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target");
+        ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
 
         // Don't allow spamming same target.
         {

@@ -27,8 +27,6 @@ public class InvulnCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
-        ServerPlayerEntity senderPlayer = source.getPlayer();
-
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         boolean shouldEnableInvuln;

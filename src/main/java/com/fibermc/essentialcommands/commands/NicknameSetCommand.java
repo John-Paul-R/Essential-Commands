@@ -31,20 +31,10 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
         return 1;
     }
 
-    public static ServerPlayerEntity getTargetPlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity targetPlayer;
-        try {
-            targetPlayer = EntityArgumentType.getPlayer(context, "target");
-        } catch (IllegalArgumentException e) {
-            targetPlayer = context.getSource().getPlayer();
-        }
-        return targetPlayer;
-    }
-
     public static int exec(CommandContext<ServerCommandSource> context, Text nicknameText) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
 
-        ServerPlayerEntity targetPlayer = getTargetPlayer(context);
+        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
         int successCode = targetPlayerEntityAccess.getEcPlayerData().setNickname(nicknameText);

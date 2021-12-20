@@ -54,7 +54,7 @@ public class EssentialCommandRegistry {
                 if (CONFIG.ENABLE_TPA.getValue()) {
                     LiteralCommandNode<ServerCommandSource> tpAskNode = CommandManager.literal("tpa")
                         .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
-                        .then(argument("target", EntityArgumentType.player())
+                        .then(CommandUtil.targetPlayerArgument()
                             .executes(new TeleportAskCommand())
                         ).build();
 
@@ -66,7 +66,7 @@ public class EssentialCommandRegistry {
                     LiteralCommandNode<ServerCommandSource> tpAcceptNode = CommandManager.literal("tpaccept")
                         .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                         .executes(new TeleportAcceptCommand()::runDefault)
-                        .then(argument("target", EntityArgumentType.player())
+                        .then(CommandUtil.targetPlayerArgument()
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportAcceptCommand())
                         ).build();
@@ -74,14 +74,14 @@ public class EssentialCommandRegistry {
                     LiteralCommandNode<ServerCommandSource> tpDenyNode = CommandManager.literal("tpdeny")
                         .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                         .executes(new TeleportDenyCommand()::runDefault)
-                        .then(argument("target", EntityArgumentType.player())
+                        .then(CommandUtil.targetPlayerArgument()
                             .suggests(TeleportResponseSuggestion.suggestedStrings())
                             .executes(new TeleportDenyCommand())
                         ).build();
 
                     LiteralCommandNode<ServerCommandSource> tpAskHereNode = CommandManager.literal("tpahere")
                             .requires(ECPerms.require(ECPerms.Registry.tpahere, 0))
-                            .then(argument("target", EntityArgumentType.player())
+                            .then(CommandUtil.targetPlayerArgument()
                                     .executes(new TeleportAskHereCommand())
                             ).build();
 
@@ -245,7 +245,7 @@ public class EssentialCommandRegistry {
                     nickSetBuilder.requires(permissionSelf)
                         .then(argument("nickname", TextArgumentType.text())
                             .executes(new NicknameSetCommand())
-                        ).then(argument("target", EntityArgumentType.player())
+                        ).then(CommandUtil.targetPlayerArgument()
                             .requires(permissionOther)
                             .then(argument("nickname", TextArgumentType.text())
                                 .executes(new NicknameSetCommand())
@@ -259,7 +259,7 @@ public class EssentialCommandRegistry {
                     nickClearBuilder
                         .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))
                         .executes(new NicknameClearCommand())
-                        .then(argument("target", EntityArgumentType.player())
+                        .then(CommandUtil.targetPlayerArgument()
                             .requires(ECPerms.require(ECPerms.Registry.nickname_others, 4))
                             .executes(new NicknameClearCommand()));
 
@@ -301,7 +301,7 @@ public class EssentialCommandRegistry {
                         CommandManager.literal("fly")
                             .requires(ECPerms.require(ECPerms.Registry.fly_self, 2))
                             .executes(new FlyCommand())
-                            .then(argument("target_player", EntityArgumentType.player())
+                            .then(CommandUtil.targetPlayerArgument()
                                 .requires(ECPerms.require(ECPerms.Registry.fly_others, 4))
                                 .then(argument("flight_enabled", BoolArgumentType.bool())
                                     .executes(new FlyCommand()))
@@ -316,7 +316,7 @@ public class EssentialCommandRegistry {
                         CommandManager.literal("invuln")
                             .requires(ECPerms.require(ECPerms.Registry.invuln_self, 2))
                             .executes(new InvulnCommand())
-                            .then(argument("target_player", EntityArgumentType.player())
+                            .then(CommandUtil.targetPlayerArgument()
                                 .requires(ECPerms.require(ECPerms.Registry.invuln_others, 4))
                                 .then(argument("invuln_enabled", BoolArgumentType.bool())
                                     .executes(new InvulnCommand()))

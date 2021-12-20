@@ -26,14 +26,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
-        ServerPlayerEntity senderPlayer = source.getPlayer();
-
-        ServerPlayerEntity targetPlayer;
-        try {
-            targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
-        } catch (IllegalArgumentException e) {
-            targetPlayer = senderPlayer;
-        }
+        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         boolean shouldEnableFly;
         try {

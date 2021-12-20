@@ -19,14 +19,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        //Store command sender
-        ServerPlayerEntity senderPlayerEntity = context.getSource().getPlayer();
-        ServerPlayerEntity targetPlayer;
-        try {
-            targetPlayer = EntityArgumentType.getPlayer(context, "target");
-        } catch (IllegalArgumentException e) {
-            targetPlayer = senderPlayerEntity;
-        }
+        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
         targetPlayerEntityAccess.getEcPlayerData().setNickname(null);
