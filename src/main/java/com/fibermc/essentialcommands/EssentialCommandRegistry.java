@@ -341,6 +341,16 @@ public class EssentialCommandRegistry {
                     essentialCommandsRootNode.addChild(topNode);
                 }
 
+                if (CONFIG.ENABLE_GAMETIME.getValue()) {
+                    LiteralCommandNode<ServerCommandSource> gameTimeNode = dispatcher.register(
+                        CommandManager.literal("gametime")
+                            .requires(ECPerms.require(ECPerms.Registry.gametime, 0))
+                            .executes(new GametimeCommand())
+                    );
+
+                    essentialCommandsRootNode.addChild(gameTimeNode);
+                }
+
                 LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
                         .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
                         .then(CommandManager.literal("reload")
