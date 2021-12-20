@@ -20,13 +20,21 @@ import java.util.Optional;
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
 
-    @Inject(method = "onPlayerConnect", at = @At("HEAD"))
+    @Inject(
+        method = "onPlayerConnect",
+        at = @At(
+            value="INVOKE",
+            // We inject right after the vanilla player join message is sent. Mostly to ensure LuckPerms permissions are
+            // loaded (for role styling in EC MOTD).
+            target="Lnet/minecraft/server/PlayerManager;sendToAll(Lnet/minecraft/network/Packet;)V"
+        )
+    )
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo callbackInfo) {
         PlayerConnectCallback.EVENT.invoker().onPlayerConnect(connection, player);
     }
 
     @Inject(method = "remove", at = @At("HEAD"))
-    public void onPlayerConnect(ServerPlayerEntity player, CallbackInfo callbackInfo) {
+    public void onPlayerLeave(ServerPlayerEntity player, CallbackInfo callbackInfo) {
         PlayerLeaveCallback.EVENT.invoker().onPlayerLeave(player);
     }
 
