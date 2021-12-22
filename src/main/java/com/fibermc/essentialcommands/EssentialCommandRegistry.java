@@ -334,7 +334,21 @@ public class EssentialCommandRegistry {
                             .executes(new WorkbenchCommand())
                     );
 
+                    LiteralCommandNode<ServerCommandSource> stonecutterNode = dispatcher.register(
+                        CommandManager.literal("stonecutter")
+                            .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
+                            .executes(new StonecutterCommand())
+                    );
+
+                    LiteralCommandNode<ServerCommandSource> grindstoneNode = dispatcher.register(
+                        CommandManager.literal("grindstone")
+                            .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
+                            .executes(new GrindstoneCommand())
+                    );
+
                     essentialCommandsRootNode.addChild(workbenchNode);
+                    essentialCommandsRootNode.addChild(stonecutterNode);
+                    essentialCommandsRootNode.addChild(grindstoneNode);
                 }
 
                 if (CONFIG.ENABLE_ENDERCHEST.getValue()) {
@@ -345,6 +359,16 @@ public class EssentialCommandRegistry {
                     );
 
                     essentialCommandsRootNode.addChild(enderchestNode);
+                }
+
+                if (CONFIG.ENABLE_WASTEBIN.getValue()) {
+                    LiteralCommandNode<ServerCommandSource> wastebinNode = dispatcher.register(
+                        CommandManager.literal("wastebin")
+                            .requires(ECPerms.require(ECPerms.Registry.wastebin, 0))
+                            .executes(new WastebinCommand())
+                    );
+
+                    essentialCommandsRootNode.addChild(wastebinNode);
                 }
 
                 if (CONFIG.ENABLE_TOP.getValue()) {

@@ -1,8 +1,6 @@
 package com.fibermc.essentialcommands.types;
 
 import com.fibermc.essentialcommands.ECPerms;
-import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
