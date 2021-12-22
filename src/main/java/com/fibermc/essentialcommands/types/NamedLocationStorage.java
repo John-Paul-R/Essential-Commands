@@ -1,5 +1,6 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.types;
 
+import com.fibermc.essentialcommands.NbtSerializable;
 import com.fibermc.essentialcommands.commands.exceptions.ECExceptions;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

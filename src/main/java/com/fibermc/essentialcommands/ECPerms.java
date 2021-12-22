@@ -7,6 +7,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -28,6 +29,7 @@ public class ECPerms {
         public static final String warp_set = "essentialcommands.warp.set";
         public static final String warp_tp = "essentialcommands.warp.tp";
         public static final String warp_delete = "essentialcommands.warp.delete";
+        public static final String warp_tp_named = "essentialcommands.warp.tp_named";
         public static final String back = "essentialcommands.back";
         public static final String spawn_tp = "essentialcommands.spawn.tp";
         public static final String spawn_set = "essentialcommands.spawn.set";
@@ -61,12 +63,18 @@ public class ECPerms {
             public static final String[] config_group = {config_reload};
             public static String[] home_limit_group;
         }
+        public static String[] per_warp_permissions = null;
     }
 
     /**
      * Registers PermissionCheckEvent handler if permissions api enabled in config.
      */
     static void init() {
+        var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
+        Registry.per_warp_permissions = worldDataManager.getWarpNames().toArray(new String[0]);
+        worldDataManager.WARPS_LOAD_EVENT.register((warps) -> {
+            Registry.per_warp_permissions = warps.keySet().toArray(new String[0]);
+        });
         if (CONFIG.USE_PERMISSIONS_API.getValue()) {
             PermissionCheckEvent.EVENT.register((source, permission) -> {
                 if (isSuperAdmin(source)) {
@@ -82,15 +90,15 @@ public class ECPerms {
     }
 
 
-    static @NotNull Predicate<ServerCommandSource> require(@NotNull String permission, int defaultRequireLevel) {
+    public static @NotNull Predicate<ServerCommandSource> require(@NotNull String permission, int defaultRequireLevel) {
         return player -> check(player, permission, defaultRequireLevel);
     }
 
-    static @NotNull Predicate<ServerCommandSource> requireAny(@NotNull String[] permissions, int defaultRequireLevel) {
+    public static @NotNull Predicate<ServerCommandSource> requireAny(@NotNull String[] permissions, int defaultRequireLevel) {
         return player -> checkAny(player, permissions, defaultRequireLevel);
     }
 
-    static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
+    public static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
         if (CONFIG.USE_PERMISSIONS_API.getValue()) {
             return Permissions.getPermissionValue(source, permission).orElse(false);
         } else {
@@ -98,11 +106,11 @@ public class ECPerms {
         }
     }
 
-    static boolean check(@NotNull CommandSource source, @NotNull String permission) {
+    public static boolean check(@NotNull CommandSource source, @NotNull String permission) {
         return check(source, permission, 4);
     }
 
-    static boolean checkAny(@NotNull CommandSource source, @NotNull String[] permissions, int defaultRequireLevel) {
+    public static boolean checkAny(@NotNull CommandSource source, @NotNull String[] permissions, int defaultRequireLevel) {
         for (String permission : permissions) {
             if (check(source, permission, defaultRequireLevel)) {
                 return true;

@@ -1,5 +1,7 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import com.fibermc.essentialcommands.types.WarpStorage;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.network.ServerPlayerEntity;

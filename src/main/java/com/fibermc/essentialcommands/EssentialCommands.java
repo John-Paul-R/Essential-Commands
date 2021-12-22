@@ -38,9 +38,10 @@ public final class EssentialCommands implements ModInitializer {
 		//init mod stuff
 		ManagerLocator managers = ManagerLocator.getInstance();
 		managers.init();
-		ServerLifecycleEvents.SERVER_STARTING.register(managers::onServerStart);
-
-		ECPerms.init();
+		ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
+			managers.onServerStart(server);
+			ECPerms.init(); // ECPerms must start after WorldDataManager at present (for warps).
+		});
 
 		ECPlaceholderRegistry.register();
 

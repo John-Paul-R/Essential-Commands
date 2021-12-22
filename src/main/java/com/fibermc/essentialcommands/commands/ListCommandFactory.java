@@ -21,11 +21,11 @@ import static com.fibermc.essentialcommands.util.TextUtil.clickableTeleport;
 
 public class ListCommandFactory {
     // Specify leading response text, and supplier of list of strings/Text
-    public static Command<ServerCommandSource> create(String responsePreText, String commandExecText, SuggestionListProvider<Entry<String, MinecraftLocation>> suggestionsProvider) {
+    public static <T> Command<ServerCommandSource> create(String responsePreText, String commandExecText, SuggestionListProvider<Entry<String, T>> suggestionsProvider) {
         return (CommandContext<ServerCommandSource> context) -> {
             MutableText responseText = new LiteralText("");
             responseText.append(new LiteralText(responsePreText).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
-            Collection<Entry<String, MinecraftLocation>> suggestionsList = suggestionsProvider.getSuggestionList(context);
+            Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
             List<Text> suggestionTextList = suggestionsList.stream().map((entry) -> clickableTeleport(
                 new LiteralText(entry.getKey()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),

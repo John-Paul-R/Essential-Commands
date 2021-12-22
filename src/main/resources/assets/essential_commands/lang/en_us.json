@@ -56,6 +56,7 @@
   "cmd.warp.set.error.exists.2": "' could not be set. A warp with the specified name already exists.",
   "cmd.warp.location_name": "warp:%s",
   "cmd.warp.tp.error.not_found": "No warp with the name '%s' could be found.",
+  "cmd.warp.tp.error.permission": "Insufficient permissions to teleport to the warp '%s'. (Warp requires explicit permission)",
   "cmd.warp.list.start": "The available server Warps are: ",
   "cmd.workbench.feedback": "Opened workbench.",
   "cmd.workbench.container_ui_name": "EC Workbench",

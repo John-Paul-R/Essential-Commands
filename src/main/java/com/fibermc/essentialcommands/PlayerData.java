@@ -1,6 +1,8 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import com.fibermc.essentialcommands.types.WarpStorage;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.ladysnake.pal.Pal;

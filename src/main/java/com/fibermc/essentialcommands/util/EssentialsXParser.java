@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.NamedLocationStorage;
+import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerDataFactory;
 import com.fibermc.essentialcommands.mixin.PersistentStateManagerInvoker;

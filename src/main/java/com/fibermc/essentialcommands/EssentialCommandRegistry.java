@@ -35,7 +35,6 @@ public class EssentialCommandRegistry {
         CommandRegistrationCallback.EVENT.register(
             (CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) -> {
 
-                //TODO Command literals still get registered, they just don't do anything if disabled. Fix this.
                 RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
 
                 LiteralCommandNode<ServerCommandSource> ecInfoNode = CommandManager.literal("info")
@@ -171,7 +170,9 @@ public class EssentialCommandRegistry {
                     warpSetBuilder
                         .requires(ECPerms.require(ECPerms.Registry.warp_set, 4))
                         .then(argument("warp_name", StringArgumentType.word())
-                            .executes(new WarpSetCommand()));
+                            .executes(new WarpSetCommand())
+                            .then(argument("requires_permission", BoolArgumentType.bool())
+                                .executes(new WarpSetCommand())));
 
                     warpTpBuilder
                         .requires(ECPerms.require(ECPerms.Registry.warp_tp, 0))
