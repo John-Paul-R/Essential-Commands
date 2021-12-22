@@ -38,7 +38,6 @@ public class WastebinCommand implements Command<ServerCommandSource> {
         return new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> {
             return GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, new SimpleInventory(27));
         }, ECText.getInstance().getText("cmd.wastebin.container_ui_name"));
-
     }
 
 }
