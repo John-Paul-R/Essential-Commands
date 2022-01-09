@@ -9,23 +9,27 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Material;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.Random;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import static com.fibermc.essentialcommands.commands.TopCommand.getTop;
 
 /**
  * Heavily referenced from
  * https://github.com/javachaos/randomteleport/blob/master/src/main/java/net.ethermod/commands/RandomTeleportCommand.java
+ *
+ * Additionally, tons of optimization tips & examples provided by @Wesley1808 on GitHub:
+ * https://github.com/Wesley1808/ServerCore/issues/16
  */
 
 public class RandomTeleportCommand implements Command<ServerCommandSource> {
@@ -103,37 +107,39 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return exec(source.getPlayer(), world, center, 0);
     }
 
+    private static int maxY; // FIXME: Multithreaded access is yikes here. Generally hate this pattern. Move away form static int.
     private static int exec(ServerPlayerEntity player, ServerWorld world, MinecraftLocation center, int timesRun) {
         if (timesRun > CONFIG.RTP_MAX_ATTEMPTS.getValue()) {
             return -1;
         }
+        maxY = world.getHeight(); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
         // Calculate position on circle perimeter
         int r = CONFIG.RTP_RADIUS.getValue();
-        double angle = (new Random()).nextDouble()*2*Math.PI;
-        double delta_x = r * Math.cos(angle);
-        double delta_z = r * Math.sin(angle);
+        final double angle = (new Random()).nextDouble()*2*Math.PI;
+        final double delta_x = r * Math.cos(angle);
+        final double delta_z = r * Math.sin(angle);
 
-        double new_x = center.pos.x + delta_x;
-        double new_z = center.pos.z + delta_z;
+        final double new_x = center.pos.x + delta_x;
+        final double new_z = center.pos.z + delta_z;
 
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
-        // TODO Can maybe run a loop that checks every-other block? (player is 2 blocks high)
         int new_y;
-        Stopwatch timer = Stopwatch.createStarted();
-        BlockHitResult blockHitResult = world.raycast(new RaycastContext(
-            new Vec3d(new_x, world.getHeight(), new_z),
-            new Vec3d(new_x, 1, new_z),
-            RaycastContext.ShapeType.COLLIDER,
-            RaycastContext.FluidHandling.SOURCE_ONLY,
-            player
-        ));
-        new_y = blockHitResult.getBlockPos().getY() + 1;
+        final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
 
-        EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time", timer.stop()).getString());
+        Chunk chunk = world.getChunk(targetXZ);
+        if (!isBiomeValid(world.getBiome(targetXZ))) {
+            exec(player, world, center, timesRun + 1);
+        }
+
+        {
+            Stopwatch timer = Stopwatch.createStarted();
+            new_y = getTop(chunk, (int)new_x, (int)new_z);
+            EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time", timer.stop()).getString());
+        }
 
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
         //  Addressed by adding timesRun limit.
-        if (world.isWater(new BlockPos(new_x, new_y-2, new_z))) {
+        if (!isSafePosition(chunk, new BlockPos(new_x, new_y-2, new_z))) {
             return exec(player, world, center, timesRun + 1);
         }
 
@@ -146,5 +152,26 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         return 1;
     }
+
+    private static boolean isSafePosition(Chunk chunk, BlockPos pos) {
+        if (pos.getY() <= chunk.getBottomY()) {
+            return false;
+        }
+
+        var material = chunk.getBlockState(pos).getMaterial();
+        return pos.getY() < maxY && !material.isLiquid() && material != Material.FIRE;
+    }
+
+    private static boolean isBiomeValid(Biome biome) {
+        final Biome.Category category = biome.getCategory();
+        return
+            category != Biome.Category.OCEAN
+            && category != Biome.Category.RIVER
+            && category != Biome.Category.BEACH
+            && category != Biome.Category.SWAMP
+            && category != Biome.Category.UNDERGROUND
+            && category != Biome.Category.NONE;
+    }
+
 
 }
