@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands;
+package com.fibermc.essentialcommands.commands.bench;
 
 import com.fibermc.essentialcommands.ECText;
 import com.mojang.brigadier.Command;
@@ -11,6 +11,8 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -34,11 +36,12 @@ public class GrindstoneCommand implements Command<ServerCommandSource> {
         return 0;
     }
 
-    private NamedScreenHandlerFactory createScreenHandlerFactory(World world, BlockPos pos) {
-        return new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> {
-            return new GrindstoneScreenHandler(syncId, inventory);
-        }, ECText.getInstance().getText("cmd.grindstone.container_ui_name"));
-
+    private @NotNull NamedScreenHandlerFactory createScreenHandlerFactory(World world, BlockPos pos) {
+        return new SimpleNamedScreenHandlerFactory(
+            (syncId, inventory, player) ->
+                new GrindstoneScreenHandler(syncId, inventory),
+            ECText.getInstance().getText("cmd.grindstone.container_ui_name")
+        );
     }
 
 }

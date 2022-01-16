@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands;
+package com.fibermc.essentialcommands.commands.bench;
 
 import com.fibermc.essentialcommands.ECText;
 import com.mojang.brigadier.Command;
@@ -12,6 +12,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -36,11 +38,12 @@ public class EnderchestCommand implements Command<ServerCommandSource> {
         return 0;
     }
 
-    private NamedScreenHandlerFactory createScreenHandlerFactory(World world, BlockPos pos) {
-        return new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> {
-            return GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, player.getEnderChestInventory());
-        }, ECText.getInstance().getText("cmd.enderchest.container_ui_name"));
-
+    private @NotNull NamedScreenHandlerFactory createScreenHandlerFactory(World world, BlockPos pos) {
+        return new SimpleNamedScreenHandlerFactory(
+            (syncId, inventory, player) ->
+                GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, player.getEnderChestInventory()),
+            ECText.getInstance().getText("cmd.enderchest.container_ui_name")
+        );
     }
 
 }

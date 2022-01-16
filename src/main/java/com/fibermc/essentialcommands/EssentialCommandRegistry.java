@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.*;
+import com.fibermc.essentialcommands.commands.bench.*;
 import com.fibermc.essentialcommands.commands.suggestions.*;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
 import com.fibermc.essentialcommands.util.TextUtil;
@@ -10,8 +11,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -311,6 +310,13 @@ public class EssentialCommandRegistry {
             registerNode.accept(CommandManager.literal("grindstone")
                 .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
                 .executes(new GrindstoneCommand())
+                .build());
+        }
+
+        if (CONFIG.ENABLE_ANVIL.getValue()) {
+            registerNode.accept(CommandManager.literal("anvil")
+                .requires(ECPerms.require(ECPerms.Registry.anvil, 0))
+                .executes(new AnvilCommand())
                 .build());
         }
 
