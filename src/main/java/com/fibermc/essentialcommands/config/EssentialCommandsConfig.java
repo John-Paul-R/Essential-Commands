@@ -8,10 +8,12 @@ import dev.jpcode.eccore.config.Option;
 import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 import static dev.jpcode.eccore.config.ConfigUtil.arrayParser;
 import static dev.jpcode.eccore.config.ConfigUtil.parseStyle;
 import static dev.jpcode.eccore.util.TextUtil.parseText;
@@ -38,7 +40,7 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<Boolean> ENABLE_ESSENTIALSX_CONVERT = new Option<>("enable_experimental_essentialsx_converter", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_TOP =             new Option<>("enable_top", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_GAMETIME =        new Option<>("enable_gametime", true, Boolean::parseBoolean);
-    @ConfigOption public final Option<Boolean> ENABLE_MOTD =             new Option<>("enable_motd", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_MOTD =            new Option<>("enable_motd", false, Boolean::parseBoolean);
     @ConfigOption public final Option<List<Integer>> HOME_LIMIT =       new Option<>("home_limit", List.of(1, 2, 5), arrayParser(ConfigUtil::parseInt));
     @ConfigOption public final Option<Double>  TELEPORT_COOLDOWN =      new Option<>("teleport_cooldown", 1.0, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Double>  TELEPORT_DELAY =         new Option<>("teleport_delay", 0.0, ConfigUtil::parseDouble);
@@ -62,9 +64,21 @@ public final class EssentialCommandsConfig extends Config {
 
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);
-        HOME_LIMIT.changeEvent.register((newValue ->
-                ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue))
+        HOME_LIMIT.changeEvent.register(newValue ->
+                ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue)
         );
+    }
+
+    public static <T> T getValueSafe(@NotNull Option<T> option, T defaultValue) {
+        try {
+            return option.getValue();
+        } catch (Exception ex) {
+            // Someone was getting an error with eccore/config/Option not being found when Option.getValue() was called
+            // from within ServerPlayerEntityMixin. I can't reproduce, but /shrug
+            // We're actually catching a ClassNotFoundException due to mixin weirdness, I think...
+            LOGGER.error(ex);
+        }
+        return defaultValue;
     }
 
 }

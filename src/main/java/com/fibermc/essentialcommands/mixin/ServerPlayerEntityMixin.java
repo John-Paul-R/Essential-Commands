@@ -5,15 +5,13 @@ import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerDataFactory;
 import com.fibermc.essentialcommands.QueuedTeleport;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.WorldProperties;
@@ -84,7 +82,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
 
     @Inject(method = "getPlayerListName", at = @At("RETURN"), cancellable = true)
     public void getPlayerListName(CallbackInfoReturnable<Text> cir) {
-        if (CONFIG.NICKNAMES_IN_PLAYER_LIST.getValue()) {
+        if (EssentialCommandsConfig.getValueSafe(CONFIG.NICKNAMES_IN_PLAYER_LIST, true)) {
             cir.setReturnValue(((ServerPlayerEntity)(Object)this).getDisplayName());
             cir.cancel();
         }
