@@ -77,14 +77,6 @@ public class ECPerms {
         worldDataManager.WARPS_LOAD_EVENT.register((warps) -> {
             Registry.per_warp_permissions = warps.keySet().toArray(new String[0]);
         });
-        if (CONFIG.USE_PERMISSIONS_API.getValue()) {
-            PermissionCheckEvent.EVENT.register((source, permission) -> {
-                if (isSuperAdmin(source)) {
-                    return TriState.TRUE;
-                }
-                return TriState.DEFAULT;
-            });
-        }
     }
 
     private static boolean isSuperAdmin(CommandSource source) {
