@@ -94,7 +94,8 @@ public class ECPerms {
 
     public static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
         if (CONFIG.USE_PERMISSIONS_API.getValue()) {
-            return Permissions.getPermissionValue(source, permission).orElse(false);
+            // TODO: In the future, config option for granting ops all perms.
+            return Permissions.getPermissionValue(source, permission).orElse(source.hasPermissionLevel(4));
         } else {
             return (source.hasPermissionLevel(defaultRequireLevel) ? TriState.TRUE:TriState.FALSE).orElse(false);
         }
