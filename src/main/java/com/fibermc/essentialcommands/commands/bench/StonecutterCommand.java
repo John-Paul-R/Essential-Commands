@@ -1,21 +1,19 @@
 package com.fibermc.essentialcommands.commands.bench;
 
 import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.screen.CraftingCommandScreenHandler;
+import com.fibermc.essentialcommands.screen.StonecutterCommandScreenHandler;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.screen.StonecutterScreenHandler;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
@@ -43,7 +41,7 @@ public class StonecutterCommand implements Command<ServerCommandSource> {
     private @NotNull NamedScreenHandlerFactory createScreenHandlerFactory(World world, BlockPos pos) {
         return new SimpleNamedScreenHandlerFactory(
             (syncId, inventory, player) ->
-                new StonecutterScreenHandler(syncId, inventory),
+                new StonecutterCommandScreenHandler(syncId, inventory, ScreenHandlerContext.create(world, pos)),
             ECText.getInstance().getText("cmd.stonecutter.container_ui_name")
         );
     }
