@@ -11,7 +11,8 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Language;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class AnvilCommand implements Command<ServerCommandSource> {
         senderPlayer.incrementStat(Stats.INTERACT_WITH_ANVIL);
 
         source.sendFeedback(
-            new LiteralText("Opened anvil.").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+            ECText.getInstance().getText("cmd.workbench.feedback", Language.getInstance().get("block.minecraft.anvil")),
             CONFIG.BROADCAST_TO_OPS.getValue()
         );
 
@@ -42,7 +43,7 @@ public class AnvilCommand implements Command<ServerCommandSource> {
         return new SimpleNamedScreenHandlerFactory(
             (syncId, inventory, player) ->
                 new AnvilCommandScreenHandler(syncId, inventory, ScreenHandlerContext.create(world, pos)),
-            ECText.getInstance().getText("cmd.anvil.container_ui_name")
+            new TranslatableText("block.minecraft.anvil")
         );
     }
 

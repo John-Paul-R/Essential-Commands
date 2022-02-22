@@ -10,6 +10,8 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Language;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +32,7 @@ public class EnderchestCommand implements Command<ServerCommandSource> {
         senderPlayer.incrementStat(Stats.OPEN_ENDERCHEST);
 
         source.sendFeedback(
-            ECText.getInstance().getText("cmd.enderchest.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+            ECText.getInstance().getText("cmd.workbench.feedback", Language.getInstance().get("container.enderchest")),
             CONFIG.BROADCAST_TO_OPS.getValue()
         );
 
@@ -41,7 +43,7 @@ public class EnderchestCommand implements Command<ServerCommandSource> {
         return new SimpleNamedScreenHandlerFactory(
             (syncId, inventory, player) ->
                 GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, player.getEnderChestInventory()),
-            ECText.getInstance().getText("cmd.enderchest.container_ui_name")
+            new TranslatableText("container.enderchest")
         );
     }
 

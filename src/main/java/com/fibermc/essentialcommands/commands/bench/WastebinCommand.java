@@ -11,6 +11,7 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +30,7 @@ public class WastebinCommand implements Command<ServerCommandSource> {
         senderPlayer.openHandledScreen(createScreenHandlerFactory(senderPlayer.getEntityWorld(), senderPlayer.getBlockPos()));
 
         source.sendFeedback(
-            new LiteralText("Opened wastebin.").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+            ECText.getInstance().getText("cmd.workbench.feedback", ECText.getInstance().get("cmd.wastebin.name")),
             CONFIG.BROADCAST_TO_OPS.getValue()
         );
 
@@ -40,7 +41,7 @@ public class WastebinCommand implements Command<ServerCommandSource> {
         return new SimpleNamedScreenHandlerFactory(
             (syncId, inventory, player) ->
                 GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, new SimpleInventory(27)),
-            ECText.getInstance().getText("cmd.wastebin.container_ui_name")
+            ECText.getInstance().getText("cmd.wastebin.name").setStyle(Style.EMPTY)
         );
     }
 
