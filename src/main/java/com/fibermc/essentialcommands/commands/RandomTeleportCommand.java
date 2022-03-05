@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.mixin.BiomeInvoker;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.google.common.base.Stopwatch;
@@ -127,7 +128,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
 
         Chunk chunk = world.getChunk(targetXZ);
-        if (!isBiomeValid(world.getBiome(targetXZ))) {
+        if (!isBiomeValid(world.getBiome(targetXZ).value())) {
             exec(player, world, center, timesRun + 1);
         }
 
@@ -163,7 +164,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     }
 
     private static boolean isBiomeValid(Biome biome) {
-        final Biome.Category category = biome.getCategory();
+        final Biome.Category category = ((BiomeInvoker)(Object) biome).invokeGetCategory();
         return
             category != Biome.Category.OCEAN
             && category != Biome.Category.RIVER
