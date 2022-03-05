@@ -36,9 +36,6 @@ public class ManagerLocator {
     static boolean teleportRequestEnabled() {
         return (CONFIG.ENABLE_TPA.getValue());
     }
-    static boolean warpEnabled() {
-        return (CONFIG.ENABLE_TPA.getValue() || CONFIG.ENABLE_SPAWN.getValue());
-    }
 
     public void init() {
         if (playerDataEnabled()) {
@@ -50,16 +47,9 @@ public class ManagerLocator {
     }
 
     public void onServerStart(MinecraftServer server) {
-        if (playerDataEnabled()) {
-            this.playerDataManager = PlayerDataManager.getInstance();
-        }
-        if (teleportRequestEnabled()) {
-            this.tpManager = new TeleportRequestManager(this.playerDataManager);
-        }
-        if (warpEnabled()) {
-            this.worldDataManager = new WorldDataManager();
-            this.worldDataManager.onServerStart(server);
-        }
+        this.playerDataManager = PlayerDataManager.getInstance();
+        this.tpManager = new TeleportRequestManager(this.playerDataManager);
+        this.worldDataManager = WorldDataManager.createForServer(server);
     }
 
     public PlayerDataManager getPlayerDataManager() {

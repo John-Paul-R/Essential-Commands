@@ -38,7 +38,6 @@ public final class EssentialCommands implements ModInitializer {
 		managers.init();
 		ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
 			managers.onServerStart(server);
-//			server.getOverworld().getChunkManager().addTicket();
 			ECPerms.init(); // ECPerms must start after WorldDataManager at present (for warps).
 		});
 

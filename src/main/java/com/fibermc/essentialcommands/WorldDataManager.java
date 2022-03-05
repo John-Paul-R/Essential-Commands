@@ -37,6 +37,13 @@ public class WorldDataManager extends PersistentState {
         spawnLocation = null;
     }
 
+    public static WorldDataManager createForServer(MinecraftServer server)
+    {
+        var worldDataManager = new WorldDataManager();
+        worldDataManager.onServerStart(server);
+        return worldDataManager;
+    }
+
     public void onServerStart(MinecraftServer server) {
         this.saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("essentialcommands");
         try {
