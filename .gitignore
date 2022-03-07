@@ -34,3 +34,10 @@ run/
 
 # env
 .env
+
+*.orig
+changelog*.md
+cfmd.py
+*cf.md
+showcase.md
+temp.md
