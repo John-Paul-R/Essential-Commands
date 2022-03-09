@@ -39,8 +39,6 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        int resultCode = -1;
-
         ServerPlayerEntity player = context.getSource().getPlayer();
         ServerWorld world = context.getSource().getWorld();
 
@@ -52,7 +50,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             return -3;
         }
 
-        Thread thread = new Thread("RTP Location Calculator Thread") {
+        var thread = new Thread("RTP Location Calculator Thread") {
             public void run() {
                 try {
                     exec(context.getSource(), world);
@@ -65,27 +63,22 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         //TODO Add OP/Permission bypass for RTP cooldown.
         if (CONFIG.RTP_COOLDOWN.getValue() > 0) {
             ServerCommandSource source = context.getSource();
-            int ticks = source.getServer().getTicks();
+            int curServerTickTime = source.getServer().getTicks();
             PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
-            // if cooldown has expired
-            if (playerData.getRtpNextUsableTime() < ticks) {
-                playerData.setRtpNextUsableTime(ticks + CONFIG.RTP_COOLDOWN.getValue()*20);
-                thread.start();
-                resultCode = 1;
-            } else {
+            if (playerData.getRtpNextUsableTime() >= curServerTickTime) {
                 source.sendError(TextUtil.concat(
                     ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                    new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - ticks)/20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                    new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - curServerTickTime)/20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                     ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
                 ));
-                resultCode = -2;
+                return -2;
+            } else { // if cooldown has expired
+                playerData.setRtpNextUsableTime(curServerTickTime + CONFIG.RTP_COOLDOWN.getValue()*20);
             }
-        } else {
-            thread.start();
-            resultCode = 1;
         }
 
-        return resultCode;
+        thread.start();
+        return 1;
     }
 
     private static boolean isValidSpawnPosition(ServerWorld world, double x, double y, double z) {
@@ -100,20 +93,20 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         MinecraftLocation center = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
         if (center == null) {
             source.sendError(TextUtil.concat(
-                    ECText.getInstance().getText("cmd.rtp.error.pre"),
-                    ECText.getInstance().getText("cmd.rtp.error.no_spawn_set")
+                ECText.getInstance().getText("cmd.rtp.error.pre"),
+                ECText.getInstance().getText("cmd.rtp.error.no_spawn_set")
             ));
             return -1;
         }
         return exec(source.getPlayer(), world, center, 0);
     }
 
-    private static int maxY; // FIXME: Multithreaded access is yikes here. Generally hate this pattern. Move away form static int.
+    private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
     private static int exec(ServerPlayerEntity player, ServerWorld world, MinecraftLocation center, int timesRun) {
         if (timesRun > CONFIG.RTP_MAX_ATTEMPTS.getValue()) {
             return -1;
         }
-        maxY = world.getHeight(); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
+        maxY.set(world.getHeight()); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
         // Calculate position on circle perimeter
         int r = CONFIG.RTP_RADIUS.getValue();
         final double angle = (new Random()).nextDouble()*2*Math.PI;
@@ -129,7 +122,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         Chunk chunk = world.getChunk(targetXZ);
         if (!isBiomeValid(world.getBiome(targetXZ).value())) {
-            exec(player, world, center, timesRun + 1);
+            return exec(player, world, center, timesRun + 1);
         }
 
         {
@@ -160,7 +153,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         }
 
         var material = chunk.getBlockState(pos).getMaterial();
-        return pos.getY() < maxY && !material.isLiquid() && material != Material.FIRE;
+        return pos.getY() < maxY.get() && !material.isLiquid() && material != Material.FIRE;
     }
 
     private static boolean isBiomeValid(Biome biome) {
