@@ -17,11 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 public class HomeTeleportOtherCommand extends HomeCommand implements Command<ServerCommandSource> {
 
-    public HomeTeleportOtherCommand() {
-    }
+    public HomeTeleportOtherCommand() {}
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {

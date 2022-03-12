@@ -14,13 +14,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 public class HomeCommand implements Command<ServerCommandSource> {
 
@@ -28,10 +26,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess)senderPlayer).getEcPlayerData();
-        //Store home name
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return exec(senderPlayerData, homeName);
@@ -66,22 +61,17 @@ public class HomeCommand implements Command<ServerCommandSource> {
     }
 
     public static int exec(PlayerData senderPlayerData, PlayerData targetPlayerData, String homeName) throws CommandSyntaxException {
-        int out;
-
         //Get home location
         MinecraftLocation loc = targetPlayerData.getHomeLocation(homeName);
 
-        // Teleport & chat message
-        if (loc != null) {
-            //Teleport player to home location
-            PlayerTeleporter.requestTeleport(senderPlayerData, loc, ECText.getInstance().getText("cmd.home.location_name", homeName));
-            out = 1;
-        } else {
+        if (loc == null) {
             Message msg = ECText.getInstance().getText("cmd.home.tp.error.not_found", "null");
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
         }
 
-        return out;
+        // Teleport & chat message
+        PlayerTeleporter.requestTeleport(senderPlayerData, loc, ECText.getInstance().getText("cmd.home.location_name", homeName));
+        return 1;
     }
 
     public static class Suggestion {

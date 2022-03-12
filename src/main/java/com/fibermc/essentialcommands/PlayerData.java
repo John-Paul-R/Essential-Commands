@@ -2,7 +2,6 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
-import com.fibermc.essentialcommands.types.WarpStorage;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.ladysnake.pal.Pal;
@@ -15,12 +14,14 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.world.PersistentState;
 
 import java.io.File;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -37,7 +38,7 @@ public class PlayerData extends PersistentState {
     // Target of tpAsk
     private TeleportRequest teleportRequest;
 
-    // players that have Asked to tp to this player
+    // players that have asked to teleport to this player
     // This list exists for autofilling the 'tpaccept' command
     private final LinkedHashMap<UUID, TeleportRequest> incomingTeleportRequests;
 
@@ -145,7 +146,11 @@ public class PlayerData extends PersistentState {
     }
 
     public void sendError(Text message) {
-        this.player.sendSystemMessage((new LiteralText("")).append(message).formatted(Formatting.RED), Util.NIL_UUID);
+        this.player.sendSystemMessage(
+            new LiteralText("")
+                .append(message)
+                .setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+            Util.NIL_UUID);
     }
 
     public Set<String> getHomeNames() {
@@ -207,15 +212,19 @@ public class PlayerData extends PersistentState {
         return this.previousLocation;
     }
 
+    /**
+     * Removes a home & persists changes to storage. Permanent.
+     * @param homeName The name of the home to remove.
+     * @return `true` if a home was successfully removed. `false` if there was
+     * no home with the specified name.
+     */
     public boolean removeHome(String homeName) {
-        //returns false if home does not exist - true if successful
-        boolean out = false;
         MinecraftLocation old = this.homes.remove(homeName);
         if (old != null) {
-            out = true;
             this.markDirty();
+            return true;
         }
-        return out;
+        return false;
     }
 
     public void updatePlayer(ServerPlayerEntity serverPlayerEntity) {
@@ -259,10 +268,27 @@ public class PlayerData extends PersistentState {
     }
 
     public MutableText getNickname() {
-        return Objects.nonNull(nickname) ? nickname.shallowCopy() : null;
+        return nickname != null ? nickname.shallowCopy() : null;
     }
     public MutableText getFullNickname() {
-        return Objects.nonNull(fullNickname) ? fullNickname : null;
+        return fullNickname;
+    }
+    public MutableText copyFullNickname() {
+        return fullNickname != null ? deepCopyText(fullNickname) : null;
+    }
+
+    private static MutableText deepCopyText(Text text) {
+        if (text.getSiblings().isEmpty()) {
+            return text.shallowCopy();
+        }
+
+        var siblings = text.getSiblings();
+        var newSiblings = siblings.stream()
+            .map(PlayerData::deepCopyText)
+            .toList();
+        siblings.clear();
+        siblings.addAll(newSiblings);
+        return text.shallowCopy();
     }
 
     public int setNickname(Text nickname) {
