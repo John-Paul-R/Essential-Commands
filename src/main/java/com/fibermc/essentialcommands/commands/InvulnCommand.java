@@ -2,17 +2,13 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.jpcode.eccore.util.TextUtil;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;

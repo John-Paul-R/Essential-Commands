@@ -3,11 +3,11 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.WorldDataManager;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 

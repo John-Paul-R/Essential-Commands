@@ -2,8 +2,8 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.jpcode.eccore.util.TextUtil;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
 import net.minecraft.entity.player.PlayerAbilities;
@@ -274,21 +274,7 @@ public class PlayerData extends PersistentState {
         return fullNickname;
     }
     public MutableText copyFullNickname() {
-        return fullNickname != null ? deepCopyText(fullNickname) : null;
-    }
-
-    private static MutableText deepCopyText(Text text) {
-        if (text.getSiblings().isEmpty()) {
-            return text.shallowCopy();
-        }
-
-        var siblings = text.getSiblings();
-        var newSiblings = siblings.stream()
-            .map(PlayerData::deepCopyText)
-            .toList();
-        siblings.clear();
-        siblings.addAll(newSiblings);
-        return text.shallowCopy();
+        return fullNickname != null ? TextUtil.deepCopy(fullNickname) : null;
     }
 
     public int setNickname(Text nickname) {

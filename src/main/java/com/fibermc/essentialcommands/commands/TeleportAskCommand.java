@@ -2,10 +2,10 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;

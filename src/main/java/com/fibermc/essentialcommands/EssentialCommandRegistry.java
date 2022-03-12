@@ -7,13 +7,13 @@ import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggest
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;

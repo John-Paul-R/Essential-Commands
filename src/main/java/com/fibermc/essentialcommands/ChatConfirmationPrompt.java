@@ -1,10 +1,10 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.CommandUtil;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
+import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;

@@ -2,10 +2,9 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
-import com.fibermc.essentialcommands.types.MinecraftLocation;
-import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
+import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -17,7 +16,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-import static com.fibermc.essentialcommands.util.TextUtil.clickableTeleport;
+import static dev.jpcode.eccore.util.TextUtil.clickableTeleport;
 
 public class ListCommandFactory {
     // Specify leading response text, and supplier of list of strings/Text
