@@ -1,13 +1,11 @@
 package com.fibermc.essentialcommands;
 
-import me.lucko.fabric.api.permissions.v0.PermissionCheckEvent;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -25,6 +23,7 @@ public class ECPerms {
         public static final String tpdeny = "essentialcommands.tpdeny";
         public static final String home_set = "essentialcommands.home.set";
         public static final String home_tp = "essentialcommands.home.tp";
+        public static final String home_tp_others = "essentialcommands.home_tp_others";
         public static final String home_delete = "essentialcommands.home.delete";
         public static final String warp_set = "essentialcommands.warp.set";
         public static final String warp_tp = "essentialcommands.warp.tp";

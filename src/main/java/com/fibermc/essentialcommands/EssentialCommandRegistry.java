@@ -2,7 +2,10 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.bench.*;
-import com.fibermc.essentialcommands.commands.suggestions.*;
+import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
+import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
+import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
+import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
 import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
@@ -11,6 +14,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -90,6 +94,7 @@ public class EssentialCommandRegistry {
             LiteralArgumentBuilder<ServerCommandSource> homeBuilder = CommandManager.literal("home");
             LiteralArgumentBuilder<ServerCommandSource> homeSetBuilder = CommandManager.literal("set");
             LiteralArgumentBuilder<ServerCommandSource> homeTpBuilder = CommandManager.literal("tp");
+            LiteralArgumentBuilder<ServerCommandSource> homeTpOtherBuilder = CommandManager.literal("tp_other");
             LiteralArgumentBuilder<ServerCommandSource> homeDeleteBuilder = CommandManager.literal("delete");
             LiteralArgumentBuilder<ServerCommandSource> homeListBuilder = CommandManager.literal("list");
 
@@ -102,13 +107,20 @@ public class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                 .executes(new HomeCommand()::runDefault)
                 .then(argument("home_name", StringArgumentType.word())
-                    .suggests(HomeSuggestion.suggestedStrings())
+                    .suggests(HomeCommand.Suggestion.suggestedStrings)
                     .executes(new HomeCommand()));
+
+            homeTpOtherBuilder
+                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 4))
+                .then(argument("target_player", EntityArgumentType.player())
+                    .then(argument("home_name", StringArgumentType.word())
+                        .suggests(HomeTeleportOtherCommand.Suggestion.suggestedStrings)
+                        .executes(new HomeTeleportOtherCommand())));
 
             homeDeleteBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_delete, 0))
                 .then(argument("home_name", StringArgumentType.word())
-                    .suggests(HomeSuggestion.suggestedStrings())
+                    .suggests(HomeCommand.Suggestion.suggestedStrings)
                     .executes(new HomeDeleteCommand()));
 
             homeListBuilder
@@ -116,13 +128,13 @@ public class EssentialCommandRegistry {
                 .executes(ListCommandFactory.create(
                     ECText.getInstance().get("cmd.home.list.start"),
                     "home tp",
-                    HomeSuggestion::getSuggestionEntries
-                ));
+                    HomeCommand.Suggestion::getSuggestionEntries));
 
             LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder
                 .requires(ECPerms.requireAny(ECPerms.Registry.Group.home_group, 0))
                 .build();
             homeNode.addChild(homeTpBuilder.build());
+            homeNode.addChild(homeTpOtherBuilder.build());
             homeNode.addChild(homeSetBuilder.build());
             homeNode.addChild(homeDeleteBuilder.build());
             homeNode.addChild(homeListBuilder.build());
