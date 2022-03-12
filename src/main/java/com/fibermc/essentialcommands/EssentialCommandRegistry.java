@@ -107,20 +107,20 @@ public class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                 .executes(new HomeCommand()::runDefault)
                 .then(argument("home_name", StringArgumentType.word())
-                    .suggests(HomeCommand.Suggestion.suggestedStrings)
+                    .suggests(HomeCommand.Suggestion.LIST_SUGGESTION_PROVIDER)
                     .executes(new HomeCommand()));
 
             homeTpOtherBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 4))
                 .then(argument("target_player", EntityArgumentType.player())
                     .then(argument("home_name", StringArgumentType.word())
-                        .suggests(HomeTeleportOtherCommand.Suggestion.suggestedStrings)
+                        .suggests(HomeTeleportOtherCommand.Suggestion.LIST_SUGGESTION_PROVIDER)
                         .executes(new HomeTeleportOtherCommand())));
 
             homeDeleteBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_delete, 0))
                 .then(argument("home_name", StringArgumentType.word())
-                    .suggests(HomeCommand.Suggestion.suggestedStrings)
+                    .suggests(HomeCommand.Suggestion.LIST_SUGGESTION_PROVIDER)
                     .executes(new HomeDeleteCommand()));
 
             homeListBuilder

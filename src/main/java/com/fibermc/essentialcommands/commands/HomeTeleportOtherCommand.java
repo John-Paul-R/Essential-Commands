@@ -48,7 +48,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
 
     public static class Suggestion {
         //Brigader Suggestions
-        public static final SuggestionProvider<ServerCommandSource> suggestedStrings
+        public static final SuggestionProvider<ServerCommandSource> LIST_SUGGESTION_PROVIDER
             = ListSuggestion.ofContext(HomeTeleportOtherCommand.Suggestion::getSuggestionsList);
 
         /**
