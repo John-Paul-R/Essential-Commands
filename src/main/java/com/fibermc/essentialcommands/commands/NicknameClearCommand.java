@@ -6,7 +6,6 @@ import com.fibermc.essentialcommands.util.TextUtil;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -20,7 +19,6 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
-
         ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
         targetPlayerEntityAccess.getEcPlayerData().setNickname(null);
 

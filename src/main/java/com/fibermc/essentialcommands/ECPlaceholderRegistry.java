@@ -15,10 +15,10 @@ class ECPlaceholderRegistry {
                 if (ctx.hasPlayer()) {
                     return PlaceholderResult.value(
                         ((ServerPlayerEntityAccess)ctx.getPlayer())
-                            .getEcPlayerData().getFullNickname());
-                } else {
-                    return PlaceholderResult.invalid("No player!");
+                            .getEcPlayerData()
+                            .getFullNickname());
                 }
+                return PlaceholderResult.invalid("No player!");
             }
         );
 

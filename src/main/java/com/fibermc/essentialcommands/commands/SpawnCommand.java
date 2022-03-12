@@ -13,33 +13,29 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-
 public class SpawnCommand implements Command<ServerCommandSource> {
 
-    public SpawnCommand() {
-    }
+    public SpawnCommand() {}
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        int out;
-        //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
-
-        //Get home location
         MinecraftLocation loc = worldDataManager.getSpawn();
 
-        // Teleport & chat message
-        if (loc != null) {
-            //Teleport player to home location
-            PlayerTeleporter.requestTeleport(senderPlayer, loc, ECText.getInstance().getText("cmd.spawn.location_name"));
-            out = 1;
-        } else {
-            context.getSource().sendError(ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set").setStyle(CONFIG.FORMATTING_ERROR.getValue()));
-            out = -2;
+        if (loc == null) {
+            context.getSource().sendError(
+                ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set").setStyle(CONFIG.FORMATTING_ERROR.getValue()));
+            return -2;
         }
 
-        return out;
+        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+
+        // Teleport & chat message
+        PlayerTeleporter.requestTeleport(
+            senderPlayer,
+            loc,
+            ECText.getInstance().getText("cmd.spawn.location_name"));
+        return 1;
     }
 
 }

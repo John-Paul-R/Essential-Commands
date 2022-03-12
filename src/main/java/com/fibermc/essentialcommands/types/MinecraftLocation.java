@@ -9,7 +9,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
-
 public class MinecraftLocation {
 
     public final Vec3d pos;
@@ -68,5 +67,5 @@ public class MinecraftLocation {
     public LiteralText toLiteralTextSimple() {
         return new LiteralText(String.format("(%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
     }
-    
+
 }

@@ -45,7 +45,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         if (!world.getRegistryKey().equals(World.OVERWORLD)) {
             context.getSource().sendError(TextUtil.concat(
                 ECText.getInstance().getText("cmd.rtp.error.pre").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                ECText.getInstance().getText("cmdcmd.rtp.error.not_overworld").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+                ECText.getInstance().getText("cmd.rtp.error.not_overworld").setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ));
             return -3;
         }
@@ -166,6 +166,5 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             && category != Biome.Category.UNDERGROUND
             && category != Biome.Category.NONE;
     }
-
 
 }

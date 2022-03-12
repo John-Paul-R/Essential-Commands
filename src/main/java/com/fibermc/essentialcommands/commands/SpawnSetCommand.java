@@ -12,7 +12,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-
 public class SpawnSetCommand implements Command<ServerCommandSource> {
 
     public SpawnSetCommand() {}
@@ -20,12 +19,8 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-
         ServerCommandSource source = context.getSource();
-        //Store command sender
         ServerPlayerEntity senderPlayer = source.getPlayer();
-
-        int successCode = 1;
 
         //Set spawn
         MinecraftLocation loc = new MinecraftLocation(senderPlayer);
@@ -37,6 +32,6 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
                 .append(loc.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
             , CONFIG.BROADCAST_TO_OPS.getValue());
 
-        return successCode;
+        return 1;
     }
 }

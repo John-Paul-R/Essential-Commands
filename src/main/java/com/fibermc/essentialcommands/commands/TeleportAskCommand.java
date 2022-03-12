@@ -21,9 +21,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         TeleportRequestManager tpMgr = ManagerLocator.getInstance().getTpManager();
-        //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
-        //Store Target Player
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
 
         // Don't allow spamming same target.
@@ -48,11 +46,11 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
 
         String senderName = context.getSource().getPlayer().getGameProfile().getName();
         new ChatConfirmationPrompt(
-                targetPlayer,
-                "/tpaccept " + senderName,
-                "/tpdeny " + senderName,
-                new LiteralText("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                new LiteralText("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+            targetPlayer,
+            "/tpaccept " + senderName,
+            "/tpdeny " + senderName,
+            new LiteralText("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+            new LiteralText("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(CONFIG.FORMATTING_ERROR.getValue())
         ).send();
         
         //Mark TPRequest Sender as having requested a teleport

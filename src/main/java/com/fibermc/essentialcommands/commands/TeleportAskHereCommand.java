@@ -20,24 +20,22 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         TeleportRequestManager tpMgr = ManagerLocator.getInstance().getTpManager();
-        //Store command sender
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
-        //Store Target Player
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
 
         //inform target player of tp request via chat
         targetPlayer.sendSystemMessage(TextUtil.concat(
-                new LiteralText(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                ECText.getInstance().getText("cmd.tpaskhere.receive").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+            new LiteralText(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+            ECText.getInstance().getText("cmd.tpaskhere.receive").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
         ), Util.NIL_UUID);
 
         String senderName = context.getSource().getPlayer().getGameProfile().getName();
         new ChatConfirmationPrompt(
-                targetPlayer,
-                "/tpaccept " + senderName,
-                "/tpdeny " + senderName,
-                new LiteralText("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                new LiteralText("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+            targetPlayer,
+            "/tpaccept " + senderName,
+            "/tpdeny " + senderName,
+            new LiteralText("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+            new LiteralText("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(CONFIG.FORMATTING_ERROR.getValue())
         ).send();
 
         //Mark TPRequest Sender as having requested a teleport
@@ -45,8 +43,8 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
 
         //inform command sender that request has been sent
         context.getSource().sendFeedback(TextUtil.concat(
-                new LiteralText("Teleport request has been sent to ").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                new LiteralText(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
+            new LiteralText("Teleport request has been sent to ").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+            new LiteralText(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
         ), CONFIG.BROADCAST_TO_OPS.getValue());
 
         return 1;

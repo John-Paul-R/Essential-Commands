@@ -4,7 +4,6 @@ import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.WorldDataManager;
-import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.WarpLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.Message;
@@ -15,7 +14,6 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 public class WarpTpCommand implements Command<ServerCommandSource> {
 
@@ -24,30 +22,27 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        int out;
-        ServerCommandSource source = context.getSource();
-        //Store command sender
-        ServerPlayerEntity senderPlayer = source.getPlayer();
-        //Store home name
+        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         String warpName = StringArgumentType.getString(context, "warp_name");
 
-        //Get home location
         WarpLocation loc = worldDataManager.getWarp(warpName);
 
-        // Teleport & chat message
-        if (loc != null) {
-            if (!loc.hasPermission(senderPlayer)) {
-                throw new CommandException(ECText.getInstance().getText("cmd.warp.tp.error.permission", warpName));
-            }
-            //Teleport player to home location
-            PlayerTeleporter.requestTeleport(senderPlayer, loc, ECText.getInstance().getText("cmd.warp.location_name", warpName));
-            out = 1;
-        } else {
+        if (loc == null) {
             Message msg = ECText.getInstance().getText("cmd.warp.tp.error.not_found", warpName);
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
         }
 
-        return out;
+        if (!loc.hasPermission(senderPlayer)) {
+            throw new CommandException(ECText.getInstance().getText("cmd.warp.tp.error.permission", warpName));
+        }
+
+        // Teleport & chat message
+        PlayerTeleporter.requestTeleport(
+            senderPlayer,
+            loc,
+            ECText.getInstance().getText("cmd.warp.location_name", warpName));
+
+        return 1;
     }
 
 }

@@ -18,9 +18,9 @@ public abstract class TeleportResponseCommand implements Command<ServerCommandSo
 
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         return exec(
-                context,
-                context.getSource().getPlayer(),
-                EntityArgumentType.getPlayer(context, "target_player")
+            context,
+            context.getSource().getPlayer(),
+            EntityArgumentType.getPlayer(context, "target_player")
         );
     }
 
@@ -28,23 +28,22 @@ public abstract class TeleportResponseCommand implements Command<ServerCommandSo
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         PlayerData senderPlayerData = ((ServerPlayerEntityAccess) senderPlayer).getEcPlayerData();
         LinkedHashMap<UUID, TeleportRequest> incomingTeleportRequests = senderPlayerData.getIncomingTeleportRequests();
-        ServerPlayerEntity targetPlayer;
 
         if (incomingTeleportRequests.size() > 1) {
             throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.tpa_reply.error.shortcut_more_than_one"));
         } else if (incomingTeleportRequests.size() < 1) {
             throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.tpa_reply.error.shortcut_none_exist"));
-        } else {
-            targetPlayer = incomingTeleportRequests.values().stream().findFirst().get().getTargetPlayer();
-            if (targetPlayer == null) {
-                throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.tpa_reply.error.no_request_from_target"));
-            }
+        }
+
+        ServerPlayerEntity targetPlayer = incomingTeleportRequests.values().stream().findFirst().get().getTargetPlayer();
+        if (targetPlayer == null) {
+            throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.tpa_reply.error.no_request_from_target"));
         }
 
         return exec(
-                context,
-                senderPlayer,
-                targetPlayer
+            context,
+            senderPlayer,
+            targetPlayer
         );
     }
 
