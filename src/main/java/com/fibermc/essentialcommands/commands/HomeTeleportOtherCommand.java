@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
@@ -11,6 +12,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,36 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
             targetPlayerData,
             HomeCommand.getSoleHomeName(targetPlayerData)
         );
+    }
+
+    public int runOfflinePlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
+        String homeName = StringArgumentType.getString(context, "home_name");
+
+        var targetPlayerName = StringArgumentType.getString(context, "target_player");
+        ManagerLocator.getInstance()
+            .getOfflinePlayerRepo()
+            .getOfflinePlayerByNameAsync(targetPlayerName)
+            .whenComplete((playerEntity, err) -> {
+                if (playerEntity == null) {
+                    context.getSource().sendError(Text.of("No player with the specified name found."));
+                    return;
+                }
+
+                var targetPlayerData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
+
+                try {
+                    HomeCommand.exec(
+                        senderPlayerData,
+                        targetPlayerData,
+                        homeName
+                    );
+                } catch (CommandSyntaxException e) {
+                    context.getSource().sendFeedback(Text.of("EC: An unknown error occurred."), false);
+                }
+            });
+        return 1;
+
     }
 
     public static class Suggestion {

@@ -19,6 +19,7 @@ import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.util.IConsumer;
 
 import java.io.FileNotFoundException;
@@ -95,8 +96,10 @@ public class EssentialCommandRegistry {
             LiteralArgumentBuilder<ServerCommandSource> homeSetBuilder = CommandManager.literal("set");
             LiteralArgumentBuilder<ServerCommandSource> homeTpBuilder = CommandManager.literal("tp");
             LiteralArgumentBuilder<ServerCommandSource> homeTpOtherBuilder = CommandManager.literal("tp_other");
+            LiteralArgumentBuilder<ServerCommandSource> homeTpOfflineBuilder = CommandManager.literal("tp_offline");
             LiteralArgumentBuilder<ServerCommandSource> homeDeleteBuilder = CommandManager.literal("delete");
             LiteralArgumentBuilder<ServerCommandSource> homeListBuilder = CommandManager.literal("list");
+            LiteralArgumentBuilder<ServerCommandSource> homeListOfflineBuilder = CommandManager.literal("list_offline");
 
             homeSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
@@ -117,6 +120,12 @@ public class EssentialCommandRegistry {
                         .suggests(HomeTeleportOtherCommand.Suggestion.LIST_SUGGESTION_PROVIDER)
                         .executes(new HomeTeleportOtherCommand())));
 
+            homeTpOfflineBuilder
+                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 4))
+                .then(argument("target_player", StringArgumentType.word())
+                    .then(argument("home_name", StringArgumentType.word())
+                        .executes(new HomeTeleportOtherCommand()::runOfflinePlayer)));
+
             homeDeleteBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_delete, 0))
                 .then(argument("home_name", StringArgumentType.word())
@@ -130,14 +139,25 @@ public class EssentialCommandRegistry {
                     "home tp",
                     HomeCommand.Suggestion::getSuggestionEntries));
 
+            homeListOfflineBuilder
+                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 4))
+                .then(argument("target_player", StringArgumentType.word())
+                    .executes(ListCommandFactory.create(
+                        ECText.getInstance().get("cmd.come.list.start"),
+                        "home tp_other",
+                        HomeTeleportOtherCommand.Suggestion::getSuggestionEntries
+                    )));
+
             LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder
                 .requires(ECPerms.requireAny(ECPerms.Registry.Group.home_group, 0))
                 .build();
             homeNode.addChild(homeTpBuilder.build());
             homeNode.addChild(homeTpOtherBuilder.build());
+            homeNode.addChild(homeTpOfflineBuilder.build());
             homeNode.addChild(homeSetBuilder.build());
             homeNode.addChild(homeDeleteBuilder.build());
             homeNode.addChild(homeListBuilder.build());
+            homeNode.addChild(homeListOfflineBuilder.build());
 
             registerNode.accept(homeNode);
         }
@@ -359,6 +379,27 @@ public class EssentialCommandRegistry {
                 .executes(new GametimeCommand())
                 .build());
         }
+
+        registerNode.accept(CommandManager.literal("lastPos")
+            .requires(ECPerms.require("essentialcommands.admin.lastpos", 4))
+                .then(argument("target_player", StringArgumentType.word())
+                .executes((context) -> {
+                    var targetPlayerName = StringArgumentType.getString(context, "target_player");
+                    ManagerLocator.getInstance()
+                        .getOfflinePlayerRepo()
+                        .getOfflinePlayerByNameAsync(targetPlayerName)
+                        .whenComplete((playerEntity, err) -> {
+                            if (playerEntity == null) {
+                                context.getSource().sendError(Text.of("No player with the specified name found."));
+                                return;
+                            }
+                            context.getSource().sendFeedback(
+                                Text.of(playerEntity.getPos().toString()),
+                                EssentialCommands.CONFIG.BROADCAST_TO_OPS.getValue());
+                        });
+                    return 1;
+                }))
+            .build());
 
         LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
             .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
