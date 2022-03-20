@@ -265,7 +265,8 @@ public class EssentialCommandRegistry {
                     ).then(argument("nickname_placeholder_api", StringArgumentType.greedyString())
                         .executes(NicknameSetCommand::runStringToText)
                     )
-                ).then(argument("nickname_placeholder_api", StringArgumentType.greedyString())
+                )
+                .then(argument("nickname_placeholder_api", StringArgumentType.greedyString())
                     .executes(NicknameSetCommand::runStringToText)
                 );
 

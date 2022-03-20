@@ -20,7 +20,11 @@ import static dev.jpcode.eccore.util.TextUtil.clickableTeleport;
 
 public class ListCommandFactory {
     // Specify leading response text, and supplier of list of strings/Text
-    public static <T> Command<ServerCommandSource> create(String responsePreText, String commandExecText, SuggestionListProvider<Entry<String, T>> suggestionsProvider) {
+    public static <T> Command<ServerCommandSource> create(
+        String responsePreText,
+        String commandExecText,
+        SuggestionListProvider<Entry<String, T>> suggestionsProvider)
+    {
         return (CommandContext<ServerCommandSource> context) -> {
             MutableText responseText = new LiteralText("");
             responseText.append(new LiteralText(responsePreText).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));

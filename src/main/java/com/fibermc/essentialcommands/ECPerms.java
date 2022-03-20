@@ -93,8 +93,13 @@ public class ECPerms {
 
     public static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
         if (CONFIG.USE_PERMISSIONS_API.getValue()) {
-            // TODO: In the future, config option for granting ops all perms.
-            return Permissions.getPermissionValue(source, permission).orElse(source.hasPermissionLevel(4));
+            try {
+                // TODO: In the future, config option for granting ops all perms.
+                return source.hasPermissionLevel(defaultRequireLevel) || Boolean.TRUE.equals(Permissions.getPermissionValue(source, permission).getBoxed());
+            } catch (Exception e) {
+                EssentialCommands.LOGGER.error(e);
+                return false;
+            }
         } else {
             return (source.hasPermissionLevel(defaultRequireLevel) ? TriState.TRUE:TriState.FALSE).orElse(false);
         }
