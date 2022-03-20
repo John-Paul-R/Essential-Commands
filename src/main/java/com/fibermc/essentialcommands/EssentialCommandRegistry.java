@@ -254,7 +254,7 @@ public class EssentialCommandRegistry {
             LiteralArgumentBuilder<ServerCommandSource> nickRevealBuilder = CommandManager.literal("reveal");
 
             Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.nickname_self, 2);
-            Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 4);
+            Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 2);
             nickSetBuilder.requires(permissionSelf)
                 .then(argument("nickname", TextArgumentType.text())
                     .executes(new NicknameSetCommand())
@@ -274,11 +274,11 @@ public class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))
                 .executes(new NicknameClearCommand())
                 .then(CommandUtil.targetPlayerArgument()
-                    .requires(ECPerms.require(ECPerms.Registry.nickname_others, 4))
+                    .requires(ECPerms.require(ECPerms.Registry.nickname_others, 2))
                     .executes(new NicknameClearCommand()));
 
             nickRevealBuilder
-                .requires(ECPerms.require(ECPerms.Registry.nickname_reveal, 4))
+                .requires(ECPerms.require(ECPerms.Registry.nickname_reveal, 2))
                 .then(argument("player_nickname", StringArgumentType.word())
                     .suggests(NicknamePlayersSuggestion.suggestedStrings())
                     .executes(new RealNameCommand())
