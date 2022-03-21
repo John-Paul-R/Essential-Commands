@@ -300,9 +300,10 @@ public class EssentialCommandRegistry {
                 .executes(new RandomTeleportCommand())
                 .build());
 
-            dispatcher.register(CommandManager.literal("rtp")
+            registerNode.accept(CommandManager.literal("rtp")
                 .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
                 .executes(new RandomTeleportCommand())
+                .build()
             );
         }
 

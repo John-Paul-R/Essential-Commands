@@ -121,9 +121,9 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
 
         Chunk chunk = world.getChunk(targetXZ);
-        if (!isBiomeValid(world.getBiome(targetXZ).value())) {
-            return exec(player, world, center, timesRun + 1);
-        }
+//        if (!isBiomeValid(world.getBiome(targetXZ).value())) {
+//            return exec(player, world, center, timesRun + 1);
+//        }
 
         {
             Stopwatch timer = Stopwatch.createStarted();
@@ -164,7 +164,8 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             && category != Biome.Category.BEACH
             && category != Biome.Category.SWAMP
             && category != Biome.Category.UNDERGROUND
-            && category != Biome.Category.NONE;
+//            && category != Biome.Category.NONE;
+            ;
     }
 
 }
