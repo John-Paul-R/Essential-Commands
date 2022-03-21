@@ -9,6 +9,7 @@
     "PlayerManagerMixin",
     "ServerPlayerEntityMixin",
     "ServerScoreboardMixin",
+    "TeleportCommandMixin",
     "WorldSaveHandlerMixin"
   ],
   "client": [
