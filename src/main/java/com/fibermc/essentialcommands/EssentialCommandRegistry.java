@@ -114,14 +114,14 @@ public class EssentialCommandRegistry {
                     .executes(new HomeCommand()));
 
             homeTpOtherBuilder
-                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 4))
+                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
                 .then(argument("target_player", EntityArgumentType.player())
                     .then(argument("home_name", StringArgumentType.word())
                         .suggests(HomeTeleportOtherCommand.Suggestion.LIST_SUGGESTION_PROVIDER)
                         .executes(new HomeTeleportOtherCommand())));
 
             homeTpOfflineBuilder
-                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 4))
+                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
                 .then(argument("target_player", StringArgumentType.word())
                     .then(argument("home_name", StringArgumentType.word())
                         .executes(new HomeTeleportOtherCommand()::runOfflinePlayer)));
@@ -140,7 +140,7 @@ public class EssentialCommandRegistry {
                     HomeCommand.Suggestion::getSuggestionEntries));
 
             homeListOfflineBuilder
-                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 4))
+                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
                 .then(argument("target_player", StringArgumentType.word())
                     .executes(ListCommandFactory.create(
                         ECText.getInstance().get("cmd.come.list.start"),
@@ -312,7 +312,7 @@ public class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.fly_self, 2))
                 .executes(new FlyCommand())
                 .then(CommandUtil.targetPlayerArgument()
-                    .requires(ECPerms.require(ECPerms.Registry.fly_others, 4))
+                    .requires(ECPerms.require(ECPerms.Registry.fly_others, 2))
                     .then(argument("flight_enabled", BoolArgumentType.bool())
                         .executes(new FlyCommand())))
                 .build());
@@ -324,7 +324,7 @@ public class EssentialCommandRegistry {
                     .requires(ECPerms.require(ECPerms.Registry.invuln_self, 2))
                     .executes(new InvulnCommand())
                     .then(CommandUtil.targetPlayerArgument()
-                        .requires(ECPerms.require(ECPerms.Registry.invuln_others, 4))
+                        .requires(ECPerms.require(ECPerms.Registry.invuln_others, 2))
                         .then(argument("invuln_enabled", BoolArgumentType.bool())
                             .executes(new InvulnCommand())))
                     .build());
@@ -383,7 +383,7 @@ public class EssentialCommandRegistry {
         }
 
         registerNode.accept(CommandManager.literal("lastPos")
-            .requires(ECPerms.require("essentialcommands.admin.lastpos", 4))
+            .requires(ECPerms.require("essentialcommands.admin.lastpos", 2))
                 .then(argument("target_player", StringArgumentType.word())
                 .executes((context) -> {
                     var targetPlayerName = StringArgumentType.getString(context, "target_player");
