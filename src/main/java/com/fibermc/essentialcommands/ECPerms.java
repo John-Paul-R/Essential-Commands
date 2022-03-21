@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands;
 
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import org.jetbrains.annotations.NotNull;
@@ -95,13 +94,13 @@ public class ECPerms {
         if (CONFIG.USE_PERMISSIONS_API.getValue()) {
             try {
                 // TODO: In the future, config option for granting ops all perms.
-                return source.hasPermissionLevel(defaultRequireLevel) || Boolean.TRUE.equals(Permissions.getPermissionValue(source, permission).getBoxed());
+                return Permissions.getPermissionValue(source, permission).orElse(source.hasPermissionLevel(Math.max(2, defaultRequireLevel)));
             } catch (Exception e) {
                 EssentialCommands.LOGGER.error(e);
                 return false;
             }
         } else {
-            return (source.hasPermissionLevel(defaultRequireLevel) ? TriState.TRUE:TriState.FALSE).orElse(false);
+            return source.hasPermissionLevel(defaultRequireLevel);
         }
     }
 
