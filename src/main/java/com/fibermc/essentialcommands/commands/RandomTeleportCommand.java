@@ -108,8 +108,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         }
         maxY.set(world.getHeight()); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
         // Calculate position on circle perimeter
-        int r = CONFIG.RTP_RADIUS.getValue();
-        final double angle = (new Random()).nextDouble()*2*Math.PI;
+        var rand = new Random();
+        int r_max = CONFIG.RTP_RADIUS.getValue();
+        int r_min = CONFIG.RTP_MIN_RADIUS.getValue();
+        int r = rand.nextInt(r_min, r_max);
+        final double angle = rand.nextDouble() * 2 * Math.PI;
         final double delta_x = r * Math.cos(angle);
         final double delta_z = r * Math.sin(angle);
 
