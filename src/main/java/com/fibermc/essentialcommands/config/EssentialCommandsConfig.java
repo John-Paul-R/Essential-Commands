@@ -14,8 +14,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
-import static dev.jpcode.eccore.config.ConfigUtil.arrayParser;
-import static dev.jpcode.eccore.config.ConfigUtil.parseStyle;
+import static dev.jpcode.eccore.config.ConfigUtil.*;
 import static dev.jpcode.eccore.util.TextUtil.parseText;
 
 public final class EssentialCommandsConfig extends Config {
@@ -54,7 +53,7 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<Boolean> NICKNAMES_IN_PLAYER_LIST =   new Option<>("nicknames_in_player_list", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> NICKNAME_MAX_LENGTH =    new Option<>("nickname_max_length", 32, ConfigUtil::parseInt);
     @ConfigOption public final Option<Integer> RTP_RADIUS =             new Option<>("rtp_radius", 1000, ConfigUtil::parseInt);
-    @ConfigOption public final Option<Integer> RTP_MIN_RADIUS =         new Option<>("rtp_min_radius", 999, ConfigUtil::parseInt);
+    @ConfigOption public final Option<Integer> RTP_MIN_RADIUS =         new Option<>("rtp_min_radius", RTP_RADIUS.getValue(), (String s) -> parseIntOrDefault(s, RTP_RADIUS.getValue()));
     @ConfigOption public final Option<Integer> RTP_COOLDOWN =           new Option<>("rtp_cooldown", 30, ConfigUtil::parseInt);
     @ConfigOption public final Option<Integer> RTP_MAX_ATTEMPTS =       new Option<>("rtp_max_attempts", 15, ConfigUtil::parseInt);
     @ConfigOption public final Option<Boolean> BROADCAST_TO_OPS =       new Option<>("broadcast_to_ops", false, Boolean::parseBoolean);

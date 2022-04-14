@@ -91,6 +91,16 @@ public final class ConfigUtil {
         return -1;
     }
 
+    public static int parseIntOrDefault(String s, int fallback) {
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            logNumberParseError(s, "int");
+            return fallback;
+        }
+    }
+
+
     public static double parseDouble(String s) {
         try {
             return Double.parseDouble(s);
