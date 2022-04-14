@@ -111,7 +111,9 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         var rand = new Random();
         int r_max = CONFIG.RTP_RADIUS.getValue();
         int r_min = CONFIG.RTP_MIN_RADIUS.getValue();
-        int r = rand.nextInt(r_min, r_max);
+        int r = r_max == r_min
+            ? r_max
+            : rand.nextInt(r_min, r_max);
         final double angle = rand.nextDouble() * 2 * Math.PI;
         final double delta_x = r * Math.cos(angle);
         final double delta_z = r * Math.sin(angle);
