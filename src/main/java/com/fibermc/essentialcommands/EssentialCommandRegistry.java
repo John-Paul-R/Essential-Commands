@@ -337,12 +337,12 @@ public class EssentialCommandRegistry {
                 .build());
 
             registerNode.accept(CommandManager.literal("stonecutter")
-                .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
+                .requires(ECPerms.require(ECPerms.Registry.stonecutter, 0))
                 .executes(new StonecutterCommand())
                 .build());
 
             registerNode.accept(CommandManager.literal("grindstone")
-                .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
+                .requires(ECPerms.require(ECPerms.Registry.grindstone, 0))
                 .executes(new GrindstoneCommand())
                 .build());
         }
