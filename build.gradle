@@ -154,8 +154,8 @@ publishing {
             name 'GitHub'
             url "https://maven.pkg.github.com/${project.github_repo}"
             credentials {
-                username env.get('GITHUB_ACTOR') as String
-                password env.get('GITHUB_TOKEN') as String
+                username = env.get('GITHUB_ACTOR')
+                password = env.get('GITHUB_TOKEN')
             }
         }
     }
@@ -185,9 +185,9 @@ modrinth {
     loaders = ['fabric']
 
     dependencies = {
-        var requiredMods = (project.mr_relations_required as String).split(',').collect { new ModDependency(it, DependencyType.REQUIRED)}
-        var optionalMods = (project.mr_relations_optional as String).split(',').collect { new ModDependency(it, DependencyType.OPTIONAL)}
-        var incompatibleMods = (project.mr_relations_incompatible as String).split(',').collect { new ModDependency(it, DependencyType.INCOMPATIBLE)}
+        var requiredMods = (project.mr_relations_required).split(',').collect { new ModDependency(it, DependencyType.REQUIRED)}
+        var optionalMods = (project.mr_relations_optional).split(',').collect { new ModDependency(it, DependencyType.OPTIONAL)}
+        var incompatibleMods = (project.mr_relations_incompatible).split(',').collect { new ModDependency(it, DependencyType.INCOMPATIBLE)}
 
         var outList = new ArrayList<ModDependency>(requiredMods.size() + optionalMods.size() + incompatibleMods.size())
         outList.addAll(requiredMods)
@@ -211,7 +211,7 @@ task publishModrinth(type: TaskModrinthUpload) { // Make sure it runs after buil
 //curseforge475964 // Begin the cursegradle task. Replacing ID with the id you set on the cursegradle config.
 curseforge {
     Map env = getenv()
-    apiKey = env.get("CURSEFORGE") as String//changelog = new File('./changelog.md').getText('UTF-8')
+    apiKey = env.get("CURSEFORGE")
 
     // Declare all projects
     //noinspection GroovyAssignabilityCheck
@@ -219,7 +219,9 @@ curseforge {
         // Set the project id
         id = project.cf_project_id
         // Set the release type
-        releaseType = project.version.contains('alpha') ? 'alpha' : project.version.contains('beta') ? 'beta' : 'release'
+        releaseType = project.version.contains('alpha') ? 'alpha'
+            : project.version.contains('beta') ? 'beta'
+            : 'release'
         // Set the release notes
         changelog = "For a list of changes, please refer to https://github.com/${project.github_repo}/releases/tag/${project.version}"
         // Add all supported game versions
