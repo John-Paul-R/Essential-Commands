@@ -146,7 +146,7 @@ public class PlayerData extends PersistentState {
 
     public void sendError(Text message) {
         this.player.sendMessage(
-            Text.literal("")
+            Text.empty()
                 .append(message)
                 .setStyle(CONFIG.FORMATTING_ERROR.getValue()),
             MessageType.SYSTEM);
@@ -334,7 +334,7 @@ public class PlayerData extends PersistentState {
 
     public void reloadFullNickname() {
         MutableText baseName = Text.literal(this.getPlayer().getGameProfile().getName());
-        MutableText tempFullNickname = Text.literal("");
+        MutableText tempFullNickname = Text.empty();
         // Note: this doesn't ever display if nickname is null,
         //  because our mixin to getDisplayName does a null check on getNickname
         if (this.nickname != null) {

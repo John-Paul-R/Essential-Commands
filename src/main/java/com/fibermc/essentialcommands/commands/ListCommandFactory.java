@@ -25,7 +25,7 @@ public class ListCommandFactory {
         SuggestionListProvider<Entry<String, T>> suggestionsProvider)
     {
         return (CommandContext<ServerCommandSource> context) -> {
-            MutableText responseText = Text.literal("");
+            MutableText responseText = Text.empty();
             responseText.append(Text.literal(responsePreText).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 

@@ -21,7 +21,7 @@ public class RealNameCommand implements Command<ServerCommandSource> {
 
         String nicknameStr = StringArgumentType.getString(context, "player_nickname");
         List<PlayerData> nicknamePlayers = PlayerDataManager.getInstance().getPlayerDataMatchingNickname(nicknameStr);
-        MutableText responseText = Text.literal("");
+        MutableText responseText = Text.empty();
 
         // If no players matched the provided nickname
         if (nicknamePlayers.size() == 0) {

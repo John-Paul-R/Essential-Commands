@@ -73,12 +73,10 @@ public abstract class Config {
             File outFile = configPath.toFile();
             FileWriter writer = new FileWriter(outFile);
 
-            props.storeSorted(writer, new StringBuilder(80)
-                .append(displayName)
-                .append("\n")
-                .append("Config Documentation: ")
-                .append(documentationLink)
-                .toString()
+            props.storeSorted(writer, displayName
+                + "\n"
+                + "Config Documentation: "
+                + documentationLink
             );
         } catch (IOException e) {
             LOGGER.warn("Failed to store preferences to disk.");
@@ -91,12 +89,12 @@ public abstract class Config {
     static final Style ACCENT_STYLE = Style.EMPTY.withFormatting(Formatting.GREEN);
 
     public @NotNull Text stateAsText() {
-        var result = Text.literal("");
+        var result = Text.empty();
         String newLine = "\n";//System.getProperty("line.separator");
 
         result.append(Text.literal(displayName + " {").setStyle(DEFAULT_STYLE));
         result.append(newLine);
-        var propsText = Text.literal("");
+        var propsText = Text.empty();
         result.append(propsText);
 
         //print field names paired with their values
@@ -137,8 +135,8 @@ public abstract class Config {
     }
 
     private MutableText fieldAsText(Field field) throws IllegalAccessException {
-        var value = (Option)field.get(this);
-        return Text.literal("")
+        var value = (Option<?>)field.get(this);
+        return Text.empty()
             .append(Text.literal(field.getName() + ": ").setStyle(DEFAULT_STYLE))
             .append(Text.literal(value.getValue().toString()));
     }

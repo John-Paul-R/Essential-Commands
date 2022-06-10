@@ -12,7 +12,7 @@ import java.util.Collection;
 public class TextUtil {
 
     public static MutableText concat(Text... arr) {
-        MutableText out = Text.literal("");
+        MutableText out = Text.empty();
         for (Text text : arr) {
             out.append(text);
         }
@@ -116,7 +116,7 @@ public class TextUtil {
         if (bufSize <= 0) {
             return null;
         }
-        MutableText buf = Text.literal("");
+        MutableText buf = Text.empty();
         for (int i = startIndex; i < endIndex; i++) {
             if (i > startIndex) {
                 buf.append(separator);
@@ -130,10 +130,8 @@ public class TextUtil {
 
     public static Text spaceBetween(Text[] array, int totalWidth, int padding) {
         int totalTextSize = 0;
-        ArrayList<String> strings = new ArrayList<>(array.length);
         for (Text txt : array) {
             String str = txt.getString();
-            strings.add(str);
             totalTextSize += str.length();
         }
 
@@ -142,7 +140,7 @@ public class TextUtil {
             return concat(array);
         }
 
-        MutableText outText = Text.literal("");//new ArrayList<>(strings.size() * 2 - 1);
+        MutableText outText = Text.empty();
         String lrPadStr = " ".repeat(padding);
         String spaceStr = " ".repeat((totalWidth - padding * 2 - totalTextSize) / (array.length - 1));
         outText.append(Text.literal(lrPadStr));
