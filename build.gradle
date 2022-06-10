@@ -41,8 +41,8 @@ allprojects {
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_jupiter_version}"
 
         // JIJ Dependencies
-        modApi     "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
-        include    "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+        modApi  "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+        include "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
         modApi  "eu.pb4:placeholder-api:${project.placeholder_api_version}"
         include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
         modImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.0'
@@ -119,7 +119,7 @@ tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
 
     // Minecraft 1.17 (21w19a) upwards uses Java 16.
-    it.options.release = 17
+    it.options.release.set(17)
 }
 
 
@@ -143,7 +143,6 @@ publishing {
             // Sources
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
-
             }
         }
     }
@@ -158,8 +157,8 @@ publishing {
             name 'GitHub'
             url "https://maven.pkg.github.com/${project.github_repo}"
             credentials {
-                username env.get('GITHUB_ACTOR')
-                password env.get('GITHUB_TOKEN')
+                username env.get('GITHUB_ACTOR') as String
+                password env.get('GITHUB_TOKEN') as String
             }
         }
     }
@@ -167,6 +166,9 @@ publishing {
 
 
 import com.modrinth.minotaur.TaskModrinthUpload
+import com.modrinth.minotaur.request.VersionType
+
+import static com.modrinth.minotaur.request.Dependency.DependencyType
 
 task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after build!
     description 'Uploads all Modrinth projects'
@@ -182,18 +184,20 @@ task publishModrinth (type: TaskModrinthUpload){ // Make sure it runs after buil
     token = env.get("MODRINTH") // An environment property called MODRINTH that is your token, set via Gradle CLI, GitHub Actions, Idea Run Configuration, or other
     projectId = modrinth_project_id
     versionNumber = project.version // Will fail if Modrinth has this version already
-    versionType = project.version.contains('alpha') ? 'alpha' : project.version.contains('beta') ? 'beta' : 'release'
+    versionType = project.version.contains('alpha') ? VersionType.ALPHA
+        : project.version.contains('beta') ? VersionType.BETA
+        : VersionType.RELEASE
 
     // On fabric, use 'remapJar' instead of 'jar'
 
     uploadFile = jar.outputs.getFiles().asPath // This is the java jar task. If it can't find the jar, try 'jar.outputs.getFiles().asPath' in place of 'jar'
-    project.mr_game_versions.split(',').each { addGameVersion it } // Call this multiple times to add multiple game versions. There are tools that can help you generate the list of versions
+    (project.mr_game_versions as String).split(',').each { addGameVersion it } // Call this multiple times to add multiple game versions. There are tools that can help you generate the list of versions
     changelog = getChangelog()
     addLoader('fabric')
 
-    if (project.mr_relations_required) project.mr_relations_required.split(',').each { addDependency it, 'required' }
-    if (project.mr_relations_optional) project.mr_relations_optional.split(',').each { addDependency it, 'optional' }
-    if (project.mr_relations_incompatible) project.mr_relations_incompatible.split(',').each { addDependency it, 'incompatible' }
+    if (project.mr_relations_required) (project.mr_relations_required as String).split(',').each { addDependency it, DependencyType.REQUIRED }
+    if (project.mr_relations_optional) (project.mr_relations_optional as String).split(',').each { addDependency it, DependencyType.OPTIONAL }
+    if (project.mr_relations_incompatible) (project.mr_relations_incompatible as String).split(',').each { addDependency it, DependencyType.INCOMPATIBLE }
 
 }
 //curseforge475964 // Begin the cursegradle task. Replacing ID with the id you set on the cursegradle config.
@@ -256,8 +260,7 @@ githubRelease {
     draft false // by default this is false
     prerelease false // by default this is false
     releaseAssets jar.destinationDirectory.getAsFileTree().matching {
-        include "**/*${project.version}.jar"
-//        include "**/*${project.mod_version}-sources.jar"
+        "**/*${project.version}.jar"
     }// this points to which files you want to upload as assets with your release
     //jar.outputs.getFiles().asPath//
     overwrite false // by default false; if set to true, will delete an existing release with the same tag and name
