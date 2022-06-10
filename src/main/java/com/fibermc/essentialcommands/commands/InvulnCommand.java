@@ -11,7 +11,7 @@ import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -51,10 +51,10 @@ public class InvulnCommand implements Command<ServerCommandSource> {
         source.sendFeedback(
             TextUtil.concat(
                 ECText.getInstance().getText("cmd.invuln.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                new LiteralText(shouldEnableInvuln ? "enabled" : "disabled").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                Text.literal(shouldEnableInvuln ? "enabled" : "disabled").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                 ECText.getInstance().getText("cmd.invuln.feedback.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
                 target.getDisplayName(),
-                new LiteralText(".").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+                Text.literal(".").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
             ),
             CONFIG.BROADCAST_TO_OPS.getValue()
         );

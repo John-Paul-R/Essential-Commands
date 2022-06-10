@@ -14,11 +14,11 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import dev.jpcode.eccore.util.TextUtil;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.util.IConsumer;
 
@@ -35,7 +35,11 @@ import static net.minecraft.server.command.CommandManager.argument;
  */
 public class EssentialCommandRegistry {
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
+    public static void register(
+        CommandDispatcher<ServerCommandSource> dispatcher,
+        CommandRegistryAccess commandRegistryAccess,
+        CommandManager.RegistrationEnvironment registrationEnvironment
+    ) {
         RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
 
         LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode;
@@ -476,7 +480,7 @@ public class EssentialCommandRegistry {
                             mcDir.resolve("world/modplayerdata").toFile(),
                             source.getSource().getServer()
                         );
-                        source.getSource().sendFeedback(new LiteralText("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS.getValue());
+                        source.getSource().sendFeedback(Text.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS.getValue());
                     } catch (NotDirectoryException | FileNotFoundException e) {
                         e.printStackTrace();
                     }

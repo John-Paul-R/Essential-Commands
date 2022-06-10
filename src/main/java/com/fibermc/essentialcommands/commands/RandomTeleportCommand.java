@@ -2,7 +2,6 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.mixin.BiomeInvoker;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.google.common.base.Stopwatch;
 import com.mojang.brigadier.Command;
@@ -14,10 +13,9 @@ import net.minecraft.block.Material;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.Random;
@@ -68,7 +66,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             if (playerData.getRtpNextUsableTime() >= curServerTickTime) {
                 source.sendError(TextUtil.concat(
                     ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                    new LiteralText(String.format("%.1f", (playerData.getRtpNextUsableTime() - curServerTickTime)/20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                    Text.literal(String.format("%.1f", (playerData.getRtpNextUsableTime() - curServerTickTime)/20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                     ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
                 ));
                 return -2;
@@ -126,9 +124,6 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
 
         Chunk chunk = world.getChunk(targetXZ);
-//        if (!isBiomeValid(world.getBiome(targetXZ).value())) {
-//            return exec(player, world, center, timesRun + 1);
-//        }
 
         {
             Stopwatch timer = Stopwatch.createStarted();
@@ -159,18 +154,6 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         var material = chunk.getBlockState(pos).getMaterial();
         return pos.getY() < maxY.get() && !material.isLiquid() && material != Material.FIRE;
-    }
-
-    private static boolean isBiomeValid(Biome biome) {
-        final Biome.Category category = ((BiomeInvoker)(Object) biome).invokeGetCategory();
-        return
-            category != Biome.Category.OCEAN
-            && category != Biome.Category.RIVER
-            && category != Biome.Category.BEACH
-            && category != Biome.Category.SWAMP
-            && category != Biome.Category.UNDERGROUND
-//            && category != Biome.Category.NONE;
-            ;
     }
 
 }

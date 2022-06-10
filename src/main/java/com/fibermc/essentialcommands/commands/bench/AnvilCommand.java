@@ -11,7 +11,7 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Language;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -43,7 +43,7 @@ public class AnvilCommand implements Command<ServerCommandSource> {
         return new SimpleNamedScreenHandlerFactory(
             (syncId, inventory, player) ->
                 new AnvilCommandScreenHandler(syncId, inventory, ScreenHandlerContext.create(world, pos)),
-            new TranslatableText("block.minecraft.anvil")
+            Text.translatable("block.minecraft.anvil")
         );
     }
 

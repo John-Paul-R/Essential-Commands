@@ -11,7 +11,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -37,7 +37,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         } catch (CommandSyntaxException e) {
             source.sendError(TextUtil.concat(
                 ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                new LiteralText(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                 ECText.getInstance().getText("cmd.home.set.error.exists.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ));
         }
@@ -48,7 +48,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         if (successCode == 1) {
             source.sendFeedback(
                 ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-                    .append(new LiteralText(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                    .append(Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
                     .append(ECText.getInstance().getText("cmd.home.set.feedback.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())),
                 CONFIG.BROADCAST_TO_OPS.getValue()
             );

@@ -9,7 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -29,7 +29,7 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
         if (!wasSuccessful) {
             source.sendFeedback(TextUtil.concat(
                 ECText.getInstance().getText("cmd.warp.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                new LiteralText(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                 ECText.getInstance().getText("cmd.warp.delete.error.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ), CONFIG.BROADCAST_TO_OPS.getValue());
             return 0;
@@ -37,7 +37,7 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
 
         source.sendFeedback(TextUtil.concat(
             ECText.getInstance().getText("cmd.warp.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            new LiteralText(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+            Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
             ECText.getInstance().getText("cmd.warp.delete.feedback.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
         ), CONFIG.BROADCAST_TO_OPS.getValue());
         return 1;

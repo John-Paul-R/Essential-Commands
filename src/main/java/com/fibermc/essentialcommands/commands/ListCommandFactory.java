@@ -6,7 +6,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
@@ -26,12 +25,12 @@ public class ListCommandFactory {
         SuggestionListProvider<Entry<String, T>> suggestionsProvider)
     {
         return (CommandContext<ServerCommandSource> context) -> {
-            MutableText responseText = new LiteralText("");
-            responseText.append(new LiteralText(responsePreText).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
+            MutableText responseText = Text.literal("");
+            responseText.append(Text.literal(responsePreText).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
             List<Text> suggestionTextList = suggestionsList.stream().map((entry) -> clickableTeleport(
-                new LiteralText(entry.getKey()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                Text.literal(entry.getKey()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                 entry.getKey(),
                 String.format("/%s", commandExecText))
             ).collect(Collectors.toList());
@@ -39,7 +38,7 @@ public class ListCommandFactory {
             if (suggestionTextList.size() > 0) {
                 responseText.append(TextUtil.join(
                     suggestionTextList,
-                    new LiteralText(", ").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+                    Text.literal(", ").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
                 ));
             } else {
                 responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty").setStyle(CONFIG.FORMATTING_ERROR.getValue()));

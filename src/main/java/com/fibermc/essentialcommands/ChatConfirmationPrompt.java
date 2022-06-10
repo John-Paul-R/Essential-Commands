@@ -5,12 +5,12 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 import dev.jpcode.eccore.util.TextUtil;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 
 public final class ChatConfirmationPrompt {
 
@@ -54,9 +54,9 @@ public final class ChatConfirmationPrompt {
 
 
     public void send() {
-        this.player.sendSystemMessage(
+        this.player.sendMessage(
             this.text,
-            Util.NIL_UUID
+            MessageType.SYSTEM
         );
     }
 

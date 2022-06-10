@@ -2,7 +2,8 @@ package com.fibermc.essentialcommands.types;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
@@ -64,8 +65,8 @@ public class MinecraftLocation {
         return tag;
     }
 
-    public LiteralText toLiteralTextSimple() {
-        return new LiteralText(String.format("(%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
+    public MutableText toLiteralTextSimple() {
+        return Text.literal(String.format("(%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
     }
 
 }

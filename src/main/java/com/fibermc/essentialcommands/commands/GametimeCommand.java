@@ -6,8 +6,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.command.TimeCommand;
-import net.minecraft.text.*;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -45,12 +45,12 @@ public class GametimeCommand implements Command<ServerCommandSource> {
     }
 
     private static Text getFormattedTime(long time) {
-        return new TranslatableText(
+        return Text.translatable(
                 "commands.time.query",
-                new LiteralText(formatGameTimeOfDay(time)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                Text.literal(formatGameTimeOfDay(time)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
             .setStyle(CONFIG.FORMATTING_DEFAULT.getValue()
                 .withHoverEvent(
-                    new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(String.valueOf(time % 24000L)))));
+                    new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(String.valueOf(time % 24000L)))));
     }
 
 

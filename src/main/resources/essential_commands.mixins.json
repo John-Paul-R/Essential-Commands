@@ -3,7 +3,6 @@
   "package": "com.fibermc.essentialcommands.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BiomeInvoker",
     "PersistentStateManagerInvoker",
     "PlayerEntityMixin",
     "PlayerManagerMixin",

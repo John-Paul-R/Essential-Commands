@@ -2,10 +2,10 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
-import net.minecraft.util.Util;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -27,13 +27,13 @@ public class PlayerTeleporter {
         } else {
             ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
-            player.sendSystemMessage(
+            player.sendMessage(
                 ECText.getInstance().getText("teleport.queued.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
                     .append(queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
                     .append(ECText.getInstance().getText("teleport.queued.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
-                    .append(new LiteralText(String.format("%.1f", CONFIG.TELEPORT_DELAY.getValue())).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                    .append(Text.literal(String.format("%.1f", CONFIG.TELEPORT_DELAY.getValue())).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
                     .append(ECText.getInstance().getText("teleport.queued.3")).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                Util.NIL_UUID
+                MessageType.SYSTEM
             );
         }
     }
@@ -51,9 +51,9 @@ public class PlayerTeleporter {
         if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS.getValue() && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
             if (dest.dim != player.getWorld().getRegistryKey()) {
-                player.sendSystemMessage(
+                player.sendMessage(
                     ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                    Util.NIL_UUID
+                    MessageType.SYSTEM
                 );
                 return;
             }
@@ -74,11 +74,11 @@ public class PlayerTeleporter {
             dest.pos.x, dest.pos.y, dest.pos.z,
             dest.headYaw, dest.pitch
         );
-        playerEntity.sendSystemMessage(
+        playerEntity.sendMessage(
             ECText.getInstance().getText("teleport.done.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
                 .append(dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
-                .append(new LiteralText(".").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())),
-            Util.NIL_UUID
+                .append(Text.literal(".").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())),
+            MessageType.SYSTEM
         );
     }
 

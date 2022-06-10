@@ -9,12 +9,11 @@ import io.github.ladysnake.pal.VanillaAbilities;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 import net.minecraft.world.PersistentState;
 
 import java.io.File;
@@ -135,9 +134,9 @@ public class PlayerData extends PersistentState {
         } else {
             this.sendError(TextUtil.concat(
                 ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                new LiteralText(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                 ECText.getInstance().getText("cmd.home.set.error.limit.2").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                new LiteralText(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                Text.literal(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
                 ECText.getInstance().getText("cmd.home.set.error.limit.3").setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ));
         }
@@ -146,11 +145,11 @@ public class PlayerData extends PersistentState {
     }
 
     public void sendError(Text message) {
-        this.player.sendSystemMessage(
-            new LiteralText("")
+        this.player.sendMessage(
+            Text.literal("")
                 .append(message)
                 .setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-            Util.NIL_UUID);
+            MessageType.SYSTEM);
     }
 
     public Set<String> getHomeNames() {
@@ -268,7 +267,7 @@ public class PlayerData extends PersistentState {
     }
 
     public MutableText getNickname() {
-        return nickname != null ? nickname.shallowCopy() : null;
+        return nickname != null ? nickname.copy() : null;
     }
     public MutableText getFullNickname() {
         return fullNickname;
@@ -293,7 +292,7 @@ public class PlayerData extends PersistentState {
                 return -2;
             }
             // Ensure player has permissions required to set the specified nickname
-            boolean hasRequiredPerms = NicknameText.checkPerms(nickname, this.player.getCommandSource());
+            boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, this.player.getCommandSource());
             if (!hasRequiredPerms) {
                 EssentialCommands.LOGGER.info(String.format(
                         "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
@@ -334,8 +333,8 @@ public class PlayerData extends PersistentState {
     }
 
     public void reloadFullNickname() {
-        MutableText baseName = new LiteralText(this.getPlayer().getGameProfile().getName());
-        MutableText tempFullNickname = new LiteralText("");
+        MutableText baseName = Text.literal(this.getPlayer().getGameProfile().getName());
+        MutableText tempFullNickname = Text.literal("");
         // Note: this doesn't ever display if nickname is null,
         //  because our mixin to getDisplayName does a null check on getNickname
         if (this.nickname != null) {

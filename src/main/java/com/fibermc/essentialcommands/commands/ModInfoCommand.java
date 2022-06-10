@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -18,9 +18,9 @@ public class ModInfoCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
 
         context.getSource().sendFeedback(TextUtil.concat(
-            new LiteralText(EssentialCommands.MOD_METADATA.getName()).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            new LiteralText(" "),
-            new LiteralText(modVersion).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
+            Text.literal(EssentialCommands.MOD_METADATA.getName()).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+            Text.literal(" "),
+            Text.literal(modVersion).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
         ), false);
 
         return 0;

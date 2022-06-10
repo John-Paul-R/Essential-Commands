@@ -5,9 +5,9 @@ import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.TeleportRequest;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Util;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -24,9 +24,9 @@ public class TeleportAcceptCommand extends TeleportResponseCommand {
         if (teleportRequest != null && teleportRequest.getTargetPlayer().equals(senderPlayer)) {
 
             //inform target player that teleport has been accepted via chat
-            targetPlayer.sendSystemMessage(
+            targetPlayer.sendMessage(
                 ECText.getInstance().getText("cmd.tpaccept.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-                , Util.NIL_UUID);
+                , MessageType.SYSTEM);
 
             //Conduct teleportation
             teleportRequest.queue();

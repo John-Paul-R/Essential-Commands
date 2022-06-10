@@ -10,7 +10,6 @@ import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
@@ -42,7 +41,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
         if (successCode >= 0) {
             source.sendFeedback(TextUtil.concat(
                 ECText.getInstance().getText("cmd.nickname.set.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                (nicknameText != null) ? nicknameText : new LiteralText(targetPlayer.getGameProfile().getName()),
+                (nicknameText != null) ? nicknameText : Text.literal(targetPlayer.getGameProfile().getName()),
                 ECText.getInstance().getText("generic.quote_fullstop").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
             ), CONFIG.BROADCAST_TO_OPS.getValue());
         } else {

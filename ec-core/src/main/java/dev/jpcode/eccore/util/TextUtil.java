@@ -2,7 +2,7 @@ package dev.jpcode.eccore.util;
 
 import com.google.gson.JsonParseException;
 import dev.jpcode.eccore.ECCore;
-import eu.pb4.placeholders.TextParser;
+import eu.pb4.placeholders.api.TextParserUtils;
 import net.minecraft.text.*;
 import org.apache.logging.log4j.Level;
 
@@ -12,7 +12,7 @@ import java.util.Collection;
 public class TextUtil {
 
     public static MutableText concat(Text... arr) {
-        MutableText out = new LiteralText("");
+        MutableText out = Text.literal("");
         for (Text text : arr) {
             out.append(text);
         }
@@ -21,7 +21,7 @@ public class TextUtil {
 
     public static MutableText deepCopy(Text text) {
         if (text.getSiblings().isEmpty()) {
-            return text.shallowCopy();
+            return text.copy();
         }
 
         var siblings = text.getSiblings();
@@ -30,7 +30,7 @@ public class TextUtil {
             .toList();
         siblings.clear();
         siblings.addAll(newSiblings);
-        return text.shallowCopy();
+        return text.copy();
     }
 
     /**
@@ -72,7 +72,7 @@ public class TextUtil {
             return null;
         }
         return join(
-            stringCollection.stream().map(str -> new LiteralText(str).setStyle(stringsFormatting)).toArray(Text[]::new),
+            stringCollection.stream().map(str -> Text.literal(str).setStyle(stringsFormatting)).toArray(Text[]::new),
             separator, 0, stringCollection.size()
         );
     }
@@ -116,7 +116,7 @@ public class TextUtil {
         if (bufSize <= 0) {
             return null;
         }
-        MutableText buf = new LiteralText("");
+        MutableText buf = Text.literal("");
         for (int i = startIndex; i < endIndex; i++) {
             if (i > startIndex) {
                 buf.append(separator);
@@ -142,18 +142,18 @@ public class TextUtil {
             return concat(array);
         }
 
-        MutableText outText = new LiteralText("");//new ArrayList<>(strings.size() * 2 - 1);
+        MutableText outText = Text.literal("");//new ArrayList<>(strings.size() * 2 - 1);
         String lrPadStr = " ".repeat(padding);
         String spaceStr = " ".repeat((totalWidth - padding * 2 - totalTextSize) / (array.length - 1));
-        outText.append(new LiteralText(lrPadStr));
+        outText.append(Text.literal(lrPadStr));
 
         for (int i = 0; i < array.length; i++) {
             outText.append(array[i]);
             if (i != array.length - 1)
-                outText.append(new LiteralText(spaceStr));
+                outText.append(Text.literal(spaceStr));
         }
 
-        outText.append(new LiteralText(lrPadStr));
+        outText.append(Text.literal(lrPadStr));
 
         return outText;
     }
@@ -163,7 +163,7 @@ public class TextUtil {
 
         Style outStyle = originalText.getStyle()
             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, teleportCommand))
-            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to teleport to " + destinationName +".")));
+            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to teleport to " + destinationName +".")));
 
         return originalText.setStyle(outStyle);
     }
@@ -186,7 +186,7 @@ public class TextUtil {
                 javaVersion,
                 16
             ));
-            registerTextParser(TextParser::parse);
+            registerTextParser(TextParserUtils::formatText);
         } else {
             ECCore.LOGGER.log(Level.WARN, String.format(
                 "Detected Java version %d. Some features require Java %d. Some text formatting features will be disabled.",

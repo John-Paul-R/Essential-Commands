@@ -6,11 +6,11 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 import dev.jpcode.eccore.util.TextUtil;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
-import net.minecraft.util.Util;
+import net.minecraft.text.Text;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,19 +58,19 @@ public class TeleportRequestManager {
             if (requesterPlayerData.getTpTimer() < 0) {
                 teleportRequest.end();
                 // Teleport expiry message to sender
-                teleportRequest.getSenderPlayer().sendSystemMessage(TextUtil.concat(
+                teleportRequest.getSenderPlayer().sendMessage(TextUtil.concat(
                     lang.getText("teleport.request.expired.1"),
                     lang.getText("teleport.request.expired.sender.2"),
                     teleportRequest.getTargetPlayer().getDisplayName(),
                     lang.getText("teleport.request.expired.3")
-                ), Util.NIL_UUID);
+                ), MessageType.SYSTEM);
                 // Teleport expiry message to receiver
-                teleportRequest.getTargetPlayer().sendSystemMessage(TextUtil.concat(
+                teleportRequest.getTargetPlayer().sendMessage(TextUtil.concat(
                     lang.getText("teleport.request.expired.1"),
                     lang.getText("teleport.request.expired.receiver.2"),
                     teleportRequest.getSenderPlayer().getDisplayName(),
                     lang.getText("teleport.request.expired.3")
-                ), Util.NIL_UUID);
+                ), MessageType.SYSTEM);
             }
         }
 
@@ -101,9 +101,9 @@ public class TeleportRequestManager {
                 Objects.requireNonNull( ((ServerPlayerEntityAccess)playerEntity).endEcQueuedTeleport());
 
                 delayedQueuedTeleportMap.remove(playerEntity.getUuid());
-                playerEntity.sendSystemMessage(
-                    new LiteralText("Teleport interrupted. Reason: Damage Taken").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                    Util.NIL_UUID
+                playerEntity.sendMessage(
+                    Text.literal("Teleport interrupted. Reason: Damage Taken").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                    MessageType.SYSTEM
                 );
             } catch (NullPointerException ignored) {}
         }
@@ -140,10 +140,10 @@ public class TeleportRequestManager {
             queuedTeleport
         );
         if (Objects.nonNull(prevValue)) {
-            prevValue.getPlayerData().getPlayer().sendSystemMessage(
-                new LiteralText("Teleport request canceled. Reason: New teleport started!")
+            prevValue.getPlayerData().getPlayer().sendMessage(
+                Text.literal("Teleport request canceled. Reason: New teleport started!")
                     .setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                Util.NIL_UUID
+                MessageType.SYSTEM
             );
         }
 

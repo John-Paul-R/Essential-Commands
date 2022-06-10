@@ -1,17 +1,11 @@
 package com.fibermc.essentialcommands;
 
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class NicknameText extends LiteralText {
-
-    public NicknameText(String string) {
-        super(string);
-    }
+public class NicknameTextUtil {
 
     private static class NickPerms {
         public final boolean color;
@@ -36,7 +30,7 @@ public class NicknameText extends LiteralText {
     // Returns true if they have the permissions for this nickname
     private static boolean hasPermissionForTextFragment(Text text, NickPerms sourcePerms) {
         Style style = text.getStyle();
-        // If the nickname has not click event, return true
+        // If the nickname has no click event, return true
         // if it DOES have a clickEvent, return true if they have the clickEvent permission...
         return areAllTrue(
             (sourcePerms.color || (style.getColor() == null)),
@@ -67,8 +61,5 @@ public class NicknameText extends LiteralText {
 
     public static boolean checkPerms(Text parentText, ServerCommandSource source) {
         return checkPerms(parentText, new NickPerms(source));
-    }
-    public boolean checkPerms(ServerPlayerEntity playerEntity) {
-        return checkPerms(this, playerEntity.getCommandSource());
     }
 }

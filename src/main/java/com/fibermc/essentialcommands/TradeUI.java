@@ -10,8 +10,7 @@
 //import net.minecraft.item.ItemStack;
 //import net.minecraft.item.Items;
 //import net.minecraft.server.network.ServerPlayerEntity;
-//import net.minecraft.text.LiteralText;
-//
+////
 //public class TradeUI {
 //
 //
@@ -20,7 +19,7 @@
 //    }
 //
 //    private Screen getPlayerUI(ServerPlayerEntity player1, ServerPlayerEntity player2) {
-//        ContainerScreen54 p1UI = new ContainerScreen54(getUIContainer(player1, player2), player1.inventory, new LiteralText("Trade with " + player2.getName()) );
+//        ContainerScreen54 p1UI = new ContainerScreen54(getUIContainer(player1, player2), player1.inventory, Text.literal("Trade with " + player2.getName()) );
 //
 //        return p1UI;
 //    }

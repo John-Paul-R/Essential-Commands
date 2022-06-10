@@ -8,8 +8,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 
 import java.util.List;
 
@@ -21,19 +21,19 @@ public class RealNameCommand implements Command<ServerCommandSource> {
 
         String nicknameStr = StringArgumentType.getString(context, "player_nickname");
         List<PlayerData> nicknamePlayers = PlayerDataManager.getInstance().getPlayerDataMatchingNickname(nicknameStr);
-        MutableText responseText = new LiteralText("");
+        MutableText responseText = Text.literal("");
 
         // If no players matched the provided nickname
         if (nicknamePlayers.size() == 0) {
             responseText
                 .append(ECText.getInstance().getText("cmd.realname.feedback.none_match").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
-                .append(new LiteralText(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                .append(Text.literal(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
                 .append(ECText.getInstance().getText("generic.quote_fullstop").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
 
         } else {
             responseText
                 .append(ECText.getInstance().getText("cmd.realname.feedback.matching.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
-                .append(new LiteralText(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                .append(Text.literal(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
                 .append(ECText.getInstance().getText("cmd.realname.feedback.matching.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
 
             for (PlayerData nicknamePlayer : nicknamePlayers) {
