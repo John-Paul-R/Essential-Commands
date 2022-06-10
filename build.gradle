@@ -162,6 +162,7 @@ publishing {
 }
 
 
+import com.github.breadmoirai.githubreleaseplugin.GithubReleaseTask
 import com.modrinth.minotaur.TaskModrinthUpload
 import com.modrinth.minotaur.dependencies.DependencyType
 import com.modrinth.minotaur.dependencies.ModDependency
@@ -169,7 +170,6 @@ import com.modrinth.minotaur.request.VersionType
 
 modrinth {
     Map env = getenv()
-
     token = env.get("MODRINTH") // An environment property called MODRINTH that is your token, set via Gradle CLI, GitHub Actions, Idea Run Configuration, or other
     projectId = project.modrinth_project_id
     versionNumber = project.version // Will fail if Modrinth has this version already
@@ -253,12 +253,17 @@ curseforge {
     }
 }
 
-tasks.getByName("githubRelease").each { task -> configure(task) {
-    group = "upload"
-}}
+task publishGithubRelease (type: GithubReleaseTask){
+    description 'Creates a GitHub Release for the project'
+    group 'upload'
+
+    Map env = getenv()
+    onlyIf {
+        env.containsKey("GITHUB")
+    }
+}
 githubRelease {
     Map env = getenv()
-    group = "upload"
     token = env.get("GITHUB") // This is your personal access token with Repo permissions
     // You get this from your user settings > developer settings > Personal Access Tokens
     owner = project.gh_owner // default is the last part of your group. Eg group: "com.github.breadmoirai" => owner: "breadmoirai"
@@ -277,6 +282,7 @@ githubRelease {
     dryRun = false // by default false; you can use this to see what actions would be taken without making a release
     apiEndpoint = "https://api.github.com" // should only change for github enterprise users
     client // This is the okhttp client used for http requests
+    allowUploadToExisting = false
 }
 
 generatePomFileForMavenJavaPublication {}
