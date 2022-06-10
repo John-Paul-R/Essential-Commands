@@ -112,9 +112,9 @@ tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
 
     // Minecraft 1.17 (21w19a) upwards uses Java 16.
-    it.options.release = 17
+    it.options.release.set(17)
 }
 
-def getTimestamp() {
+static def getTimestamp() {
     return new Date().format('yyyyMMddHHmmss')
 }
