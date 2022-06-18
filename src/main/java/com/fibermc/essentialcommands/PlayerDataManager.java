@@ -8,6 +8,7 @@ import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.TextParserUtils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -18,7 +19,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,7 +56,7 @@ public class PlayerDataManager {
         if (CONFIG.ENABLE_MOTD.getValue()) {
             var player = handler.getPlayer();
             var message = Placeholders.parseText(
-                Text.literal(CONFIG.MOTD.getValue()),
+                TextParserUtils.formatText(CONFIG.MOTD.getValue()),
                 PlaceholderContext.of(player)
             );
             player.getCommandSource().sendFeedback(message, false);
