@@ -271,9 +271,9 @@ githubRelease {
     body = readChangelogFromFile() // by default this is empty
     draft = false // by default this is false
     prerelease = false // by default this is false
-    releaseAssets libsDirectory.getAsFileTree().matching {
-        "**/*${project.version}.jar"
-    }// this points to which files you want to upload as assets with your release
+    releaseAssets libsDirectory
+        .getAsFileTree()
+        .matching((PatternFilterable pattern) -> pattern.include("**/*${project.version}.jar"))
     //jar.outputs.getFiles().asPath//
     overwrite = false // by default false; if set to true, will delete an existing release with the same tag and name
     dryRun = false // by default false; you can use this to see what actions would be taken without making a release
