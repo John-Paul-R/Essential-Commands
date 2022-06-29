@@ -28,7 +28,7 @@ public abstract class ECText {
     private static final Pattern TOKEN_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]");
     public static final String DEFAULT_LANGUAGE = "en_us";
 
-    private static volatile ECText instance = create("en_us");
+    private static volatile ECText instance = create(CONFIG.LANGUAGE.getValue());
 
     private ECText() {}
 
