@@ -184,6 +184,10 @@ public class PlayerData extends PersistentState {
             }
         }
 
+        if (dataTag.contains("rtpNextUsableTime")) {
+            this.rtpNextUsableTime = dataTag.getInt("rtpNextUsableTime");
+        }
+
         if (this.player != null) {
             updatePlayer(this.player);
         }
@@ -199,6 +203,8 @@ public class PlayerData extends PersistentState {
         tag.put("homes", homesNbt);
 
         tag.putString("nickname", Text.Serializer.toJson(nickname));
+
+        tag.putInt("rtpNextUsableTime", rtpNextUsableTime);
 
         return tag;
     }
