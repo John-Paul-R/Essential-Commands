@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import com.fibermc.essentialcommands.util.TimeUtil;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.jpcode.eccore.util.TextUtil;
 import io.github.ladysnake.pal.Pal;
@@ -52,7 +53,7 @@ public class PlayerData extends PersistentState {
     private MutableText fullNickname;
 
     // RTP Cooldown
-    private int rtpNextUsableTime;
+    private int timeUsedRtp;
 
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
@@ -165,19 +166,27 @@ public class PlayerData extends PersistentState {
         return homes.get(homeName);
     }
 
+    private static final class StorageKey
+    {
+        static final String playerUuid = "playerUuid";
+        static final String homes = "homes";
+        static final String nickname = "nickname";
+        static final String timeUsedRtpEpochMs = "timeUsedRtpEpochMs";
+    }
+
     public void fromNbt(NbtCompound tag) {
         NbtCompound dataTag = tag.getCompound("data");
-        this.pUuid = dataTag.getUuid("playerUuid");
+        this.pUuid = dataTag.getUuid(StorageKey.playerUuid);
 
         NamedLocationStorage homes = new NamedLocationStorage();
-        NbtElement homesTag = dataTag.get("homes");
+        NbtElement homesTag = dataTag.get(StorageKey.homes);
         if (homesTag != null) {
             homes.loadNbt(homesTag);
         }
         this.homes = homes;
 
-        if (dataTag.contains("nickname")){
-            this.nickname = Text.Serializer.fromJson(dataTag.getString("nickname"));
+        if (dataTag.contains(StorageKey.nickname)){
+            this.nickname = Text.Serializer.fromJson(dataTag.getString(StorageKey.nickname));
             try {
                 reloadFullNickname();
             } catch (NullPointerException ignore) {
@@ -185,8 +194,8 @@ public class PlayerData extends PersistentState {
             }
         }
 
-        if (dataTag.contains("rtpNextUsableTime")) {
-            this.rtpNextUsableTime = dataTag.getInt("rtpNextUsableTime");
+        if (dataTag.contains(StorageKey.timeUsedRtpEpochMs)) {
+            this.timeUsedRtp = TimeUtil.epochTimeMsToTicks(dataTag.getLong(StorageKey.timeUsedRtpEpochMs));
         }
 
         if (this.player != null) {
@@ -197,15 +206,15 @@ public class PlayerData extends PersistentState {
 
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
-        tag.putUuid("playerUuid", pUuid);
+        tag.putUuid(StorageKey.playerUuid, pUuid);
 
         NbtCompound homesNbt = new NbtCompound();
         homes.writeNbt(homesNbt);
-        tag.put("homes", homesNbt);
+        tag.put(StorageKey.homes, homesNbt);
 
-        tag.putString("nickname", Text.Serializer.toJson(nickname));
+        tag.putString(StorageKey.nickname, Text.Serializer.toJson(nickname));
 
-        tag.putInt("rtpNextUsableTime", rtpNextUsableTime);
+        tag.putLong(StorageKey.timeUsedRtpEpochMs, TimeUtil.tickTimeToEpochMs(timeUsedRtp));
 
         return tag;
     }
@@ -331,12 +340,13 @@ public class PlayerData extends PersistentState {
         super.save(saveFile);
     }
 
-    public void setRtpNextUsableTime(int i) {
-        this.rtpNextUsableTime = i;
+    public void setTimeUsedRtp(int i) {
+        this.timeUsedRtp = i;
+        this.markDirty();
     }
 
-    public int getRtpNextUsableTime() {
-        return rtpNextUsableTime;
+    public int getTimeUsedRtp() {
+        return timeUsedRtp;
     }
 
     public void reloadFullNickname() {
