@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
+import com.fibermc.essentialcommands.util.TimeUtil;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -37,6 +38,7 @@ public final class EssentialCommands implements ModInitializer {
         ManagerLocator managers = ManagerLocator.getInstance();
         managers.init();
         ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
+            TimeUtil.init(server);
             managers.onServerStart(server);
             ECPerms.init(); // ECPerms must start after WorldDataManager at present (for warps).
         });

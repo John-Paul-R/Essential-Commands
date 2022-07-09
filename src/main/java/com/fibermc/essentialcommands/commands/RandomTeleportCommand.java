@@ -48,7 +48,26 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             return -3;
         }
 
-        var thread = new Thread("RTP Location Calculator Thread") {
+        //TODO Add OP/Permission bypass for RTP cooldown.
+        if (CONFIG.RTP_COOLDOWN.getValue() > 0) {
+            ServerCommandSource source = context.getSource();
+            int curServerTickTime = source.getServer().getTicks();
+            PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
+            var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN.getValue() * 20;
+            var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
+            if (rtpCooldownRemaining > 0) {
+                source.sendError(TextUtil.concat(
+                    ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                    Text.literal(String.format("%.1f", rtpCooldownRemaining / 20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                    ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+                ));
+                return -2;
+            } else { // if cooldown has expired
+                playerData.setTimeUsedRtp(curServerTickTime);
+            }
+        }
+
+        new Thread("RTP Location Calculator Thread") {
             public void run() {
                 try {
                     exec(context.getSource(), world);
@@ -56,26 +75,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                     e.printStackTrace();
                 }
             }
-        };
-
-        //TODO Add OP/Permission bypass for RTP cooldown.
-        if (CONFIG.RTP_COOLDOWN.getValue() > 0) {
-            ServerCommandSource source = context.getSource();
-            int curServerTickTime = source.getServer().getTicks();
-            PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
-            if (playerData.getRtpNextUsableTime() >= curServerTickTime) {
-                source.sendError(TextUtil.concat(
-                    ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                    Text.literal(String.format("%.1f", (playerData.getRtpNextUsableTime() - curServerTickTime)/20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                    ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
-                ));
-                return -2;
-            } else { // if cooldown has expired
-                playerData.setRtpNextUsableTime(curServerTickTime + CONFIG.RTP_COOLDOWN.getValue()*20);
-            }
-        }
-
-        thread.start();
+        }.start();
         return 1;
     }
 
