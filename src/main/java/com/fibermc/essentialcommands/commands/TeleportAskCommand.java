@@ -30,10 +30,11 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
                 .getEcPlayerData()
                 .getSentTeleportRequest();
             if (existingTeleportRequest != null && existingTeleportRequest.getTargetPlayer().equals(targetPlayer)) {
-                senderPlayer.sendMessage(TextUtil.concat(
-                    ECText.getInstance().getText("cmd.tpask.error.exists"),
-                    existingTeleportRequest.getTargetPlayer().getDisplayName()
-                ), MessageType.SYSTEM);
+                senderPlayer.sendMessage(
+                    ECText.getInstance().getText(
+                        "cmd.tpask.error.exists",
+                        existingTeleportRequest.getTargetPlayer().getDisplayName())
+                    , MessageType.SYSTEM);
                 return 0;
             }
         }
@@ -41,7 +42,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         //inform target player of tp request via chat
         targetPlayer.sendMessage(TextUtil.concat(
             Text.literal(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-            ECText.getInstance().getText("cmd.tpask.receive").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+            ECText.getInstance().getText("cmd.tpask.receive")
         ), MessageType.SYSTEM);
 
         String senderName = context.getSource().getPlayer().getGameProfile().getName();
@@ -56,12 +57,12 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_TO);
 
+        var targetPlayerText = Text.literal(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
         //inform command sender that request has been sent
-        context.getSource().sendFeedback(TextUtil.concat(
-            Text.literal("Teleport request has been sent to ").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            Text.literal(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
-        ), CONFIG.BROADCAST_TO_OPS.getValue());
-        
+        context.getSource().sendFeedback(
+            ECText.getInstance().getText("cmd.tpask.send", targetPlayerText),
+            CONFIG.BROADCAST_TO_OPS.getValue());
+
         return 1;
     }
 }

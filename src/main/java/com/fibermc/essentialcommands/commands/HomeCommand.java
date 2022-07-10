@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -14,6 +15,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,12 +67,18 @@ public class HomeCommand implements Command<ServerCommandSource> {
         MinecraftLocation loc = targetPlayerData.getHomeLocation(homeName);
 
         if (loc == null) {
-            Message msg = ECText.getInstance().getText("cmd.home.tp.error.not_found", "null");
+            Message msg = ECText.getInstance().getText(
+                "cmd.home.tp.error.not_found",
+                TextFormatType.Error,
+                Text.literal(homeName));
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
         }
 
         // Teleport & chat message
-        PlayerTeleporter.requestTeleport(senderPlayerData, loc, ECText.getInstance().getText("cmd.home.location_name", homeName));
+        PlayerTeleporter.requestTeleport(
+            senderPlayerData,
+            loc,
+            ECText.getInstance().getText("cmd.home.location_name", Text.literal(homeName)));
         return 1;
     }
 

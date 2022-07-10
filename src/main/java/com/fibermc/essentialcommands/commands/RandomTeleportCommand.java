@@ -10,6 +10,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
+import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -41,11 +42,10 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         ServerWorld world = context.getSource().getWorld();
 
         if (!world.getRegistryKey().equals(World.OVERWORLD)) {
-            context.getSource().sendError(TextUtil.concat(
+            throw new CommandException(TextUtil.concat(
                 ECText.getInstance().getText("cmd.rtp.error.pre").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
                 ECText.getInstance().getText("cmd.rtp.error.not_overworld").setStyle(CONFIG.FORMATTING_ERROR.getValue())
             ));
-            return -3;
         }
 
         //TODO Add OP/Permission bypass for RTP cooldown.
@@ -56,15 +56,15 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN.getValue() * 20;
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
             if (rtpCooldownRemaining > 0) {
-                source.sendError(TextUtil.concat(
-                    ECText.getInstance().getText("cmd.rtp.error.cooldown.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                    Text.literal(String.format("%.1f", rtpCooldownRemaining / 20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                    ECText.getInstance().getText("cmd.rtp.error.cooldown.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
-                ));
-                return -2;
-            } else { // if cooldown has expired
-                playerData.setTimeUsedRtp(curServerTickTime);
+                throw new CommandException(
+                    ECText.getInstance().getText(
+                        "cmd.rtp.error.cooldown",
+                        TextFormatType.Error,
+                        Text.literal(String.format("%.1f", rtpCooldownRemaining / 20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                );
             }
+            // if cooldown has expired
+            playerData.setTimeUsedRtp(curServerTickTime);
         }
 
         new Thread("RTP Location Calculator Thread") {

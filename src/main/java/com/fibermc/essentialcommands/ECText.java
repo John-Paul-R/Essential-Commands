@@ -6,7 +6,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import dev.jpcode.eccore.util.TextUtil;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.PlaceholderResult;
+import eu.pb4.placeholders.api.Placeholders;
 import net.minecraft.client.font.TextVisitFactory;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.*;
 import net.minecraft.util.JsonHelper;
 
@@ -29,6 +34,7 @@ public abstract class ECText {
     public static final String DEFAULT_LANGUAGE = "en_us";
 
     private static volatile ECText instance = create(CONFIG.LANGUAGE.getValue());
+    private static MinecraftServer _server;
 
     private ECText() {}
 
@@ -36,6 +42,10 @@ public abstract class ECText {
         CONFIG.LANGUAGE.changeEvent.register((langId) -> {
             instance = create(langId);
         });
+    }
+
+    public static void init(MinecraftServer server) {
+        _server = server;
     }
 
     private static ECText create(String langId) {
@@ -83,6 +93,41 @@ public abstract class ECText {
                 return Text.literal(get(key)).setStyle(CONFIG.FORMATTING_DEFAULT.getValue());
             }
 
+            public MutableText getText(String key,  Text... args) {
+                return getText(key, TextFormatType.Default, args);
+            }
+
+            public MutableText getText(String key, TextFormatType textFormatType,  Text... args) {
+                var argsList = Arrays.stream(args).map(Text::copy).toList();
+                Placeholders.PlaceholderGetter placeholderGetter = (placeholderId) ->
+                    (ctx, abc) -> {
+                        var idxAndFormattingCode = placeholderId.split(":");
+                        if (idxAndFormattingCode.length < 1) {
+                            throw new IllegalArgumentException("lang string placeholder did not contain an index");
+                        }
+                        var text = argsList.get(Integer.parseInt(idxAndFormattingCode[0]));
+
+                        if (idxAndFormattingCode.length == 2) {
+                            var style = switch (idxAndFormattingCode[1]) {
+                                case "d" -> CONFIG.FORMATTING_DEFAULT.getValue();
+                                case "a" -> CONFIG.FORMATTING_ACCENT.getValue();
+                                case "e" -> CONFIG.FORMATTING_ERROR.getValue();
+                                default -> throw new StringIndexOutOfBoundsException();
+                            };
+                            text.setStyle(style);
+                        }
+                        return PlaceholderResult.value(text);
+                    };
+
+                var retVal = Placeholders.parseText(getText(key), PlaceholderContext.of(_server), Placeholders.PREDEFINED_PLACEHOLDER_PATTERN, placeholderGetter);
+
+                return TextUtil.concat(retVal.getSiblings().stream()
+                    .map(txt -> argsList.contains(txt)
+                        ? txt
+                        : txt.copy().setStyle(textFormatType.getStyle()))
+                    .toArray(Text[]::new));
+            }
+
             public MutableText getText(String key, Object... args) {
                 return Text.literal(String.format(get(key), args)).setStyle(CONFIG.FORMATTING_DEFAULT.getValue());
             }
@@ -125,6 +170,10 @@ public abstract class ECText {
 //        Language
 //    }
     public abstract String get(String key);
+
+    public abstract MutableText getText(String key, Text... args);
+
+    public abstract MutableText getText(String key, TextFormatType textFormatType,  Text... args);
 
     public abstract MutableText getText(String key, Object... args);
 

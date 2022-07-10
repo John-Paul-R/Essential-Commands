@@ -5,7 +5,6 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -22,11 +21,11 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
         targetPlayerEntityAccess.getEcPlayerData().setNickname(null);
 
         //inform command sender that the nickname has been set
-        context.getSource().sendFeedback(TextUtil.concat(
-            ECText.getInstance().getText("cmd.nickname.set.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            Text.literal(targetPlayer.getGameProfile().getName()),
-            ECText.getInstance().getText("generic.quote_fullstop").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-        ), CONFIG.BROADCAST_TO_OPS.getValue());
+        context.getSource().sendFeedback(
+            ECText.getInstance().getText(
+                "cmd.nickname.set.feedback",
+                Text.literal(targetPlayer.getGameProfile().getName())),
+            CONFIG.BROADCAST_TO_OPS.getValue());
 
         return 1;
     }

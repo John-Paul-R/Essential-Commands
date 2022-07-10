@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -39,11 +40,11 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
 
         //inform command sender that the nickname has been set
         if (successCode >= 0) {
-            source.sendFeedback(TextUtil.concat(
-                ECText.getInstance().getText("cmd.nickname.set.feedback").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                (nicknameText != null) ? nicknameText : Text.literal(targetPlayer.getGameProfile().getName()),
-                ECText.getInstance().getText("generic.quote_fullstop").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-            ), CONFIG.BROADCAST_TO_OPS.getValue());
+            source.sendFeedback(
+                ECText.getInstance().getText(
+                    "cmd.nickname.set.feedback",
+                    (nicknameText != null) ? nicknameText : Text.literal(targetPlayer.getGameProfile().getName())),
+                CONFIG.BROADCAST_TO_OPS.getValue());
         } else {
             MutableText failReason = switch (successCode) {
                 case -1 -> ECText.getInstance().getText("cmd.nickname.set.error.perms");
@@ -54,12 +55,13 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
                 );
                 default -> ECText.getInstance().getText("generic.error.unknown");
             };
-            source.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.nickname.set.error.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                nicknameText,
-                ECText.getInstance().getText("cmd.nickname.set.error.2").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                failReason.setStyle(CONFIG.FORMATTING_ERROR.getValue())
-            ));
+            source.sendError(
+                ECText.getInstance().getText(
+                    "cmd.nickname.set.error",
+                    TextFormatType.Error,
+                    nicknameText,
+                    failReason.setStyle(CONFIG.FORMATTING_ERROR.getValue()))
+            );
         }
 
         return successCode;
