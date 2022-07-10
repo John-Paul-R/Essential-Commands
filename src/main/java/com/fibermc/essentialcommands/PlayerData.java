@@ -18,10 +18,7 @@ import net.minecraft.text.Text;
 import net.minecraft.world.PersistentState;
 
 import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -283,9 +280,10 @@ public class PlayerData extends PersistentState {
         this.tpCooldown = cooldown;
     }
 
-    public MutableText getNickname() {
-        return nickname != null ? nickname.copy() : null;
+    public Optional<MutableText> getNickname() {
+        return Optional.ofNullable(nickname != null ? nickname.copy() : null);
     }
+
     public MutableText getFullNickname() {
         return fullNickname;
     }
@@ -350,7 +348,7 @@ public class PlayerData extends PersistentState {
         return timeUsedRtp;
     }
 
-    public void reloadFullNickname() {
+    private void reloadFullNickname() {
         MutableText baseName = Text.literal(this.getPlayer().getGameProfile().getName());
         MutableText tempFullNickname = Text.empty();
         // Note: this doesn't ever display if nickname is null,

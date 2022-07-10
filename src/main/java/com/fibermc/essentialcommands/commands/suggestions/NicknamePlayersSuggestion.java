@@ -6,7 +6,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 
-import java.util.Objects;
+import java.util.Optional;
 
 public class NicknamePlayersSuggestion {
     //Brigader Suggestions
@@ -14,7 +14,8 @@ public class NicknamePlayersSuggestion {
         return ListSuggestion.ofContext(context ->
             PlayerDataManager.getInstance().getAllPlayerData().stream()
                 .map(PlayerData::getNickname)
-                .filter(Objects::nonNull)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .map(MutableText::getString)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList()
