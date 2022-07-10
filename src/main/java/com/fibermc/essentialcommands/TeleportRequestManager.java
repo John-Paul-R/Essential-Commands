@@ -10,7 +10,6 @@ import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,7 +99,7 @@ public class TeleportRequestManager {
 
                 delayedQueuedTeleportMap.remove(playerEntity.getUuid());
                 playerEntity.sendMessage(
-                    Text.literal("Teleport interrupted. Reason: Damage Taken").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                    ECText.getInstance().getText("teleport.interrupted.damage", TextFormatType.Error),
                     MessageType.SYSTEM
                 );
             } catch (NullPointerException ignored) {}
