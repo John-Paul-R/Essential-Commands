@@ -162,7 +162,10 @@ public class PlayerDataManager {
      */
     public List<PlayerData> getPlayerDataMatchingNickname(String nickname) {
         return dataMap.values().stream()
-            .filter(playerData -> playerData.getNickname().getString().equalsIgnoreCase(nickname))
+            .filter(playerData -> playerData
+                .getNickname()
+                .map(nick -> nick.getString().equalsIgnoreCase(nickname))
+                .orElse(false))
             .collect(Collectors.toList());
     }
 }
