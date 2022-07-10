@@ -57,11 +57,11 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_HERE);
 
+        var targetPlayerText = Text.literal(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
         //inform command sender that request has been sent
-        context.getSource().sendFeedback(TextUtil.concat(
-            Text.literal("Teleport request has been sent to ").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            Text.literal(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
-        ), CONFIG.BROADCAST_TO_OPS.getValue());
+        context.getSource().sendFeedback(
+            ECText.getInstance().getText("cmd.tpask.send", targetPlayerText),
+            CONFIG.BROADCAST_TO_OPS.getValue());
 
         return 1;
     }
