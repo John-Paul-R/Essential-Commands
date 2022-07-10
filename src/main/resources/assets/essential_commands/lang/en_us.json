@@ -66,6 +66,7 @@
   "teleport.request.expired.sender.2": "to",
   "teleport.request.expired.receiver.2":  "from",
   "teleport.request.expired.3": " expired.",
+  "teleport.request.canceled_by_new": "Queued Teleport to '${0}' canceled. Reason: New teleport to '${1}' started!",
 
   "generic.argument.target_player": "",
   "generic.error.unknown": "An unknown error occured while executing the command.",

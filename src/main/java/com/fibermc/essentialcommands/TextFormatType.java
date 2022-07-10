@@ -3,6 +3,8 @@ package com.fibermc.essentialcommands;
 import dev.jpcode.eccore.config.Option;
 import net.minecraft.text.Style;
 
+import java.util.function.UnaryOperator;
+
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public enum TextFormatType {
@@ -15,7 +17,20 @@ public enum TextFormatType {
     public Style getStyle() {
         return _style.getValue();
     }
-    private TextFormatType(Option<Style> style) {
+
+    public UnaryOperator<Style> nonOverwritingStyleUpdater() {
+        return (s) -> {
+            var style = this.getStyle();
+            // The goal here is to overwrite defaults, but not custom styles (e.g. from nickname).
+            boolean shouldApply = s.getColor() == null
+                || s == Default.getStyle()
+                || s == Accent.getStyle()
+                || s == Error.getStyle();
+            return shouldApply ? s.withColor(style.getColor()) : s;
+        };
+    }
+
+    TextFormatType(Option<Style> style) {
         this._style = style;
     }
 }

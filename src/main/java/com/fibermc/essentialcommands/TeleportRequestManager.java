@@ -33,7 +33,7 @@ public class TeleportRequestManager {
     public TeleportRequestManager(PlayerDataManager dataManager) {
         INSTANCE = this;
         this.dataManager = dataManager;
-        activeTpRequestList = new LinkedList<TeleportRequest>();
+        activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
         delayedQueuedTeleportMap = new ConcurrentHashMap<>();
     }
@@ -139,10 +139,13 @@ public class TeleportRequestManager {
             queuedTeleport.getPlayerData().getPlayer().getUuid(),
             queuedTeleport
         );
-        if (Objects.nonNull(prevValue)) {
+        if (prevValue != null) {
+            var styleUpdater = TextFormatType.Accent.nonOverwritingStyleUpdater();
             prevValue.getPlayerData().getPlayer().sendMessage(
-                Text.literal("Teleport request canceled. Reason: New teleport started!")
-                    .setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+                ECText.getInstance().getText(
+                    "teleport.request.canceled_by_new",
+                    prevValue.getDestName().styled(styleUpdater),
+                    queuedTeleport.getDestName().styled(styleUpdater)),
                 MessageType.SYSTEM
             );
         }
