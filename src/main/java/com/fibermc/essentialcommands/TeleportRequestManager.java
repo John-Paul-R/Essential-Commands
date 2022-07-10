@@ -23,17 +23,15 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 public class TeleportRequestManager {
 
     private static final int TPS = 20;
-    private final PlayerDataManager dataManager;
     private final LinkedList<TeleportRequest> activeTpRequestList;
     private final LinkedList<PlayerData> tpCooldownList;
     private final ConcurrentHashMap<UUID, QueuedTeleport> delayedQueuedTeleportMap;
 
     private static TeleportRequestManager INSTANCE;
 
-    public TeleportRequestManager(PlayerDataManager dataManager) {
+    public TeleportRequestManager() {
         INSTANCE = this;
-        this.dataManager = dataManager;
-        activeTpRequestList = new LinkedList<TeleportRequest>();
+        activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
         delayedQueuedTeleportMap = new ConcurrentHashMap<>();
     }
