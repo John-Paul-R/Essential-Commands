@@ -133,13 +133,15 @@ public class PlayerData extends PersistentState {
             this.markDirty();
             outCode = 1;
         } else {
-            this.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                ECText.getInstance().getText("cmd.home.set.error.limit.2").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                Text.literal(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                ECText.getInstance().getText("cmd.home.set.error.limit.3").setStyle(CONFIG.FORMATTING_ERROR.getValue())
-            ));
+            var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+            var maxHomesText = Text.literal(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+            this.sendError(
+                ECText.getInstance().getText(
+                    "cmd.home.set.error.limit",
+                    TextFormatType.Error,
+                    homeNameText,
+                    maxHomesText
+                ));
         }
 
         return outCode;

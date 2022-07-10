@@ -2,12 +2,12 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.WorldDataManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -25,21 +25,20 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
 
         boolean wasSuccessful = worldDataManager.delWarp(warpName);
 
+        var warpNameText = Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
         //inform command sender that the warp has been removed
         if (!wasSuccessful) {
-            source.sendFeedback(TextUtil.concat(
-                ECText.getInstance().getText("cmd.warp.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                ECText.getInstance().getText("cmd.warp.delete.error.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
-            ), CONFIG.BROADCAST_TO_OPS.getValue());
+            source.sendFeedback(
+                ECText.getInstance().getText("cmd.warp.delete.error", TextFormatType.Error, warpNameText),
+                CONFIG.BROADCAST_TO_OPS.getValue()
+            );
             return 0;
         }
 
-        source.sendFeedback(TextUtil.concat(
-            ECText.getInstance().getText("cmd.warp.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-            ECText.getInstance().getText("cmd.warp.delete.feedback.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-        ), CONFIG.BROADCAST_TO_OPS.getValue());
+        source.sendFeedback(
+            ECText.getInstance().getText("cmd.warp.delete.feedback", warpNameText),
+            CONFIG.BROADCAST_TO_OPS.getValue()
+        );
         return 1;
     }
 }

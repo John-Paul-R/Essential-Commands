@@ -28,11 +28,10 @@ public class PlayerTeleporter {
             ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             player.sendMessage(
-                ECText.getInstance().getText("teleport.queued.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-                    .append(queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
-                    .append(ECText.getInstance().getText("teleport.queued.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
-                    .append(Text.literal(String.format("%.1f", CONFIG.TELEPORT_DELAY.getValue())).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
-                    .append(ECText.getInstance().getText("teleport.queued.3")).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+                ECText.getInstance().getText(
+                    "teleport.queued",
+                    queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
+                    Text.literal(String.format("%.1f", CONFIG.TELEPORT_DELAY.getValue())).setStyle(CONFIG.FORMATTING_ACCENT.getValue())),
                 MessageType.SYSTEM
             );
         }
@@ -75,9 +74,9 @@ public class PlayerTeleporter {
             dest.headYaw, dest.pitch
         );
         playerEntity.sendMessage(
-            ECText.getInstance().getText("teleport.done.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-                .append(dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
-                .append(Text.literal(".").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())),
+            ECText.getInstance().getText(
+                "teleport.done",
+                dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT.getValue())),
             MessageType.SYSTEM
         );
     }

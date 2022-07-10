@@ -2,13 +2,13 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -31,15 +31,14 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         //Add home to PlayerData
         //TODO if home with given name is already set, warn of overwrite and require that the command be typed again, or a confirmation message be given
         PlayerData pData = ((ServerPlayerEntityAccess)senderPlayer).getEcPlayerData();
+        var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
         int successCode = 0;
         try {
              successCode = pData.addHome(homeName, new MinecraftLocation(senderPlayer));
         } catch (CommandSyntaxException e) {
-            source.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                ECText.getInstance().getText("cmd.home.set.error.exists.2").setStyle(CONFIG.FORMATTING_ERROR.getValue())
-            ));
+            source.sendError(
+                ECText.getInstance().getText("cmd.home.set.error.exists", TextFormatType.Error, homeNameText)
+            );
         }
 
         pData.markDirty();
@@ -47,9 +46,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been set
         if (successCode == 1) {
             source.sendFeedback(
-                ECText.getInstance().getText("cmd.home.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-                    .append(Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
-                    .append(ECText.getInstance().getText("cmd.home.set.feedback.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())),
+                ECText.getInstance().getText("cmd.home.set.feedback", homeNameText),
                 CONFIG.BROADCAST_TO_OPS.getValue()
             );
         }

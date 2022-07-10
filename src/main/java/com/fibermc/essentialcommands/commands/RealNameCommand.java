@@ -23,25 +23,22 @@ public class RealNameCommand implements Command<ServerCommandSource> {
         List<PlayerData> nicknamePlayers = PlayerDataManager.getInstance().getPlayerDataMatchingNickname(nicknameStr);
         MutableText responseText = Text.empty();
 
+        var nicknameText = Text.literal(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
         // If no players matched the provided nickname
         if (nicknamePlayers.size() == 0) {
             responseText
-                .append(ECText.getInstance().getText("cmd.realname.feedback.none_match").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
-                .append(Text.literal(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
-                .append(ECText.getInstance().getText("generic.quote_fullstop").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
+                .append(ECText.getInstance().getText("cmd.realname.feedback.none_match", nicknameText));
 
         } else {
             responseText
-                .append(ECText.getInstance().getText("cmd.realname.feedback.matching.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()))
-                .append(Text.literal(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
-                .append(ECText.getInstance().getText("cmd.realname.feedback.matching.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()));
+                .append(ECText.getInstance().getText("cmd.realname.feedback.matching", nicknameText));
 
             for (PlayerData nicknamePlayer : nicknamePlayers) {
                 responseText.append("\n  ");
                 responseText.append(nicknamePlayer.getPlayer().getGameProfile().getName());
             }
-
         }
+
         context.getSource().sendFeedback(
             responseText, CONFIG.BROADCAST_TO_OPS.getValue()
         );

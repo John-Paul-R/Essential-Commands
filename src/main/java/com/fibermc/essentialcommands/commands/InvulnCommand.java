@@ -6,12 +6,10 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -48,13 +46,15 @@ public class InvulnCommand implements Command<ServerCommandSource> {
 
         // Label boolean values in suggestions, or switch to single state value (present or it's not)
 
+        var enabledText = ECText.getInstance().getText(
+                shouldEnableInvuln ? "generic.enabled" : "generic.disabled")
+            .setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+
         source.sendFeedback(
-            TextUtil.concat(
-                ECText.getInstance().getText("cmd.invuln.feedback.1").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                Text.literal(shouldEnableInvuln ? "enabled" : "disabled").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                ECText.getInstance().getText("cmd.invuln.feedback.2").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-                target.getDisplayName(),
-                Text.literal(".").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
+            ECText.getInstance().getText(
+                "cmd.invuln.feedback",
+                enabledText,
+                target.getDisplayName()
             ),
             CONFIG.BROADCAST_TO_OPS.getValue()
         );
