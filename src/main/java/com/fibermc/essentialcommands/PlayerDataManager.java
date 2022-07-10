@@ -109,9 +109,11 @@ public class PlayerDataManager {
 
     // EVENTS
     private static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
-        PlayerData playerData = getInstance().addPlayerData(player);
+        PlayerData playerData = getInstance().loadPlayerData(player);
         ((ServerPlayerEntityAccess) player).setEcPlayerData(playerData);
-        getInstance().initPlayerDataFile(player);
+        // Immediately save file. (Frankly not sure if this is actually necessary)
+        playerData.markDirty();
+        playerData.save();
     }
 
     private static void onPlayerLeave(ServerPlayerEntity player) {
@@ -132,7 +134,7 @@ public class PlayerDataManager {
     }
 
     // SET / ADD
-    private PlayerData addPlayerData(ServerPlayerEntity player) {
+    private PlayerData loadPlayerData(ServerPlayerEntity player) {
         PlayerData playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
         dataMap.put(player.getUuid(), playerData);
         return playerData;
@@ -145,12 +147,6 @@ public class PlayerDataManager {
     // SAVE / LOAD
     private void unloadPlayerData(ServerPlayerEntity player) {
         this.dataMap.remove(player.getUuid());
-    }
-
-    private void initPlayerDataFile(ServerPlayerEntity player) {
-        PlayerData pData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
-        pData.markDirty();
-        pData.save();
     }
 
     public Collection<PlayerData> getAllPlayerData() {
