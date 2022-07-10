@@ -34,7 +34,7 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
                     ECText.getInstance().getText(
                         "cmd.tpask.error.exists",
                         existingTeleportRequest.getTargetPlayer().getDisplayName())
-                    , MessageType.SYSTEM);
+                    , false);
                 return 0;
             }
         }
