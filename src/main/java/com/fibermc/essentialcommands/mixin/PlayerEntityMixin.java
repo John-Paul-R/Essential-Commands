@@ -32,7 +32,7 @@ public abstract class PlayerEntityMixin {
         }
         try {
             var playerData = ((ServerPlayerEntityAccess)(Object)this).getEcPlayerData();
-            if (playerData.getNickname() != null) {
+            if (playerData.getNickname().isPresent()) {
                 MutableText nickname = playerData.getFullNickname();
                 // Re-add "whisper" click event unless the nickname has a click event set.
                 Style nicknameStyle = nickname.getStyle();
