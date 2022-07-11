@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-import dev.jpcode.eccore.util.TextUtil;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.message.MessageType;
@@ -55,19 +54,17 @@ public class TeleportRequestManager {
             if (requesterPlayerData.getTpTimer() < 0) {
                 teleportRequest.end();
                 // Teleport expiry message to sender
-                teleportRequest.getSenderPlayer().sendMessage(TextUtil.concat(
-                    lang.getText("teleport.request.expired.1"),
-                    lang.getText("teleport.request.expired.sender.2"),
-                    teleportRequest.getTargetPlayer().getDisplayName(),
-                    lang.getText("teleport.request.expired.3")
-                ), MessageType.SYSTEM);
+                teleportRequest.getSenderPlayer().sendMessage(
+                    lang.getText(
+                        "teleport.request.expired.sender",
+                        teleportRequest.getTargetPlayer().getDisplayName()),
+                    MessageType.SYSTEM);
                 // Teleport expiry message to receiver
-                teleportRequest.getTargetPlayer().sendMessage(TextUtil.concat(
-                    lang.getText("teleport.request.expired.1"),
-                    lang.getText("teleport.request.expired.receiver.2"),
-                    teleportRequest.getSenderPlayer().getDisplayName(),
-                    lang.getText("teleport.request.expired.3")
-                ), MessageType.SYSTEM);
+                teleportRequest.getTargetPlayer().sendMessage(
+                    lang.getText(
+                        "teleport.request.expired.receiver",
+                        teleportRequest.getSenderPlayer().getDisplayName()),
+                    MessageType.SYSTEM);
             }
         }
 
