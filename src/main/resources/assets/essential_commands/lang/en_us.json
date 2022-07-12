@@ -59,6 +59,9 @@
   "cmd.list.feedback.empty": "No locations found.",
   "cmd.top.location_name": "world surface",
 
+  "player.afk.enter": "${0} is now AFK.",
+  "player.afk.exit": "${0} is no longer AFK.",
+
   "teleport.error.interdimensional_teleport_disabled": "Teleport failed. Reason: Interdimensional teleportation disabled.",
   "teleport.queued": "Teleporting to ${0} in ${1} seconds...",
   "teleport.done": "Teleported to ${0}.",

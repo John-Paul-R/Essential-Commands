@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
@@ -27,7 +26,7 @@ public class TeleportRequestManager {
 
     private static TeleportRequestManager INSTANCE;
 
-    public TeleportRequestManager() {
+    private TeleportRequestManager() {
         INSTANCE = this;
         activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
@@ -35,12 +34,16 @@ public class TeleportRequestManager {
     }
 
     public static TeleportRequestManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new TeleportRequestManager();
+        }
         return INSTANCE;
     }
 
     public static void init() {
-        PlayerDamageCallback.EVENT.register((ServerPlayerEntity playerEntity, DamageSource source) -> TeleportRequestManager.INSTANCE.onPlayerDamaged(playerEntity, source));
-        ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> TeleportRequestManager.INSTANCE.tick(server));
+        getInstance();
+        PlayerDamageCallback.EVENT.register((ServerPlayerEntity playerEntity, DamageSource source) -> INSTANCE.onPlayerDamaged(playerEntity, source));
+        PlayerDataManager.TICK_EVENT.register(((playerDataManager, server) -> INSTANCE.tick(server)));
     }
 
     public void tick(MinecraftServer server) {

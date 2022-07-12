@@ -15,6 +15,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.PersistentState;
 
 import java.io.File;
@@ -51,8 +52,12 @@ public class PlayerData extends PersistentState {
     // RTP Cooldown
     private int timeUsedRtp;
 
+    private boolean afk;
+    private Vec3d lastTickPos;
+
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
+        this.lastTickPos = player.getPos();
         this.pUuid = player.getUuid();
         this.saveFile = saveFile;
         tpTimer = -1;
@@ -162,6 +167,31 @@ public class PlayerData extends PersistentState {
 
     public MinecraftLocation getHomeLocation(String homeName) {
         return homes.get(homeName);
+    }
+
+    public void setAfk(boolean afk) {
+        this.afk = afk;
+
+        this.player.server.sendMessage(
+            ECText.getInstance().getText(
+                afk ? "player.afk.enter" : "player.afk.exit",
+                this.player.getDisplayName()));
+    }
+
+    public boolean isAfk() {
+        return afk;
+    }
+
+    public void onTickEnd() {
+        var currentPos = player.getPos();
+        if (this.afk && !this.lastTickPos.equals(currentPos)) {
+            this.setAfk(false);
+        }
+        lastTickPos = player.getPos();
+    }
+
+    public Vec3d getLastTickPos() {
+        return lastTickPos;
     }
 
     private static final class StorageKey
