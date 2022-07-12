@@ -33,7 +33,7 @@ public class EnderchestCommand implements Command<ServerCommandSource> {
 
         source.sendFeedback(
             ECText.getInstance().getText("cmd.workbench.feedback", Language.getInstance().get("container.enderchest")),
-            CONFIG.BROADCAST_TO_OPS.getValue()
+            CONFIG.BROADCAST_TO_OPS
         );
 
         return 0;

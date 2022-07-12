@@ -33,7 +33,7 @@ public class GrindstoneCommand implements Command<ServerCommandSource> {
 
         source.sendFeedback(
             ECText.getInstance().getText("cmd.workbench.feedback", Language.getInstance().get("block.minecraft.grindstone")),
-            CONFIG.BROADCAST_TO_OPS.getValue()
+            CONFIG.BROADCAST_TO_OPS
         );
 
         return 0;

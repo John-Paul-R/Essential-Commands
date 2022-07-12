@@ -40,7 +40,7 @@ public abstract class PlayerEntityMixin {
         var name = getNicknameStyledName(teamDecoratedName, playerData);
         return playerData.isAfk()
             ? Text.empty()
-                .append(CONFIG.AFK_PREFIX.getValue())
+                .append(CONFIG.AFK_PREFIX)
                 .append(name)
             : name;
     }

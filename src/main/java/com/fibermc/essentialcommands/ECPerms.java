@@ -96,7 +96,7 @@ public class ECPerms {
     }
 
     public static boolean check(@NotNull CommandSource source, @NotNull String permission, int defaultRequireLevel) {
-        if (CONFIG.USE_PERMISSIONS_API.getValue()) {
+        if (CONFIG.USE_PERMISSIONS_API) {
             try {
                 // TODO: In the future, config option for granting ops all perms.
                 return Permissions.getPermissionValue(source, permission).orElse(source.hasPermissionLevel(Math.max(2, defaultRequireLevel)));
@@ -138,14 +138,14 @@ public class ECPerms {
         }
 
         // If permissions API is disabled, min int value in permission group is used for all non-op players.
-        if (!CONFIG.USE_PERMISSIONS_API.getValue()) {
+        if (!CONFIG.USE_PERMISSIONS_API) {
             return Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
         }
 
         // If permissions api is enabled, find the highest numeric permission node that the user has & return its
         // numeric value.
         int highestValue;
-        if (CONFIG.GRANT_LOWEST_NUMERIC_BY_DEFAULT.getValue()) {
+        if (CONFIG.GRANT_LOWEST_NUMERIC_BY_DEFAULT) {
             // Grant min perm value in group by default, if none are set.
             highestValue = Arrays.stream(permissionGroup).mapToInt(ECPerms::getNumericValue).min().getAsInt();
         } else {

@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
@@ -82,7 +82,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
 
     @Inject(method = "getPlayerListName", at = @At("RETURN"), cancellable = true)
     public void getPlayerListName(CallbackInfoReturnable<Text> cir) {
-        if (EssentialCommandsConfig.getValueSafe(CONFIG.NICKNAMES_IN_PLAYER_LIST, true)) {
+        if (EssentialCommandsConfig.getValueSafe(BACKING_CONFIG.NICKNAMES_IN_PLAYER_LIST, true)) {
             cir.setReturnValue(((ServerPlayerEntity)(Object)this).getDisplayName());
             cir.cancel();
         }

@@ -27,6 +27,7 @@ import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
+import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
 
@@ -60,7 +61,7 @@ public class EssentialCommandRegistry {
             essentialCommandsRootNode.addChild(node);
         };
 
-        if (CONFIG.ENABLE_TPA.getValue()) {
+        if (CONFIG.ENABLE_TPA) {
             registerNode.accept(CommandManager.literal("tpa")
                 .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                 .then(CommandUtil.targetPlayerArgument()
@@ -95,7 +96,7 @@ public class EssentialCommandRegistry {
                 .build());
         }
 
-        if (CONFIG.ENABLE_HOME.getValue()) {
+        if (CONFIG.ENABLE_HOME) {
             LiteralArgumentBuilder<ServerCommandSource> homeBuilder = CommandManager.literal("home");
             LiteralArgumentBuilder<ServerCommandSource> homeSetBuilder = CommandManager.literal("set");
             LiteralArgumentBuilder<ServerCommandSource> homeTpBuilder = CommandManager.literal("tp");
@@ -168,7 +169,7 @@ public class EssentialCommandRegistry {
 
 
         //Back
-        if (CONFIG.ENABLE_BACK.getValue()) {
+        if (CONFIG.ENABLE_BACK) {
             LiteralArgumentBuilder<ServerCommandSource> backBuilder = CommandManager.literal("back");
             backBuilder
                 .requires(ECPerms.require(ECPerms.Registry.back, 0))
@@ -181,7 +182,7 @@ public class EssentialCommandRegistry {
         }
 
         //Warp
-        if (CONFIG.ENABLE_WARP.getValue()) {
+        if (CONFIG.ENABLE_WARP) {
             LiteralArgumentBuilder<ServerCommandSource> warpBuilder = CommandManager.literal("warp");
             LiteralArgumentBuilder<ServerCommandSource> warpSetBuilder = CommandManager.literal("set");
             LiteralArgumentBuilder<ServerCommandSource> warpTpBuilder = CommandManager.literal("tp");
@@ -227,7 +228,7 @@ public class EssentialCommandRegistry {
         }
 
         //Spawn
-        if (CONFIG.ENABLE_SPAWN.getValue()) {
+        if (CONFIG.ENABLE_SPAWN) {
             LiteralArgumentBuilder<ServerCommandSource> spawnBuilder = CommandManager.literal("spawn");
             LiteralArgumentBuilder<ServerCommandSource> spawnSetBuilder = CommandManager.literal("set");
             LiteralArgumentBuilder<ServerCommandSource> spawnTpBuilder = CommandManager.literal("tp");
@@ -251,7 +252,7 @@ public class EssentialCommandRegistry {
             registerNode.accept(spawnNode);
         }
 
-        if (CONFIG.ENABLE_NICK.getValue()) {
+        if (CONFIG.ENABLE_NICK) {
             LiteralArgumentBuilder<ServerCommandSource> nickBuilder = CommandManager.literal("nickname");
             LiteralArgumentBuilder<ServerCommandSource> nickSetBuilder = CommandManager.literal("set");
             LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
@@ -298,7 +299,7 @@ public class EssentialCommandRegistry {
             registerNode.accept(nickNode);
         }
 
-        if (CONFIG.ENABLE_RTP.getValue()) {
+        if (CONFIG.ENABLE_RTP) {
             registerNode.accept(CommandManager.literal("randomteleport")
                 .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
                 .executes(new RandomTeleportCommand())
@@ -311,7 +312,7 @@ public class EssentialCommandRegistry {
             );
         }
 
-        if (CONFIG.ENABLE_FLY.getValue()) {
+        if (CONFIG.ENABLE_FLY) {
             registerNode.accept(CommandManager.literal("fly")
                 .requires(ECPerms.require(ECPerms.Registry.fly_self, 2))
                 .executes(new FlyCommand())
@@ -322,7 +323,7 @@ public class EssentialCommandRegistry {
                 .build());
         }
 
-        if (CONFIG.ENABLE_INVULN.getValue()) {
+        if (CONFIG.ENABLE_INVULN) {
             registerNode.accept(
                 CommandManager.literal("invuln")
                     .requires(ECPerms.require(ECPerms.Registry.invuln_self, 2))
@@ -334,7 +335,7 @@ public class EssentialCommandRegistry {
                     .build());
         }
 
-        if (CONFIG.ENABLE_WORKBENCH.getValue()) {
+        if (CONFIG.ENABLE_WORKBENCH) {
             registerNode.accept(CommandManager.literal("workbench")
                 .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
                 .executes(new WorkbenchCommand())
@@ -351,42 +352,42 @@ public class EssentialCommandRegistry {
                 .build());
         }
 
-        if (CONFIG.ENABLE_ANVIL.getValue()) {
+        if (CONFIG.ENABLE_ANVIL) {
             registerNode.accept(CommandManager.literal("anvil")
                 .requires(ECPerms.require(ECPerms.Registry.anvil, 0))
                 .executes(new AnvilCommand())
                 .build());
         }
 
-        if (CONFIG.ENABLE_ENDERCHEST.getValue()) {
+        if (CONFIG.ENABLE_ENDERCHEST) {
             registerNode.accept(CommandManager.literal("enderchest")
                     .requires(ECPerms.require(ECPerms.Registry.enderchest, 0))
                     .executes(new EnderchestCommand())
                 .build());
         }
 
-        if (CONFIG.ENABLE_WASTEBIN.getValue()) {
+        if (CONFIG.ENABLE_WASTEBIN) {
             registerNode.accept(CommandManager.literal("wastebin")
                 .requires(ECPerms.require(ECPerms.Registry.wastebin, 0))
                 .executes(new WastebinCommand())
                 .build());
         }
 
-        if (CONFIG.ENABLE_TOP.getValue()) {
+        if (CONFIG.ENABLE_TOP) {
             registerNode.accept(CommandManager.literal("top")
                 .requires(ECPerms.require(ECPerms.Registry.top, 2))
                 .executes(new TopCommand())
                 .build());
         }
 
-        if (CONFIG.ENABLE_GAMETIME.getValue()) {
+        if (CONFIG.ENABLE_GAMETIME) {
             registerNode.accept(CommandManager.literal("gametime")
                 .requires(ECPerms.require(ECPerms.Registry.gametime, 0))
                 .executes(new GametimeCommand())
                 .build());
         }
 
-        if (CONFIG.ENABLE_AFK.getValue()) {
+        if (CONFIG.ENABLE_AFK) {
             registerNode.accept(CommandManager.literal("afk")
                 .requires(ECPerms.require(ECPerms.Registry.afk, 0))
                 .executes(new AfkCommand())
@@ -408,7 +409,7 @@ public class EssentialCommandRegistry {
                             }
                             context.getSource().sendFeedback(
                                 Text.of(playerEntity.getPos().toString()),
-                                EssentialCommands.CONFIG.BROADCAST_TO_OPS.getValue());
+                                EssentialCommands.CONFIG.BROADCAST_TO_OPS);
                         });
                     return 1;
                 }))
@@ -420,14 +421,14 @@ public class EssentialCommandRegistry {
                 var source = context.getSource();
                 var world = source.getServer().getOverworld();
                 if (world.isDay()) {
-                    source.sendFeedback(ECText.getInstance().getText("cmd.day.error.already_daytime"), CONFIG.BROADCAST_TO_OPS.getValue());
+                    source.sendFeedback(ECText.getInstance().getText("cmd.day.error.already_daytime"), CONFIG.BROADCAST_TO_OPS);
                     return -1;
                 }
                 var time = world.getTimeOfDay();
                 var timeToDay = 24000L - time % 24000L;
 
                 world.setTimeOfDay(time + timeToDay);
-                source.sendFeedback(ECText.getInstance().getText("cmd.day.feedback"), CONFIG.BROADCAST_TO_OPS.getValue());
+                source.sendFeedback(ECText.getInstance().getText("cmd.day.feedback"), CONFIG.BROADCAST_TO_OPS);
                 return 1;
             })
             .build());
@@ -436,7 +437,7 @@ public class EssentialCommandRegistry {
             .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
             .then(CommandManager.literal("reload")
                 .executes((context) -> {
-                    CONFIG.loadOrCreateProperties();
+                    BACKING_CONFIG.loadOrCreateProperties();
                     context.getSource().sendFeedback(
                         TextUtil.concat(
                             ECText.getInstance().getText("essentialcommands.fullprefix"),
@@ -451,18 +452,18 @@ public class EssentialCommandRegistry {
             .then(CommandManager.literal("display")
                 .requires(ECPerms.require(ECPerms.Registry.config_reload, 4))
                 .executes((context) -> {
-                    CONFIG.loadOrCreateProperties();
+                    BACKING_CONFIG.loadOrCreateProperties();
                     context.getSource().sendFeedback(
-                        CONFIG.stateAsText(),
+                        BACKING_CONFIG.stateAsText(),
                         false
                     );
                     return 1;
                 })
                 .then(CommandManager.argument("config_property", StringArgumentType.word())
-                    .suggests(ListSuggestion.of(CONFIG::getPublicFieldNames))
+                    .suggests(ListSuggestion.of(BACKING_CONFIG::getPublicFieldNames))
                     .executes(context -> {
                         try {
-                            context.getSource().sendFeedback(CONFIG.getFieldValueAsText(
+                            context.getSource().sendFeedback(BACKING_CONFIG.getFieldValueAsText(
                                 StringArgumentType.getString(context, "config_property")
                             ), false);
                         } catch (NoSuchFieldException e) {
@@ -476,7 +477,7 @@ public class EssentialCommandRegistry {
 
         essentialCommandsRootNode.addChild(configNode);
 
-        if (CONFIG.ENABLE_ESSENTIALSX_CONVERT.getValue()) {
+        if (CONFIG.ENABLE_ESSENTIALSX_CONVERT) {
             essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
                 .requires(source -> source.hasPermissionLevel(4))
                 .executes((source) -> {
@@ -487,7 +488,7 @@ public class EssentialCommandRegistry {
                             mcDir.resolve("world/modplayerdata").toFile(),
                             source.getSource().getServer()
                         );
-                        source.getSource().sendFeedback(Text.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS.getValue());
+                        source.getSource().sendFeedback(Text.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
                     } catch (NotDirectoryException | FileNotFoundException e) {
                         e.printStackTrace();
                     }

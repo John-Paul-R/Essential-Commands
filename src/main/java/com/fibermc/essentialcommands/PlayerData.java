@@ -147,8 +147,8 @@ public class PlayerData extends PersistentState {
             this.markDirty();
             outCode = 1;
         } else {
-            var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
-            var maxHomesText = Text.literal(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+            var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT);
+            var maxHomesText = Text.literal(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT);
             this.sendError(
                 ECText.getInstance().getText(
                     "cmd.home.set.error.limit",
@@ -165,7 +165,7 @@ public class PlayerData extends PersistentState {
         this.player.sendMessage(
             Text.empty()
                 .append(message)
-                .setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                .setStyle(CONFIG.FORMATTING_ERROR),
             MessageType.SYSTEM);
     }
 
@@ -195,7 +195,7 @@ public class PlayerData extends PersistentState {
         }
 
         if (afk) {
-            if (CONFIG.INVULN_WHILE_AFK.getValue()) {
+            if (CONFIG.INVULN_WHILE_AFK) {
                 Pal.grantAbility(this.player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
             }
 
@@ -236,15 +236,15 @@ public class PlayerData extends PersistentState {
         }
 
         if (this.afk) {
-            if (CONFIG.INVULN_WHILE_AFK.getValue()) {
+            if (CONFIG.INVULN_WHILE_AFK) {
                 player.requestTeleport(lastTickPos.x, lastTickPos.y, lastTickPos.z);
             } else if (hasMovedThisTick) {
                 this.setAfk(false);
             }
 
         } else if (
-            CONFIG.AUTO_AFK_ENABLED.getValue()
-            && (ticks - Math.max(lastMovedTick, lastActionTick)) > CONFIG.AUTO_AFK_TICKS.getValue()
+            CONFIG.AUTO_AFK_ENABLED
+            && (ticks - Math.max(lastMovedTick, lastActionTick)) > CONFIG.AUTO_AFK_TICKS
         ) {
             this.setAfk(true);
         }
@@ -419,7 +419,7 @@ public class PlayerData extends PersistentState {
             ));
         } else {
             // Ensure nickname does not exceed max length
-            if (nickname.getString().length() > CONFIG.NICKNAME_MAX_LENGTH.getValue()) {
+            if (nickname.getString().length() > CONFIG.NICKNAME_MAX_LENGTH) {
                 return -2;
             }
             // Ensure player has permissions required to set the specified nickname
@@ -471,14 +471,14 @@ public class PlayerData extends PersistentState {
         //  because our mixin to getDisplayName does a null check on getNickname
         if (this.nickname != null) {
             tempFullNickname
-                .append(CONFIG.NICKNAME_PREFIX.getValue())
+                .append(CONFIG.NICKNAME_PREFIX)
                 .append(this.nickname );
         } else {
             tempFullNickname
                 .append(baseName);
         }
 
-        if (CONFIG.NICK_REVEAL_ON_HOVER.getValue()) {
+        if (CONFIG.NICK_REVEAL_ON_HOVER) {
             tempFullNickname.setStyle(tempFullNickname.getStyle().withHoverEvent(
                 HoverEvent.Action.SHOW_TEXT.buildHoverEvent(baseName)
             ));

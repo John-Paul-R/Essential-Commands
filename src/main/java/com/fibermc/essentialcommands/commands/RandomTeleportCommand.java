@@ -43,24 +43,24 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         if (!world.getRegistryKey().equals(World.OVERWORLD)) {
             throw new CommandException(TextUtil.concat(
-                ECText.getInstance().getText("cmd.rtp.error.pre").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
-                ECText.getInstance().getText("cmd.rtp.error.not_overworld").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+                ECText.getInstance().getText("cmd.rtp.error.pre").setStyle(CONFIG.FORMATTING_ERROR),
+                ECText.getInstance().getText("cmd.rtp.error.not_overworld").setStyle(CONFIG.FORMATTING_ERROR)
             ));
         }
 
         //TODO Add OP/Permission bypass for RTP cooldown.
-        if (CONFIG.RTP_COOLDOWN.getValue() > 0) {
+        if (CONFIG.RTP_COOLDOWN > 0) {
             ServerCommandSource source = context.getSource();
             int curServerTickTime = source.getServer().getTicks();
             PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
-            var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN.getValue() * 20;
+            var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN * 20;
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
             if (rtpCooldownRemaining > 0) {
                 throw new CommandException(
                     ECText.getInstance().getText(
                         "cmd.rtp.error.cooldown",
                         TextFormatType.Error,
-                        Text.literal(String.format("%.1f", rtpCooldownRemaining / 20D)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
+                        Text.literal(String.format("%.1f", rtpCooldownRemaining / 20D)).setStyle(CONFIG.FORMATTING_ACCENT))
                 );
             }
             // if cooldown has expired
@@ -101,14 +101,14 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
     private static int exec(ServerPlayerEntity player, ServerWorld world, MinecraftLocation center, int timesRun) {
-        if (timesRun > CONFIG.RTP_MAX_ATTEMPTS.getValue()) {
+        if (timesRun > CONFIG.RTP_MAX_ATTEMPTS) {
             return -1;
         }
         maxY.set(world.getHeight()); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
         // Calculate position on circle perimeter
         var rand = new Random();
-        int r_max = CONFIG.RTP_RADIUS.getValue();
-        int r_min = CONFIG.RTP_MIN_RADIUS.getValue();
+        int r_max = CONFIG.RTP_RADIUS;
+        int r_min = CONFIG.RTP_MIN_RADIUS;
         int r = r_max == r_min
             ? r_max
             : rand.nextInt(r_min, r_max);

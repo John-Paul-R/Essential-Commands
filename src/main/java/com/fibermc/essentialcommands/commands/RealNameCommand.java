@@ -23,7 +23,7 @@ public class RealNameCommand implements Command<ServerCommandSource> {
         List<PlayerData> nicknamePlayers = PlayerDataManager.getInstance().getPlayerDataMatchingNickname(nicknameStr);
         MutableText responseText = Text.empty();
 
-        var nicknameText = Text.literal(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+        var nicknameText = Text.literal(nicknameStr).setStyle(CONFIG.FORMATTING_ACCENT);
         // If no players matched the provided nickname
         if (nicknamePlayers.size() == 0) {
             responseText
@@ -40,7 +40,7 @@ public class RealNameCommand implements Command<ServerCommandSource> {
         }
 
         context.getSource().sendFeedback(
-            responseText, CONFIG.BROADCAST_TO_OPS.getValue()
+            responseText, CONFIG.BROADCAST_TO_OPS
         );
 
         return 0;

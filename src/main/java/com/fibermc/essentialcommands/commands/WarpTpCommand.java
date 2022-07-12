@@ -24,7 +24,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         String warpName = StringArgumentType.getString(context, "warp_name");
-        var warpNameText = Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+        var warpNameText = Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT);
         WarpLocation loc = worldDataManager.getWarp(warpName);
 
         if (loc == null) {

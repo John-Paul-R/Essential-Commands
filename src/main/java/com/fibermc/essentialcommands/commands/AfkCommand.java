@@ -18,7 +18,7 @@ public class AfkCommand implements Command<ServerCommandSource> {
         var player = source.getPlayer();
         var playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
 
-        if (CONFIG.INVULN_WHILE_AFK.getValue()) {
+        if (CONFIG.INVULN_WHILE_AFK) {
             if (playerData.isInCombat()) {
                 throw new CommandException(ECText.getInstance().getText(
                     "cmd.afk.error.in_combat",

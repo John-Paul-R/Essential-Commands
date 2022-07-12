@@ -59,10 +59,10 @@ public class PlayerDataManager {
         });
 
     private static void onPlayerConnected(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
-        if (CONFIG.ENABLE_MOTD.getValue()) {
+        if (CONFIG.ENABLE_MOTD) {
             var player = handler.getPlayer();
             var message = Placeholders.parseText(
-                TextParserUtils.formatText(CONFIG.MOTD.getValue()),
+                TextParserUtils.formatText(CONFIG.MOTD),
                 PlaceholderContext.of(player)
             );
             player.getCommandSource().sendFeedback(message, false);
@@ -82,7 +82,7 @@ public class PlayerDataManager {
     }
 
     public void tick(MinecraftServer server) {
-        if (CONFIG.NICKNAMES_IN_PLAYER_LIST.getValue() && server.getTicks() % (20*5) == 0) {
+        if (CONFIG.NICKNAMES_IN_PLAYER_LIST && server.getTicks() % (20*5) == 0) {
             if (this.changedNicknames.size() + this.changedTeams.size() > 0) {
                 PlayerManager serverPlayerManager = server.getPlayerManager();
 
@@ -142,7 +142,7 @@ public class PlayerDataManager {
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
         PlayerData pData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
-        if (CONFIG.ALLOW_BACK_ON_DEATH.getValue())
+        if (CONFIG.ALLOW_BACK_ON_DEATH)
             pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
     }
 

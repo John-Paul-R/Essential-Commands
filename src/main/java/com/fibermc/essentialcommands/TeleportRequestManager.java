@@ -80,8 +80,8 @@ public class TeleportRequestManager {
             }
         }
 
-        var shouldInterruptTeleportOnMove = CONFIG.TELEPORT_INTERRUPT_ON_MOVE.getValue();
-        var maxMoveBeforeInterrupt = CONFIG.TELEPORT_INTERRUPT_ON_MOVE_AMOUNT.getValue();
+        var shouldInterruptTeleportOnMove = CONFIG.TELEPORT_INTERRUPT_ON_MOVE;
+        var maxMoveBeforeInterrupt = CONFIG.TELEPORT_INTERRUPT_ON_MOVE_AMOUNT;
         Iterator<Map.Entry<UUID, QueuedTeleport>> tpQueueIter = delayedQueuedTeleportMap.entrySet().iterator();
         while (tpQueueIter.hasNext()) {
             Map.Entry<UUID, QueuedTeleport> entry = tpQueueIter.next();
@@ -107,7 +107,7 @@ public class TeleportRequestManager {
     }
 
     public void onPlayerDamaged(ServerPlayerEntity playerEntity, DamageSource damageSource) {
-        if (CONFIG.TELEPORT_INTERRUPT_ON_DAMAGED.getValue() && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)) {
+        if (CONFIG.TELEPORT_INTERRUPT_ON_DAMAGED && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)) {
             try {
                 Objects.requireNonNull( ((ServerPlayerEntityAccess)playerEntity).endEcQueuedTeleport());
 
@@ -124,7 +124,7 @@ public class TeleportRequestManager {
         PlayerData requestSenderData = ((ServerPlayerEntityAccess)requestSender).getEcPlayerData();
         PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
 
-        final int TRD = CONFIG.TELEPORT_REQUEST_DURATION.getValue() * TPS;//sec * ticks per sec
+        final int TRD = CONFIG.TELEPORT_REQUEST_DURATION * TPS;//sec * ticks per sec
         requestSenderData.setTpTimer(TRD);
         TeleportRequest teleportRequest = new TeleportRequest(requestSender, targetPlayer, requestType);
         requestSenderData.setSentTeleportRequest(teleportRequest);
@@ -135,7 +135,7 @@ public class TeleportRequestManager {
     public void startTpCooldown(ServerPlayerEntity player) {
         PlayerData pData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
 
-        final int TC = (int)(CONFIG.TELEPORT_COOLDOWN.getValue() * TPS);
+        final int TC = (int)(CONFIG.TELEPORT_COOLDOWN * TPS);
         pData.setTpCooldown(TC);
         tpCooldownList.add(pData);
     }

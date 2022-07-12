@@ -47,8 +47,8 @@ public class GametimeCommand implements Command<ServerCommandSource> {
     private static Text getFormattedTime(long time) {
         return Text.translatable(
                 "commands.time.query",
-                Text.literal(formatGameTimeOfDay(time)).setStyle(CONFIG.FORMATTING_ACCENT.getValue()))
-            .setStyle(CONFIG.FORMATTING_DEFAULT.getValue()
+                Text.literal(formatGameTimeOfDay(time)).setStyle(CONFIG.FORMATTING_ACCENT))
+            .setStyle(CONFIG.FORMATTING_DEFAULT
                 .withHoverEvent(
                     new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(String.valueOf(time % 24000L)))));
     }

@@ -64,7 +64,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
 
         var enabledText = ECText.getInstance().getText(
                 shouldEnableFly ? "generic.enabled" : "generic.disabled")
-            .setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+            .setStyle(CONFIG.FORMATTING_ACCENT);
 
         source.sendFeedback(
             ECText.getInstance().getText(
@@ -72,7 +72,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
                 enabledText,
                 target.getDisplayName()
             ),
-            CONFIG.BROADCAST_TO_OPS.getValue()
+            CONFIG.BROADCAST_TO_OPS
         );
     }
 }

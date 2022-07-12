@@ -24,7 +24,7 @@ public class SpawnCommand implements Command<ServerCommandSource> {
 
         if (loc == null) {
             context.getSource().sendError(
-                ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set").setStyle(CONFIG.FORMATTING_ERROR.getValue()));
+                ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set").setStyle(CONFIG.FORMATTING_ERROR));
             return -2;
         }
 

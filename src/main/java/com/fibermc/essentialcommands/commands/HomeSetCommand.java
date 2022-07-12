@@ -31,7 +31,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         //Add home to PlayerData
         //TODO if home with given name is already set, warn of overwrite and require that the command be typed again, or a confirmation message be given
         PlayerData pData = ((ServerPlayerEntityAccess)senderPlayer).getEcPlayerData();
-        var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+        var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT);
         int successCode = 0;
         try {
              successCode = pData.addHome(homeName, new MinecraftLocation(senderPlayer));
@@ -47,7 +47,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         if (successCode == 1) {
             source.sendFeedback(
                 ECText.getInstance().getText("cmd.home.set.feedback", homeNameText),
-                CONFIG.BROADCAST_TO_OPS.getValue()
+                CONFIG.BROADCAST_TO_OPS
             );
         }
 

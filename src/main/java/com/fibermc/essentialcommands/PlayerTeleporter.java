@@ -22,7 +22,7 @@ public class PlayerTeleporter {
 //        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
-        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY.getValue() <= 0) {
+        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
             ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
@@ -30,8 +30,8 @@ public class PlayerTeleporter {
             player.sendMessage(
                 ECText.getInstance().getText(
                     "teleport.queued",
-                    queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-                    Text.literal(String.format("%.1f", CONFIG.TELEPORT_DELAY.getValue())).setStyle(CONFIG.FORMATTING_ACCENT.getValue())),
+                    queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT),
+                    Text.literal(String.format("%.1f", CONFIG.TELEPORT_DELAY)).setStyle(CONFIG.FORMATTING_ACCENT)),
                 MessageType.SYSTEM
             );
         }
@@ -47,11 +47,11 @@ public class PlayerTeleporter {
         ServerPlayerEntity player = pData.getPlayer();
 
         // If teleporting between dimensions is disabled and player doesn't have TP rules override
-        if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS.getValue() && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
+        if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
             if (dest.dim != player.getWorld().getRegistryKey()) {
                 player.sendMessage(
-                    ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled").setStyle(CONFIG.FORMATTING_ERROR.getValue()),
+                    ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled").setStyle(CONFIG.FORMATTING_ERROR),
                     MessageType.SYSTEM
                 );
                 return;
@@ -76,14 +76,14 @@ public class PlayerTeleporter {
         playerEntity.sendMessage(
             ECText.getInstance().getText(
                 "teleport.done",
-                dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT.getValue())),
+                dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT)),
             MessageType.SYSTEM
         );
     }
 
     public static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
         return (
-            (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES.getValue())
+            (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
             || ECPerms.check(player.getCommandSource(), permission, 5)
         );
 

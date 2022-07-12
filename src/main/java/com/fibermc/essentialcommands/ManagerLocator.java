@@ -25,17 +25,17 @@ public class ManagerLocator {
     }
 
     static boolean playerDataEnabled() {
-        return (CONFIG.ENABLE_HOME.getValue()
-            || CONFIG.ENABLE_TPA.getValue()
-            || CONFIG.ENABLE_BACK.getValue()
-            || CONFIG.ENABLE_WARP.getValue()
-            || CONFIG.ENABLE_SPAWN.getValue()
-            || CONFIG.ENABLE_NICK.getValue()
+        return (CONFIG.ENABLE_HOME
+            || CONFIG.ENABLE_TPA
+            || CONFIG.ENABLE_BACK
+            || CONFIG.ENABLE_WARP
+            || CONFIG.ENABLE_SPAWN
+            || CONFIG.ENABLE_NICK
         );
     }
 
     static boolean teleportRequestEnabled() {
-        return (CONFIG.ENABLE_TPA.getValue());
+        return (CONFIG.ENABLE_TPA);
     }
 
     public void init() {

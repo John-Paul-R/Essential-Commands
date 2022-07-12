@@ -44,14 +44,14 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
                 ECText.getInstance().getText(
                     "cmd.nickname.set.feedback",
                     (nicknameText != null) ? nicknameText : Text.literal(targetPlayer.getGameProfile().getName())),
-                CONFIG.BROADCAST_TO_OPS.getValue());
+                CONFIG.BROADCAST_TO_OPS);
         } else {
             MutableText failReason = switch (successCode) {
                 case -1 -> ECText.getInstance().getText("cmd.nickname.set.error.perms");
                 case -2 -> ECText.getInstance().getText(
                     "cmd.nickname.set.error.length",
                     nicknameText.getString().length(),
-                    CONFIG.NICKNAME_MAX_LENGTH.getValue()
+                    CONFIG.NICKNAME_MAX_LENGTH
                 );
                 default -> ECText.getInstance().getText("generic.error.unknown");
             };
@@ -60,7 +60,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
                     "cmd.nickname.set.error",
                     TextFormatType.Error,
                     nicknameText,
-                    failReason.setStyle(CONFIG.FORMATTING_ERROR.getValue()))
+                    failReason.setStyle(CONFIG.FORMATTING_ERROR))
             );
         }
 

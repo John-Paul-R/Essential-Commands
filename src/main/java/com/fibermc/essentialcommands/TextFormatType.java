@@ -5,12 +5,12 @@ import net.minecraft.text.Style;
 
 import java.util.function.UnaryOperator;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 
 public enum TextFormatType {
-    Default (CONFIG.FORMATTING_DEFAULT),
-    Accent  (CONFIG.FORMATTING_ACCENT),
-    Error   (CONFIG.FORMATTING_ERROR);
+    Default (BACKING_CONFIG.FORMATTING_DEFAULT),
+    Accent  (BACKING_CONFIG.FORMATTING_ACCENT),
+    Error   (BACKING_CONFIG.FORMATTING_ERROR);
 
     private final Option<Style> _style;
 

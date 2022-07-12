@@ -25,7 +25,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource>  {
             ECText.getInstance().getText(
                 "cmd.nickname.set.feedback",
                 Text.literal(targetPlayer.getGameProfile().getName())),
-            CONFIG.BROADCAST_TO_OPS.getValue());
+            CONFIG.BROADCAST_TO_OPS);
 
         return 1;
     }

@@ -18,9 +18,9 @@ public class ModInfoCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
 
         context.getSource().sendFeedback(TextUtil.concat(
-            Text.literal(EssentialCommands.MOD_METADATA.getName()).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
+            Text.literal(EssentialCommands.MOD_METADATA.getName()).setStyle(CONFIG.FORMATTING_DEFAULT),
             Text.literal(" "),
-            Text.literal(modVersion).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
+            Text.literal(modVersion).setStyle(CONFIG.FORMATTING_ACCENT)
         ), false);
 
         return 0;

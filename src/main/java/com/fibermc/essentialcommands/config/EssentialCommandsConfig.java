@@ -20,7 +20,7 @@ import static dev.jpcode.eccore.config.ConfigUtil.*;
 import static dev.jpcode.eccore.util.TextUtil.parseText;
 import static dev.jpcode.eccore.util.TimeUtil.durationToTicks;
 
-public final class EssentialCommandsConfig extends Config {
+public final class EssentialCommandsConfig extends Config<EssentialCommandsConfig> {
 
     @ConfigOption public final Option<Style> FORMATTING_DEFAULT =     new Option<>("formatting_default", parseStyle("gold"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
     @ConfigOption public final Option<Style> FORMATTING_ACCENT =      new Option<>("formatting_accent", parseStyle("light_purple"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);

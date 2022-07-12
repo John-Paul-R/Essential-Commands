@@ -23,8 +23,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
+import static com.fibermc.essentialcommands.EssentialCommands.*;
 
 public abstract class ECText {
 
@@ -33,13 +32,13 @@ public abstract class ECText {
     private static final Pattern TOKEN_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]");
     public static final String DEFAULT_LANGUAGE = "en_us";
 
-    private static volatile ECText instance = create(CONFIG.LANGUAGE.getValue());
+    private static volatile ECText instance = create(CONFIG.LANGUAGE);
     private static MinecraftServer _server;
 
     private ECText() {}
 
     static {
-        CONFIG.LANGUAGE.changeEvent.register((langId) -> {
+        BACKING_CONFIG.LANGUAGE.changeEvent.register((langId) -> {
             instance = create(langId);
         });
     }
@@ -90,7 +89,7 @@ public abstract class ECText {
             }
 
             public MutableText getText(String key) {
-                return Text.literal(get(key)).setStyle(CONFIG.FORMATTING_DEFAULT.getValue());
+                return Text.literal(get(key)).setStyle(CONFIG.FORMATTING_DEFAULT);
             }
 
             public MutableText getText(String key,  Text... args) {
@@ -109,9 +108,9 @@ public abstract class ECText {
 
                         if (idxAndFormattingCode.length == 2) {
                             var style = switch (idxAndFormattingCode[1]) {
-                                case "d" -> CONFIG.FORMATTING_DEFAULT.getValue();
-                                case "a" -> CONFIG.FORMATTING_ACCENT.getValue();
-                                case "e" -> CONFIG.FORMATTING_ERROR.getValue();
+                                case "d" -> CONFIG.FORMATTING_DEFAULT;
+                                case "a" -> CONFIG.FORMATTING_ACCENT;
+                                case "e" -> CONFIG.FORMATTING_ERROR;
                                 default -> throw new StringIndexOutOfBoundsException();
                             };
                             text.setStyle(style);
@@ -136,7 +135,7 @@ public abstract class ECText {
             }
 
             public MutableText getText(String key, Object... args) {
-                return Text.literal(String.format(get(key), args)).setStyle(CONFIG.FORMATTING_DEFAULT.getValue());
+                return Text.literal(String.format(get(key), args)).setStyle(CONFIG.FORMATTING_DEFAULT);
             }
 
             public boolean hasTranslation(String key) {

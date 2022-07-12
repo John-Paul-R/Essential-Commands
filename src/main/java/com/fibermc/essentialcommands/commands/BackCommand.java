@@ -36,7 +36,7 @@ public class BackCommand implements Command<ServerCommandSource> {
             out=1;
         } else {
             context.getSource().sendError(
-                ECText.getInstance().getText("cmd.back.error.no_prev_location").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+                ECText.getInstance().getText("cmd.back.error.no_prev_location").setStyle(CONFIG.FORMATTING_ERROR)
             );
         }
 

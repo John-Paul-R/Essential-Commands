@@ -30,7 +30,7 @@ public class WastebinCommand implements Command<ServerCommandSource> {
 
         source.sendFeedback(
             ECText.getInstance().getText("cmd.workbench.feedback", ECText.getInstance().get("cmd.wastebin.name")),
-            CONFIG.BROADCAST_TO_OPS.getValue()
+            CONFIG.BROADCAST_TO_OPS
         );
 
         return 0;

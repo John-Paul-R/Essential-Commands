@@ -35,14 +35,14 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
             requiresPermission = false;
         }
 
-        var warpNameText = Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+        var warpNameText = Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT);
         //Add warp
         try {
             worldDataManager.setWarp(warpName, new MinecraftLocation(senderPlayer), requiresPermission);
             //inform command sender that the home has been set
             source.sendFeedback(
                 ECText.getInstance().getText("cmd.warp.set.feedback", warpNameText),
-                CONFIG.BROADCAST_TO_OPS.getValue()
+                CONFIG.BROADCAST_TO_OPS
             );
         } catch (CommandSyntaxException e) {
             source.sendError(

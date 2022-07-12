@@ -31,12 +31,12 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         //Remove Home - TODO Require player to type the command again to confirm deletion.
         boolean wasSuccessful = senderPlayerData.removeHome(homeName);
 
-        var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+        var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT);
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             source.sendFeedback(
                 ECText.getInstance().getText("cmd.home.delete.feedback", homeNameText),
-                CONFIG.BROADCAST_TO_OPS.getValue()
+                CONFIG.BROADCAST_TO_OPS
             );
             return 1;
         }

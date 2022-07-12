@@ -16,12 +16,14 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public abstract class Config {
+public abstract class Config<T extends Config<T>> {
     static final Logger LOGGER = LogManager.getLogger("ec-core-config");
 
     protected SortedProperties props;
@@ -52,6 +54,7 @@ public abstract class Config {
         }
         initProperties();
         storeProperties();
+        configLoadHandlers.forEach(consumer -> consumer.accept((T) this));
     }
 
     private void initProperties() {
@@ -150,4 +153,9 @@ public abstract class Config {
         return null;
     }
 
+    private final List<Consumer<T>> configLoadHandlers = new ArrayList<>();
+
+    public void registerLoadHandler(Consumer<T> handler) {
+        configLoadHandlers.add(handler);
+    }
 }

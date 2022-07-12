@@ -42,7 +42,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         targetPlayer.sendMessage(
             ECText.getInstance().getText(
                 "cmd.tpask.receive",
-                Text.literal(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue())),
+                Text.literal(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT)),
             MessageType.SYSTEM);
 
         String senderName = context.getSource().getPlayer().getGameProfile().getName();
@@ -50,18 +50,18 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
             targetPlayer,
             "/tpaccept " + senderName,
             "/tpdeny " + senderName,
-            Text.literal("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-            Text.literal("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+            Text.literal("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(CONFIG.FORMATTING_ACCENT),
+            Text.literal("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(CONFIG.FORMATTING_ERROR)
         ).send();
         
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_TO);
 
-        var targetPlayerText = Text.literal(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+        var targetPlayerText = Text.literal(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT);
         //inform command sender that request has been sent
         context.getSource().sendFeedback(
             ECText.getInstance().getText("cmd.tpask.send", targetPlayerText),
-            CONFIG.BROADCAST_TO_OPS.getValue());
+            CONFIG.BROADCAST_TO_OPS);
 
         return 1;
     }

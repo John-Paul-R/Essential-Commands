@@ -48,7 +48,7 @@ public class InvulnCommand implements Command<ServerCommandSource> {
 
         var enabledText = ECText.getInstance().getText(
                 shouldEnableInvuln ? "generic.enabled" : "generic.disabled")
-            .setStyle(CONFIG.FORMATTING_ACCENT.getValue());
+            .setStyle(CONFIG.FORMATTING_ACCENT);
 
         source.sendFeedback(
             ECText.getInstance().getText(
@@ -56,7 +56,7 @@ public class InvulnCommand implements Command<ServerCommandSource> {
                 enabledText,
                 target.getDisplayName()
             ),
-            CONFIG.BROADCAST_TO_OPS.getValue()
+            CONFIG.BROADCAST_TO_OPS
         );
     }
 }
