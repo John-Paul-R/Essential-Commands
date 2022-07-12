@@ -52,12 +52,14 @@ See the [full List of Commands & Permissions](https://github.com/John-Paul-R/Ess
   - /home set \<home-name>
   - /home tp \<home-name>
   - /home delete \<home-name>
+  - /home list
 
 ### Warps
 
   - /warp set \<warp-name>
   - /warp tp \<warp-name>
   - /warp delete \<warp-name>
+  - /warp list
 
 ### Back
 
@@ -74,12 +76,25 @@ See the [full List of Commands & Permissions](https://github.com/John-Paul-R/Ess
   - /randomteleport
   - /rtp
 
+### Workbench
+
+  - /workbench
+  - /anvil
+  - /enderchest
+  - /stonecutter
+  - /grindstone
+  - /wastebin
+
 ### Kitchen sink
 
+  - /afk
   - /fly
   - /fly \<target-player>
-  - /workbench
-  - /enderchest
+  - /invuln
+  - /invuln \<target-player>
+  - /top
+  - /day
+  - /gametime
 
 ### Config
 
