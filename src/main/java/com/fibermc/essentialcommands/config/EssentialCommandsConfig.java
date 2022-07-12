@@ -64,6 +64,7 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<String> LANGUAGE = new Option<>("language", "en_us", String::toString);
     @ConfigOption public final Option<String> MOTD = new Option<>("motd", "<yellow>Welcome to our server <blue>%player:displayname%</blue>!\nPlease read the rules.</yellow>", String::toString);
     @ConfigOption public final Option<Text> AFK_PREFIX = new Option<>("afk_prefix", Text.literal("[AFK] ").formatted(Formatting.GRAY), TextUtil::parseText, Text.Serializer::toJson);
+    @ConfigOption public final Option<Boolean> INVULN_WHILE_AFK = new Option<>("invuln_while_afk", false, Boolean::parseBoolean);
 
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);
