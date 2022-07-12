@@ -386,6 +386,13 @@ public class EssentialCommandRegistry {
                 .build());
         }
 
+        if (CONFIG.ENABLE_AFK.getValue()) {
+            registerNode.accept(CommandManager.literal("afk")
+                .requires(ECPerms.require(ECPerms.Registry.afk, 0))
+                .executes(new AfkCommand())
+                .build());
+        }
+
         registerNode.accept(CommandManager.literal("lastPos")
             .requires(ECPerms.require("essentialcommands.admin.lastpos", 2))
                 .then(argument("target_player", StringArgumentType.word())

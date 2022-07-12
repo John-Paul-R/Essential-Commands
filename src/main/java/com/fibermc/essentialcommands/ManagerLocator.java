@@ -49,7 +49,7 @@ public class ManagerLocator {
 
     public void onServerStart(MinecraftServer server) {
         this.playerDataManager = PlayerDataManager.getInstance();
-        this.tpManager = new TeleportRequestManager();
+        this.tpManager = TeleportRequestManager.getInstance();
         this.worldDataManager = WorldDataManager.createForServer(server);
         this.offlinePlayerRepo = new OfflinePlayerRepo(server);
     }

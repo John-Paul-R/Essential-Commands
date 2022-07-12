@@ -1,14 +1,13 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.events.PlayerConnectCallback;
-import com.fibermc.essentialcommands.events.PlayerDeathCallback;
-import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
-import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
+import com.fibermc.essentialcommands.events.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.TextParserUtils;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -51,6 +50,13 @@ public class PlayerDataManager {
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> PlayerDataManager.getInstance().tick(server));
         ServerPlayConnectionEvents.JOIN.register(PlayerDataManager::onPlayerConnected);
     }
+
+    public static final Event<PlayerDataManagerTickCallback> TICK_EVENT = EventFactory.createArrayBacked(PlayerDataManagerTickCallback.class,
+        (listeners) -> (playerDataManager, server) -> {
+            for (PlayerDataManagerTickCallback event : listeners) {
+                event.onTick(playerDataManager, server);
+            }
+        });
 
     private static void onPlayerConnected(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
         if (CONFIG.ENABLE_MOTD.getValue()) {
@@ -105,6 +111,9 @@ public class PlayerDataManager {
             }
         }
 
+        TICK_EVENT.invoker().onTick(this, server);
+
+        getAllPlayerData().forEach(PlayerData::onTickEnd);
     }
 
     public void scheduleTask(Runnable task) {

@@ -52,6 +52,7 @@ public class ECPerms {
         public static final String top = "essentialcommands.top";
         public static final String gametime = "essentialcommands.gametime";
         public static final String time_set_day = "essentialcommands.day";
+        public static final String afk = "essentialcommands.afk";
         public static final String config_reload = "essentialcommands.config.reload";
         public static final String bypass_teleport_delay = "essentialcommands.bypass.teleport_delay";
         public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";

@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.events.PlayerActCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import com.fibermc.essentialcommands.util.TimeUtil;
@@ -7,6 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.jpcode.eccore.util.TextUtil;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -15,6 +18,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.PersistentState;
 
 import java.io.File;
@@ -51,13 +55,18 @@ public class PlayerData extends PersistentState {
     // RTP Cooldown
     private int timeUsedRtp;
 
+    private boolean afk;
+    private Vec3d lastTickPos;
+
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
+        this.lastTickPos = player.getPos();
         this.pUuid = player.getUuid();
         this.saveFile = saveFile;
         tpTimer = -1;
         incomingTeleportRequests = new LinkedHashMap<>();
         homes = new NamedLocationStorage();
+        PLAYER_ACT_EVENT.register((packet) -> setAfk(false));
     }
 
     /**
@@ -162,6 +171,58 @@ public class PlayerData extends PersistentState {
 
     public MinecraftLocation getHomeLocation(String homeName) {
         return homes.get(homeName);
+    }
+
+    public final Event<PlayerActCallback> PLAYER_ACT_EVENT = EventFactory.createArrayBacked(
+        PlayerActCallback.class,
+        (listeners) -> (packet) -> {
+            for (PlayerActCallback event : listeners) {
+                event.onPlayerAct(packet);
+            }
+        });
+
+    public void setAfk(boolean afk) {
+        if (this.afk == afk) {
+            return;
+        }
+
+        if (afk) {
+            this.player.server.getPlayerManager().broadcast(
+                ECText.getInstance().getText(
+                    "player.afk.enter",
+                    this.player.getDisplayName()),
+                MessageType.SYSTEM);
+
+            // This assignment should happen after the message, otherwise
+            // `getDisplayName` will include the `[AFK]` prefix.
+            this.afk = afk;
+        } else {
+            // This assignment should happen before the message, otherwise
+            // `getDisplayName` will include the `[AFK]` prefix.
+            this.afk = afk;
+
+            this.player.server.getPlayerManager().broadcast(
+                ECText.getInstance().getText(
+                    "player.afk.exit",
+                    this.player.getDisplayName()),
+                MessageType.SYSTEM);
+        }
+    }
+
+    public boolean isAfk() {
+        return afk;
+    }
+
+    public void onTickEnd() {
+        var currentPos = player.getPos();
+        if (this.afk && !this.lastTickPos.equals(currentPos)) {
+            this.setAfk(false);
+        }
+        lastTickPos = player.getPos();
+    }
+
+    public Vec3d getLastTickPos() {
+        return lastTickPos;
     }
 
     private static final class StorageKey
