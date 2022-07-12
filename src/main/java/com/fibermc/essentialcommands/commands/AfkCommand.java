@@ -14,7 +14,7 @@ public class AfkCommand implements Command<ServerCommandSource> {
         var playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
 
         // Message sending is done in here
-        playerData.setAfk(true);
+        playerData.setAfk(!playerData.isAfk());
 
         return 0;
     }
