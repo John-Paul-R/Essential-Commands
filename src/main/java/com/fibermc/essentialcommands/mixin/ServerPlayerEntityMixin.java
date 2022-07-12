@@ -115,4 +115,14 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
         this.getEcPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity)(Object)this));
     }
+
+    @Inject(method = "enterCombat", at = @At("RETURN"))
+    public void onEnterCombat(CallbackInfo ci) {
+        ecPlayerData.setInCombat(true);
+    }
+
+    @Inject(method = "endCombat", at = @At("RETURN"))
+    public void onExitCombat(CallbackInfo ci) {
+        ecPlayerData.setInCombat(false);
+    }
 }

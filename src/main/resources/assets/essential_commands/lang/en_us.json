@@ -51,6 +51,7 @@
   "cmd.warp.list.start": "The available server Warps are: ",
   "cmd.day.error.already_daytime": "It is already daytime.",
   "cmd.day.feedback": "Set time to day.",
+  "cmd.afk.error.in_combat": "Cannot enter AFK while in combat.",
 
   "cmd.workbench.feedback": "Opened %s.",
   "cmd.workbench.container_ui_name": "EC %s",

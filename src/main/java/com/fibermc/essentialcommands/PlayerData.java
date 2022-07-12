@@ -57,6 +57,7 @@ public class PlayerData extends PersistentState {
 
     private boolean afk;
     private Vec3d lastTickPos;
+    private boolean isInCombat;
 
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
@@ -187,6 +188,10 @@ public class PlayerData extends PersistentState {
         }
 
         if (afk) {
+            if (CONFIG.INVULN_WHILE_AFK.getValue()) {
+                Pal.grantAbility(this.player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
+            }
+
             this.player.server.getPlayerManager().broadcast(
                 ECText.getInstance().getText(
                     "player.afk.enter",
@@ -200,6 +205,8 @@ public class PlayerData extends PersistentState {
             // This assignment should happen before the message, otherwise
             // `getDisplayName` will include the `[AFK]` prefix.
             this.afk = afk;
+
+            Pal.revokeAbility(this.player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
 
             this.player.server.getPlayerManager().broadcast(
                 ECText.getInstance().getText(
@@ -215,14 +222,27 @@ public class PlayerData extends PersistentState {
 
     public void onTickEnd() {
         var currentPos = player.getPos();
-        if (this.afk && !this.lastTickPos.equals(currentPos)) {
-            this.setAfk(false);
+        if (this.afk) {
+            if (CONFIG.INVULN_WHILE_AFK.getValue()) {
+                player.requestTeleport(lastTickPos.x, lastTickPos.y, lastTickPos.z);
+            } else if (!this.lastTickPos.equals(currentPos)) {
+                this.setAfk(false);
+            }
+
         }
         lastTickPos = player.getPos();
     }
 
     public Vec3d getLastTickPos() {
         return lastTickPos;
+    }
+
+    public boolean isInCombat() {
+        return isInCombat;
+    }
+
+    public void setInCombat(boolean inCombat) {
+        isInCombat = inCombat;
     }
 
     private static final class StorageKey

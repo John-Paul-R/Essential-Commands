@@ -1,8 +1,11 @@
 package com.fibermc.essentialcommands.mixin;
 
+import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.events.PlayerConnectCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
+import io.github.ladysnake.pal.Pal;
+import io.github.ladysnake.pal.VanillaAbilities;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -31,6 +34,8 @@ public abstract class PlayerManagerMixin {
     )
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo callbackInfo) {
         PlayerConnectCallback.EVENT.invoker().onPlayerConnect(connection, player);
+        // Just to be _super_ sure there is no incorrect persistance of this invuln.
+        Pal.revokeAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
     }
 
     @Inject(method = "remove", at = @At("HEAD"))
