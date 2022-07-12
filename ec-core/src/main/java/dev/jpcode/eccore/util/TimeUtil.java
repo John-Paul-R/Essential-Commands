@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.util;
+package dev.jpcode.eccore.util;
 
 import net.minecraft.server.MinecraftServer;
 

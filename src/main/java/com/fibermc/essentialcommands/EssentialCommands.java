@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
-import com.fibermc.essentialcommands.util.TimeUtil;
+import dev.jpcode.eccore.util.TimeUtil;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
