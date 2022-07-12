@@ -119,13 +119,20 @@ public abstract class ECText {
                         return PlaceholderResult.value(text);
                     };
 
-                var retVal = Placeholders.parseText(getText(key), PlaceholderContext.of(_server), Placeholders.PREDEFINED_PLACEHOLDER_PATTERN, placeholderGetter);
+                var retVal = Placeholders.parseText(
+                    getText(key),
+                    PlaceholderContext.of(_server),
+                    Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
+                    placeholderGetter);
 
-                return TextUtil.concat(retVal.getSiblings().stream()
-                    .map(txt -> argsList.contains(txt)
-                        ? txt
-                        : txt.copy().setStyle(textFormatType.getStyle()))
-                    .toArray(Text[]::new));
+                var retValSiblings = retVal.getSiblings();
+                return retValSiblings.size() == 0
+                    ? retVal.copy()
+                    : TextUtil.concat(retVal.getSiblings().stream()
+                        .map(txt -> argsList.contains(txt)
+                            ? txt
+                            : txt.copy().setStyle(textFormatType.getStyle()))
+                        .toArray(Text[]::new));
             }
 
             public MutableText getText(String key, Object... args) {
