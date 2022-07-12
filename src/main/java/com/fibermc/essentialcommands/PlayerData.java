@@ -170,12 +170,31 @@ public class PlayerData extends PersistentState {
     }
 
     public void setAfk(boolean afk) {
-        this.afk = afk;
+        if (this.afk == afk) {
+            return;
+        }
 
-        this.player.server.sendMessage(
-            ECText.getInstance().getText(
-                afk ? "player.afk.enter" : "player.afk.exit",
-                this.player.getDisplayName()));
+        if (afk) {
+            this.player.server.getPlayerManager().broadcast(
+                ECText.getInstance().getText(
+                    "player.afk.enter",
+                    this.player.getDisplayName()),
+                MessageType.SYSTEM);
+
+            // This assignment should happen after the message, otherwise
+            // `getDisplayName` will include the `[AFK]` prefix.
+            this.afk = afk;
+        } else {
+            // This assignment should happen before the message, otherwise
+            // `getDisplayName` will include the `[AFK]` prefix.
+            this.afk = afk;
+
+            this.player.server.getPlayerManager().broadcast(
+                ECText.getInstance().getText(
+                    "player.afk.exit",
+                    this.player.getDisplayName()),
+                MessageType.SYSTEM);
+        }
     }
 
     public boolean isAfk() {
