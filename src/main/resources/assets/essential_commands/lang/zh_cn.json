@@ -62,10 +62,8 @@
   "teleport.error.interdimensional_teleport_disabled": "传送失败。原因：跨维度传送已禁用。",
   "teleport.queued": "正在传送至 ${0} 倒计时：${1} 秒...",
   "teleport.done": "已传送至 ${0}",
-  "teleport.request.expired.1": "传送",
-  "teleport.request.expired.sender.2": "至",
-  "teleport.request.expired.receiver.2":  "来自 ",
-  "teleport.request.expired.3": "的请求已过期。",
+  "teleport.request.expired.sender": "传送至 ${0} 的请求已过期。",
+  "teleport.request.expired.receiver":  "传送来自 ${0} 的请求已过期。",
 
   "generic.argument.target_player": "",
   "generic.error.unknown": "执行指令时发生未知错误。",

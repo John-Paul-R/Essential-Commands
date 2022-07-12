@@ -57,10 +57,8 @@
   "teleport.error.interdimensional_teleport_disabled": "Телепортация отменена. Телепортация между измерениями выключена администрацией.",
   "teleport.queued": "Телепортирование к ${0} через ${1} секунд...",
   "teleport.done": "Телепортирование к ${0}.",
-  "teleport.request.expired.1": "Запрос на телепортацию ",
-  "teleport.request.expired.sender.2": "к",
-  "teleport.request.expired.receiver.2":  "от",
-  "teleport.request.expired.3": " истек.",
+  "teleport.request.expired.sender": "Запрос на телепортацию к ${0} истек.",
+  "teleport.request.expired.receiver": "Запрос на телепортацию от ${0} истек.",
 
   "generic.argument.target_player": "",
   "generic.error.unknown": "При выполнении команды произошла неизвестная ошибка.",
