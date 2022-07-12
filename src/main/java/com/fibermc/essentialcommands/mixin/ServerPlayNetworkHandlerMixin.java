@@ -4,10 +4,7 @@ import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ServerPlayPacketListener;
-import net.minecraft.network.packet.c2s.play.BoatPaddleStateC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ServerPlayNetworkHandlerMixin {
 
     private PlayerData getPlayerData() {
-        var player= ((ServerPlayNetworkHandler)(Object)this).player;
+        var player = ((ServerPlayNetworkHandler) (Object) this).player;
         return ((ServerPlayerEntityAccess) player).getEcPlayerData();
     }
 
@@ -43,6 +40,11 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onBoatPaddleState", at = @At("RETURN"))
     public void onBoatPaddleState(BoatPaddleStateC2SPacket packet, CallbackInfo ci) {
+        invokeActEvent(packet);
+    }
+
+    @Inject(method = "onPlayerInteractEntity", at = @At("RETURN"))
+    public void onPlayerInteractEntity(PlayerInteractEntityC2SPacket packet, CallbackInfo ci) {
         invokeActEvent(packet);
     }
 }
