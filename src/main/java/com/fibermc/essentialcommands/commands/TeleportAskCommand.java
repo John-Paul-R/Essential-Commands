@@ -9,7 +9,6 @@ import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -42,7 +41,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         targetPlayer.sendMessage(
             ECText.getInstance().getText(
                 "cmd.tpask.receive",
-                Text.literal(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT)),
+                ECText.accent(senderPlayer.getEntityName())),
             MessageType.SYSTEM);
 
         String senderName = context.getSource().getPlayer().getGameProfile().getName();
@@ -50,14 +49,14 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
             targetPlayer,
             "/tpaccept " + senderName,
             "/tpdeny " + senderName,
-            Text.literal("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(CONFIG.FORMATTING_ACCENT),
-            Text.literal("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(CONFIG.FORMATTING_ERROR)
+            ECText.accent("[" + ECText.getInstance().get("generic.accept") + "]"),
+            ECText.error("[" + ECText.getInstance().get("generic.deny") + "]")
         ).send();
         
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_TO);
 
-        var targetPlayerText = Text.literal(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT);
+        var targetPlayerText = ECText.accent(targetPlayer.getEntityName());
         //inform command sender that request has been sent
         context.getSource().sendFeedback(
             ECText.getInstance().getText("cmd.tpask.send", targetPlayerText),

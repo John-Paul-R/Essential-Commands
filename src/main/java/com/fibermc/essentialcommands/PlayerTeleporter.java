@@ -5,7 +5,6 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -31,7 +30,7 @@ public class PlayerTeleporter {
                 ECText.getInstance().getText(
                     "teleport.queued",
                     queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT),
-                    Text.literal(String.format("%.1f", CONFIG.TELEPORT_DELAY)).setStyle(CONFIG.FORMATTING_ACCENT)),
+                    ECText.accent(String.format("%.1f", CONFIG.TELEPORT_DELAY))),
                 MessageType.SYSTEM
             );
         }

@@ -47,6 +47,18 @@ public abstract class ECText {
         _server = server;
     }
 
+    public static MutableText literal(String str) {
+        return Text.literal(str).setStyle(CONFIG.FORMATTING_DEFAULT);
+    }
+
+    public static MutableText accent(String str) {
+        return Text.literal(str).setStyle(CONFIG.FORMATTING_ACCENT);
+    }
+
+    public static MutableText error(String str) {
+        return Text.literal(str).setStyle(CONFIG.FORMATTING_ERROR);
+    }
+
     private static ECText create(String langId) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         Objects.requireNonNull(builder);
@@ -89,7 +101,7 @@ public abstract class ECText {
             }
 
             public MutableText getText(String key) {
-                return Text.literal(get(key)).setStyle(CONFIG.FORMATTING_DEFAULT);
+                return ECText.literal(get(key));
             }
 
             public MutableText getText(String key,  Text... args) {
@@ -135,7 +147,7 @@ public abstract class ECText {
             }
 
             public MutableText getText(String key, Object... args) {
-                return Text.literal(String.format(get(key), args)).setStyle(CONFIG.FORMATTING_DEFAULT);
+                return ECText.literal(String.format(get(key), args));
             }
 
             public boolean hasTranslation(String key) {

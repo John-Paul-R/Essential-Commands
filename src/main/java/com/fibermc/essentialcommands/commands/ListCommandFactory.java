@@ -26,11 +26,11 @@ public class ListCommandFactory {
     {
         return (CommandContext<ServerCommandSource> context) -> {
             MutableText responseText = Text.empty();
-            responseText.append(Text.literal(responsePreText).setStyle(CONFIG.FORMATTING_DEFAULT));
+            responseText.append(ECText.literal(responsePreText));
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
             List<Text> suggestionTextList = suggestionsList.stream().map((entry) -> clickableTeleport(
-                Text.literal(entry.getKey()).setStyle(CONFIG.FORMATTING_ACCENT),
+                ECText.accent(entry.getKey()),
                 entry.getKey(),
                 String.format("/%s", commandExecText))
             ).collect(Collectors.toList());
@@ -38,7 +38,7 @@ public class ListCommandFactory {
             if (suggestionTextList.size() > 0) {
                 responseText.append(TextUtil.join(
                     suggestionTextList,
-                    Text.literal(", ").setStyle(CONFIG.FORMATTING_DEFAULT)
+                    ECText.literal(", ")
                 ));
             } else {
                 responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty").setStyle(CONFIG.FORMATTING_ERROR));

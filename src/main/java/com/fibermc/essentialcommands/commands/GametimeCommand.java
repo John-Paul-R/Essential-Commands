@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -47,7 +48,7 @@ public class GametimeCommand implements Command<ServerCommandSource> {
     private static Text getFormattedTime(long time) {
         return Text.translatable(
                 "commands.time.query",
-                Text.literal(formatGameTimeOfDay(time)).setStyle(CONFIG.FORMATTING_ACCENT))
+                ECText.accent(formatGameTimeOfDay(time)))
             .setStyle(CONFIG.FORMATTING_DEFAULT
                 .withHoverEvent(
                     new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(String.valueOf(time % 24000L)))));

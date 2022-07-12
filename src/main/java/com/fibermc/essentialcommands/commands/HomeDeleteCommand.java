@@ -10,7 +10,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -31,7 +30,7 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         //Remove Home - TODO Require player to type the command again to confirm deletion.
         boolean wasSuccessful = senderPlayerData.removeHome(homeName);
 
-        var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT);
+        var homeNameText = ECText.accent(homeName);
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             source.sendFeedback(

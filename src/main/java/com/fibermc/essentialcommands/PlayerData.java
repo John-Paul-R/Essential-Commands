@@ -147,8 +147,8 @@ public class PlayerData extends PersistentState {
             this.markDirty();
             outCode = 1;
         } else {
-            var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT);
-            var maxHomesText = Text.literal(String.valueOf(playerMaxHomes)).setStyle(CONFIG.FORMATTING_ACCENT);
+            var homeNameText = ECText.accent(homeName);
+            var maxHomesText = ECText.accent(String.valueOf(playerMaxHomes));
             this.sendError(
                 ECText.getInstance().getText(
                     "cmd.home.set.error.limit",

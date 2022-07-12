@@ -9,7 +9,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -25,7 +24,7 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
 
         boolean wasSuccessful = worldDataManager.delWarp(warpName);
 
-        var warpNameText = Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT);
+        var warpNameText = ECText.accent(warpName);
         //inform command sender that the warp has been removed
         if (!wasSuccessful) {
             source.sendFeedback(

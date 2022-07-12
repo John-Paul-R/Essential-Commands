@@ -12,7 +12,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -35,7 +34,7 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
             requiresPermission = false;
         }
 
-        var warpNameText = Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT);
+        var warpNameText = ECText.accent(warpName);
         //Add warp
         try {
             worldDataManager.setWarp(warpName, new MinecraftLocation(senderPlayer), requiresPermission);

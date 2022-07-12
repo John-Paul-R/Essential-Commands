@@ -11,9 +11,6 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class WarpTpCommand implements Command<ServerCommandSource> {
 
@@ -24,7 +21,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         String warpName = StringArgumentType.getString(context, "warp_name");
-        var warpNameText = Text.literal(warpName).setStyle(CONFIG.FORMATTING_ACCENT);
+        var warpNameText = ECText.accent(warpName);
         WarpLocation loc = worldDataManager.getWarp(warpName);
 
         if (loc == null) {

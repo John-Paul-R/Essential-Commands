@@ -11,7 +11,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -31,7 +30,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
         //Add home to PlayerData
         //TODO if home with given name is already set, warn of overwrite and require that the command be typed again, or a confirmation message be given
         PlayerData pData = ((ServerPlayerEntityAccess)senderPlayer).getEcPlayerData();
-        var homeNameText = Text.literal(homeName).setStyle(CONFIG.FORMATTING_ACCENT);
+        var homeNameText = ECText.accent(homeName);
         int successCode = 0;
         try {
              successCode = pData.addHome(homeName, new MinecraftLocation(senderPlayer));

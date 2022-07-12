@@ -14,7 +14,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -60,7 +59,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                     ECText.getInstance().getText(
                         "cmd.rtp.error.cooldown",
                         TextFormatType.Error,
-                        Text.literal(String.format("%.1f", rtpCooldownRemaining / 20D)).setStyle(CONFIG.FORMATTING_ACCENT))
+                        ECText.accent(String.format("%.1f", rtpCooldownRemaining / 20D)))
                 );
             }
             // if cooldown has expired
