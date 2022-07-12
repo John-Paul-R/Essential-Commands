@@ -57,6 +57,7 @@ public class PlayerData extends PersistentState {
 
     private boolean afk;
     private Vec3d lastTickPos;
+    private boolean isInCombat;
 
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
@@ -234,6 +235,14 @@ public class PlayerData extends PersistentState {
 
     public Vec3d getLastTickPos() {
         return lastTickPos;
+    }
+
+    public boolean isInCombat() {
+        return isInCombat;
+    }
+
+    public void setInCombat(boolean inCombat) {
+        isInCombat = inCombat;
     }
 
     private static final class StorageKey
