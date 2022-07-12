@@ -245,6 +245,14 @@ public class PlayerData extends PersistentState {
         isInCombat = inCombat;
     }
 
+    public boolean hasMovedThisTick() {
+        return !this.lastTickPos.equals(this.player.getPos());
+    }
+
+    public double distanceMovedThisTick() {
+        return this.lastTickPos.distanceTo(this.player.getPos());
+    }
+
     private static final class StorageKey
     {
         static final String playerUuid = "playerUuid";

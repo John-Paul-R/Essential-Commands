@@ -50,6 +50,8 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<Boolean> USE_PERMISSIONS_API =    new Option<>("use_permissions_api", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> CHECK_FOR_UPDATES =      new Option<>("check_for_updates", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> TELEPORT_INTERRUPT_ON_DAMAGED = new Option<>("teleport_interrupt_on_damaged", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> TELEPORT_INTERRUPT_ON_MOVE = new Option<>("teleport_interrupt_on_move", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Double>  TELEPORT_INTERRUPT_ON_MOVE_AMOUNT = new Option<>("teleport_interrupt_on_move_max_blocks", 3D, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Boolean> ALLOW_TELEPORT_BETWEEN_DIMENSIONS = new Option<>("allow_teleport_between_dimensions", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> OPS_BYPASS_TELEPORT_RULES =  new Option<>("ops_bypass_teleport_rules", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICKNAMES_IN_PLAYER_LIST =   new Option<>("nicknames_in_player_list", true, Boolean::parseBoolean);

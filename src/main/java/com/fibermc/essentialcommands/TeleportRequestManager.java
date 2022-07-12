@@ -80,11 +80,23 @@ public class TeleportRequestManager {
             }
         }
 
+        var shouldInterruptTeleportOnMove = CONFIG.TELEPORT_INTERRUPT_ON_MOVE.getValue();
+        var maxMoveBeforeInterrupt = CONFIG.TELEPORT_INTERRUPT_ON_MOVE_AMOUNT.getValue();
         Iterator<Map.Entry<UUID, QueuedTeleport>> tpQueueIter = delayedQueuedTeleportMap.entrySet().iterator();
         while (tpQueueIter.hasNext()) {
             Map.Entry<UUID, QueuedTeleport> entry = tpQueueIter.next();
             QueuedTeleport queuedTeleport = entry.getValue();
             queuedTeleport.tick(server);
+
+            var playerData = queuedTeleport.getPlayerData();
+            if (shouldInterruptTeleportOnMove
+                && playerData.hasMovedThisTick()
+                && playerData.getPlayer().getPos().distanceTo(queuedTeleport.initialPosition) > maxMoveBeforeInterrupt
+            ) {
+                playerData.sendError(
+                    ECText.getInstance().getText("teleport.interruped.moved", TextFormatType.Error));
+                tpQueueIter.remove();
+            }
             if (queuedTeleport.getTicksRemaining() < 0) {
                 tpQueueIter.remove();
                 PlayerTeleporter.teleport(queuedTeleport);

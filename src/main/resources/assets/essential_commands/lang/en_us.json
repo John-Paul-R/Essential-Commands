@@ -67,6 +67,7 @@
   "teleport.queued": "Teleporting to ${0} in ${1} seconds...",
   "teleport.done": "Teleported to ${0}.",
   "teleport.interrupted.damage": "Teleport interrupted. Reason: Damage Taken",
+  "teleport.interruped.moved": "Teleport interrupted. Reason: Moved",
   "teleport.request.expired.sender": "Teleport request to ${0} expired.",
   "teleport.request.expired.receiver":  "Teleport request from ${0} expired.",
   "teleport.request.canceled_by_new": "Queued Teleport to '${0}' canceled. Reason: New teleport to '${1}' started!",
