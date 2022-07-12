@@ -43,3 +43,7 @@ showcase.md
 temp.md
 
 remappedSrc
+
+*/logs/*
+*.log.gz
+*.log
