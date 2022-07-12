@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.events.PlayerActCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import com.fibermc.essentialcommands.util.TimeUtil;
@@ -7,6 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.jpcode.eccore.util.TextUtil;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -63,6 +66,7 @@ public class PlayerData extends PersistentState {
         tpTimer = -1;
         incomingTeleportRequests = new LinkedHashMap<>();
         homes = new NamedLocationStorage();
+        PLAYER_ACT_EVENT.register((packet) -> setAfk(false));
     }
 
     /**
@@ -168,6 +172,14 @@ public class PlayerData extends PersistentState {
     public MinecraftLocation getHomeLocation(String homeName) {
         return homes.get(homeName);
     }
+
+    public final Event<PlayerActCallback> PLAYER_ACT_EVENT = EventFactory.createArrayBacked(
+        PlayerActCallback.class,
+        (listeners) -> (packet) -> {
+            for (PlayerActCallback event : listeners) {
+                event.onPlayerAct(packet);
+            }
+        });
 
     public void setAfk(boolean afk) {
         if (this.afk == afk) {
