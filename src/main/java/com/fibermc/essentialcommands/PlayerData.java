@@ -58,16 +58,23 @@ public class PlayerData extends PersistentState {
     private boolean afk;
     private Vec3d lastTickPos;
     private boolean isInCombat;
+    private int lastActionTick;
+    private int lastMovedTick;
+    private boolean hasMovedThisTick;
 
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
         this.lastTickPos = player.getPos();
+        this.lastActionTick = player.server.getTicks();
         this.pUuid = player.getUuid();
         this.saveFile = saveFile;
         tpTimer = -1;
         incomingTeleportRequests = new LinkedHashMap<>();
         homes = new NamedLocationStorage();
-        PLAYER_ACT_EVENT.register((packet) -> setAfk(false));
+        PLAYER_ACT_EVENT.register((packet) -> {
+            updateLastActionTick();
+            setAfk(false);
+        });
     }
 
     /**
@@ -221,15 +228,27 @@ public class PlayerData extends PersistentState {
     }
 
     public void onTickEnd() {
+        var ticks = player.server.getTicks();
         var currentPos = player.getPos();
+        hasMovedThisTick = !this.lastTickPos.equals(currentPos);
+        if (hasMovedThisTick) {
+            lastMovedTick = ticks;
+        }
+
         if (this.afk) {
             if (CONFIG.INVULN_WHILE_AFK.getValue()) {
                 player.requestTeleport(lastTickPos.x, lastTickPos.y, lastTickPos.z);
-            } else if (!this.lastTickPos.equals(currentPos)) {
+            } else if (hasMovedThisTick) {
                 this.setAfk(false);
             }
 
+        } else if (
+            CONFIG.AUTO_AFK_ENABLED.getValue()
+            && (ticks - Math.max(lastMovedTick, lastActionTick)) > CONFIG.AUTO_AFK_TICKS.getValue()
+        ) {
+            this.setAfk(true);
         }
+
         lastTickPos = player.getPos();
     }
 
@@ -246,11 +265,19 @@ public class PlayerData extends PersistentState {
     }
 
     public boolean hasMovedThisTick() {
-        return !this.lastTickPos.equals(this.player.getPos());
+        return this.hasMovedThisTick;
     }
 
     public double distanceMovedThisTick() {
         return this.lastTickPos.distanceTo(this.player.getPos());
+    }
+
+    public int getLastActionTick() {
+        return lastActionTick;
+    }
+
+    public void updateLastActionTick() {
+        this.lastActionTick = player.server.getTicks();
     }
 
     private static final class StorageKey
