@@ -5,7 +5,6 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -40,10 +39,11 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
         }
 
         //inform target player of tp request via chat
-        targetPlayer.sendMessage(TextUtil.concat(
-            Text.literal(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-            ECText.getInstance().getText("cmd.tpaskhere.receive").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-        ), MessageType.SYSTEM);
+        targetPlayer.sendMessage(
+            ECText.getInstance().getText(
+                "cmd.tpaskhere.receive",
+                Text.literal(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue())),
+            MessageType.SYSTEM);
 
         String senderName = context.getSource().getPlayer().getGameProfile().getName();
         new ChatConfirmationPrompt(
