@@ -37,6 +37,7 @@ public final class EssentialCommands implements ModInitializer {
         BACKING_CONFIG.loadOrCreateProperties();
 
         ECPlaceholderRegistry.register();
+        ECAbilitySources.init();
 
         ManagerLocator managers = ManagerLocator.getInstance();
         managers.init();
