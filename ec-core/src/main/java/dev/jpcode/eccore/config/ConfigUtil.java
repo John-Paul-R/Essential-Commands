@@ -2,6 +2,7 @@ package dev.jpcode.eccore.config;
 
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import dev.jpcode.eccore.util.TimeUtil;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -9,6 +10,7 @@ import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -141,5 +143,13 @@ public final class ConfigUtil {
 
     public static String serializeStyle(Style style) {
         return String.valueOf(styleJsonDeserializer.serialize(style, null, null));
+    }
+
+    public static int parseDurationToTicks(String str) {
+        return TimeUtil.durationToTicks(Duration.parse(str));
+    }
+
+    public static String serializeTicksAsDuration(int ticks) {
+        return Duration.ofMillis(TimeUtil.ticksToMs(ticks)).toString();
     }
 }

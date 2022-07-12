@@ -1,6 +1,8 @@
-package com.fibermc.essentialcommands.util;
+package dev.jpcode.eccore.util;
 
 import net.minecraft.server.MinecraftServer;
+
+import java.time.Duration;
 
 public final class TimeUtil {
     private static final double tps = 20;
@@ -31,5 +33,9 @@ public final class TimeUtil {
     public static int epochTimeMsToTicks(long epochTimeMs) {
         var msFromNow = epochTimeMs - net.minecraft.util.Util.getEpochTimeMs();
         return _server.getTicks() + msToTicks(msFromNow);
+    }
+
+    public static int durationToTicks(Duration duration) {
+        return TimeUtil.msToTicks(duration.toMillis());
     }
 }
