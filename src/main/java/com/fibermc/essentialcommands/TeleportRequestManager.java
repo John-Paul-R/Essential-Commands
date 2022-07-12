@@ -92,11 +92,13 @@ public class TeleportRequestManager {
             if (shouldInterruptTeleportOnMove
                 && playerData.hasMovedThisTick()
                 && playerData.getPlayer().getPos().distanceTo(queuedTeleport.initialPosition) > maxMoveBeforeInterrupt
+                && !ECPerms.check(playerData.getPlayer().getCommandSource(), ECPerms.Registry.bypass_teleport_interrupt_on_move)
             ) {
                 playerData.sendError(
                     ECText.getInstance().getText("teleport.interruped.moved", TextFormatType.Error));
                 tpQueueIter.remove();
             }
+
             if (queuedTeleport.getTicksRemaining() < 0) {
                 tpQueueIter.remove();
                 PlayerTeleporter.teleport(queuedTeleport);
