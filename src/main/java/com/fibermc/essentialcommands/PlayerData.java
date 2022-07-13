@@ -195,6 +195,9 @@ public class PlayerData extends PersistentState {
         }
 
         if (afk) {
+            if (!CONFIG.ENABLE_AFK) {
+                return;
+            }
             if (CONFIG.INVULN_WHILE_AFK) {
                 Pal.grantAbility(this.player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
             }
