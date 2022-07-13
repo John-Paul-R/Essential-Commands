@@ -221,6 +221,8 @@ public class PlayerData extends PersistentState {
                     this.player.getDisplayName()),
                 MessageType.SYSTEM);
         }
+
+        PlayerDataManager.getInstance().markNicknameDirty(this);
     }
 
     public boolean isAfk() {
