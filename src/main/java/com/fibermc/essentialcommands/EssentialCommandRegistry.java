@@ -147,11 +147,7 @@ public class EssentialCommandRegistry {
             homeListOfflineBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
                 .then(argument("target_player", StringArgumentType.word())
-                    .executes(ListCommandFactory.create(
-                        ECText.getInstance().get("cmd.come.list.start"),
-                        "home tp_other",
-                        HomeTeleportOtherCommand.Suggestion::getSuggestionEntries
-                    )));
+                    .executes(HomeTeleportOtherCommand::runListOffline));
 
             LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder
                 .requires(ECPerms.requireAny(ECPerms.Registry.Group.home_group, 0))

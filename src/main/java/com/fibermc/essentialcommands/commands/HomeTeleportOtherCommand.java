@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class HomeTeleportOtherCommand extends HomeCommand implements Command<ServerCommandSource> {
 
@@ -74,6 +77,33 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
             });
         return 1;
 
+    }
+
+    public static int runListOffline(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        var targetPlayerName = StringArgumentType.getString(context, "target_player");
+        ManagerLocator.getInstance()
+            .getOfflinePlayerRepo()
+            .getOfflinePlayerByNameAsync(targetPlayerName)
+            .whenComplete((playerEntity, err) -> {
+                if (playerEntity==null) {
+                    context.getSource().sendError(Text.of("No player with the specified name found."));
+                    return;
+                }
+
+                var targetPlayerData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
+                var suggestionText = ListCommandFactory.getSuggestionText(
+                    ECText.getInstance().get("cmd.home.list.start"),
+                    "home tp_offline %s".formatted(targetPlayerName),
+                    targetPlayerData.getHomeEntries()
+                );
+
+                context.getSource().sendFeedback(
+                    suggestionText,
+                    CONFIG.BROADCAST_TO_OPS
+                );
+
+            });
+        return 0;
     }
 
     public static class Suggestion {

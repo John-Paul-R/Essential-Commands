@@ -26,32 +26,40 @@ public class ListCommandFactory {
         SuggestionListProvider<Entry<String, T>> suggestionsProvider)
     {
         return (CommandContext<ServerCommandSource> context) -> {
-            MutableText responseText = Text.empty()
-                .append(ECText.literal(responsePreText));
-
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
-            List<Text> suggestionTextList = suggestionsList.stream()
-                .map((entry) -> clickableTeleport(
-                    ECText.accent(entry.getKey()),
-                    entry.getKey(),
-                    String.format("/%s", commandExecText)
-                ))
-                .collect(Collectors.toList());
-
-            if (suggestionTextList.size() > 0) {
-                responseText.append(TextUtil.join(
-                    suggestionTextList,
-                    ECText.literal(", ")
-                ));
-            } else {
-                responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty", TextFormatType.Error));
-            }
             context.getSource().sendFeedback(
-                responseText,
+                getSuggestionText(responsePreText, commandExecText, suggestionsList),
                 CONFIG.BROADCAST_TO_OPS
             );
             return 0;
         };
+    }
+
+    public static <T> Text getSuggestionText(
+        String responsePreText,
+        String commandExecText,
+        Collection<Entry<String, T>> suggestionsList)
+    {
+        MutableText responseText = Text.empty()
+            .append(ECText.literal(responsePreText));
+
+        List<Text> suggestionTextList = suggestionsList.stream()
+            .map((entry) -> clickableTeleport(
+                ECText.accent(entry.getKey()),
+                entry.getKey(),
+                String.format("/%s", commandExecText)
+            ))
+            .collect(Collectors.toList());
+
+        if (suggestionTextList.size() > 0) {
+            responseText.append(TextUtil.join(
+                suggestionTextList,
+                ECText.literal(", ")
+            ));
+        } else {
+            responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty", TextFormatType.Error));
+        }
+        return responseText;
     }
 }
