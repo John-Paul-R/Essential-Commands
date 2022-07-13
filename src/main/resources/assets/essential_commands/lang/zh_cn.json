@@ -29,7 +29,7 @@
   "cmd.realname.feedback.matching": "如下玩家正在使用该昵称：'${0}':",
   "cmd.spawn.location_name": "出生点",
   "cmd.spawn.tp.error.no_spawn_set": "出生点未设置",
-  "cmd.spawn.set.feedback": "出生点被设置为",
+  "cmd.spawn.set.feedback": "出生点被设置为${0}",
   "cmd.tpaccept.feedback": "传送请求已被接受。",
   "cmd.tpa_reply.error.shortcut_none_exist": "没有未处理的传送请求。",
   "cmd.tpa_reply.error.shortcut_more_than_one": "存在多个未处理的传送请求，请明确您想要接受请求的发起玩家的名称",

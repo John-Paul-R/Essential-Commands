@@ -30,7 +30,7 @@
   "cmd.realname.feedback.matching": "Следующие игроки соответствуют имени '${0}':",
   "cmd.spawn.location_name": "Точка спавна",
   "cmd.spawn.tp.error.no_spawn_set": "Точка спавна не установлена",
-  "cmd.spawn.set.feedback": "Точка спавна установлена на ",
+  "cmd.spawn.set.feedback": "Точка спавна установлена на ${0}",
   "cmd.tpaccept.feedback": "Запрос на телепортацию принят.",
   "cmd.tpa_reply.error.shortcut_none_exist": "Нет активных запросов на тедепортацию.",
   "cmd.tpa_reply.error.shortcut_more_than_one": "Более 1 ожидающего запроса на телепортацию. Укажите имя игрока, чей запрос вы хотите принять.",

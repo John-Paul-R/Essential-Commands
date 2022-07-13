@@ -29,7 +29,7 @@
   "cmd.realname.feedback.matching": "The following player(s) match the nickname '${0}':",
   "cmd.spawn.location_name": "spawn",
   "cmd.spawn.tp.error.no_spawn_set": "Spawn not set.",
-  "cmd.spawn.set.feedback": "Spawn set at ",
+  "cmd.spawn.set.feedback": "Spawn set at ${0}",
   "cmd.tpaccept.feedback": "Teleport request accepted.",
   "cmd.tpa_reply.error.shortcut_none_exist": "No pending teleport requests.",
   "cmd.tpa_reply.error.shortcut_more_than_one": "More than 1 pending teleport request. Specify the name of the player who's request you want to accept.",
