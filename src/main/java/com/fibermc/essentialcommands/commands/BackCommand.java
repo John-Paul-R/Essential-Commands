@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
@@ -10,8 +11,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 
 public class BackCommand implements Command<ServerCommandSource> {
@@ -36,7 +35,7 @@ public class BackCommand implements Command<ServerCommandSource> {
             out=1;
         } else {
             context.getSource().sendError(
-                ECText.getInstance().getText("cmd.back.error.no_prev_location").setStyle(CONFIG.FORMATTING_ERROR)
+                ECText.getInstance().getText("cmd.back.error.no_prev_location", TextFormatType.Error)
             );
         }
 

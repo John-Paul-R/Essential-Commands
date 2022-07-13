@@ -28,8 +28,9 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
 
         //inform command sender that the home has been set
         source.sendFeedback(
-            ECText.getInstance().getText("cmd.spawn.set.feedback").setStyle(CONFIG.FORMATTING_DEFAULT)
-                .append(loc.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT))
+            ECText.getInstance().getText(
+                "cmd.spawn.set.feedback",
+                loc.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT))
             , CONFIG.BROADCAST_TO_OPS);
 
         return 1;

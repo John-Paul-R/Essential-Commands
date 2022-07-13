@@ -97,41 +97,59 @@ public abstract class ECText {
         final Map<String, String> map = builder.build();
         return new ECText() {
             public String get(String key) {
-                return (String)map.getOrDefault(key, key);
+                return map.getOrDefault(key, key);
+            }
+
+            // Literals
+            public MutableText getTextLiteral(String key, TextFormatType textFormatType) {
+                return Text.literal(get(key)).setStyle(textFormatType.getStyle());
             }
 
             public MutableText getText(String key) {
-                return ECText.literal(get(key));
+                return getTextLiteral(key, TextFormatType.Default);
             }
 
-            public MutableText getText(String key,  Text... args) {
-                return getText(key, TextFormatType.Default, args);
+            public MutableText getText(String key, TextFormatType textFormatType) {
+                return getTextLiteral(key, textFormatType);
+            }
+
+            // Interpolated
+            public MutableText getText(String key, Text... args) {
+                return getTextInternal(key, TextFormatType.Default, args);
             }
 
             public MutableText getText(String key, TextFormatType textFormatType,  Text... args) {
-                var argsList = Arrays.stream(args).map(Text::copy).toList();
-                Placeholders.PlaceholderGetter placeholderGetter = (placeholderId) ->
+                return getTextInternal(key, textFormatType, args);
+            }
+
+            private Placeholders.PlaceholderGetter placeholderGetterForContext(TextFormatType textFormatType, List<MutableText> args) {
+                return (placeholderId) ->
                     (ctx, abc) -> {
                         var idxAndFormattingCode = placeholderId.split(":");
                         if (idxAndFormattingCode.length < 1) {
                             throw new IllegalArgumentException("lang string placeholder did not contain an index");
                         }
-                        var text = argsList.get(Integer.parseInt(idxAndFormattingCode[0]));
 
-                        if (idxAndFormattingCode.length == 2) {
-                            var style = switch (idxAndFormattingCode[1]) {
-                                case "d" -> CONFIG.FORMATTING_DEFAULT;
-                                case "a" -> CONFIG.FORMATTING_ACCENT;
-                                case "e" -> CONFIG.FORMATTING_ERROR;
-                                default -> throw new StringIndexOutOfBoundsException();
-                            };
-                            text.setStyle(style);
-                        }
+                        var firstToken = idxAndFormattingCode[0];
+                        var text = switch (firstToken) {
+                            case "l" -> {
+                                if (idxAndFormattingCode.length < 2) {
+                                    throw new IllegalArgumentException("Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: " + placeholderId);
+                                }
+                                yield getTextLiteral(idxAndFormattingCode[1], textFormatType);
+                            }
+
+                            default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));
+                        };
                         return PlaceholderResult.value(text);
                     };
+            }
 
+            public MutableText getTextInternal(String key, TextFormatType textFormatType,  Text... args) {
+                var argsList = Arrays.stream(args).map(Text::copy).toList();
+                var placeholderGetter = placeholderGetterForContext(textFormatType, argsList);
                 var retVal = Placeholders.parseText(
-                    getText(key),
+                    Text.literal(get(key)),
                     PlaceholderContext.of(_server),
                     Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
                     placeholderGetter);
@@ -146,6 +164,7 @@ public abstract class ECText {
                         .toArray(Text[]::new));
             }
 
+            // Other stuff
             public MutableText getText(String key, Object... args) {
                 return ECText.literal(String.format(get(key), args));
             }

@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -47,8 +48,8 @@ public class InvulnCommand implements Command<ServerCommandSource> {
         // Label boolean values in suggestions, or switch to single state value (present or it's not)
 
         var enabledText = ECText.getInstance().getText(
-                shouldEnableInvuln ? "generic.enabled" : "generic.disabled")
-            .setStyle(CONFIG.FORMATTING_ACCENT);
+            shouldEnableInvuln ? "generic.enabled" : "generic.disabled",
+            TextFormatType.Accent);
 
         source.sendFeedback(
             ECText.getInstance().getText(

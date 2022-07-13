@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -25,15 +26,18 @@ public class ListCommandFactory {
         SuggestionListProvider<Entry<String, T>> suggestionsProvider)
     {
         return (CommandContext<ServerCommandSource> context) -> {
-            MutableText responseText = Text.empty();
-            responseText.append(ECText.literal(responsePreText));
+            MutableText responseText = Text.empty()
+                .append(ECText.literal(responsePreText));
+
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
-            List<Text> suggestionTextList = suggestionsList.stream().map((entry) -> clickableTeleport(
-                ECText.accent(entry.getKey()),
-                entry.getKey(),
-                String.format("/%s", commandExecText))
-            ).collect(Collectors.toList());
+            List<Text> suggestionTextList = suggestionsList.stream()
+                .map((entry) -> clickableTeleport(
+                    ECText.accent(entry.getKey()),
+                    entry.getKey(),
+                    String.format("/%s", commandExecText)
+                ))
+                .collect(Collectors.toList());
 
             if (suggestionTextList.size() > 0) {
                 responseText.append(TextUtil.join(
@@ -41,7 +45,7 @@ public class ListCommandFactory {
                     ECText.literal(", ")
                 ));
             } else {
-                responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty").setStyle(CONFIG.FORMATTING_ERROR));
+                responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty", TextFormatType.Error));
             }
             context.getSource().sendFeedback(
                 responseText,

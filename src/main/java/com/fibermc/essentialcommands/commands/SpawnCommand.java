@@ -1,17 +1,12 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.ManagerLocator;
-import com.fibermc.essentialcommands.PlayerTeleporter;
-import com.fibermc.essentialcommands.WorldDataManager;
+import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class SpawnCommand implements Command<ServerCommandSource> {
 
@@ -24,7 +19,7 @@ public class SpawnCommand implements Command<ServerCommandSource> {
 
         if (loc == null) {
             context.getSource().sendError(
-                ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set").setStyle(CONFIG.FORMATTING_ERROR));
+                ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set", TextFormatType.Error));
             return -2;
         }
 

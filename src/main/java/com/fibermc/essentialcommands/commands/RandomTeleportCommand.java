@@ -42,8 +42,8 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         if (!world.getRegistryKey().equals(World.OVERWORLD)) {
             throw new CommandException(TextUtil.concat(
-                ECText.getInstance().getText("cmd.rtp.error.pre").setStyle(CONFIG.FORMATTING_ERROR),
-                ECText.getInstance().getText("cmd.rtp.error.not_overworld").setStyle(CONFIG.FORMATTING_ERROR)
+                ECText.getInstance().getText("cmd.rtp.error.pre", TextFormatType.Error),
+                ECText.getInstance().getText("cmd.rtp.error.not_overworld", TextFormatType.Error)
             ));
         }
 

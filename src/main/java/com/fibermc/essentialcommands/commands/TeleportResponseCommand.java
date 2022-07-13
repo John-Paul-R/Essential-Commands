@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.TeleportRequest;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -30,14 +31,17 @@ public abstract class TeleportResponseCommand implements Command<ServerCommandSo
         LinkedHashMap<UUID, TeleportRequest> incomingTeleportRequests = senderPlayerData.getIncomingTeleportRequests();
 
         if (incomingTeleportRequests.size() > 1) {
-            throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.tpa_reply.error.shortcut_more_than_one"));
+            throw CommandUtil.createSimpleException(
+                ECText.getInstance().getText("cmd.tpa_reply.error.shortcut_more_than_one", TextFormatType.Error));
         } else if (incomingTeleportRequests.size() < 1) {
-            throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.tpa_reply.error.shortcut_none_exist"));
+            throw CommandUtil.createSimpleException(
+                ECText.getInstance().getText("cmd.tpa_reply.error.shortcut_none_exist", TextFormatType.Error));
         }
 
         ServerPlayerEntity targetPlayer = incomingTeleportRequests.values().stream().findFirst().get().getTargetPlayer();
         if (targetPlayer == null) {
-            throw CommandUtil.createSimpleException(ECText.getInstance().getText("cmd.tpa_reply.error.no_request_from_target"));
+            throw CommandUtil.createSimpleException(
+                ECText.getInstance().getText("cmd.tpa_reply.error.no_request_from_target", TextFormatType.Error));
         }
 
         return exec(

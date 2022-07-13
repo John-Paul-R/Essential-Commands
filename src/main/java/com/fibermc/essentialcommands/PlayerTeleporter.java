@@ -50,7 +50,7 @@ public class PlayerTeleporter {
             // If this teleport is between dimensions
             if (dest.dim != player.getWorld().getRegistryKey()) {
                 player.sendMessage(
-                    ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled").setStyle(CONFIG.FORMATTING_ERROR),
+                    ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled", TextFormatType.Error),
                     MessageType.SYSTEM
                 );
                 return;
