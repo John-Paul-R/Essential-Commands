@@ -55,6 +55,7 @@ public class PlayerDataManager {
         (listeners) -> (playerDataManager, server) -> {
             for (PlayerDataManagerTickCallback event : listeners) {
                 event.onTick(playerDataManager, server);
+                server.getOverworld().updateSleepingPlayers();
             }
         });
 

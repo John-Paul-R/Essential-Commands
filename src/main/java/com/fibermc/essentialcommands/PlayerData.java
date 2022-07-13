@@ -278,6 +278,10 @@ public class PlayerData extends PersistentState {
         return lastActionTick;
     }
 
+    public int ticksSinceLastActionOrMove() {
+        return player.server.getTicks() - Math.max(lastMovedTick, lastActionTick);
+    }
+
     public void updateLastActionTick() {
         this.lastActionTick = player.server.getTicks();
     }
