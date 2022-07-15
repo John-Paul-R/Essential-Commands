@@ -28,6 +28,7 @@ public class AfkCommand implements Command<ServerCommandSource> {
 
         // Message sending is done in here
         playerData.setAfk(!playerData.isAfk());
+        playerData.updateLastActionTick();
 
         return 0;
     }
