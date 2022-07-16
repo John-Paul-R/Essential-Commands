@@ -411,23 +411,25 @@ public class EssentialCommandRegistry {
                 }))
             .build());
 
-        registerNode.accept(CommandManager.literal("day")
-            .requires(ECPerms.require(ECPerms.Registry.time_set_day, 2))
-            .executes((context) -> {
-                var source = context.getSource();
-                var world = source.getServer().getOverworld();
-                if (world.isDay()) {
-                    source.sendFeedback(ECText.getInstance().getText("cmd.day.error.already_daytime"), CONFIG.BROADCAST_TO_OPS);
-                    return -1;
-                }
-                var time = world.getTimeOfDay();
-                var timeToDay = 24000L - time % 24000L;
+        if (CONFIG.ENABLE_DAY) {
+            registerNode.accept(CommandManager.literal("day")
+                .requires(ECPerms.require(ECPerms.Registry.time_set_day, 2))
+                .executes((context) -> {
+                    var source = context.getSource();
+                    var world = source.getServer().getOverworld();
+                    if (world.isDay()) {
+                        source.sendFeedback(ECText.getInstance().getText("cmd.day.error.already_daytime"), CONFIG.BROADCAST_TO_OPS);
+                        return -1;
+                    }
+                    var time = world.getTimeOfDay();
+                    var timeToDay = 24000L - time % 24000L;
 
-                world.setTimeOfDay(time + timeToDay);
-                source.sendFeedback(ECText.getInstance().getText("cmd.day.feedback"), CONFIG.BROADCAST_TO_OPS);
-                return 1;
-            })
-            .build());
+                    world.setTimeOfDay(time + timeToDay);
+                    source.sendFeedback(ECText.getInstance().getText("cmd.day.feedback"), CONFIG.BROADCAST_TO_OPS);
+                    return 1;
+                })
+                .build());
+        }
 
         LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
             .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))

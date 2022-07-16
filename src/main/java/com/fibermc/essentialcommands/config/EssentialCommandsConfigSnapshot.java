@@ -7,6 +7,7 @@ import java.util.List;
 
 public final class EssentialCommandsConfigSnapshot {
 
+    public final boolean ENABLE_DAY;
     public final Style FORMATTING_DEFAULT;
     public final Style FORMATTING_ACCENT;
     public final Style FORMATTING_ERROR;
@@ -80,6 +81,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.ENABLE_GAMETIME                   = config.ENABLE_GAMETIME.getValue();
         this.ENABLE_MOTD                       = config.ENABLE_MOTD.getValue();
         this.ENABLE_AFK                        = config.ENABLE_AFK.getValue();
+        this.ENABLE_DAY                        = config.ENABLE_DAY.getValue();
         this.HOME_LIMIT                        = config.HOME_LIMIT.getValue();
         this.TELEPORT_COOLDOWN                 = config.TELEPORT_COOLDOWN.getValue();
         this.TELEPORT_DELAY                    = config.TELEPORT_DELAY.getValue();
