@@ -11,7 +11,7 @@
   "cmd.home.location_name": "家： ${0}",
   "cmd.home.delete.feedback": "已删除家 \"${0}\" 。",
   "cmd.home.delete.error": "无法删除家 \"${0}\" 。",
-  "cmd.home.set.feedback": "已设置家 \"{0}\" 。",
+  "cmd.home.set.feedback": "已设置家 \"${0}\" 。",
   "cmd.home.set.error.limit": "无法设置家 \"${0}\" 。原因：已达到家的可设置上限(${1})。",
   "cmd.home.set.error.exists": "无法设置家 \"${0}\" 。原因：已有一个相同名称的家。",
   "cmd.home.list.start": "当前已设置的家： ",
