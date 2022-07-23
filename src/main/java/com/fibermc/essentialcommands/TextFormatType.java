@@ -10,7 +10,8 @@ import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 public enum TextFormatType {
     Default (BACKING_CONFIG.FORMATTING_DEFAULT),
     Accent  (BACKING_CONFIG.FORMATTING_ACCENT),
-    Error   (BACKING_CONFIG.FORMATTING_ERROR);
+    Error   (BACKING_CONFIG.FORMATTING_ERROR),
+    Empty    (new Option<>("---", Style.EMPTY, value -> Style.EMPTY));
 
     private final Option<Style> _style;
 
@@ -25,7 +26,8 @@ public enum TextFormatType {
             boolean shouldApply = s.getColor() == null
                 || s == Default.getStyle()
                 || s == Accent.getStyle()
-                || s == Error.getStyle();
+                || s == Error.getStyle()
+                || s == Empty.getStyle();
             return shouldApply ? s.withColor(style.getColor()) : s;
         };
     }

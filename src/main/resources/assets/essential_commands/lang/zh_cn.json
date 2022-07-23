@@ -53,8 +53,8 @@
   "cmd.day.feedback": "将时间设为白天。",
   "cmd.afk.error.in_combat": "无法在战斗中将状态设置为离开。",
 
-  "cmd.workbench.feedback": "已打开 %s 。",
-  "cmd.workbench.container_ui_name": "EC %s",
+  "cmd.workbench.feedback": "已打开 ${0} 。",
+  "cmd.workbench.container_ui_name": "EC ${0}",
   "cmd.wastebin.name": "垃圾箱",
 
   "cmd.list.feedback.empty": "找不到地点。",

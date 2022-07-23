@@ -53,8 +53,8 @@
   "cmd.day.feedback": "Set time to day.",
   "cmd.afk.error.in_combat": "Cannot enter AFK while in combat.",
 
-  "cmd.workbench.feedback": "Opened %s.",
-  "cmd.workbench.container_ui_name": "EC %s",
+  "cmd.workbench.feedback": "Opened ${0}.",
+  "cmd.workbench.container_ui_name": "EC ${0}",
   "cmd.wastebin.name": "Wastebin",
 
   "cmd.list.feedback.empty": "No locations found.",
