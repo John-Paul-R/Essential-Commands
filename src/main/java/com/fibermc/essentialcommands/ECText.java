@@ -155,13 +155,18 @@ public abstract class ECText {
                     placeholderGetter);
 
                 var retValSiblings = retVal.getSiblings();
+
+                var specifiedStyle = textFormatType.getStyle();
+
                 return retValSiblings.size() == 0
                     ? retVal.copy()
-                    : TextUtil.concat(retVal.getSiblings().stream()
-                        .map(txt -> argsList.contains(txt)
-                            ? txt
-                            : txt.copy().setStyle(textFormatType.getStyle()))
-                        .toArray(Text[]::new));
+                    : retVal.copyContentOnly().setStyle(specifiedStyle)
+                        .append(TextUtil.concat(
+                            retVal.getSiblings().stream()
+                            .map(txt -> argsList.contains(txt)
+                                ? txt
+                                : txt.copy().setStyle(specifiedStyle))
+                            .toArray(Text[]::new)));
             }
 
             // Other stuff
