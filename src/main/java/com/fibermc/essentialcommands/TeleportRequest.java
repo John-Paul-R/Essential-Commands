@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class TeleportRequest {

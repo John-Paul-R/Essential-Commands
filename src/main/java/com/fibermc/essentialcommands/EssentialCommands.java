@@ -1,18 +1,20 @@
 package com.fibermc.essentialcommands;
 
+import java.nio.file.Path;
+
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfigSnapshot;
-import dev.jpcode.eccore.util.TimeUtil;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.nio.file.Path;
+import dev.jpcode.eccore.util.TimeUtil;
 
 public final class EssentialCommands implements ModInitializer {
     public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer("essential_commands").orElseThrow().getMetadata();
@@ -23,7 +25,9 @@ public final class EssentialCommands implements ModInitializer {
         "Essential Commands Config",
         "https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation"
     );
+    @SuppressWarnings("checkstyle:StaticVariableName")
     public static EssentialCommandsConfigSnapshot CONFIG = EssentialCommandsConfigSnapshot.create(BACKING_CONFIG);
+
     public static void log(Level level, String message) {
         final String logPrefix = "[EssentialCommands]: ";
         LOGGER.log(level, logPrefix.concat(message));

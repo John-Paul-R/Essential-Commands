@@ -1,10 +1,10 @@
 package dev.jpcode.eccore.util;
 
-public class StringBuilderPlus  {
+public class StringBuilderPlus {
 
     private final StringBuilder sb;
 
-    public StringBuilderPlus(){
+    public StringBuilderPlus() {
         sb = new StringBuilder();
     }
 

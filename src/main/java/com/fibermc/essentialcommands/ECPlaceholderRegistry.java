@@ -3,9 +3,11 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
+
 import net.minecraft.util.Identifier;
 
-class ECPlaceholderRegistry {
+final class ECPlaceholderRegistry {
+    private ECPlaceholderRegistry() {}
 
     public static void register() {
         var namespace = EssentialCommands.MOD_ID;

@@ -1,16 +1,19 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.CommandUtil;
+
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
-import dev.jpcode.eccore.util.TextUtil;
+
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 public final class ChatConfirmationPrompt {
 
@@ -38,20 +41,20 @@ public final class ChatConfirmationPrompt {
                                   MutableText denyText) {
         this.player = player;
         this.text = (MutableText) TextUtil.spaceBetween(
-                new Text[]{
-                    confirmText.setStyle(confirmText.getStyle().withClickEvent(new ClickEvent(
+            new Text[]{
+                confirmText.setStyle(
+                    confirmText.getStyle().withClickEvent(new ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
                         confirmCommandStr))),
-                    denyText.setStyle(denyText.getStyle().withClickEvent(new ClickEvent(
+                denyText.setStyle(
+                    denyText.getStyle().withClickEvent(new ClickEvent(
                         ClickEvent.Action.RUN_COMMAND,
-                        denyCommandStr)))
-                },
-                64,
-                14
-
+                        denyCommandStr))),
+            },
+            64,
+            14
         );
     }
-
 
     public void send() {
         this.player.sendMessage(

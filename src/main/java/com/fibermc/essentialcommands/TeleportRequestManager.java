@@ -1,49 +1,50 @@
 package com.fibermc.essentialcommands;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 /**
  * TeleportRequestManager
  */
-public class TeleportRequestManager {
+public final class TeleportRequestManager {
 
     private static final int TPS = 20;
     private final LinkedList<TeleportRequest> activeTpRequestList;
     private final LinkedList<PlayerData> tpCooldownList;
     private final ConcurrentHashMap<UUID, QueuedTeleport> delayedQueuedTeleportMap;
 
-    private static TeleportRequestManager INSTANCE;
+    private static TeleportRequestManager instance;
 
     private TeleportRequestManager() {
-        INSTANCE = this;
+        instance = this;
         activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
         delayedQueuedTeleportMap = new ConcurrentHashMap<>();
     }
 
     public static TeleportRequestManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new TeleportRequestManager();
+        if (instance == null) {
+            instance = new TeleportRequestManager();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public static void init() {
         getInstance();
-        PlayerDamageCallback.EVENT.register((ServerPlayerEntity playerEntity, DamageSource source) -> INSTANCE.onPlayerDamaged(playerEntity, source));
-        PlayerDataManager.TICK_EVENT.register(((playerDataManager, server) -> INSTANCE.tick(server)));
+        PlayerDamageCallback.EVENT.register((ServerPlayerEntity playerEntity, DamageSource source) -> instance.onPlayerDamaged(playerEntity, source));
+        PlayerDataManager.TICK_EVENT.register(((playerDataManager, server) -> instance.tick(server)));
     }
 
     public void tick(MinecraftServer server) {
@@ -107,9 +108,11 @@ public class TeleportRequestManager {
     }
 
     public void onPlayerDamaged(ServerPlayerEntity playerEntity, DamageSource damageSource) {
-        if (CONFIG.TELEPORT_INTERRUPT_ON_DAMAGED && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)) {
+        if (CONFIG.TELEPORT_INTERRUPT_ON_DAMAGED
+            && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)
+        ) {
             try {
-                Objects.requireNonNull( ((ServerPlayerEntityAccess)playerEntity).endEcQueuedTeleport());
+                Objects.requireNonNull(((ServerPlayerEntityAccess) playerEntity).endEcQueuedTeleport());
 
                 delayedQueuedTeleportMap.remove(playerEntity.getUuid());
                 playerEntity.sendMessage(
@@ -121,11 +124,11 @@ public class TeleportRequestManager {
     }
 
     public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer, TeleportRequest.Type requestType) {
-        PlayerData requestSenderData = ((ServerPlayerEntityAccess)requestSender).getEcPlayerData();
-        PlayerData targetPlayerData = ((ServerPlayerEntityAccess)targetPlayer).getEcPlayerData();
+        PlayerData requestSenderData = ((ServerPlayerEntityAccess) requestSender).getEcPlayerData();
+        PlayerData targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).getEcPlayerData();
 
-        final int TRD = CONFIG.TELEPORT_REQUEST_DURATION * TPS;//sec * ticks per sec
-        requestSenderData.setTpTimer(TRD);
+        final int teleportRequestDurationSeconds = CONFIG.TELEPORT_REQUEST_DURATION * TPS; //sec * ticks per sec
+        requestSenderData.setTpTimer(teleportRequestDurationSeconds);
         TeleportRequest teleportRequest = new TeleportRequest(requestSender, targetPlayer, requestType);
         requestSenderData.setSentTeleportRequest(teleportRequest);
         targetPlayerData.addIncomingTeleportRequest(teleportRequest);
@@ -133,17 +136,16 @@ public class TeleportRequestManager {
     }
 
     public void startTpCooldown(ServerPlayerEntity player) {
-        PlayerData pData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
+        PlayerData pData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
 
-        final int TC = (int)(CONFIG.TELEPORT_COOLDOWN * TPS);
-        pData.setTpCooldown(TC);
+        final int teleportCooldownSeconds = (int) (CONFIG.TELEPORT_COOLDOWN * TPS);
+        pData.setTpCooldown(teleportCooldownSeconds);
         tpCooldownList.add(pData);
     }
 
     public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, MutableText destName) {
-        queueTeleport(new QueuedLocationTeleport(((ServerPlayerEntityAccess)player).getEcPlayerData(), dest, destName));
+        queueTeleport(new QueuedLocationTeleport(((ServerPlayerEntityAccess) player).getEcPlayerData(), dest, destName));
     }
-
 
     public void queueTeleport(QueuedTeleport queuedTeleport) {
         QueuedTeleport prevValue = delayedQueuedTeleportMap.put(

@@ -1,14 +1,5 @@
 package dev.jpcode.eccore.config;
 
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -22,6 +13,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public abstract class Config<T extends Config<T>> {
     static final Logger LOGGER = LogManager.getLogger("ec-core-config");
@@ -138,7 +139,7 @@ public abstract class Config<T extends Config<T>> {
     }
 
     private MutableText fieldAsText(Field field) throws IllegalAccessException {
-        var value = (Option<?>)field.get(this);
+        var value = (Option<?>) field.get(this);
         return Text.empty()
             .append(Text.literal(field.getName() + ": ").setStyle(DEFAULT_STYLE))
             .append(Text.literal(value.getValue().toString()));

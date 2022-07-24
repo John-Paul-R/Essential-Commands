@@ -1,25 +1,28 @@
 package com.fibermc.essentialcommands.config;
 
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.List;
+
 import com.fibermc.essentialcommands.ECPerms;
+import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+
 import dev.jpcode.eccore.config.Config;
 import dev.jpcode.eccore.config.ConfigOption;
 import dev.jpcode.eccore.config.ConfigUtil;
 import dev.jpcode.eccore.config.Option;
 import dev.jpcode.eccore.util.TextUtil;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.List;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 import static dev.jpcode.eccore.config.ConfigUtil.*;
 import static dev.jpcode.eccore.util.TextUtil.parseText;
 import static dev.jpcode.eccore.util.TimeUtil.durationToTicks;
 
+@SuppressWarnings("checkstyle:all")
 public final class EssentialCommandsConfig extends Config<EssentialCommandsConfig> {
 
     @ConfigOption public final Option<Style> FORMATTING_DEFAULT =     new Option<>("formatting_default", parseStyle("gold"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);

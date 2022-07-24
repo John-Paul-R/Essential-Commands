@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 

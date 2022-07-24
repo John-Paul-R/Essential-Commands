@@ -1,37 +1,37 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.suggestions.OfflinePlayerRepo;
+
 import net.minecraft.server.MinecraftServer;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class ManagerLocator {
+public final class ManagerLocator {
 
     private PlayerDataManager playerDataManager;
     private TeleportRequestManager tpManager;
     private WorldDataManager worldDataManager;
     private OfflinePlayerRepo offlinePlayerRepo;
 
-    public static ManagerLocator INSTANCE;
+    public static ManagerLocator instance;
 
-    private ManagerLocator() {
-        INSTANCE = this;
-    }
+    private ManagerLocator() {}
 
     public static ManagerLocator getInstance() {
-        if (INSTANCE != null)
-            return INSTANCE;
-        return new ManagerLocator();
+        if (instance != null) {
+            return instance;
+        }
+        return instance = new ManagerLocator();
     }
 
     static boolean playerDataEnabled() {
-        return (CONFIG.ENABLE_HOME
+        return CONFIG.ENABLE_HOME
             || CONFIG.ENABLE_TPA
             || CONFIG.ENABLE_BACK
             || CONFIG.ENABLE_WARP
             || CONFIG.ENABLE_SPAWN
             || CONFIG.ENABLE_NICK
-        );
+            ;
     }
 
     static boolean teleportRequestEnabled() {

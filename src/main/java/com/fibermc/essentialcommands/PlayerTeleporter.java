@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
@@ -11,11 +12,13 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 /**
  * Teleporter
  */
-public class PlayerTeleporter {
+public final class PlayerTeleporter {
+    private PlayerTeleporter() {}
 
     public static void requestTeleport(PlayerData pData, MinecraftLocation dest, MutableText destName) {
         requestTeleport(new QueuedLocationTeleport(pData, dest, destName));
     }
+
     public static void requestTeleport(QueuedTeleport queuedTeleport) {
         ServerPlayerEntity player = queuedTeleport.getPlayerData().getPlayer();
 //        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
@@ -35,18 +38,22 @@ public class PlayerTeleporter {
             );
         }
     }
+
     public static void requestTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
-        requestTeleport(((ServerPlayerEntityAccess)playerEntity).getEcPlayerData(), dest, destName);
+        requestTeleport(((ServerPlayerEntityAccess) playerEntity).getEcPlayerData(), dest, destName);
     }
+
     public static void teleport(QueuedTeleport queuedTeleport) {
         queuedTeleport.complete();
         teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
     }
-    public static void teleport(PlayerData pData, MinecraftLocation dest) {//forceTeleport
+
+    public static void teleport(PlayerData pData, MinecraftLocation dest) { //forceTeleport
         ServerPlayerEntity player = pData.getPlayer();
 
         // If teleporting between dimensions is disabled and player doesn't have TP rules override
-        if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
+        if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS
+            && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
             if (dest.dim != player.getWorld().getRegistryKey()) {
                 player.sendMessage(
@@ -59,11 +66,13 @@ public class PlayerTeleporter {
 
         execTeleport(player, dest);
     }
+
     public static void teleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
-        if (ManagerLocator.playerDataEnabled())
-            teleport(((ServerPlayerEntityAccess)playerEntity).getEcPlayerData(), dest);
-        else
+        if (ManagerLocator.playerDataEnabled()) {
+            teleport(((ServerPlayerEntityAccess) playerEntity).getEcPlayerData(), dest);
+        } else {
             execTeleport(playerEntity, dest);
+        }
     }
 
     private static void execTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
@@ -83,7 +92,7 @@ public class PlayerTeleporter {
     public static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
         return (
             (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
-            || ECPerms.check(player.getCommandSource(), permission, 5)
+                || ECPerms.check(player.getCommandSource(), permission, 5)
         );
 
     }

@@ -2,12 +2,15 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.EssentialCommands;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 public class ModInfoCommand implements Command<ServerCommandSource> {
 

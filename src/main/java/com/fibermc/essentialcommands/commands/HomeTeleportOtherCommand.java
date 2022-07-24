@@ -1,24 +1,26 @@
 package com.fibermc.essentialcommands.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -85,7 +87,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
             .getOfflinePlayerRepo()
             .getOfflinePlayerByNameAsync(targetPlayerName)
             .whenComplete((playerEntity, err) -> {
-                if (playerEntity==null) {
+                if (playerEntity == null) {
                     context.getSource().sendError(Text.of("No player with the specified name found."));
                     return;
                 }

@@ -1,22 +1,24 @@
 package com.fibermc.essentialcommands;
 
-import dev.jpcode.eccore.config.Option;
+import java.util.function.UnaryOperator;
+
 import net.minecraft.text.Style;
 
-import java.util.function.UnaryOperator;
+import dev.jpcode.eccore.config.Option;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 
+@SuppressWarnings({"checkstyle:MethodParamPad", "checkstyle:singlespaceseparator"})
 public enum TextFormatType {
     Default (BACKING_CONFIG.FORMATTING_DEFAULT),
     Accent  (BACKING_CONFIG.FORMATTING_ACCENT),
     Error   (BACKING_CONFIG.FORMATTING_ERROR),
-    Empty    (new Option<>("---", Style.EMPTY, value -> Style.EMPTY));
+    Empty   (new Option<>("---", Style.EMPTY, value -> Style.EMPTY));
 
-    private final Option<Style> _style;
+    private final Option<Style> style;
 
     public Style getStyle() {
-        return _style.getValue();
+        return style.getValue();
     }
 
     public UnaryOperator<Style> nonOverwritingStyleUpdater() {
@@ -33,6 +35,6 @@ public enum TextFormatType {
     }
 
     TextFormatType(Option<Style> style) {
-        this._style = style;
+        this.style = style;
     }
 }

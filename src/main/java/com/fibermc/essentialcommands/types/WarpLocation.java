@@ -1,10 +1,11 @@
 package com.fibermc.essentialcommands.types;
 
+import java.util.Objects;
+
 import com.fibermc.essentialcommands.ECPerms;
+
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
-
-import java.util.Objects;
 
 public class WarpLocation extends MinecraftLocation {
 
@@ -54,7 +55,7 @@ public class WarpLocation extends MinecraftLocation {
     }
 
     public boolean hasPermission(ServerPlayerEntity player) {
-        return permissionString==null || ECPerms.check(
+        return permissionString == null || ECPerms.check(
             player.getCommandSource(),
             String.format("%s.%s", ECPerms.Registry.warp_tp_named, permissionString));
     }

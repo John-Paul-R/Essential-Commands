@@ -4,11 +4,13 @@ import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import io.github.ladysnake.pal.VanillaAbilities;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.github.ladysnake.pal.VanillaAbilities;
+
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;

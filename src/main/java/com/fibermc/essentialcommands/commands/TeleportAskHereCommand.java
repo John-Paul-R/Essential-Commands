@@ -2,9 +2,11 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -31,8 +33,8 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
                 senderPlayer.sendMessage(
                     ECText.getInstance().getText(
                         "cmd.tpask.error.exists",
-                        existingTeleportRequest.getTargetPlayer().getDisplayName())
-                    , MessageType.SYSTEM);
+                        existingTeleportRequest.getTargetPlayer().getDisplayName()),
+                    MessageType.SYSTEM);
                 return 0;
             }
         }

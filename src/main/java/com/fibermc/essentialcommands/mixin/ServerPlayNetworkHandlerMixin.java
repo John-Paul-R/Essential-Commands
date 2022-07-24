@@ -2,14 +2,15 @@ package com.fibermc.essentialcommands.mixin;
 
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import net.minecraft.network.Packet;
-import net.minecraft.network.listener.ServerPlayPacketListener;
-import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import net.minecraft.network.Packet;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin {
@@ -20,7 +21,7 @@ public class ServerPlayNetworkHandlerMixin {
     }
 
     private void invokeActEvent(Packet<ServerPlayPacketListener> packet) {
-        getPlayerData().PLAYER_ACT_EVENT.invoker().onPlayerAct(packet);
+        getPlayerData().playerActEvent.invoker().onPlayerAct(packet);
     }
 
     @Inject(method = "onPlayerAction", at = @At("RETURN"))

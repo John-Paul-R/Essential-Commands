@@ -1,19 +1,21 @@
 package com.fibermc.essentialcommands.commands;
 
+import java.util.LinkedHashMap;
+import java.util.UUID;
+
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.TeleportRequest;
 import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-
-import java.util.LinkedHashMap;
-import java.util.UUID;
 
 public abstract class TeleportResponseCommand implements Command<ServerCommandSource> {
 

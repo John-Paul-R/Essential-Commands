@@ -4,10 +4,12 @@ import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.WorldDataManager;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.server.command.ServerCommandSource;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;

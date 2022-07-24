@@ -16,7 +16,7 @@ public class MinecraftLocation {
     public final float pitch, headYaw;
     public final RegistryKey<World> dim;
 
-    public MinecraftLocation(RegistryKey<World>  dim, double x, double y, double z) {
+    public MinecraftLocation(RegistryKey<World> dim, double x, double y, double z) {
         this.dim = dim;
         this.pos = new Vec3d(x, y, z);
         this.pitch = 0f;
@@ -24,11 +24,11 @@ public class MinecraftLocation {
         //todo world.getPersistentStateManager().
     }
 
-    public MinecraftLocation(RegistryKey<World>  dim, double x, double y, double z, float headYaw, float pitch) {
+    public MinecraftLocation(RegistryKey<World> dim, double x, double y, double z, float headYaw, float pitch) {
         this.dim = dim;
         this.pos = new Vec3d(x, y, z);
         this.headYaw = headYaw;
-        this.pitch = pitch; 
+        this.pitch = pitch;
     }
 
     public MinecraftLocation(ServerPlayerEntity player) {
@@ -51,9 +51,11 @@ public class MinecraftLocation {
         this.headYaw = tag.getFloat("headYaw");
         this.pitch = tag.getFloat("pitch");
     }
+
     public NbtCompound asNbt() {
         return this.writeNbt(new NbtCompound());
     }
+
     public NbtCompound writeNbt(NbtCompound tag) {
         tag.putString("WorldRegistryKey", dim.getValue().toString());
         tag.putDouble("x", pos.x);

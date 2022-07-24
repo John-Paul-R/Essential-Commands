@@ -1,5 +1,10 @@
 package com.fibermc.essentialcommands.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
@@ -7,6 +12,7 @@ import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -14,13 +20,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class HomeCommand implements Command<ServerCommandSource> {
 
@@ -28,14 +30,14 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return exec(senderPlayerData, homeName);
     }
 
     private static PlayerData getTargetPlayerData(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        return ((ServerPlayerEntityAccess)context.getSource().getPlayer()).getEcPlayerData();
+        return ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
     }
 
     public static String getSoleHomeName(PlayerData playerData) throws CommandSyntaxException {

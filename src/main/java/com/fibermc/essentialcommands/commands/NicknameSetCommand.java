@@ -3,20 +3,23 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
+
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
+import dev.jpcode.eccore.util.TextUtil;
+
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class NicknameSetCommand implements Command<ServerCommandSource>  {
+public class NicknameSetCommand implements Command<ServerCommandSource> {
     public NicknameSetCommand() {}
 
     @Override

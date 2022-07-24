@@ -1,5 +1,10 @@
 package com.fibermc.essentialcommands;
 
+import java.io.FileNotFoundException;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.util.function.Predicate;
+
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.bench.*;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
@@ -7,34 +12,35 @@ import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggest
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
+import org.spongepowered.asm.util.IConsumer;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import dev.jpcode.eccore.util.TextUtil;
+
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import org.spongepowered.asm.util.IConsumer;
 
-import java.io.FileNotFoundException;
-import java.nio.file.NotDirectoryException;
-import java.nio.file.Path;
-import java.util.function.Predicate;
+import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
 
 /**
- * BasicCommands
+ * Primary registry class for EssentialCommands.
+ * Contains logic for building the brigaider command trees, and registers
+ * required permissions for each node.
  */
-public class EssentialCommandRegistry {
+public final class EssentialCommandRegistry {
+    private EssentialCommandRegistry() {}
 
     public static void register(
         CommandDispatcher<ServerCommandSource> dispatcher,
@@ -77,7 +83,7 @@ public class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                 .executes(new TeleportAcceptCommand()::runDefault)
                 .then(CommandUtil.targetPlayerArgument()
-                    .suggests(TeleportResponseSuggestion.suggestedStrings())
+                    .suggests(TeleportResponseSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new TeleportAcceptCommand()))
                 .build());
 
@@ -85,7 +91,7 @@ public class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                 .executes(new TeleportDenyCommand()::runDefault)
                 .then(CommandUtil.targetPlayerArgument()
-                    .suggests(TeleportResponseSuggestion.suggestedStrings())
+                    .suggests(TeleportResponseSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new TeleportDenyCommand()))
                 .build());
 
@@ -163,7 +169,6 @@ public class EssentialCommandRegistry {
             registerNode.accept(homeNode);
         }
 
-
         //Back
         if (CONFIG.ENABLE_BACK) {
             LiteralArgumentBuilder<ServerCommandSource> backBuilder = CommandManager.literal("back");
@@ -195,13 +200,13 @@ public class EssentialCommandRegistry {
             warpTpBuilder
                 .requires(ECPerms.require(ECPerms.Registry.warp_tp, 0))
                 .then(argument("warp_name", StringArgumentType.word())
-                    .suggests(WarpSuggestion.suggestedStrings())
+                    .suggests(WarpSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new WarpTpCommand()));
 
             warpDeleteBuilder
                 .requires(ECPerms.require(ECPerms.Registry.warp_delete, 4))
                 .then(argument("warp_name", StringArgumentType.word())
-                    .suggests(WarpSuggestion.suggestedStrings())
+                    .suggests(WarpSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new WarpDeleteCommand()));
 
             warpListBuilder
@@ -281,7 +286,7 @@ public class EssentialCommandRegistry {
             nickRevealBuilder
                 .requires(ECPerms.require(ECPerms.Registry.nickname_reveal, 2))
                 .then(argument("player_nickname", StringArgumentType.word())
-                    .suggests(NicknamePlayersSuggestion.suggestedStrings())
+                    .suggests(NicknamePlayersSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new RealNameCommand())
                 );
 

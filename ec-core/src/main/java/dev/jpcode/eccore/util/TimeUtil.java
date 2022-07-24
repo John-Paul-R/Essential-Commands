@@ -1,38 +1,40 @@
 package dev.jpcode.eccore.util;
 
-import net.minecraft.server.MinecraftServer;
-
 import java.time.Duration;
 
+import net.minecraft.server.MinecraftServer;
+
 public final class TimeUtil {
-    private static final double tps = 20;
-    private static final double secondsPerTick = 1 / tps;
-    private static final long msPerTick = (long) (secondsPerTick * 1000);
-    private static MinecraftServer _server;
+    private TimeUtil() {}
+
+    private static final double TPS = 20;
+    private static final double SECONDS_PER_TICK = 1 / TPS;
+    private static final long MS_PER_TICK = (long) (SECONDS_PER_TICK * 1000);
+    private static MinecraftServer server;
 
     public static void init(MinecraftServer server) {
-        _server = server;
+        TimeUtil.server = server;
     }
 
     public static int getTicks() {
-        return _server.getTicks();
+        return server.getTicks();
     }
 
     public static long ticksToMs(int ticks) {
-        return ticks * msPerTick;
+        return ticks * MS_PER_TICK;
     }
 
     public static int msToTicks(long ms) {
-        return (int) (ms / msPerTick);
+        return (int) (ms / MS_PER_TICK);
     }
 
     public static long tickTimeToEpochMs(int ticks) {
-        return ticksToMs(ticks - _server.getTicks()) + net.minecraft.util.Util.getEpochTimeMs();
+        return ticksToMs(ticks - server.getTicks()) + net.minecraft.util.Util.getEpochTimeMs();
     }
 
     public static int epochTimeMsToTicks(long epochTimeMs) {
         var msFromNow = epochTimeMs - net.minecraft.util.Util.getEpochTimeMs();
-        return _server.getTicks() + msToTicks(msFromNow);
+        return server.getTicks() + msToTicks(msFromNow);
     }
 
     public static int durationToTicks(Duration duration) {

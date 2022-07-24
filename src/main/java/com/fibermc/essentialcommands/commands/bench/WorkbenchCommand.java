@@ -1,15 +1,16 @@
 package com.fibermc.essentialcommands.commands.bench;
 
 import com.fibermc.essentialcommands.screen.CraftingCommandScreenHandler;
+import org.jetbrains.annotations.NotNull;
+
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 
 public class WorkbenchCommand extends SimpleScreenCommand {
-    private static final ScreenHandlerFactory screenHandlerFactory = (syncId, inventory, player) ->
+    private static final ScreenHandlerFactory SCREEN_HANDLER_FACTORY = (syncId, inventory, player) ->
         new CraftingCommandScreenHandler(
             syncId,
             inventory,
@@ -23,7 +24,7 @@ public class WorkbenchCommand extends SimpleScreenCommand {
 
     @Override
     protected @NotNull ScreenHandlerFactory getScreenHandlerFactory() {
-        return screenHandlerFactory;
+        return SCREEN_HANDLER_FACTORY;
     }
 
     @Override

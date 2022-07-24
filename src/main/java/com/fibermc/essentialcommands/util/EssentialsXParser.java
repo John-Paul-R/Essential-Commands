@@ -12,21 +12,20 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerDataFactory;
 import com.fibermc.essentialcommands.mixin.PersistentStateManagerInvoker;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-
-import net.minecraft.world.World;
-
+import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
-public class EssentialsXParser {
+public final class EssentialsXParser {
+    private EssentialsXParser() {}
 
     public static NamedLocationStorage parsePlayerHomes(File yamlSource, MinecraftServer server, Map<UUID, RegistryKey<World>> uuidRegistryKeyMap) {
         NamedLocationStorage homes = new NamedLocationStorage();
@@ -41,19 +40,20 @@ public class EssentialsXParser {
         Map<Object, Object> ydoc = yaml.load(yamlStr);
         Map<String, Map<String, Object>> homesMap = (Map<String, Map<String, Object>>) ydoc.get("homes");
         homesMap.forEach((String name, Map<String, Object> locData) -> {
-            RegistryKey<World> worldRegistryKey = uuidRegistryKeyMap.get(UUID.fromString((String)locData.get("world")));
-            if (worldRegistryKey == null)
+            RegistryKey<World> worldRegistryKey = uuidRegistryKeyMap.get(UUID.fromString((String) locData.get("world")));
+            if (worldRegistryKey == null) {
                 worldRegistryKey = World.OVERWORLD;
+            }
 
             homes.put(
                 name,
                 new MinecraftLocation(
                     worldRegistryKey,
-                    (Double)locData.get("x"),
-                    (Double)locData.get("y"),
-                    (Double)locData.get("z"),
-                    ((Double)locData.get("yaw")).floatValue(),
-                    ((Double)locData.get("pitch")).floatValue()
+                    (Double) locData.get("x"),
+                    (Double) locData.get("y"),
+                    (Double) locData.get("z"),
+                    ((Double) locData.get("yaw")).floatValue(),
+                    ((Double) locData.get("pitch")).floatValue()
                 ));
         });
 
@@ -96,7 +96,8 @@ public class EssentialsXParser {
     public static void convertPlayerDataDir(File sourceDir, File targetDir, MinecraftServer server) throws NotDirectoryException, FileNotFoundException {
         if (!sourceDir.exists()) {
             throw new FileNotFoundException(sourceDir.getAbsolutePath() + " does not exist!");
-        } if (!sourceDir.isDirectory()) {
+        }
+        if (!sourceDir.isDirectory()) {
             throw new NotDirectoryException(sourceDir.getAbsolutePath() + " is not a directory!");
         }
 

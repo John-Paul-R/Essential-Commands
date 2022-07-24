@@ -5,9 +5,10 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class NicknameTextUtil {
+public final class NicknameTextUtil {
+    private NicknameTextUtil() {}
 
-    private static class NickPerms {
+    private static final class NickPerms {
         public final boolean color;
         public final boolean fancy;
         public final boolean hover;
@@ -21,9 +22,8 @@ public class NicknameTextUtil {
         }
     }
 
-    public static boolean areAllTrue(boolean... array)
-    {
-        for(boolean b : array) if(!b) return false;
+    public static boolean areAllTrue(boolean... array) {
+        for (boolean b : array) if (!b) return false;
         return true;
     }
 
@@ -34,7 +34,13 @@ public class NicknameTextUtil {
         // if it DOES have a clickEvent, return true if they have the clickEvent permission...
         return areAllTrue(
             (sourcePerms.color || (style.getColor() == null)),
-            (sourcePerms.fancy || !(style.isBold() || style.isItalic() || style.isObfuscated() || style.isStrikethrough() || style.isUnderlined()) || !style.getFont().equals(new Identifier("minecraft:default"))),
+            (sourcePerms.fancy
+                || !(style.isBold()
+                    || style.isItalic()
+                    || style.isObfuscated()
+                    || style.isStrikethrough()
+                    || style.isUnderlined())
+                || !style.getFont().equals(new Identifier("minecraft:default"))),
             (sourcePerms.click || (style.getClickEvent() == null)),
             (sourcePerms.hover || (style.getHoverEvent() == null))
         );

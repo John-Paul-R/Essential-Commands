@@ -1,20 +1,23 @@
 package com.fibermc.essentialcommands;
 
-import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.ServerCommandSource;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+import me.lucko.fabric.api.permissions.v0.Permissions;
+import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.command.CommandSource;
+import net.minecraft.server.command.ServerCommandSource;
+
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class ECPerms {
+public final class ECPerms {
+    private ECPerms() {}
 
     //`essentialcommands.<command>.<subcommand>`
 //            `essentialcommands.<command>.*`
+    @SuppressWarnings({"checkstyle:constantname", "checkstyle:staticvariablename"})
     public static final class Registry {
         public static final String tpa = "essentialcommands.tpa";
         public static final String tpahere = "essentialcommands.tpahere";
@@ -58,6 +61,7 @@ public class ECPerms {
         public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";
         public static final String bypass_teleport_interrupt_on_damaged = "essentialcommands.bypass.teleport_interrupt_on_damaged";
         public static final String bypass_teleport_interrupt_on_move = "essentialcommands.bypass.teleport_interrupt_on_move";
+
         public static final class Group {
             public static final String[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};
             public static final String[] home_group = {home_set, home_tp, home_delete};
@@ -68,6 +72,7 @@ public class ECPerms {
             public static final String[] config_group = {config_reload};
             public static String[] home_limit_group;
         }
+
         public static String[] per_warp_permissions = null;
     }
 
@@ -77,7 +82,7 @@ public class ECPerms {
     static void init() {
         var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         Registry.per_warp_permissions = worldDataManager.getWarpNames().toArray(new String[0]);
-        worldDataManager.WARPS_LOAD_EVENT.register((warps) -> {
+        worldDataManager.warpsLoadEvent.register((warps) -> {
             Registry.per_warp_permissions = warps.keySet().toArray(new String[0]);
         });
     }
@@ -85,7 +90,6 @@ public class ECPerms {
     private static boolean isSuperAdmin(CommandSource source) {
         return source.hasPermissionLevel(4);
     }
-
 
     public static @NotNull Predicate<ServerCommandSource> require(@NotNull String permission, int defaultRequireLevel) {
         return player -> check(player, permission, defaultRequireLevel);
@@ -152,7 +156,7 @@ public class ECPerms {
             // Set value to -1 in the case where the user has no relevant permissions set.
             highestValue = -1;
         }
-        for (String permission: permissionGroup) {
+        for (String permission : permissionGroup) {
             if (check(source, permission)) {
                 highestValue = Math.max(highestValue, getNumericValue(permission));
             }
@@ -164,6 +168,4 @@ public class ECPerms {
         String trueBasePermission = basePermission.endsWith(".") ? basePermission : basePermission + ".";
         return numericValues.stream().map(el -> trueBasePermission.concat(el.toString())).toArray(String[]::new);
     }
-
-
 }

@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<!-- https://checkstyle.org -->
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN" "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<module name="Checker">
+  <!-- Checker properties                                        -->
+  <!-- See https://checkstyle.org/config.html#Checker_Properties -->
+  <property name="charset" value="UTF-8"/>
+  <property name="fileExtensions" value="java"/>
+  <property name="localeLanguage" value="en"/>
+  <property name="localeCountry" value="US"/>
+  <property name="severity" value="warning"/>
+  <property name="tabWidth" value="4"/>
+
+  <!-- Checks whether files end with a new line                       -->
+  <!-- See https://checkstyle.org/config_misc.html#NewlineAtEndOfFile -->
+  <module name="NewlineAtEndOfFile"/>
+
+  <!-- Checks for size violations                   -->
+  <!-- See https://checkstyle.org/config_sizes.html -->
+  <module name="FileLength"/>
+  <module name="LineLength">
+    <property name="fileExtensions" value="java"/>
+    <property name="max" value="200"/>
+  </module>
+
+  <!-- Checks for whitespace                             -->
+  <!-- See https://checkstyle.org/config_whitespace.html -->
+  <module name="FileTabCharacter"/>
+  <module name="RegexpMultiline">
+    <property name="format" value="\n[\t ]*\r?\n[\t ]*\r?\n"/>
+    <property name="message" value="Multiple adjacent blank lines."/>
+  </module>
+  <module name="RegexpSingleline">
+    <property name="format" value="\s+$"/>
+    <property name="message" value="Line has trailing whitespace."/>
+  </module>
+
+  <!-- Checks for headers                            -->
+  <!-- See https://checkstyle.org/config_header.html -->
+  <!-- <module name="Header">
+    <property name="fileExtensions" value="java"/>
+    <property name="headerFile" value="LICENCE"/>
+  </module> -->
+
+  <!-- Checks that a package-info.java file exists for each package  -->
+  <!-- See https://checkstyle.org/config_javadoc.html#JavadocPackage -->
+  <!-- <module name="JavadocPackage"/> -->
+  <module name="SuppressWarningsFilter"/>
+
+  <module name="TreeWalker">
+    <module name="SuppressWarningsHolder"/>
+    <module name="SuppressWarnings">
+      <property name="id" value="checkstyle:suppresswarnings"/>
+    </module>
+    <!-- Checks for imports                             -->
+    <!-- See https://checkstyle.org/config_imports.html -->
+<!--    <module name="AvoidStarImport"/>-->
+    <module name="IllegalImport"/>
+    <module name="ImportOrder">
+      <property name="groups" value="java,javax,*,com.mojang,net.minecraft,net.fabricmc,dev.jpcode"/>
+      <property name="separated" value="true"/>
+      <property name="option" value="bottom"/>
+      <property name="separatedStaticGroups" value="true"/>
+      <property name="useContainerOrderingForStatic" value="true"/>
+    </module>
+    <module name="RedundantImport"/>
+    <module name="UnusedImports"/>
+
+    <!-- Checks for class design                       -->
+    <!-- See https://checkstyle.org/config_design.html -->
+    <module name="FinalClass"/>
+    <module name="HideUtilityClassConstructor"/>
+    <module name="OneTopLevelClass"/>
+
+    <!-- Checks for annotations                            -->
+    <!-- See https://checkstyle.org/config_annotation.html -->
+    <module name="AnnotationLocation"/>
+    <module name="MissingOverride"/>
+
+    <!-- Checks for modifiers                             -->
+    <!-- See https://checkstyle.org/config_modifiers.html -->
+    <module name="ModifierOrder"/>
+    <module name="RedundantModifier"/>
+
+    <!-- Checks for common coding problems             -->
+    <!-- See https://checkstyle.org/config_coding.html -->
+    <module name="ArrayTrailingComma"/> <!-- cleaner diffs -->
+    <module name="AvoidNoArgumentSuperConstructorCall"/>
+    <module name="DefaultComesLast"/>
+    <module name="EmptyStatement"/>
+    <module name="EqualsAvoidNull"/>
+    <module name="EqualsHashCode"/>
+    <module name="MissingSwitchDefault"/>
+    <module name="PackageDeclaration"/>
+    <module name="SimplifyBooleanExpression"/>
+    <module name="SimplifyBooleanReturn"/>
+    <module name="StringLiteralEquality"/>
+<!--    <module name="UnnecessaryParentheses"/>-->
+    <module name="UnnecessarySemicolonAfterOuterTypeDeclaration"/>
+    <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
+    <module name="UnnecessarySemicolonInTryWithResources"/>
+
+    <!-- Checks for blocks, i.e. { ... }               -->
+    <!-- See https://checkstyle.org/config_blocks.html -->
+<!--    <module name="AvoidNestedBlocks"/>-->
+    <module name="EmptyBlock"/>
+    <module name="EmptyCatchBlock"/>
+    <!-- <module name="LeftCurly"/>-->
+    <!-- <module name="NeedBraces"/>-->
+    <!-- <module name="RightCurly"/>-->
+
+    <!-- Checks for K&R brace styling                                  -->
+    <!-- See https://en.wikipedia.org/wiki/Indentation_style#K&R_style -->
+<!--    <module name="LeftCurly"> &lt;!&ndash; braces on new line for class structure &ndash;&gt;-->
+<!--      <property name="option" value="nl"/>-->
+<!--      <property name="tokens" value="ANNOTATION_DEF,CLASS_DEF,CTOR_DEF,ENUM_DEF,INTERFACE_DEF,METHOD_DEF,OBJBLOCK,RECORD_DEF"/>-->
+<!--    </module>-->
+    <module name="LeftCurly"> <!-- braces at end of line within blocks -->
+      <property name="option" value="eol"/>
+      <property name="tokens" value="ENUM_CONSTANT_DEF,LAMBDA,LITERAL_CASE,LITERAL_CATCH,LITERAL_DEFAULT,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_SWITCH,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,STATIC_INIT,COMPACT_CTOR_DEF"/>
+    </module>
+    <module name="RightCurly"/>
+
+    <!-- Checks for naming conventions                 -->
+    <!-- See https://checkstyle.org/config_naming.html -->
+    <module name="CatchParameterName"/>
+    <module name="ClassTypeParameterName"/>
+    <module name="ConstantName"/>
+    <module name="IllegalIdentifierName"/>
+    <module name="InterfaceTypeParameterName"/>
+    <module name="LambdaParameterName"/>
+    <module name="LocalFinalVariableName"/>
+    <module name="LocalVariableName"/>
+    <module name="MemberName">
+      <property name="format" value="^[a-z][a-zA-Z0-9\$]*$"/>
+    </module>
+    <module name="MethodName">
+      <property name="format" value="^[a-z][a-zA-Z0-9\$]*$"/>
+    </module>
+    <module name="MethodTypeParameterName"/>
+    <module name="PackageName"/>
+    <module name="ParameterName"/>
+    <module name="PatternVariableName"/>
+    <module name="RecordComponentName"/>
+    <module name="RecordTypeParameterName"/>
+    <module name="StaticVariableName"/>
+    <module name="TypeName"/>
+
+    <!-- Checks for Javadoc comments                    -->
+    <!-- See https://checkstyle.org/config_javadoc.html -->
+    <module name="InvalidJavadocPosition"/>
+<!--    <module name="JavadocMethod"/>-->
+    <module name="JavadocParagraph"/>
+<!--    <module name="JavadocStyle"/>-->
+    <module name="JavadocType"/>
+    <!-- <module name="MissingJavadocMethod"/> -->
+    <!-- <module name="MissingJavadocPackage"/> -->
+    <!-- <module name="MissingJavadocType"/> -->
+    <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+    <module name="SingleLineJavadoc"/>
+
+    <!-- Checks for whitespace                             -->
+    <!-- See https://checkstyle.org/config_whitespace.html -->
+    <module name="EmptyForIteratorPad"/>
+    <module name="EmptyLineSeparator">
+      <property name="allowMultipleEmptyLines" value="false"/>
+      <property name="allowNoEmptyLineBetweenFields" value="true"/>
+    </module>
+    <module name="GenericWhitespace"/>
+    <module name="MethodParamPad"/>
+    <module name="NoWhitespaceAfter"/>
+    <module name="NoWhitespaceBefore">
+      <property name="tokens" value="COMMA, POST_INC, POST_DEC, ELLIPSIS, LABELED_STAT"/>
+<!--      SEMI,-->
+    </module>
+    <module name="OperatorWrap"/>
+    <module name="ParenPad"/>
+    <module name="SingleSpaceSeparator"/>
+<!--    <module name="TypecastParenPad"/>-->
+<!--    <module name="WhitespaceAfter"/>-->
+    <module name="WhitespaceAround">
+      <property name="allowEmptyCatches" value="true"/>
+      <property name="allowEmptyConstructors" value="true"/>
+      <property name="allowEmptyLambdas" value="true"/>
+      <property name="allowEmptyLoops" value="true"/>
+      <property name="allowEmptyMethods" value="true"/>
+      <property name="allowEmptyTypes" value="true"/>
+    </module>
+
+    <!-- Miscellaneous checks                        -->
+    <!-- See https://checkstyle.org/config_misc.html -->
+    <module name="ArrayTypeStyle"/>
+<!--    <module name="CommentsIndentation"/>-->
+<!--    Checkstyle's default indentations setup is wrong in too many cases, and
+        doesn't offer enough ways to customize.-->
+<!--    <module name="Indentation">-->
+<!--      <property name="lineWrappingIndentation" value="0"/>-->
+<!--      <property name="forceStrictCondition" value="false"/>-->
+<!--    </module>-->
+    <module name="OuterTypeFilename"/>
+<!--    <module name="TodoComment"/>-->
+    <module name="UpperEll"/>
+
+  </module>
+
+  <!-- Excludes all 'module-info.java' files              -->
+  <!-- See https://checkstyle.org/config_filefilters.html -->
+  <module name="BeforeExecutionExclusionFileFilter">
+    <property name="fileNamePattern" value="module\-info\.java$"/>
+  </module>
+
+</module>

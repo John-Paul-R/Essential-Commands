@@ -4,9 +4,11 @@ import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.WorldDataManager;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -30,8 +32,8 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
         source.sendFeedback(
             ECText.getInstance().getText(
                 "cmd.spawn.set.feedback",
-                loc.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT))
-            , CONFIG.BROADCAST_TO_OPS);
+                loc.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT)),
+            CONFIG.BROADCAST_TO_OPS);
 
         return 1;
     }

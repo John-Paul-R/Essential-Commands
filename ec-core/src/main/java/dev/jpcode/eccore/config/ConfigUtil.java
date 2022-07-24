@@ -1,19 +1,21 @@
 package dev.jpcode.eccore.config;
 
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import dev.jpcode.eccore.util.TimeUtil;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import org.apache.logging.log4j.Level;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+
+import dev.jpcode.eccore.util.TimeUtil;
 
 import static dev.jpcode.eccore.config.Config.LOGGER;
 import static dev.jpcode.eccore.util.TextUtil.parseText;
@@ -26,7 +28,7 @@ public final class ConfigUtil {
     private ConfigUtil() {}
 
     // TODO do not delclair serializer objects out here. Pretty sure is bad for concurrent parsing.
-    private static final Style.Serializer styleJsonDeserializer = new Style.Serializer();
+    private static final Style.Serializer STYLE_JSON_DESERIALIZER = new Style.Serializer();
 
     public static Style parseStyleOrDefault(String styleStr, String defaultStyleStr) {
         Style outStyle = null;
@@ -53,7 +55,7 @@ public final class ConfigUtil {
 
         if (outStyle == null) {
             try {
-                outStyle = styleJsonDeserializer.deserialize(
+                outStyle = STYLE_JSON_DESERIALIZER.deserialize(
                         JsonParser.parseString(styleStr),
                         null, null
                 );
@@ -102,7 +104,6 @@ public final class ConfigUtil {
         }
     }
 
-
     public static double parseDouble(String s) {
         try {
             return Double.parseDouble(s);
@@ -142,7 +143,7 @@ public final class ConfigUtil {
     }
 
     public static String serializeStyle(Style style) {
-        return String.valueOf(styleJsonDeserializer.serialize(style, null, null));
+        return String.valueOf(STYLE_JSON_DESERIALIZER.serialize(style, null, null));
     }
 
     public static int parseDurationToTicks(String str) {

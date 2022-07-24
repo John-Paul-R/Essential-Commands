@@ -9,12 +9,6 @@ import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.WorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,6 +16,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.world.GameMode;
+import net.minecraft.world.WorldProperties;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 
@@ -57,9 +58,9 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
         target = "Lnet/minecraft/server/PlayerManager;sendPlayerStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
     ), locals = LocalCapture.CAPTURE_FAILSOFT)
     public void onTeleportBetweenWorlds(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci,
-                                        ServerWorld  serverWorld,
-                                        WorldProperties worldProperties
-    ) {
+                                        ServerWorld serverWorld,
+                                        WorldProperties worldProperties)
+    {
         ((ServerPlayerEntityAccess) this).getEcPlayerData().updatePlayer((ServerPlayerEntity) (Object) this);
     }
 
@@ -83,7 +84,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     @Inject(method = "getPlayerListName", at = @At("RETURN"), cancellable = true)
     public void getPlayerListName(CallbackInfoReturnable<Text> cir) {
         if (EssentialCommandsConfig.getValueSafe(BACKING_CONFIG.NICKNAMES_IN_PLAYER_LIST, true)) {
-            cir.setReturnValue(((ServerPlayerEntity)(Object)this).getDisplayName());
+            cir.setReturnValue(((ServerPlayerEntity) (Object) this).getDisplayName());
             cir.cancel();
         }
     }
@@ -97,9 +98,9 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
             return ecPlayerData;
         }
 
-        ServerPlayerEntity playerEntity = (ServerPlayerEntity)(Object)this;
+        ServerPlayerEntity playerEntity = (ServerPlayerEntity) (Object) this;
         EssentialCommands.LOGGER.info(String.format(
-                "[Essential Commands] Loading PlayerData for player with uuid '%s'.", playerEntity.getUuidAsString()));
+            "[Essential Commands] Loading PlayerData for player with uuid '%s'.", playerEntity.getUuidAsString()));
         PlayerData playerData = PlayerDataFactory.create(playerEntity);
         setEcPlayerData(playerData);
         return playerData;
@@ -113,7 +114,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     // Teleport hook (for /back)
     @Inject(method = "teleport", at = @At("HEAD"))
     public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
-        this.getEcPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity)(Object)this));
+        this.getEcPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
     }
 
     @Inject(method = "enterCombat", at = @At("RETURN"))

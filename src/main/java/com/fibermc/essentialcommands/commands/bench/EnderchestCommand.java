@@ -1,12 +1,13 @@
 package com.fibermc.essentialcommands.commands.bench;
 
+import org.jetbrains.annotations.NotNull;
+
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 
 public class EnderchestCommand extends SimpleScreenCommand {
     @Override

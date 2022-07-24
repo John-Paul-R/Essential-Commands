@@ -1,13 +1,16 @@
 package com.fibermc.essentialcommands.commands;
 
+import java.util.Random;
+
 import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.google.common.base.Stopwatch;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 import net.minecraft.command.CommandException;
@@ -18,19 +21,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-import java.util.Random;
+import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static com.fibermc.essentialcommands.commands.TopCommand.getTop;
 
 /**
+ * <p>
  * Heavily referenced from
  * https://github.com/javachaos/randomteleport/blob/master/src/main/java/net.ethermod/commands/RandomTeleportCommand.java
- *
+ * </p>
+ * <p>
  * Additionally, tons of optimization tips & examples provided by @Wesley1808 on GitHub:
  * https://github.com/Wesley1808/ServerCore/issues/16
+ * </p>
  */
-
+@SuppressWarnings("checkstyle:all")
 public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     public RandomTeleportCommand() {}
@@ -51,7 +57,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         if (CONFIG.RTP_COOLDOWN > 0) {
             ServerCommandSource source = context.getSource();
             int curServerTickTime = source.getServer().getTicks();
-            PlayerData playerData = ((ServerPlayerEntityAccess)player).getEcPlayerData();
+            PlayerData playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
             var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN * 20;
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
             if (rtpCooldownRemaining > 0) {
@@ -81,7 +87,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     private static boolean isValidSpawnPosition(ServerWorld world, double x, double y, double z) {
         // TODO This should be memoized. Cuts exec time in 1/2.
         BlockState targetBlockState = world.getBlockState(new BlockPos(x, y, z));
-        BlockState footBlockState = world.getBlockState(new BlockPos(x, y-1, z));
+        BlockState footBlockState = world.getBlockState(new BlockPos(x, y - 1, z));
         return targetBlockState.isAir() && footBlockState.getMaterial().isSolid();
     }
 
@@ -99,6 +105,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     }
 
     private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
+
     private static int exec(ServerPlayerEntity player, ServerWorld world, MinecraftLocation center, int timesRun) {
         if (timesRun > CONFIG.RTP_MAX_ATTEMPTS) {
             return -1;
@@ -126,13 +133,13 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         {
             Stopwatch timer = Stopwatch.createStarted();
-            new_y = getTop(chunk, (int)new_x, (int)new_z);
+            new_y = getTop(chunk, (int) new_x, (int) new_z);
             EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time", timer.stop()).getString());
         }
 
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
         //  Addressed by adding timesRun limit.
-        if (!isSafePosition(chunk, new BlockPos(new_x, new_y-2, new_z))) {
+        if (!isSafePosition(chunk, new BlockPos(new_x, new_y - 2, new_z))) {
             return exec(player, world, center, timesRun + 1);
         }
 

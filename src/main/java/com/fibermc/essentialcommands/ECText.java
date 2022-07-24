@@ -1,19 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import dev.jpcode.eccore.util.TextUtil;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.PlaceholderResult;
-import eu.pb4.placeholders.api.Placeholders;
-import net.minecraft.client.font.TextVisitFactory;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.*;
-import net.minecraft.util.JsonHelper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,25 +11,40 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.PlaceholderResult;
+import eu.pb4.placeholders.api.Placeholders;
+
+import net.minecraft.client.font.TextVisitFactory;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.*;
+import net.minecraft.util.JsonHelper;
+
+import dev.jpcode.eccore.util.TextUtil;
+
 import static com.fibermc.essentialcommands.EssentialCommands.*;
 
 public abstract class ECText {
+    private ECText() {}
 
     private static final Gson GSON = new Gson();
     private static final Pattern TOKEN_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]");
     public static final String DEFAULT_LANGUAGE_SPEC = "en_us";
 
     private static volatile ECText instance = create(CONFIG.LANGUAGE);
-    private static MinecraftServer _server;
-
-    private ECText() {}
+    private static MinecraftServer server;
 
     static {
         BACKING_CONFIG.LANGUAGE.changeEvent.register((langId) -> instance = create(langId));
     }
 
     public static void init(MinecraftServer server) {
-        _server = server;
+        ECText.server = server;
     }
 
     public static MutableText literal(String str) {
@@ -114,7 +115,7 @@ public abstract class ECText {
                 return getTextInternal(key, TextFormatType.Default, args);
             }
 
-            public MutableText getText(String key, TextFormatType textFormatType,  Text... args) {
+            public MutableText getText(String key, TextFormatType textFormatType, Text... args) {
                 return getTextInternal(key, textFormatType, args);
             }
 
@@ -130,7 +131,9 @@ public abstract class ECText {
                         var text = switch (firstToken) {
                             case "l" -> {
                                 if (idxAndFormattingCode.length < 2) {
-                                    throw new IllegalArgumentException("Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: " + placeholderId);
+                                    throw new IllegalArgumentException(
+                                        "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
+                                            + placeholderId);
                                 }
                                 yield getTextLiteral(idxAndFormattingCode[1], textFormatType);
                             }
@@ -141,12 +144,12 @@ public abstract class ECText {
                     };
             }
 
-            public MutableText getTextInternal(String key, TextFormatType textFormatType,  Text... args) {
+            public MutableText getTextInternal(String key, TextFormatType textFormatType, Text... args) {
                 var argsList = Arrays.stream(args).map(Text::copy).toList();
                 var placeholderGetter = placeholderGetterForContext(textFormatType, argsList);
                 var retVal = Placeholders.parseText(
                     Text.literal(get(key)),
-                    PlaceholderContext.of(_server),
+                    PlaceholderContext.of(server),
                     Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
                     placeholderGetter);
 
@@ -206,14 +209,14 @@ public abstract class ECText {
         return instance;
     }
 
-//    public static String get(String key) {
+    //    public static String get(String key) {
 //        Language
 //    }
     public abstract String get(String key);
 
     public abstract MutableText getText(String key, Text... args);
 
-    public abstract MutableText getText(String key, TextFormatType textFormatType,  Text... args);
+    public abstract MutableText getText(String key, TextFormatType textFormatType, Text... args);
 
     public abstract MutableText getText(String key, Object... args);
 

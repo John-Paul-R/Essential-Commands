@@ -1,16 +1,18 @@
 package com.fibermc.essentialcommands.commands.bench;
 
 import com.fibermc.essentialcommands.ECText;
+import org.jetbrains.annotations.NotNull;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandlerFactory;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 

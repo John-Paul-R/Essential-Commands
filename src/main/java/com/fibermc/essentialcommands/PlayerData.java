@@ -1,15 +1,16 @@
 package com.fibermc.essentialcommands;
 
+import java.io.File;
+import java.util.*;
+
 import com.fibermc.essentialcommands.events.PlayerActCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
-import dev.jpcode.eccore.util.TimeUtil;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -21,8 +22,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.PersistentState;
 
-import java.io.File;
-import java.util.*;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+
+import dev.jpcode.eccore.util.TextUtil;
+import dev.jpcode.eccore.util.TimeUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -71,7 +75,7 @@ public class PlayerData extends PersistentState {
         tpTimer = -1;
         incomingTeleportRequests = new LinkedHashMap<>();
         homes = new NamedLocationStorage();
-        PLAYER_ACT_EVENT.register((packet) -> {
+        playerActEvent.register((packet) -> {
             updateLastActionTick();
             setAfk(false);
         });
@@ -82,12 +86,14 @@ public class PlayerData extends PersistentState {
      * This constructor should ONLY be used for temporarily
      * handling data of offline players.
      *
+     * <p>
      * getPlayer() will always return null on an instance created in this fashion,
      * and any operations that would require a ServerPlayerEntity will fail.
+     * </p>
      *
      * @param playerUuid UUID of the player whose data we want to grab or modify.
-     * @param homes NamedLocationStorage of the player's homes (fills field)
-     * @param saveFile The save file for this PlayerData instance.
+     * @param homes      NamedLocationStorage of the player's homes (fills field)
+     * @param saveFile   The save file for this PlayerData instance.
      */
     public PlayerData(UUID playerUuid, NamedLocationStorage homes, File saveFile) {
         this.pUuid = playerUuid;
@@ -96,7 +102,6 @@ public class PlayerData extends PersistentState {
         incomingTeleportRequests = new LinkedHashMap<>();
         this.homes = homes;
     }
-
 
     public int getTpTimer() {
         return tpTimer;
@@ -181,7 +186,7 @@ public class PlayerData extends PersistentState {
         return homes.get(homeName);
     }
 
-    public final Event<PlayerActCallback> PLAYER_ACT_EVENT = EventFactory.createArrayBacked(
+    public final Event<PlayerActCallback> playerActEvent = EventFactory.createArrayBacked(
         PlayerActCallback.class,
         (listeners) -> (packet) -> {
             for (PlayerActCallback event : listeners) {
@@ -249,7 +254,7 @@ public class PlayerData extends PersistentState {
 
         } else if (
             CONFIG.AUTO_AFK_ENABLED
-            && (ticks - Math.max(lastMovedTick, lastActionTick)) > CONFIG.AUTO_AFK_TICKS
+                && (ticks - Math.max(lastMovedTick, lastActionTick)) > CONFIG.AUTO_AFK_TICKS
         ) {
             this.setAfk(true);
         }
@@ -289,27 +294,26 @@ public class PlayerData extends PersistentState {
         this.lastActionTick = player.server.getTicks();
     }
 
-    private static final class StorageKey
-    {
-        static final String playerUuid = "playerUuid";
-        static final String homes = "homes";
-        static final String nickname = "nickname";
-        static final String timeUsedRtpEpochMs = "timeUsedRtpEpochMs";
+    private static final class StorageKey {
+        static final String PLAYER_UUID = "playerUuid";
+        static final String HOMES = "homes";
+        static final String NICKNAME = "nickname";
+        static final String TIME_USED_RTP_EPOCH_MS = "timeUsedRtpEpochMs";
     }
 
     public void fromNbt(NbtCompound tag) {
         NbtCompound dataTag = tag.getCompound("data");
-        this.pUuid = dataTag.getUuid(StorageKey.playerUuid);
+        this.pUuid = dataTag.getUuid(StorageKey.PLAYER_UUID);
 
         NamedLocationStorage homes = new NamedLocationStorage();
-        NbtElement homesTag = dataTag.get(StorageKey.homes);
+        NbtElement homesTag = dataTag.get(StorageKey.HOMES);
         if (homesTag != null) {
             homes.loadNbt(homesTag);
         }
         this.homes = homes;
 
-        if (dataTag.contains(StorageKey.nickname)){
-            this.nickname = Text.Serializer.fromJson(dataTag.getString(StorageKey.nickname));
+        if (dataTag.contains(StorageKey.NICKNAME)) {
+            this.nickname = Text.Serializer.fromJson(dataTag.getString(StorageKey.NICKNAME));
             try {
                 reloadFullNickname();
             } catch (NullPointerException ignore) {
@@ -317,8 +321,8 @@ public class PlayerData extends PersistentState {
             }
         }
 
-        if (dataTag.contains(StorageKey.timeUsedRtpEpochMs)) {
-            this.timeUsedRtp = TimeUtil.epochTimeMsToTicks(dataTag.getLong(StorageKey.timeUsedRtpEpochMs));
+        if (dataTag.contains(StorageKey.TIME_USED_RTP_EPOCH_MS)) {
+            this.timeUsedRtp = TimeUtil.epochTimeMsToTicks(dataTag.getLong(StorageKey.TIME_USED_RTP_EPOCH_MS));
         }
 
         if (this.player != null) {
@@ -329,15 +333,15 @@ public class PlayerData extends PersistentState {
 
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
-        tag.putUuid(StorageKey.playerUuid, pUuid);
+        tag.putUuid(StorageKey.PLAYER_UUID, pUuid);
 
         NbtCompound homesNbt = new NbtCompound();
         homes.writeNbt(homesNbt);
-        tag.put(StorageKey.homes, homesNbt);
+        tag.put(StorageKey.HOMES, homesNbt);
 
-        tag.putString(StorageKey.nickname, Text.Serializer.toJson(nickname));
+        tag.putString(StorageKey.NICKNAME, Text.Serializer.toJson(nickname));
 
-        tag.putLong(StorageKey.timeUsedRtpEpochMs, TimeUtil.tickTimeToEpochMs(timeUsedRtp));
+        tag.putLong(StorageKey.TIME_USED_RTP_EPOCH_MS, TimeUtil.tickTimeToEpochMs(timeUsedRtp));
 
         return tag;
     }
@@ -352,6 +356,7 @@ public class PlayerData extends PersistentState {
 
     /**
      * Removes a home & persists changes to storage. Permanent.
+     *
      * @param homeName The name of the home to remove.
      * @return `true` if a home was successfully removed. `false` if there was
      * no home with the specified name.
@@ -412,6 +417,7 @@ public class PlayerData extends PersistentState {
     public MutableText getFullNickname() {
         return fullNickname;
     }
+
     public MutableText copyFullNickname() {
         return fullNickname != null ? TextUtil.deepCopy(fullNickname) : null;
     }
@@ -423,8 +429,8 @@ public class PlayerData extends PersistentState {
             this.nickname = null;
             resultCode = 1;
             EssentialCommands.LOGGER.info(String.format(
-                    "Cleared %s's nickname",
-                    this.player.getGameProfile().getName()
+                "Cleared %s's nickname",
+                this.player.getGameProfile().getName()
             ));
         } else {
             // Ensure nickname does not exceed max length
@@ -435,16 +441,16 @@ public class PlayerData extends PersistentState {
             boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, this.player.getCommandSource());
             if (!hasRequiredPerms) {
                 EssentialCommands.LOGGER.info(String.format(
-                        "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
-                        this.player.getGameProfile().getName(),
-                        nickname
+                    "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
+                    this.player.getGameProfile().getName(),
+                    nickname
                 ));
                 return -1;
             } else {
                 EssentialCommands.LOGGER.info(String.format(
-                        "Set %s's nickname to '%s'.",
-                        this.player.getGameProfile().getName(),
-                        nickname
+                    "Set %s's nickname to '%s'.",
+                    this.player.getGameProfile().getName(),
+                    nickname
                 ));
             }
 
@@ -481,7 +487,7 @@ public class PlayerData extends PersistentState {
         if (this.nickname != null) {
             tempFullNickname
                 .append(CONFIG.NICKNAME_PREFIX)
-                .append(this.nickname );
+                .append(this.nickname);
         } else {
             tempFullNickname
                 .append(baseName);

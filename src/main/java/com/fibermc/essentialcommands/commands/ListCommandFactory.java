@@ -1,24 +1,29 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.TextFormatType;
-import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.context.CommandContext;
-import dev.jpcode.eccore.util.TextUtil;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
+
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.context.CommandContext;
+
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+
+import dev.jpcode.eccore.util.TextUtil;
+
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static dev.jpcode.eccore.util.TextUtil.clickableTeleport;
 
-public class ListCommandFactory {
+public final class ListCommandFactory {
+    private ListCommandFactory() {}
+
     // Specify leading response text, and supplier of list of strings/Text
     public static <T> Command<ServerCommandSource> create(
         String responsePreText,

@@ -1,10 +1,11 @@
 package com.fibermc.essentialcommands.config;
 
+import java.util.List;
+
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
-import java.util.List;
-
+@SuppressWarnings("checkstyle:all")
 public final class EssentialCommandsConfigSnapshot {
 
     public final boolean ENABLE_DAY;

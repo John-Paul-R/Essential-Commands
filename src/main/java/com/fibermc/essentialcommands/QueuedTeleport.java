@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -16,11 +17,10 @@ public abstract class QueuedTeleport {
     private final Text destName;
     public final Vec3d initialPosition;
 
-
     public QueuedTeleport(PlayerData playerData, Text destName) {
         this.playerData = playerData;
         this.destName = destName;
-        this.ticksRemaining = (int)(CONFIG.TELEPORT_DELAY*20);
+        this.ticksRemaining = (int) (CONFIG.TELEPORT_DELAY * 20);
         this.initialPosition = playerData.getPlayer().getPos();
     }
 

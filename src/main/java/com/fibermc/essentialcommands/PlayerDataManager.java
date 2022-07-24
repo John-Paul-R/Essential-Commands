@@ -1,16 +1,17 @@
 package com.fibermc.essentialcommands;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.TextParserUtils;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
@@ -19,10 +20,11 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -32,10 +34,10 @@ public class PlayerDataManager {
     private final List<PlayerData> changedNicknames;
     private final List<String> changedTeams;
     private final List<Runnable> nextTickTasks;
-    private static PlayerDataManager INSTANCE;
+    private static PlayerDataManager instance;
 
     public PlayerDataManager() {
-        INSTANCE = this;
+        instance = this;
         this.changedNicknames = new LinkedList<>();
         this.changedTeams = new LinkedList<>();
         this.nextTickTasks = new LinkedList<>();
@@ -51,7 +53,8 @@ public class PlayerDataManager {
         ServerPlayConnectionEvents.JOIN.register(PlayerDataManager::onPlayerConnected);
     }
 
-    public static final Event<PlayerDataManagerTickCallback> TICK_EVENT = EventFactory.createArrayBacked(PlayerDataManagerTickCallback.class,
+    public static final Event<PlayerDataManagerTickCallback> TICK_EVENT = EventFactory.createArrayBacked(
+        PlayerDataManagerTickCallback.class,
         (listeners) -> (playerDataManager, server) -> {
             for (PlayerDataManagerTickCallback event : listeners) {
                 event.onTick(playerDataManager, server);
@@ -71,7 +74,7 @@ public class PlayerDataManager {
     }
 
     public static PlayerDataManager getInstance() {
-        return INSTANCE != null ? INSTANCE : new PlayerDataManager();
+        return instance != null ? instance : new PlayerDataManager();
     }
 
     public void markNicknameDirty(PlayerData playerData) {
@@ -83,7 +86,7 @@ public class PlayerDataManager {
     }
 
     public void tick(MinecraftServer server) {
-        if (CONFIG.NICKNAMES_IN_PLAYER_LIST && server.getTicks() % (20*5) == 0) {
+        if (CONFIG.NICKNAMES_IN_PLAYER_LIST && server.getTicks() % (20 * 5) == 0) {
             if (this.changedNicknames.size() + this.changedTeams.size() > 0) {
                 PlayerManager serverPlayerManager = server.getPlayerManager();
 
@@ -93,8 +96,8 @@ public class PlayerDataManager {
                 ).filter(Objects::nonNull).collect(Collectors.toSet());
 
                 server.getPlayerManager().sendToAll(new PlayerListS2CPacket(
-                        PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME,
-                        allChangedNicknamePlayers
+                    PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME,
+                    allChangedNicknamePlayers
                 ));
 
                 changedNicknames.forEach(PlayerData::save);
@@ -143,8 +146,9 @@ public class PlayerDataManager {
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
         PlayerData pData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
-        if (CONFIG.ALLOW_BACK_ON_DEATH)
+        if (CONFIG.ALLOW_BACK_ON_DEATH) {
             pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
+        }
     }
 
     // SET / ADD

@@ -1,11 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.VersionParsingException;
-import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.api.Version;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,7 +8,14 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-public class Updater {
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.VersionParsingException;
+import net.fabricmc.loader.api.metadata.ModMetadata;
+
+public final class Updater {
+    private Updater() {}
 
     public static void checkForUpdates() {
         HttpClient client = HttpClient.newBuilder()
