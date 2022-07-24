@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.config;
 
 import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.permission.NumericPermissionGroup;
 import dev.jpcode.eccore.config.Config;
 import dev.jpcode.eccore.config.ConfigOption;
 import dev.jpcode.eccore.config.ConfigUtil;
@@ -76,7 +77,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);
         HOME_LIMIT.changeEvent.register(newValue ->
-                ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue)
+                ECPerms.Registry.Group.home_limit_group = NumericPermissionGroup.create("essentialcommands.home.limit", newValue)
         );
     }
 
