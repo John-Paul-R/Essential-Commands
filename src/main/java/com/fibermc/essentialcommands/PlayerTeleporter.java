@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.permission.PermissionNode;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -80,7 +81,7 @@ public class PlayerTeleporter {
         );
     }
 
-    public static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
+    public static boolean playerHasTpRulesBypass(ServerPlayerEntity player, PermissionNode permission) {
         return (
             (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
             || ECPerms.check(player.getCommandSource(), permission, 5)
