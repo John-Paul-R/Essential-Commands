@@ -127,8 +127,8 @@ public final class TeleportRequestManager {
         PlayerData requestSenderData = ((ServerPlayerEntityAccess) requestSender).getEcPlayerData();
         PlayerData targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).getEcPlayerData();
 
-        final int teleportRequestDurationSeconds = CONFIG.TELEPORT_REQUEST_DURATION * TPS; //sec * ticks per sec
-        requestSenderData.setTpTimer(teleportRequestDurationSeconds);
+        final int teleportRequestDurationTicks = CONFIG.TELEPORT_REQUEST_DURATION * TPS; //sec * ticks per sec
+        requestSenderData.setTpTimer(teleportRequestDurationTicks);
         TeleportRequest teleportRequest = new TeleportRequest(requestSender, targetPlayer, requestType);
         requestSenderData.setSentTeleportRequest(teleportRequest);
         targetPlayerData.addIncomingTeleportRequest(teleportRequest);
@@ -138,8 +138,8 @@ public final class TeleportRequestManager {
     public void startTpCooldown(ServerPlayerEntity player) {
         PlayerData pData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
 
-        final int teleportCooldownSeconds = (int) (CONFIG.TELEPORT_COOLDOWN * TPS);
-        pData.setTpCooldown(teleportCooldownSeconds);
+        final int teleportCooldownTicks = (int) (CONFIG.TELEPORT_COOLDOWN * TPS);
+        pData.setTpCooldown(teleportCooldownTicks);
         tpCooldownList.add(pData);
     }
 
