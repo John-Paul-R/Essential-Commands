@@ -18,7 +18,8 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import dev.jpcode.eccore.util.TimeUtil;
 
 public final class EssentialCommands implements ModInitializer {
-    public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer("essential_commands").map(ModContainer::getMetadata).orElse(null);
+    private static final String MOD_CONTAINER_ID = "essential_commands";
+    public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer(MOD_CONTAINER_ID).map(ModContainer::getMetadata).orElse(null);
     public static final String MOD_ID = MOD_METADATA == null ? "essentialcommands | ERR - NO MOD DATA" : MOD_METADATA.getId();
     public static final Logger LOGGER = LogManager.getLogger("EssentialCommands");
     public static final EssentialCommandsConfig BACKING_CONFIG = new EssentialCommandsConfig(
@@ -29,13 +30,17 @@ public final class EssentialCommands implements ModInitializer {
     @SuppressWarnings("checkstyle:StaticVariableName")
     public static EssentialCommandsConfigSnapshot CONFIG = EssentialCommandsConfigSnapshot.create(BACKING_CONFIG);
 
-    public static void log(Level level, String message) {
+    public static void log(Level level, String message, Object... args) {
         final String logPrefix = "[EssentialCommands]: ";
-        LOGGER.log(level, logPrefix.concat(message));
+        LOGGER.log(level, logPrefix.concat(message), args);
     }
 
     @Override
     public void onInitialize() {
+        if (MOD_METADATA == null) {
+            log(Level.WARN, "failed to load mod metadata using mod container id '{}' ", MOD_CONTAINER_ID);
+        }
+
         log(Level.INFO, "Mod Load Initiated.");
 
         BACKING_CONFIG.registerLoadHandler((backingConfig) -> CONFIG = EssentialCommandsConfigSnapshot.create(backingConfig));

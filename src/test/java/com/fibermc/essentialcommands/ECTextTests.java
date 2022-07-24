@@ -67,6 +67,5 @@ public class ECTextTests
             assert inputToken.getContent().equals(actualToken.getContent());
             assert inputToken.getStyle().equals(actualToken.getStyle());
         }
-
     }
 }
