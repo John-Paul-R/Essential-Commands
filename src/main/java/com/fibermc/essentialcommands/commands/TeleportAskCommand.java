@@ -51,8 +51,8 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
             targetPlayer,
             "/tpaccept " + senderName,
             "/tpdeny " + senderName,
-            ECText.accent("[" + ECText.getInstance().get("generic.accept") + "]"),
-            ECText.error("[" + ECText.getInstance().get("generic.deny") + "]")
+            ECText.accent("[" + ECText.getInstance().getString("generic.accept") + "]"),
+            ECText.error("[" + ECText.getInstance().getString("generic.deny") + "]")
         ).send();
 
         //Mark TPRequest Sender as having requested a teleport

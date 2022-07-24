@@ -12,13 +12,14 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 
 import dev.jpcode.eccore.util.TimeUtil;
 
 public final class EssentialCommands implements ModInitializer {
-    public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer("essential_commands").orElseThrow().getMetadata();
-    public static final String MOD_ID = MOD_METADATA.getId();
+    public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer("essential_commands").map(ModContainer::getMetadata).orElse(null);
+    public static final String MOD_ID = MOD_METADATA == null ? "essentialcommands | ERR - NO MOD DATA" : MOD_METADATA.getId();
     public static final Logger LOGGER = LogManager.getLogger("EssentialCommands");
     public static final EssentialCommandsConfig BACKING_CONFIG = new EssentialCommandsConfig(
         Path.of("./config/EssentialCommands.properties"),

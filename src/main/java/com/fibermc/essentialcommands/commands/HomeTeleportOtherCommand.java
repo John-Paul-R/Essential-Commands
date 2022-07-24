@@ -94,7 +94,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
 
                 var targetPlayerData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
                 var suggestionText = ListCommandFactory.getSuggestionText(
-                    ECText.getInstance().get("cmd.home.list.start"),
+                    ECText.getInstance().getString("cmd.home.list.start"),
                     "home tp_offline %s".formatted(targetPlayerName),
                     targetPlayerData.getHomeEntries()
                 );

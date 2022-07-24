@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
@@ -16,21 +14,22 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.PlaceholderResult;
-import eu.pb4.placeholders.api.Placeholders;
 
-import net.minecraft.client.font.TextVisitFactory;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.*;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.StringVisitable;
+import net.minecraft.text.Text;
 import net.minecraft.util.JsonHelper;
-
-import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.*;
 
 public abstract class ECText {
-    private ECText() {}
+    protected final Map<String, String> stringMap;
+
+    protected ECText(Map<String, String> stringMap) {
+        this.stringMap = stringMap;
+    }
 
     private static final Gson GSON = new Gson();
     private static final Pattern TOKEN_PATTERN = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]");
@@ -92,104 +91,7 @@ public abstract class ECText {
         }
 
         final Map<String, String> map = builder.build();
-        return new ECText() {
-            public String get(String key) {
-                return map.getOrDefault(key, key);
-            }
-
-            // Literals
-            public MutableText getTextLiteral(String key, TextFormatType textFormatType) {
-                return Text.literal(get(key)).setStyle(textFormatType.getStyle());
-            }
-
-            public MutableText getText(String key) {
-                return getTextLiteral(key, TextFormatType.Default);
-            }
-
-            public MutableText getText(String key, TextFormatType textFormatType) {
-                return getTextLiteral(key, textFormatType);
-            }
-
-            // Interpolated
-            public MutableText getText(String key, Text... args) {
-                return getTextInternal(key, TextFormatType.Default, args);
-            }
-
-            public MutableText getText(String key, TextFormatType textFormatType, Text... args) {
-                return getTextInternal(key, textFormatType, args);
-            }
-
-            private Placeholders.PlaceholderGetter placeholderGetterForContext(TextFormatType textFormatType, List<MutableText> args) {
-                return (placeholderId) ->
-                    (ctx, abc) -> {
-                        var idxAndFormattingCode = placeholderId.split(":");
-                        if (idxAndFormattingCode.length < 1) {
-                            throw new IllegalArgumentException("lang string placeholder did not contain an index");
-                        }
-
-                        var firstToken = idxAndFormattingCode[0];
-                        var text = switch (firstToken) {
-                            case "l" -> {
-                                if (idxAndFormattingCode.length < 2) {
-                                    throw new IllegalArgumentException(
-                                        "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
-                                            + placeholderId);
-                                }
-                                yield getTextLiteral(idxAndFormattingCode[1], textFormatType);
-                            }
-
-                            default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));
-                        };
-                        return PlaceholderResult.value(text);
-                    };
-            }
-
-            public MutableText getTextInternal(String key, TextFormatType textFormatType, Text... args) {
-                var argsList = Arrays.stream(args).map(Text::copy).toList();
-                var placeholderGetter = placeholderGetterForContext(textFormatType, argsList);
-                var retVal = Placeholders.parseText(
-                    Text.literal(get(key)),
-                    PlaceholderContext.of(server),
-                    Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
-                    placeholderGetter);
-
-                var retValSiblings = retVal.getSiblings();
-
-                var specifiedStyle = textFormatType.getStyle();
-
-                if (retValSiblings.size() == 0) {
-                    return retVal.copy();
-                }
-
-                return TextUtil.flattenRoot(retVal)
-                    .stream()
-                    .map(text -> argsList.contains(text)
-                        ? text
-                        : text.copy().setStyle(specifiedStyle))
-                    .collect(TextUtil.collect());
-            }
-
-            // Other stuff
-            public MutableText getText(String key, Object... args) {
-                return ECText.literal(String.format(get(key), args));
-            }
-
-            public boolean hasTranslation(String key) {
-                return map.containsKey(key);
-            }
-
-            public boolean isRightToLeft() {
-                return false;
-            }
-
-            public OrderedText reorder(StringVisitable text) {
-                return (visitor) ->
-                    text.visit((style, string) ->
-                        TextVisitFactory.visitFormatted(string, style, visitor)
-                            ? Optional.empty()
-                            : StringVisitable.TERMINATE_VISIT, Style.EMPTY).isPresent();
-            }
-        };
+        return new ECTextImpl(map, server);
     }
 
     public static void load(InputStream inputStream, BiConsumer<String, String> entryConsumer) {
@@ -209,10 +111,7 @@ public abstract class ECText {
         return instance;
     }
 
-    //    public static String get(String key) {
-//        Language
-//    }
-    public abstract String get(String key);
+    public abstract String getString(String key);
 
     public abstract MutableText getText(String key, Text... args);
 
