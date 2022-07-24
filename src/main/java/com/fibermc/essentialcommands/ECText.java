@@ -158,15 +158,16 @@ public abstract class ECText {
 
                 var specifiedStyle = textFormatType.getStyle();
 
-                return retValSiblings.size() == 0
-                    ? retVal.copy()
-                    : retVal.copyContentOnly().setStyle(specifiedStyle)
-                        .append(TextUtil.concat(
-                            retVal.getSiblings().stream()
-                            .map(txt -> argsList.contains(txt)
-                                ? txt
-                                : txt.copy().setStyle(specifiedStyle))
-                            .toArray(Text[]::new)));
+                if (retValSiblings.size() == 0) {
+                    return retVal.copy();
+                }
+
+                return TextUtil.flattenRoot(retVal)
+                    .stream()
+                    .map(text -> argsList.contains(text)
+                        ? text
+                        : text.copy().setStyle(specifiedStyle))
+                    .collect(TextUtil.collect());
             }
 
             // Other stuff

@@ -6,8 +6,12 @@ import eu.pb4.placeholders.api.TextParserUtils;
 import net.minecraft.text.*;
 import org.apache.logging.log4j.Level;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 public class TextUtil {
 
@@ -206,5 +210,51 @@ public class TextUtil {
                 break;
         }
         return outText;
+    }
+
+    public static Collector<Text, MutableText, MutableText> collect() {
+        return new Collector<>() {
+            @Override
+            public Supplier<MutableText> supplier() {
+                return Text::empty;
+            }
+
+            @Override
+            public BiConsumer<MutableText, Text> accumulator() {
+                return MutableText::append;
+            }
+
+            @Override
+            public BinaryOperator<MutableText> combiner() {
+                return (r1, r2) -> { r1.append(r2); return r1; };
+            }
+
+            @Override
+            public Function<MutableText, MutableText> finisher() {
+                return (a) -> a;
+            }
+
+            @Override
+            public Set<Characteristics> characteristics() {
+                return Collections.emptySet();
+            }
+        };
+    }
+
+    /**
+     * indempotent
+     * @return flattened text
+     */
+    public static List<Text> flattenRoot(Text text) {
+        var siblings = text.getSiblings();
+        if (siblings.size() == 0) {
+            return List.of(text);
+        }
+
+        List<Text> content = new ArrayList<>(siblings.size() + 1);
+        content.add(text.copyContentOnly().setStyle(text.getStyle()));
+        content.addAll(siblings);
+
+        return content;
     }
 }
