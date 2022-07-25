@@ -58,6 +58,10 @@ public class ECTextImpl extends ECText {
         return new Placeholders.PlaceholderGetter() {
             @Override
             public boolean isContextOptional() {
+                // In some situations (Notably, unit tests), the MinecraftServer from which to init
+                // the PlaceholderContext will be unavailable, so we set the context to Optional.
+                // (At time of writing, none of EC's PlaceholderGetter tech depends on the server
+                // context)
                 return true;
             }
 
@@ -95,15 +99,15 @@ public class ECTextImpl extends ECText {
                 TextNode.convert(Text.literal(getString(key))),
                 Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
                 placeholderGetter)
-            .toText(parserContext, true);
+            .toText(parserContext, true); // Not 100% sure if this flag should be true or false
 
         var retValSiblings = retVal.getSiblings();
-
-        var specifiedStyle = textFormatType.getStyle();
 
         if (retValSiblings.size() == 0) {
             return retVal.copy();
         }
+
+        var specifiedStyle = textFormatType.getStyle();
 
         return TextUtil.flattenRoot(retVal)
             .stream()
