@@ -28,7 +28,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Build and Test
 
     runs-on: ubuntu-latest
 
@@ -54,11 +54,9 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: 🔨 Build artifacts
-        run: gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
 
-      - name: Run Tests
-        run: gradle -b build-github-action.gradle -c settings-github-action.gradle test
+      - name: 🔨 Build artifacts and Run Tests
+        run: gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
 
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v2
