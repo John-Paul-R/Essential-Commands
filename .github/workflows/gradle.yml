@@ -16,7 +16,7 @@ on:
       - LICENCE
 
   pull_request:
-    branches: [ "1.18, 1.19" ]
+    branches: [ "1.18", "1.19" ]
     paths:
       - '**/src/**'
       - '**/build.gradle'
@@ -57,7 +57,7 @@ jobs:
       - name: 🔨 Build artifacts
         run: gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
 
-      -name: Run Tests
+      - name: Run Tests
         run: gradle -b build-github-action.gradle -c settings-github-action.gradle test
 
       - name: 📦 Upload artifacts
