@@ -276,7 +276,7 @@ githubRelease {
         .matching((PatternFilterable pattern) -> pattern.include("**/*${project.version}.jar"))
     //jar.outputs.getFiles().asPath//
     overwrite = false // by default false; if set to true, will delete an existing release with the same tag and name
-    dryRun = true // by default false; you can use this to see what actions would be taken without making a release
+    dryRun = false // by default false; you can use this to see what actions would be taken without making a release
     apiEndpoint = "https://api.github.com" // should only change for github enterprise users
     client // This is the okhttp client used for http requests
     allowUploadToExisting = false

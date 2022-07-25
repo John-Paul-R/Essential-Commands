@@ -9,9 +9,10 @@ import org.junit.jupiter.api.Test;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @DisplayName("ECText")
-public class ECTextTests
-{
+public class ECTextTests {
     private static ECText ecText;
 
     @BeforeAll
@@ -25,19 +26,19 @@ public class ECTextTests
     }
 
     @Test
-    @DisplayName("getTextInternal - no interplolation - success")
+    @DisplayName("getTextInternal - no interplolation")
     void getTextInternal_FormatsCorrectly()
     {
         var expected = Text.literal("enabled").setStyle(TextFormatType.Default.getStyle());
         var enabledText = ecText.getText("generic.enabled");
 
-        assert enabledText.getContent().equals(expected.getContent());
-        assert enabledText.getStyle().equals(expected.getStyle());
+        assertEquals(enabledText.getContent(), expected.getContent());
+        assertEquals(enabledText.getStyle(), expected.getStyle());
     }
 
     @Test
-    @DisplayName("getTextInternal - single interplolation - success")
-    void getTextInternal_SingleIterpolatedToken_FormatsCorrectly()
+    @DisplayName("getTextInternal - two interpolated tokens")
+    void getTextInternal_TwoInterpolatedTokens_FormatsCorrectly()
     {
         var playerNameText = Text.literal("Steve").formatted(Formatting.AQUA);
         var defaultStyle = TextFormatType.Default.getStyle();
@@ -56,7 +57,7 @@ public class ECTextTests
         var expectedString = expectedMessage.getString();
         var actualString = actualMessage.getString();
 
-        assert expectedString.equals(actualString);
+        assertEquals(expectedString, actualString);
 
         var expectedSiblings = expectedMessage.getSiblings();
         var actualSiblings = actualMessage.getSiblings();
@@ -64,8 +65,8 @@ public class ECTextTests
             var inputToken = expectedSiblings.get(i);
             var actualToken = actualSiblings.get(i);
 
-            assert inputToken.getContent().equals(actualToken.getContent());
-            assert inputToken.getStyle().equals(actualToken.getStyle());
+            assertEquals(inputToken.getContent(), actualToken.getContent());
+            assertEquals(inputToken.getStyle(), actualToken.getStyle());
         }
     }
 }

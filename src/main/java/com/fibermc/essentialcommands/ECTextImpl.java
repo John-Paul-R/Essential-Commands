@@ -7,10 +7,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import eu.pb4.placeholders.api.ParserContext;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.PlaceholderResult;
-import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.*;
 import eu.pb4.placeholders.api.node.TextNode;
 
 import net.minecraft.client.font.TextVisitFactory;
@@ -28,7 +25,7 @@ public class ECTextImpl extends ECText {
         // that is not guaranteed. This is admittedly a bit hacky.
         parserContext = server != null
             ? ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(server))
-            : ParserContext.of(PlaceholderContext.KEY, new PlaceholderContext(null, null, null, null, null, null));
+            : ParserContext.of();
     }
 
     public String getString(String key) {
@@ -58,28 +55,37 @@ public class ECTextImpl extends ECText {
     }
 
     private Placeholders.PlaceholderGetter placeholderGetterForContext(TextFormatType textFormatType, List<MutableText> args) {
-        return (placeholderId) ->
-            (ctx, abc) -> {
-                var idxAndFormattingCode = placeholderId.split(":");
-                if (idxAndFormattingCode.length < 1) {
-                    throw new IllegalArgumentException("lang string placeholder did not contain an index");
-                }
+        return new Placeholders.PlaceholderGetter() {
+            @Override
+            public boolean isContextOptional() {
+                return true;
+            }
 
-                var firstToken = idxAndFormattingCode[0];
-                var text = switch (firstToken) {
-                    case "l" -> {
-                        if (idxAndFormattingCode.length < 2) {
-                            throw new IllegalArgumentException(
-                                "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
-                                    + placeholderId);
-                        }
-                        yield getTextLiteral(idxAndFormattingCode[1], textFormatType);
+            @Override
+            public PlaceholderHandler getPlaceholder(String placeholderId) {
+                return (ctx, abc) -> {
+                    var idxAndFormattingCode = placeholderId.split(":");
+                    if (idxAndFormattingCode.length < 1) {
+                        throw new IllegalArgumentException("lang string placeholder did not contain an index");
                     }
 
-                    default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));
+                    var firstToken = idxAndFormattingCode[0];
+                    var text = switch (firstToken) {
+                        case "l" -> {
+                            if (idxAndFormattingCode.length < 2) {
+                                throw new IllegalArgumentException(
+                                    "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
+                                        + placeholderId);
+                            }
+                            yield ECTextImpl.this.getTextLiteral(idxAndFormattingCode[1], textFormatType);
+                        }
+
+                        default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));
+                    };
+                    return PlaceholderResult.value(text);
                 };
-                return PlaceholderResult.value(text);
-            };
+            }
+        };
     }
 
     public MutableText getTextInternal(String key, TextFormatType textFormatType, Text... args) {
