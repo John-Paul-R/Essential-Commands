@@ -33,6 +33,7 @@ public class ECTextTests
 
         assert enabledText.getContent().equals(expected.getContent());
         assert enabledText.getStyle().equals(expected.getStyle());
+        assert false;
     }
 
     @Test
