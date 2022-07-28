@@ -25,6 +25,7 @@ import org.spongepowered.asm.util.IConsumer;
 import java.io.FileNotFoundException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.function.Predicate;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
@@ -51,9 +52,12 @@ public class EssentialCommandRegistry {
             essentialCommandsRootNode.addChild(ecInfoNode);
         }
 
-        IConsumer<LiteralCommandNode<ServerCommandSource>> registerNode = CONFIG.REGISTER_TOP_LEVEL_COMMANDS
+        var excludedTopLevelCommands = new HashSet<>(CONFIG.EXCLUDED_TOP_LEVEL_COMMANDS.getValue());
+        IConsumer<LiteralCommandNode<ServerCommandSource>> registerNode = CONFIG.REGISTER_TOP_LEVEL_COMMANDS.getValue()
             ? (node) -> {
-                rootNode.addChild(node);
+                if (!excludedTopLevelCommands.toString().contains(node.getLiteral())) {
+                    rootNode.addChild(node);
+                }
                 essentialCommandsRootNode.addChild(node);
             }
             : essentialCommandsRootNode::addChild;
