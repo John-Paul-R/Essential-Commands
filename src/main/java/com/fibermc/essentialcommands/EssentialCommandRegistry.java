@@ -51,10 +51,12 @@ public class EssentialCommandRegistry {
             essentialCommandsRootNode.addChild(ecInfoNode);
         }
 
-        IConsumer<LiteralCommandNode<ServerCommandSource>> registerNode = (node) -> {
-            rootNode.addChild(node);
-            essentialCommandsRootNode.addChild(node);
-        };
+        IConsumer<LiteralCommandNode<ServerCommandSource>> registerNode = CONFIG.REGISTER_TOP_LEVEL_COMMANDS
+            ? (node) -> {
+                rootNode.addChild(node);
+                essentialCommandsRootNode.addChild(node);
+            }
+            : essentialCommandsRootNode::addChild;
 
         if (CONFIG.ENABLE_TPA.getValue()) {
             registerNode.accept(CommandManager.literal("tpa")
