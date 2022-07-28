@@ -1,5 +1,10 @@
 package com.fibermc.essentialcommands;
 
+import java.io.FileNotFoundException;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.function.Predicate;
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.bench.*;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
@@ -51,9 +56,12 @@ public class EssentialCommandRegistry {
             essentialCommandsRootNode.addChild(ecInfoNode);
         }
 
+        var excludedTopLevelCommands = new HashSet<>(CONFIG.EXCLUDED_TOP_LEVEL_COMMANDS);
         IConsumer<LiteralCommandNode<ServerCommandSource>> registerNode = CONFIG.REGISTER_TOP_LEVEL_COMMANDS
             ? (node) -> {
-                rootNode.addChild(node);
+                if (!excludedTopLevelCommands.toString().contains(node.getLiteral())) {
+                    rootNode.addChild(node);
+                }
                 essentialCommandsRootNode.addChild(node);
             }
             : essentialCommandsRootNode::addChild;

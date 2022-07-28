@@ -62,6 +62,7 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<String> LANGUAGE = new Option<>("language", "en_us", String::toString);
     @ConfigOption public final Option<String> MOTD = new Option<>("motd", "<yellow>Welcome to our server <blue>%player:displayname%</blue>!\nPlease read the rules.</yellow>", String::toString);
     @ConfigOption public final Option<Boolean> REGISTER_TOP_LEVEL_COMMANDS = new Option<>("register_top_level_commands", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<List<String>> EXCLUDED_TOP_LEVEL_COMMANDS = new Option<>("excluded_top_level_commands", List.of(), ConfigUtil.arrayParser(Object::toString));
 
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);

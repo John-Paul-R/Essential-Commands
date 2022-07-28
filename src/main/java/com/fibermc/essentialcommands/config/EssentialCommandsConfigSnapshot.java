@@ -59,6 +59,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean AUTO_AFK_ENABLED;
     public final int AUTO_AFK_TICKS;
     public final boolean REGISTER_TOP_LEVEL_COMMANDS;
+    public final List<String> EXCLUDED_TOP_LEVEL_COMMANDS;
 
     private EssentialCommandsConfigSnapshot(EssentialCommandsConfig config) {
         this.FORMATTING_DEFAULT                = config.FORMATTING_DEFAULT.getValue();
@@ -112,6 +113,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.AUTO_AFK_ENABLED                  = config.AUTO_AFK_ENABLED.getValue();
         this.AUTO_AFK_TICKS                    = config.AUTO_AFK_TICKS.getValue();
         this.REGISTER_TOP_LEVEL_COMMANDS       = config.REGISTER_TOP_LEVEL_COMMANDS.getValue();
+        this.EXCLUDED_TOP_LEVEL_COMMANDS       = config.EXCLUDED_TOP_LEVEL_COMMANDS.getValue();
     }
 
     public static EssentialCommandsConfigSnapshot create(EssentialCommandsConfig config) {
