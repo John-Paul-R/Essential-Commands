@@ -31,6 +31,7 @@ public final class ECPerms {
         public static final String warp_tp = "essentialcommands.warp.tp";
         public static final String warp_delete = "essentialcommands.warp.delete";
         public static final String warp_tp_named = "essentialcommands.warp.tp_named";
+        public static final String warp_tp_others = "essentialcommands.warp_tp_others";
         public static final String back = "essentialcommands.back";
         public static final String spawn_tp = "essentialcommands.spawn.tp";
         public static final String spawn_set = "essentialcommands.spawn.set";
@@ -81,9 +82,9 @@ public final class ECPerms {
      */
     static void init() {
         var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        Registry.per_warp_permissions = worldDataManager.getWarpNames().toArray(new String[0]);
+        Registry.per_warp_permissions = worldDataManager.getWarpNames().toArray(String[]::new);
         worldDataManager.warpsLoadEvent.register((warps) -> {
-            Registry.per_warp_permissions = warps.keySet().toArray(new String[0]);
+            Registry.per_warp_permissions = warps.keySet().toArray(String[]::new);
         });
     }
 

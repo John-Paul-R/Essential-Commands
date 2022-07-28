@@ -1,6 +1,9 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.PlayerTeleporter;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.types.WarpLocation;
 
 import com.mojang.brigadier.Command;
@@ -11,6 +14,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import net.minecraft.command.CommandException;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -20,8 +24,18 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        exec(context, senderPlayer);
+
+        return 1;
+    }
+
+    private void exec(
+        CommandContext<ServerCommandSource> context,
+        ServerPlayerEntity targetPlayer) throws CommandSyntaxException
+    {
+        var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
+        var senderPlayer = context.getSource().getPlayer();
         String warpName = StringArgumentType.getString(context, "warp_name");
         var warpNameText = ECText.accent(warpName);
         WarpLocation loc = worldDataManager.getWarp(warpName);
@@ -43,11 +57,13 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
 
         // Teleport & chat message
         PlayerTeleporter.requestTeleport(
-            senderPlayer,
+            targetPlayer,
             loc,
             ECText.getInstance().getText("cmd.warp.location_name", warpNameText));
-
-        return 1;
     }
 
+    public int runOther(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        exec(context, EntityArgumentType.getPlayer(context, "target_player"));
+        return 0;
+    }
 }

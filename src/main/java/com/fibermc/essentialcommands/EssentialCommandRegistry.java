@@ -193,6 +193,7 @@ public final class EssentialCommandRegistry {
             LiteralArgumentBuilder<ServerCommandSource> warpBuilder = CommandManager.literal("warp");
             LiteralArgumentBuilder<ServerCommandSource> warpSetBuilder = CommandManager.literal("set");
             LiteralArgumentBuilder<ServerCommandSource> warpTpBuilder = CommandManager.literal("tp");
+            LiteralArgumentBuilder<ServerCommandSource> warpTpOtherBuilder = CommandManager.literal("tp_other");
             LiteralArgumentBuilder<ServerCommandSource> warpDeleteBuilder = CommandManager.literal("delete");
             LiteralArgumentBuilder<ServerCommandSource> warpListBuilder = CommandManager.literal("list");
 
@@ -208,6 +209,13 @@ public final class EssentialCommandRegistry {
                 .then(argument("warp_name", StringArgumentType.word())
                     .suggests(WarpSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new WarpTpCommand()));
+
+            warpTpOtherBuilder
+                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
+                .then(argument("target_player", EntityArgumentType.player())
+                    .then(argument("warp_name", StringArgumentType.word())
+                        .suggests(WarpSuggestion.STRING_SUGGESTIONS_PROVIDER)
+                        .executes(new WarpTpCommand()::runOther)));
 
             warpDeleteBuilder
                 .requires(ECPerms.require(ECPerms.Registry.warp_delete, 4))
@@ -227,6 +235,7 @@ public final class EssentialCommandRegistry {
                 .requires(ECPerms.requireAny(ECPerms.Registry.Group.warp_group, 0))
                 .build();
             warpNode.addChild(warpTpBuilder.build());
+            warpNode.addChild(warpTpOtherBuilder.build());
             warpNode.addChild(warpSetBuilder.build());
             warpNode.addChild(warpDeleteBuilder.build());
             warpNode.addChild(warpListBuilder.build());
