@@ -30,7 +30,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
 
         //Add home to PlayerData
         //TODO if home with given name is already set, warn of overwrite and require that the command be typed again, or a confirmation message be given
-        PlayerData pData = ((ServerPlayerEntityAccess) senderPlayer).getEcPlayerData();
+        PlayerData pData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
         var homeNameText = ECText.accent(homeName);
         int successCode = 0;
         try {

@@ -36,7 +36,7 @@ public abstract class PlayerEntityMixin {
             return teamDecoratedName;
         }
 
-        var playerData = ((ServerPlayerEntityAccess) this).getEcPlayerData();
+        var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
         var name = getNicknameStyledName(teamDecoratedName, playerData);
 
         return playerData.isAfk()

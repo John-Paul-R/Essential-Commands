@@ -27,7 +27,7 @@ public final class PlayerTeleporter {
         if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
-            ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
+            ((ServerPlayerEntityAccess) player).ec$setQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             player.sendMessage(
                 ECText.getInstance().getText(
@@ -40,7 +40,7 @@ public final class PlayerTeleporter {
     }
 
     public static void requestTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
-        requestTeleport(((ServerPlayerEntityAccess) playerEntity).getEcPlayerData(), dest, destName);
+        requestTeleport(((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData(), dest, destName);
     }
 
     public static void teleport(QueuedTeleport queuedTeleport) {
@@ -69,7 +69,7 @@ public final class PlayerTeleporter {
 
     public static void teleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
         if (ManagerLocator.playerDataEnabled()) {
-            teleport(((ServerPlayerEntityAccess) playerEntity).getEcPlayerData(), dest);
+            teleport(((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData(), dest);
         } else {
             execTeleport(playerEntity, dest);
         }

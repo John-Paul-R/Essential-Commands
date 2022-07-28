@@ -39,7 +39,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
-        int successCode = targetPlayerEntityAccess.getEcPlayerData().setNickname(nicknameText);
+        int successCode = targetPlayerEntityAccess.ec$getPlayerData().setNickname(nicknameText);
 
         //inform command sender that the nickname has been set
         if (successCode >= 0) {

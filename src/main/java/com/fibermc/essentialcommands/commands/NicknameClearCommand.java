@@ -20,7 +20,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
         ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
-        targetPlayerEntityAccess.getEcPlayerData().setNickname(null);
+        targetPlayerEntityAccess.ec$getPlayerData().setNickname(null);
 
         //inform command sender that the nickname has been set
         context.getSource().sendFeedback(

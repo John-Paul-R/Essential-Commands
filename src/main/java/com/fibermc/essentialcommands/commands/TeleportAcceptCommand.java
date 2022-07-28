@@ -20,7 +20,7 @@ public class TeleportAcceptCommand extends TeleportResponseCommand {
 
     protected int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer) {
         ServerCommandSource source = context.getSource();
-        PlayerData targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).getEcPlayerData();
+        PlayerData targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
         TeleportRequest teleportRequest = targetPlayerData.getSentTeleportRequest();

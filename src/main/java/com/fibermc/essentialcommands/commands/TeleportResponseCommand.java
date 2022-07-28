@@ -29,7 +29,7 @@ public abstract class TeleportResponseCommand implements Command<ServerCommandSo
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) senderPlayer).getEcPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
         LinkedHashMap<UUID, TeleportRequest> incomingTeleportRequests = senderPlayerData.getIncomingTeleportRequests();
 
         if (incomingTeleportRequests.size() > 1) {

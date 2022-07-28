@@ -53,7 +53,7 @@ public final class TeleportRequestManager {
         var lang = ECText.getInstance();
         // decrement the tp timer for all players that have put in a tp request
         for (TeleportRequest teleportRequest : activeTpRequestList) {
-            PlayerData requesterPlayerData = ((ServerPlayerEntityAccess) teleportRequest.getSenderPlayer()).getEcPlayerData();
+            PlayerData requesterPlayerData = ((ServerPlayerEntityAccess) teleportRequest.getSenderPlayer()).ec$getPlayerData();
             requesterPlayerData.tickTpTimer();
             if (requesterPlayerData.getTpTimer() < 0) {
                 teleportRequest.end();
@@ -112,7 +112,7 @@ public final class TeleportRequestManager {
             && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)
         ) {
             try {
-                Objects.requireNonNull(((ServerPlayerEntityAccess) playerEntity).endEcQueuedTeleport());
+                Objects.requireNonNull(((ServerPlayerEntityAccess) playerEntity).ec$endQueuedTeleport());
 
                 delayedQueuedTeleportMap.remove(playerEntity.getUuid());
                 playerEntity.sendMessage(
@@ -124,8 +124,8 @@ public final class TeleportRequestManager {
     }
 
     public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer, TeleportRequest.Type requestType) {
-        PlayerData requestSenderData = ((ServerPlayerEntityAccess) requestSender).getEcPlayerData();
-        PlayerData targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).getEcPlayerData();
+        PlayerData requestSenderData = ((ServerPlayerEntityAccess) requestSender).ec$getPlayerData();
+        PlayerData targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
 
         final int teleportRequestDurationTicks = CONFIG.TELEPORT_REQUEST_DURATION * TPS; //sec * ticks per sec
         requestSenderData.setTpTimer(teleportRequestDurationTicks);
@@ -136,7 +136,7 @@ public final class TeleportRequestManager {
     }
 
     public void startTpCooldown(ServerPlayerEntity player) {
-        PlayerData pData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
+        PlayerData pData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
 
         final int teleportCooldownTicks = (int) (CONFIG.TELEPORT_COOLDOWN * TPS);
         pData.setTpCooldown(teleportCooldownTicks);
@@ -144,7 +144,7 @@ public final class TeleportRequestManager {
     }
 
     public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, MutableText destName) {
-        queueTeleport(new QueuedLocationTeleport(((ServerPlayerEntityAccess) player).getEcPlayerData(), dest, destName));
+        queueTeleport(new QueuedLocationTeleport(((ServerPlayerEntityAccess) player).ec$getPlayerData(), dest, destName));
     }
 
     public void queueTeleport(QueuedTeleport queuedTeleport) {

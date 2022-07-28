@@ -18,7 +18,7 @@ public class AfkCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var source = context.getSource();
         var player = source.getPlayer();
-        var playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
+        var playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
 
         if (CONFIG.INVULN_WHILE_AFK) {
             if (playerData.isInCombat()) {

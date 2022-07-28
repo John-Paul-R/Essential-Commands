@@ -21,7 +21,7 @@ public class QueuedPlayerTeleport extends QueuedTeleport {
     }
 
     public QueuedPlayerTeleport(ServerPlayerEntity teleportingPlayer, ServerPlayerEntity destinationPlayer) {
-        super(((ServerPlayerEntityAccess) teleportingPlayer).getEcPlayerData(), destinationPlayer.getDisplayName());
+        super(((ServerPlayerEntityAccess) teleportingPlayer).ec$getPlayerData(), destinationPlayer.getDisplayName());
         this.targetPlayer = destinationPlayer;
     }
 

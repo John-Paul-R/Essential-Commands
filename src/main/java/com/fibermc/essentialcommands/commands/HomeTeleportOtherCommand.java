@@ -30,18 +30,18 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return HomeCommand.exec(senderPlayerData, getTargetPlayerData(context), homeName);
     }
 
     private static PlayerData getTargetPlayerData(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        return ((ServerPlayerEntityAccess) EntityArgumentType.getPlayer(context, "target_player")).getEcPlayerData();
+        return ((ServerPlayerEntityAccess) EntityArgumentType.getPlayer(context, "target_player")).ec$getPlayerData();
     }
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
+        var senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
         var targetPlayerData = getTargetPlayerData(context);
 
         return HomeCommand.exec(
@@ -52,7 +52,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
     }
 
     public int runOfflinePlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         var targetPlayerName = StringArgumentType.getString(context, "target_player");
@@ -65,7 +65,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
                     return;
                 }
 
-                var targetPlayerData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
+                var targetPlayerData = ((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData();
 
                 try {
                     HomeCommand.exec(
@@ -92,7 +92,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
                     return;
                 }
 
-                var targetPlayerData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
+                var targetPlayerData = ((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData();
                 var suggestionText = ListCommandFactory.getSuggestionText(
                     ECText.getInstance().getString("cmd.home.list.start"),
                     "home tp_offline %s".formatted(targetPlayerName),

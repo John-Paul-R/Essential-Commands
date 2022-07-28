@@ -4,14 +4,14 @@ import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.QueuedTeleport;
 
 public interface ServerPlayerEntityAccess {
-    QueuedTeleport getEcQueuedTeleport();
+    QueuedTeleport ec$getQueuedTeleport();
 
-    void setEcQueuedTeleport(QueuedTeleport queuedTeleport);
+    void ec$setQueuedTeleport(QueuedTeleport queuedTeleport);
 
-    QueuedTeleport endEcQueuedTeleport();
+    QueuedTeleport ec$endQueuedTeleport();
 
-    PlayerData getEcPlayerData();
+    PlayerData ec$getPlayerData();
 
-    void setEcPlayerData(PlayerData playerData);
+    void ec$setPlayerData(PlayerData playerData);
 
 }

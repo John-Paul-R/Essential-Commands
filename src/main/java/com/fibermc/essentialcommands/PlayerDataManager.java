@@ -127,7 +127,7 @@ public class PlayerDataManager {
     // EVENTS
     private static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
         PlayerData playerData = getInstance().loadPlayerData(player);
-        ((ServerPlayerEntityAccess) player).setEcPlayerData(playerData);
+        ((ServerPlayerEntityAccess) player).ec$setPlayerData(playerData);
         // Immediately save file. (Frankly not sure if this is actually necessary)
         playerData.markDirty();
         playerData.save();
@@ -139,13 +139,13 @@ public class PlayerDataManager {
     }
 
     private static void onPlayerRespawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
-        PlayerData pData = ((ServerPlayerEntityAccess) oldPlayerEntity).getEcPlayerData();
+        PlayerData pData = ((ServerPlayerEntityAccess) oldPlayerEntity).ec$getPlayerData();
         pData.updatePlayer(newPlayerEntity);
-        ((ServerPlayerEntityAccess) newPlayerEntity).setEcPlayerData(pData);
+        ((ServerPlayerEntityAccess) newPlayerEntity).ec$setPlayerData(pData);
     }
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
-        PlayerData pData = ((ServerPlayerEntityAccess) playerEntity).getEcPlayerData();
+        PlayerData pData = ((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData();
         if (CONFIG.ALLOW_BACK_ON_DEATH) {
             pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
         }
@@ -153,7 +153,7 @@ public class PlayerDataManager {
 
     // SET / ADD
     private PlayerData loadPlayerData(ServerPlayerEntity player) {
-        PlayerData playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
+        PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
         dataMap.put(player.getUuid(), playerData);
         return playerData;
     }

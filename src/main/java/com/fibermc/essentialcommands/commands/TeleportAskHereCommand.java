@@ -27,7 +27,7 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
         // Don't allow spamming same target.
         {
             var existingTeleportRequest = ((ServerPlayerEntityAccess) senderPlayer)
-                .getEcPlayerData()
+                .ec$getPlayerData()
                 .getSentTeleportRequest();
             if (existingTeleportRequest != null && existingTeleportRequest.getTargetPlayer().equals(targetPlayer)) {
                 senderPlayer.sendMessage(

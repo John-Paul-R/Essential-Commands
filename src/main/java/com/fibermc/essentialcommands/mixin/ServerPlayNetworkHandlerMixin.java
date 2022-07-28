@@ -17,7 +17,7 @@ public class ServerPlayNetworkHandlerMixin {
 
     private PlayerData getPlayerData() {
         var player = ((ServerPlayNetworkHandler) (Object) this).player;
-        return ((ServerPlayerEntityAccess) player).getEcPlayerData();
+        return ((ServerPlayerEntityAccess) player).ec$getPlayerData();
     }
 
     private void invokeActEvent(Packet<ServerPlayPacketListener> packet) {

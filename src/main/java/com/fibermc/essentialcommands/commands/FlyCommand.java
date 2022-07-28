@@ -50,7 +50,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
     public static void exec(ServerCommandSource source, ServerPlayerEntity target, boolean shouldEnableFly) {
         PlayerAbilities playerAbilities = target.getAbilities();
 
-        PlayerData playerData = ((ServerPlayerEntityAccess) target).getEcPlayerData();
+        PlayerData playerData = ((ServerPlayerEntityAccess) target).ec$getPlayerData();
 
         try {
             playerData.setFlight(shouldEnableFly);

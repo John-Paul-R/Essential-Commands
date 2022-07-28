@@ -61,21 +61,21 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
                                         ServerWorld serverWorld,
                                         WorldProperties worldProperties)
     {
-        ((ServerPlayerEntityAccess) this).getEcPlayerData().updatePlayer((ServerPlayerEntity) (Object) this);
+        ((ServerPlayerEntityAccess) this).ec$getPlayerData().updatePlayer((ServerPlayerEntity) (Object) this);
     }
 
     @Override
-    public QueuedTeleport getEcQueuedTeleport() {
+    public QueuedTeleport ec$getQueuedTeleport() {
         return ecQueuedTeleport;
     }
 
     @Override
-    public void setEcQueuedTeleport(QueuedTeleport queuedTeleport) {
+    public void ec$setQueuedTeleport(QueuedTeleport queuedTeleport) {
         ecQueuedTeleport = queuedTeleport;
     }
 
     @Override
-    public QueuedTeleport endEcQueuedTeleport() {
+    public QueuedTeleport ec$endQueuedTeleport() {
         QueuedTeleport prevQueuedTeleport = ecQueuedTeleport;
         ecQueuedTeleport = null;
         return prevQueuedTeleport;
@@ -90,40 +90,40 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     }
 
     @Unique
-    public PlayerData ecPlayerData;
+    public PlayerData ec$playerData;
 
     @Override
-    public PlayerData getEcPlayerData() {
-        if (ecPlayerData != null) {
-            return ecPlayerData;
+    public PlayerData ec$getPlayerData() {
+        if (ec$playerData != null) {
+            return ec$playerData;
         }
 
         ServerPlayerEntity playerEntity = (ServerPlayerEntity) (Object) this;
         EssentialCommands.LOGGER.info(String.format(
             "[Essential Commands] Loading PlayerData for player with uuid '%s'.", playerEntity.getUuidAsString()));
         PlayerData playerData = PlayerDataFactory.create(playerEntity);
-        setEcPlayerData(playerData);
+        ec$setPlayerData(playerData);
         return playerData;
     }
 
     @Override
-    public void setEcPlayerData(PlayerData playerData) {
-        ecPlayerData = playerData;
+    public void ec$setPlayerData(PlayerData playerData) {
+        ec$playerData = playerData;
     }
 
     // Teleport hook (for /back)
     @Inject(method = "teleport", at = @At("HEAD"))
     public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
-        this.getEcPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
+        this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
     }
 
     @Inject(method = "enterCombat", at = @At("RETURN"))
     public void onEnterCombat(CallbackInfo ci) {
-        ecPlayerData.setInCombat(true);
+        ec$playerData.setInCombat(true);
     }
 
     @Inject(method = "endCombat", at = @At("RETURN"))
     public void onExitCombat(CallbackInfo ci) {
-        ecPlayerData.setInCombat(false);
+        ec$playerData.setInCombat(false);
     }
 }
