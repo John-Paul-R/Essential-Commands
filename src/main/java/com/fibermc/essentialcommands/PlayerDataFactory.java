@@ -4,18 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import com.fibermc.essentialcommands.util.FileUtil;
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.WorldSavePath;
 
 public final class PlayerDataFactory {
     private PlayerDataFactory() {}
@@ -95,20 +92,8 @@ public final class PlayerDataFactory {
     }
 
     private static File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
-        return getPlayerDataDirectoryPath(player.getServer())
+        return FileUtil.getOrCreateWorldDirectory(player.getServer(), "modplayerData")
             .resolve(player.getUuidAsString() + ".dat")
             .toFile();
-    }
-
-    private static Path getPlayerDataDirectoryPath(MinecraftServer server) throws IOException {
-        Path dataDirectoryPath;
-        try {
-            dataDirectoryPath = Files.createDirectories(server.getSavePath(WorldSavePath.ROOT).resolve("modplayerdata"));
-        } catch (NullPointerException e) {
-            dataDirectoryPath = Files.createDirectories(Paths.get("./world/modplayerdata/"));
-            EssentialCommands.log(Level.WARN, "Session save path could not be found. Defaulting to ./world/modplayerdata");
-        }
-
-        return dataDirectoryPath;
     }
 }
