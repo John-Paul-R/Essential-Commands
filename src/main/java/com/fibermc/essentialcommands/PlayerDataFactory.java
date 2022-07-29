@@ -92,7 +92,7 @@ public final class PlayerDataFactory {
     }
 
     private static File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
-        return FileUtil.getOrCreateWorldDirectory(player.getServer(), "modplayerData")
+        return FileUtil.getOrCreateWorldDirectory(player.getServer(), "modplayerdata")
             .resolve(player.getUuidAsString() + ".dat")
             .toFile();
     }
