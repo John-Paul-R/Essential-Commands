@@ -7,8 +7,8 @@ import eu.pb4.placeholders.impl.GeneralUtils;
 
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextContent;
 
+@SuppressWarnings("UnstableApiUsage")
 public final class ECPlaceholderApiCompat {
     private ECPlaceholderApiCompat() {}
 
@@ -32,11 +32,11 @@ public final class ECPlaceholderApiCompat {
         } else {
             MutableText base = Text.empty();
 
-            for (int i = 0; i < children.length; i++) {
-                if (children[i] != null) {
-                    var childText = getText(children[i], context);
+            for (TextNode child : children) {
+                if (child != null) {
+                    var childText = getText(child, context);
 
-                    if (childText.getContent() != TextContent.EMPTY || childText.getSiblings().size() > 0) {
+                    if (!GeneralUtils.isEmpty(childText)) {
                         base.append(childText);
                     }
                 }
