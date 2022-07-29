@@ -38,7 +38,7 @@ public class SleepManagerMixin {
                         ServerPlayerEntity serverPlayerEntity
     ) {
         if (CONFIG.ENABLE_AFK && CONFIG.AUTO_AFK_ENABLED) {
-            var playerData = ((ServerPlayerEntityAccess) serverPlayerEntity).getEcPlayerData();
+            var playerData = ((ServerPlayerEntityAccess) serverPlayerEntity).ec$getPlayerData();
             if (!serverPlayerEntity.isSpectator() // mirror check in `update` - don't `--total` unless it was just added to
                 && !serverPlayerEntity.isSleeping() // if they're sleeping, toss the custom afk logic
                 && playerData.ticksSinceLastActionOrMove() > CONFIG.AUTO_AFK_TICKS

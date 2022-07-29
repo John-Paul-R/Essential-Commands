@@ -451,6 +451,9 @@ public final class EssentialCommandRegistry {
                 .build());
         }
 
+        var profileNode = ProfileCommand.buildNode();
+        essentialCommandsRootNode.addChild(profileNode);
+
         LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
             .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
             .then(CommandManager.literal("reload")

@@ -14,7 +14,7 @@ public class WorldSaveHandlerMixin {
 
     @Inject(method = "savePlayerData", at = @At("RETURN"))
     public void onSavePlayerData(PlayerEntity player, CallbackInfo ci) {
-        ((ServerPlayerEntityAccess) player).getEcPlayerData().save();
+        ((ServerPlayerEntityAccess) player).ec$getPlayerData().save();
 //        System.out.printf("Saved PlayerData for player: %s\n", player.getName().getString());
     }
 

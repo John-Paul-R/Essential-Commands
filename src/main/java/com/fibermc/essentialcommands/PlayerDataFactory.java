@@ -4,40 +4,49 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import com.fibermc.essentialcommands.util.FileUtil;
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.WorldSavePath;
 
 public final class PlayerDataFactory {
     private PlayerDataFactory() {}
 
-    public static PlayerData create(ServerPlayerEntity player, File saveFile) {
-        PlayerData pData = new PlayerData(player, saveFile);
-        if (Files.exists(saveFile.toPath()) && saveFile.length() != 0) {
-            try {
-                NbtCompound nbtCompound3 = NbtIo.readCompressed(new FileInputStream(saveFile));
-                pData.fromNbt(nbtCompound3);
-                //Testing:
+    private static PlayerData create(ServerPlayerEntity player, File playerDataFile) {
+        PlayerData pData = new PlayerData(player, playerDataFile);
 
+        boolean fileExisted = false;
+
+        try {
+            fileExisted = !playerDataFile.createNewFile();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        if (fileExisted && playerDataFile.length() != 0) {
+            try {
+                pData.fromNbt(NbtIo.readCompressed(new FileInputStream(playerDataFile)));
             } catch (IOException e) {
-                EssentialCommands.log(Level.WARN, "Failed to load essential_commands player data for {"
-                    + player.getName().getString()
-                    + "}");
+                EssentialCommands.log(Level.WARN,
+                    "Failed to load essential_commands player data for {%s}", player.getName().getString());
                 e.printStackTrace();
             }
+        } else {
+            pData.markDirty();
+            pData.save();
         }
-        pData.markDirty();
+
         return pData;
     }
 
+    /**
+     * This is exclusively used with EssentialsXParser
+     */
     public static PlayerData create(NamedLocationStorage homes, File saveFile) {
         String fileName = saveFile.getName();
         UUID playerUuid = UUID.fromString(fileName.substring(0, fileName.indexOf(".dat")));
@@ -57,6 +66,12 @@ public final class PlayerDataFactory {
                     + "}");
                 e.printStackTrace();
             }
+        } else {
+            try {
+                saveFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         pData.markDirty();
@@ -64,33 +79,21 @@ public final class PlayerDataFactory {
     }
 
     public static PlayerData create(ServerPlayerEntity player) {
-        return create(player, getPlayerDataFile(player));
+        try {
+            return create(player, getPlayerDataFile(player));
+        } catch (IOException ex) {
+            EssentialCommands.log(
+                Level.ERROR,
+                "Failed to create player data file for player with id '{}'. Player data may fail to save, or other unexpected behavior may occur.",
+                player.getUuidAsString());
+            EssentialCommands.LOGGER.error(ex);
+        }
+        return new PlayerData(player, null);
     }
 
-    private static File getPlayerDataFile(ServerPlayerEntity player) {
-        String pUuid = player.getUuidAsString();
-
-        //Path mainDirectory = player.getServer().getRunDirectory().toPath();
-        Path dataDirectoryPath;
-        File playerDataFile = null;
-        try {
-            try {
-                dataDirectoryPath = Files.createDirectories(player.getServer().getSavePath(WorldSavePath.ROOT).resolve("modplayerdata"));
-            } catch (NullPointerException e) {
-                dataDirectoryPath = Files.createDirectories(Paths.get("./world/modplayerdata/"));
-                EssentialCommands.log(Level.WARN, "Session save path could not be found. Defaulting to ./world/modplayerdata");
-            }
-            playerDataFile = dataDirectoryPath.resolve(pUuid + ".dat").toFile();
-            playerDataFile.createNewFile();
-//            if (playerDataFile.createNewFile() || playerDataFile.length()==0) {//creates file and returns true only if file did not exist, otherwise returns false
-//                //Initialize file if just created
-//                pData.markDirty();
-//                pData.save();
-//            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return playerDataFile;
+    private static File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
+        return FileUtil.getOrCreateWorldDirectory(player.getServer(), "modplayerData")
+            .resolve(player.getUuidAsString() + ".dat")
+            .toFile();
     }
 }

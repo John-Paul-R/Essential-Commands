@@ -34,8 +34,8 @@ public class TeleportRequest {
 
     public TeleportRequest(ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer, Type requestType) {
         this.requestType = requestType;
-        this.senderPlayer = ((ServerPlayerEntityAccess) senderPlayer).getEcPlayerData();
-        this.targetPlayer = ((ServerPlayerEntityAccess) targetPlayer).getEcPlayerData();
+        this.senderPlayer = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
+        this.targetPlayer = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
     }
 
     public void queue() {

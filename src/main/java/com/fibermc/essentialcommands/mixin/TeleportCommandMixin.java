@@ -37,7 +37,7 @@ public class TeleportCommandMixin {
     ) throws CommandSyntaxException {
         // This cast is guaranteed to work because of where we inject.
         var targetPlayer = (ServerPlayerEntity)target;
-        var targetPlayerData = ((ServerPlayerEntityAccess)target).getEcPlayerData();
+        var targetPlayerData = ((ServerPlayerEntityAccess)target).ec$getPlayerData();
         targetPlayerData.setPreviousLocation(new MinecraftLocation(targetPlayer));
     }
 }

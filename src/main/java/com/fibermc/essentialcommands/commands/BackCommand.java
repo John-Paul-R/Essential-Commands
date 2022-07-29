@@ -22,7 +22,7 @@ public class BackCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Store command sender
         ServerPlayerEntity player = context.getSource().getPlayer();
-        PlayerData playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
+        PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
 
         //Get previous location
         MinecraftLocation loc = playerData.getPreviousLocation();

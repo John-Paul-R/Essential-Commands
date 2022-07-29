@@ -6,6 +6,7 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -27,7 +28,7 @@ public final class PlayerTeleporter {
         if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
-            ((ServerPlayerEntityAccess) player).setEcQueuedTeleport(queuedTeleport);
+            ((ServerPlayerEntityAccess) player).ec$setQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             player.sendMessage(
                 ECText.getInstance().getText(
@@ -40,7 +41,7 @@ public final class PlayerTeleporter {
     }
 
     public static void requestTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
-        requestTeleport(((ServerPlayerEntityAccess) playerEntity).getEcPlayerData(), dest, destName);
+        requestTeleport(((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData(), dest, destName);
     }
 
     public static void teleport(QueuedTeleport queuedTeleport) {
@@ -69,7 +70,7 @@ public final class PlayerTeleporter {
 
     public static void teleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
         if (ManagerLocator.playerDataEnabled()) {
-            teleport(((ServerPlayerEntityAccess) playerEntity).getEcPlayerData(), dest);
+            teleport(((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData(), dest);
         } else {
             execTeleport(playerEntity, dest);
         }
@@ -84,7 +85,10 @@ public final class PlayerTeleporter {
         playerEntity.sendMessage(
             ECText.getInstance().getText(
                 "teleport.done",
-                dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT)),
+                ((ServerPlayerEntityAccess) playerEntity).ec$getProfile().shouldPrintTeleportCoordinates()
+                    ? dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT)
+                    : Text.literal("destination").setStyle(CONFIG.FORMATTING_DEFAULT)
+            ),
             MessageType.SYSTEM
         );
     }

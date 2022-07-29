@@ -21,7 +21,7 @@ public class TeleportCancelCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
 
         var existingTeleportRequest = ((ServerPlayerEntityAccess) senderPlayer)
-            .getEcPlayerData()
+            .ec$getPlayerData()
             .getSentTeleportRequest();
 
         if (existingTeleportRequest == null) {

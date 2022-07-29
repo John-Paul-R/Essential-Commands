@@ -57,7 +57,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         if (CONFIG.RTP_COOLDOWN > 0) {
             ServerCommandSource source = context.getSource();
             int curServerTickTime = source.getServer().getTicks();
-            PlayerData playerData = ((ServerPlayerEntityAccess) player).getEcPlayerData();
+            PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
             var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN * 20;
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
             if (rtpCooldownRemaining > 0) {

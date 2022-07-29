@@ -30,14 +30,14 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return exec(senderPlayerData, homeName);
     }
 
     private static PlayerData getTargetPlayerData(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        return ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
+        return ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
     }
 
     public static String getSoleHomeName(PlayerData playerData) throws CommandSyntaxException {
@@ -52,7 +52,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
     }
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData playerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData();
+        PlayerData playerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
 
         return exec(
             playerData,

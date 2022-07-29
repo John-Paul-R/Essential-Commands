@@ -15,7 +15,7 @@ public final class TeleportResponseSuggestion {
     //Brigader Suggestions
     public static final SuggestionProvider<ServerCommandSource> STRING_SUGGESTIONS_PROVIDER
         = ListSuggestion.ofContext((CommandContext<ServerCommandSource> context) ->
-        ((ServerPlayerEntityAccess) context.getSource().getPlayer()).getEcPlayerData().getIncomingTeleportRequests().values()
+        ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData().getIncomingTeleportRequests().values()
             .stream().map((entry) -> entry.getSenderPlayer().getGameProfile().getName())
             .collect(Collectors.toList())
     );
