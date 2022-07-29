@@ -29,8 +29,6 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
-import dev.jpcode.eccore.util.TextUtil;
-
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -436,16 +434,17 @@ public final class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.time_set_day, 2))
                 .executes((context) -> {
                     var source = context.getSource();
+                    var playerData = PlayerData.accessFromContextOrThrow(context);
                     var world = source.getServer().getOverworld();
                     if (world.isDay()) {
-                        source.sendFeedback(ECText.getInstance().getText("cmd.day.error.already_daytime"), CONFIG.BROADCAST_TO_OPS);
+                        playerData.sendCommandFeedback("cmd.day.error.already_daytime");
                         return -1;
                     }
                     var time = world.getTimeOfDay();
                     var timeToDay = 24000L - time % 24000L;
 
                     world.setTimeOfDay(time + timeToDay);
-                    source.sendFeedback(ECText.getInstance().getText("cmd.day.feedback"), CONFIG.BROADCAST_TO_OPS);
+                    playerData.sendCommandFeedback("cmd.day.feedback");
                     return 1;
                 })
                 .build());
@@ -459,11 +458,9 @@ public final class EssentialCommandRegistry {
             .then(CommandManager.literal("reload")
                 .executes((context) -> {
                     BACKING_CONFIG.loadOrCreateProperties();
+                    var playerProfile = PlayerProfile.accessFromContextOrThrow(context);
                     context.getSource().sendFeedback(
-                        TextUtil.concat(
-                            ECText.getInstance().getText("essentialcommands.fullprefix"),
-                            ECText.getInstance().getText("cmd.config.reload")
-                        ),
+                        ECText.getInstance().getText("cmd.config.reload", TextFormatType.Default, playerProfile),
                         true
                     );
                     return 1;

@@ -18,7 +18,7 @@
   "cmd.nickname.set.feedback": "Nickname set to '${0}'.",
   "cmd.nickname.set.error": "Nickname could not be set to '${0}'. Reason: ${1}",
   "cmd.nickname.set.error.perms": "Player has insufficient permissions for specified nickname.",
-  "cmd.nickname.set.error.length": "Length of supplied nickname (%s) exceeded max nickname length (%s)",
+  "cmd.nickname.set.error.length": "Length of supplied nickname (${0}) exceeded max nickname length (${1})",
   "cmd.rtp.error.pre": "Could not execute command '/rtp'. Reason: ",
   "cmd.rtp.error.not_overworld": "Not in Overworld.",
   "cmd.rtp.error.cooldown": "Command is on cooldown. (${0} seconds remaining.)",
@@ -82,6 +82,6 @@
 
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
-  "cmd.config.reload": "Config Reloaded."
+  "cmd.config.reload": "${l:essentialcommands.fullprefix} Config Reloaded."
 
 }

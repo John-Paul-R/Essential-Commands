@@ -2,7 +2,6 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 
 import com.mojang.brigadier.Command;
@@ -13,8 +12,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-
 public class HomeDeleteCommand implements Command<ServerCommandSource> {
 
     public HomeDeleteCommand() {}
@@ -23,8 +20,8 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         //Store command sender
-        ServerPlayerEntity senderPlayer = source.getPlayer();
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess)senderPlayer).ec$getPlayerData();
+        ServerPlayerEntity senderPlayer = source.getPlayerOrThrow();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
         //Store home name
         String homeName = StringArgumentType.getString(context, "home_name");
 
@@ -34,16 +31,11 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         var homeNameText = ECText.accent(homeName);
         //inform command sender that the home has been removed
         if (wasSuccessful) {
-            source.sendFeedback(
-                ECText.getInstance().getText("cmd.home.delete.feedback", homeNameText),
-                CONFIG.BROADCAST_TO_OPS
-            );
+            senderPlayerData.sendCommandFeedback("cmd.home.delete.feedback", homeNameText);
             return 1;
         }
 
-        source.sendError(
-            ECText.getInstance().getText("cmd.home.delete.error", TextFormatType.Error, homeNameText)
-        );
+        senderPlayerData.sendCommandError("cmd.home.delete.error", homeNameText);
         return 0;
     }
 }

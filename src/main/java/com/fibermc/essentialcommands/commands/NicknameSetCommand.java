@@ -53,8 +53,8 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
                 case -1 -> ECText.getInstance().getText("cmd.nickname.set.error.perms");
                 case -2 -> ECText.getInstance().getText(
                     "cmd.nickname.set.error.length",
-                    nicknameText.getString().length(),
-                    CONFIG.NICKNAME_MAX_LENGTH
+                    ECText.accent(String.valueOf(nicknameText.getString().length())),
+                    ECText.accent(String.valueOf(CONFIG.NICKNAME_MAX_LENGTH))
                 );
                 default -> ECText.getInstance().getText("generic.error.unknown");
             };

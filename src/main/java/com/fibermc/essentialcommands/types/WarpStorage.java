@@ -2,8 +2,10 @@ package com.fibermc.essentialcommands.types;
 
 import java.util.HashMap;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.NbtSerializable;
-import com.fibermc.essentialcommands.commands.exceptions.ECExceptions;
+import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.commands.CommandUtil;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -48,7 +50,8 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
         if (this.get(name) == null) {
             return super.put(name, location);
         } else {
-            throw ECExceptions.keyExists().create(name);
+            throw CommandUtil.createSimpleException(
+                ECText.getInstance().getText("cmd.warp.set.error.exists", TextFormatType.Error, ECText.accent(name)));
         }
     }
 

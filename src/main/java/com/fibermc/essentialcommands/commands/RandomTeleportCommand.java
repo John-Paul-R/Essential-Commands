@@ -134,7 +134,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         {
             Stopwatch timer = Stopwatch.createStarted();
             new_y = getTop(chunk, (int) new_x, (int) new_z);
-            EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time", timer.stop()).getString());
+            EssentialCommands.LOGGER.info(
+                ECText.getInstance().getText(
+                    "cmd.rtp.log.location_validate_time",
+                    ECText.accent(String.valueOf(timer.stop()))
+                ).getString());
         }
 
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.

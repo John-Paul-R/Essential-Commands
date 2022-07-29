@@ -8,6 +8,7 @@ import java.util.Set;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.PlayerProfile;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -83,6 +84,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
 
     public static int runListOffline(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var targetPlayerName = StringArgumentType.getString(context, "target_player");
+        var senderPlayerProfile = PlayerProfile.accessFromContextOrThrow(context);
         ManagerLocator.getInstance()
             .getOfflinePlayerRepo()
             .getOfflinePlayerByNameAsync(targetPlayerName)
@@ -96,7 +98,8 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
                 var suggestionText = ListCommandFactory.getSuggestionText(
                     ECText.getInstance().getString("cmd.home.list.start"),
                     "home tp_offline %s".formatted(targetPlayerName),
-                    targetPlayerData.getHomeEntries()
+                    targetPlayerData.getHomeEntries(),
+                    senderPlayerProfile
                 );
 
                 context.getSource().sendFeedback(

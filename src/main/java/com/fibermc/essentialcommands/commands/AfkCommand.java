@@ -17,14 +17,17 @@ public class AfkCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var source = context.getSource();
-        var player = source.getPlayer();
-        var playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
+        var player = source.getPlayerOrThrow();
+        var playerAccess = ((ServerPlayerEntityAccess) player);
+        var playerData = playerAccess.ec$getPlayerData();
+        var playerProfile = playerAccess.ec$getProfile();
 
         if (CONFIG.INVULN_WHILE_AFK) {
             if (playerData.isInCombat()) {
                 throw new CommandException(ECText.getInstance().getText(
                     "cmd.afk.error.in_combat",
-                    TextFormatType.Error));
+                    TextFormatType.Error,
+                    playerProfile));
             }
         }
 

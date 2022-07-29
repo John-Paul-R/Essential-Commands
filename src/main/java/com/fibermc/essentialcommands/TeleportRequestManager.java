@@ -8,7 +8,6 @@ import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
@@ -58,17 +57,15 @@ public final class TeleportRequestManager {
             if (requesterPlayerData.getTpTimer() < 0) {
                 teleportRequest.end();
                 // Teleport expiry message to sender
-                teleportRequest.getSenderPlayer().sendMessage(
-                    lang.getText(
-                        "teleport.request.expired.sender",
-                        teleportRequest.getTargetPlayer().getDisplayName()),
-                    MessageType.SYSTEM);
+                teleportRequest.getSenderPlayerData().sendMessage(
+                    "teleport.request.expired.sender",
+                    teleportRequest.getTargetPlayer().getDisplayName()
+                );
                 // Teleport expiry message to receiver
-                teleportRequest.getTargetPlayer().sendMessage(
-                    lang.getText(
-                        "teleport.request.expired.receiver",
-                        teleportRequest.getSenderPlayer().getDisplayName()),
-                    MessageType.SYSTEM);
+                teleportRequest.getTargetPlayerData().sendMessage(
+                    "teleport.request.expired.receiver",
+                    teleportRequest.getSenderPlayer().getDisplayName()
+                );
             }
         }
 
@@ -95,8 +92,7 @@ public final class TeleportRequestManager {
                 && playerData.getPlayer().getPos().distanceTo(queuedTeleport.initialPosition) > maxMoveBeforeInterrupt
                 && !ECPerms.check(playerData.getPlayer().getCommandSource(), ECPerms.Registry.bypass_teleport_interrupt_on_move)
             ) {
-                playerData.sendError(
-                    ECText.getInstance().getText("teleport.interruped.moved", TextFormatType.Error));
+                playerData.sendError("teleport.interruped.moved");
                 tpQueueIter.remove();
             }
 
@@ -112,13 +108,11 @@ public final class TeleportRequestManager {
             && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)
         ) {
             try {
-                Objects.requireNonNull(((ServerPlayerEntityAccess) playerEntity).ec$endQueuedTeleport());
+                var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
+                Objects.requireNonNull(playerAccess.ec$endQueuedTeleport());
 
                 delayedQueuedTeleportMap.remove(playerEntity.getUuid());
-                playerEntity.sendMessage(
-                    ECText.getInstance().getText("teleport.interrupted.damage", TextFormatType.Error),
-                    MessageType.SYSTEM
-                );
+                playerAccess.ec$getPlayerData().sendError("teleport.interrupted.damage");
             } catch (NullPointerException ignored) {}
         }
     }
@@ -154,12 +148,10 @@ public final class TeleportRequestManager {
         );
         if (prevValue != null) {
             var styleUpdater = TextFormatType.Accent.nonOverwritingStyleUpdater();
-            prevValue.getPlayerData().getPlayer().sendMessage(
-                ECText.getInstance().getText(
-                    "teleport.request.canceled_by_new",
-                    prevValue.getDestName().styled(styleUpdater),
-                    queuedTeleport.getDestName().styled(styleUpdater)),
-                MessageType.SYSTEM
+            prevValue.getPlayerData().sendMessage(
+                "teleport.request.canceled_by_new",
+                prevValue.getDestName().styled(styleUpdater),
+                queuedTeleport.getDestName().styled(styleUpdater)
             );
         }
 

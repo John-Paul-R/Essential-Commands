@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
+import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -117,7 +118,8 @@ public abstract class ECText {
 
     public abstract MutableText getText(String key, TextFormatType textFormatType, Text... args);
 
-    public abstract MutableText getText(String key, Object... args);
+//    public abstract MutableText getText(String key, Object... args);
+    public abstract MutableText getText(String key, TextFormatType textFormatType, IStyleProvider styleProvider, Text... args);
 
     public abstract MutableText getText(String key);
 

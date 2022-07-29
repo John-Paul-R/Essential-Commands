@@ -19,19 +19,21 @@ public class SpawnCommand implements Command<ServerCommandSource> {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         MinecraftLocation loc = worldDataManager.getSpawn();
 
+        var playerData = PlayerData.accessFromContextOrThrow(context);
         if (loc == null) {
-            context.getSource().sendError(
-                ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set", TextFormatType.Error));
+            playerData.sendCommandError("cmd.spawn.tp.error.no_spawn_set");
             return -2;
         }
 
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
 
         // Teleport & chat message
-        PlayerTeleporter.requestTeleport(
-            senderPlayer,
-            loc,
-            ECText.getInstance().getText("cmd.spawn.location_name"));
+        var styledLocationName = ECText.getInstance().getText(
+            "cmd.spawn.location_name",
+            TextFormatType.Default,
+            PlayerProfile.accessFromContextOrThrow(context));
+
+        PlayerTeleporter.requestTeleport(senderPlayer, loc, styledLocationName);
         return 1;
     }
 
