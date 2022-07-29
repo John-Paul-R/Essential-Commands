@@ -260,12 +260,16 @@ public final class TextUtil {
      */
     public static List<Text> flattenRoot(Text text) {
         var siblings = text.getSiblings();
-        if (siblings.size() == 0) {
+        if (text.getContent().equals(TextContent.EMPTY) && siblings.size() == 1) {
+            return siblings;
+        } else if (siblings.size() == 0) {
             return List.of(text);
         }
 
         List<Text> content = new ArrayList<>(siblings.size() + 1);
-        content.add(text.copyContentOnly().setStyle(text.getStyle()));
+        if (!text.getContent().equals(TextContent.EMPTY)) {
+            content.add(text.copyContentOnly().setStyle(text.getStyle()));
+        }
         content.addAll(siblings);
 
         return content;

@@ -1,12 +1,11 @@
 package com.fibermc.essentialcommands;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.fibermc.essentialcommands.types.ECPlaceholderApiCompat;
 import eu.pb4.placeholders.api.*;
 import eu.pb4.placeholders.api.node.TextNode;
 
@@ -92,26 +91,34 @@ public class ECTextImpl extends ECText {
         };
     }
 
+    private static int hashText(Text text) {
+        return Objects.hash(text.getContent(), text.getStyle());
+    }
+
     public MutableText getTextInternal(String key, TextFormatType textFormatType, Text... args) {
         var argsList = Arrays.stream(args).map(Text::copy).toList();
+        var argsHashes = argsList.stream()
+            .map(ECTextImpl::hashText)
+            .collect(Collectors.toCollection(HashSet::new));
+
         var placeholderGetter = placeholderGetterForContext(textFormatType, argsList);
-        var retVal = Placeholders.parseNodes(
-                TextNode.convert(Text.literal(getString(key))),
-                Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
-                placeholderGetter)
-            .toText(parserContext, true); // Not 100% sure if this flag should be true or false
+        var nodes = Placeholders.parseNodes(
+            TextNode.convert(Text.literal(getString(key))),
+            Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
+            placeholderGetter);
+        var retVal = ECPlaceholderApiCompat.toText(nodes, parserContext);
 
         var retValSiblings = retVal.getSiblings();
 
-        if (retValSiblings.size() == 0) {
-            return retVal.copy();
-        }
-
         var specifiedStyle = textFormatType.getStyle();
 
-        return TextUtil.flattenRoot(retVal)
+        if (retValSiblings.size() == 0) {
+            return retVal.copy().setStyle(textFormatType.getStyle());
+        }
+
+        return retValSiblings
             .stream()
-            .map(text -> argsList.contains(text)
+            .map(text -> argsHashes.contains(hashText(text))
                 ? text
                 : text.copy().setStyle(specifiedStyle))
             .collect(TextUtil.collect());

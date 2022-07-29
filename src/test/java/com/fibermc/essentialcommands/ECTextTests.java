@@ -69,4 +69,34 @@ public class ECTextTests {
             assertEquals(inputToken.getStyle(), actualToken.getStyle());
         }
     }
+
+    @Test
+    @DisplayName("getTextInternal - first token interpolated")
+    void getTextInternal_FirstTokenInterpolated_FormatsCorrectly()
+    {
+        var playerNameText = Text.empty()
+            .append(Text.literal("[UnstyledPrefix] "))
+            .append(Text.literal("Steve").formatted(Formatting.AQUA));
+        var defaultStyle = TextFormatType.Default.getStyle();
+        var expectedMessage = Text.empty()
+            .append(playerNameText)
+            .append(Text.literal(" is now AFK.").setStyle(defaultStyle));
+
+        var actualMessage = ecText.getText("player.afk.enter", playerNameText);
+
+        var expectedString = expectedMessage.getString();
+        var actualString = actualMessage.getString();
+
+        assertEquals(expectedString, actualString);
+
+        var expectedSiblings = expectedMessage.getSiblings();
+        var actualSiblings = actualMessage.getSiblings();
+        for (int i = 0; i < expectedSiblings.size(); i++) {
+            var inputToken = expectedSiblings.get(i);
+            var actualToken = actualSiblings.get(i);
+
+            assertEquals(inputToken.getContent(), actualToken.getContent());
+            assertEquals(inputToken.getStyle(), actualToken.getStyle());
+        }
+    }
 }

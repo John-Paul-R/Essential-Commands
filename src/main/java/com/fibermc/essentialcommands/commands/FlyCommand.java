@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import io.github.ladysnake.pal.VanillaAbilities;
 
@@ -35,7 +36,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
             try {
                 // Fall back to toggling the current PAL flight state granted by EC
                 shouldEnableFly = !VanillaAbilities.ALLOW_FLYING
-                        .getTracker(targetPlayer).isGrantedBy(ECAbilitySources.FLY_COMMAND);
+                    .getTracker(targetPlayer).isGrantedBy(ECAbilitySources.FLY_COMMAND);
             } catch (NoClassDefFoundError ign) {
                 // If PAL is not found, fall back to toggling the current vanilla flight state.
                 shouldEnableFly = !targetPlayer.getAbilities().allowFlying;
@@ -65,8 +66,8 @@ public class FlyCommand implements Command<ServerCommandSource> {
         // Label boolean values in suggestions, or switch to single state value (present or it's not)
 
         var enabledText = ECText.getInstance().getText(
-                shouldEnableFly ? "generic.enabled" : "generic.disabled")
-            .setStyle(CONFIG.FORMATTING_ACCENT);
+            shouldEnableFly ? "generic.enabled" : "generic.disabled",
+            TextFormatType.Accent);
 
         source.sendFeedback(
             ECText.getInstance().getText(
