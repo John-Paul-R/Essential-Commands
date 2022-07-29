@@ -6,6 +6,7 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -84,7 +85,10 @@ public final class PlayerTeleporter {
         playerEntity.sendMessage(
             ECText.getInstance().getText(
                 "teleport.done",
-                dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT)),
+                ((ServerPlayerEntityAccess) playerEntity).ec$getProfile().shouldPrintTeleportCoordinates()
+                    ? dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT)
+                    : Text.literal("destination").setStyle(CONFIG.FORMATTING_DEFAULT)
+            ),
             MessageType.SYSTEM
         );
     }
