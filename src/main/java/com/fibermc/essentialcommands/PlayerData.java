@@ -30,7 +30,7 @@ import dev.jpcode.eccore.util.TimeUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class PlayerData extends PersistentState {
+public class PlayerData extends PersistentState implements IServerPlayerEntityData {
 
     // ServerPlayerEntity
     private ServerPlayerEntity player;
@@ -326,7 +326,7 @@ public class PlayerData extends PersistentState {
         }
 
         if (this.player != null) {
-            updatePlayer(this.player);
+            updatePlayerEntity(this.player);
         }
 
     }
@@ -370,7 +370,8 @@ public class PlayerData extends PersistentState {
         return false;
     }
 
-    public void updatePlayer(ServerPlayerEntity serverPlayerEntity) {
+    @Override
+    public void updatePlayerEntity(ServerPlayerEntity serverPlayerEntity) {
         this.player = serverPlayerEntity;
 
         // This is to fix a bug with ability to fly being lost upon being teleported to a new dim via /execute...tp.

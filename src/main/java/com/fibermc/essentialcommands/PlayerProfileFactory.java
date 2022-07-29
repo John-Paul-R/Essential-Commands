@@ -13,8 +13,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public final class PlayerProfileFactory {
     private PlayerProfileFactory() {}
 
-    private static PlayerData create(ServerPlayerEntity player, File playerDataFile) {
-        PlayerData pData = new PlayerData(player, playerDataFile);
+    private static PlayerProfile create(ServerPlayerEntity player, File playerDataFile) {
+        PlayerProfile pData = new PlayerProfile(player, playerDataFile);
 
         boolean fileExisted = false;
 
@@ -30,7 +30,7 @@ public final class PlayerProfileFactory {
             } catch (IOException e) {
                 EssentialCommands.log(
                     Level.WARN,
-                    "Failed to load essential_commands player data for {%s}", player.getName().getString());
+                    "Failed to load essential_commands player profile for {}", player.getName().getString());
                 e.printStackTrace();
             }
         } else {
@@ -41,7 +41,7 @@ public final class PlayerProfileFactory {
         return pData;
     }
 
-    public static PlayerData create(ServerPlayerEntity player) {
+    public static PlayerProfile create(ServerPlayerEntity player) {
         try {
             return create(player, getPlayerProfileFile(player));
         } catch (IOException ex) {
@@ -51,7 +51,7 @@ public final class PlayerProfileFactory {
                 player.getUuidAsString());
             EssentialCommands.LOGGER.error(ex);
         }
-        return new PlayerData(player, null);
+        return new PlayerProfile(player, null);
     }
 
     private static File getPlayerProfileFile(ServerPlayerEntity player) throws IOException {

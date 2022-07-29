@@ -128,9 +128,9 @@ public class PlayerDataManager {
     private static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
         PlayerData playerData = getInstance().loadPlayerData(player);
         ((ServerPlayerEntityAccess) player).ec$setPlayerData(playerData);
-        // Immediately save file. (Frankly not sure if this is actually necessary)
-        playerData.markDirty();
-        playerData.save();
+
+        PlayerProfile profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
+        ((ServerPlayerEntityAccess) player).ec$setProfile(profile);
     }
 
     private static void onPlayerLeave(ServerPlayerEntity player) {
@@ -140,8 +140,12 @@ public class PlayerDataManager {
 
     private static void onPlayerRespawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
         PlayerData pData = ((ServerPlayerEntityAccess) oldPlayerEntity).ec$getPlayerData();
-        pData.updatePlayer(newPlayerEntity);
+        pData.updatePlayerEntity(newPlayerEntity);
         ((ServerPlayerEntityAccess) newPlayerEntity).ec$setPlayerData(pData);
+
+        PlayerProfile profile = ((ServerPlayerEntityAccess) oldPlayerEntity).ec$getProfile();
+        profile.updatePlayerEntity(newPlayerEntity);
+        ((ServerPlayerEntityAccess) newPlayerEntity).ec$setProfile(profile);
     }
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {

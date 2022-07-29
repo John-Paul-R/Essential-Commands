@@ -1,9 +1,6 @@
 package com.fibermc.essentialcommands.mixin;
 
-import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataFactory;
-import com.fibermc.essentialcommands.QueuedTeleport;
+import com.fibermc.essentialcommands.*;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
@@ -61,7 +58,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
                                         ServerWorld serverWorld,
                                         WorldProperties worldProperties)
     {
-        ((ServerPlayerEntityAccess) this).ec$getPlayerData().updatePlayer((ServerPlayerEntity) (Object) this);
+        ((ServerPlayerEntityAccess) this).ec$getPlayerData().updatePlayerEntity((ServerPlayerEntity) (Object) this);
     }
 
     @Override
@@ -109,6 +106,28 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
     @Override
     public void ec$setPlayerData(PlayerData playerData) {
         ec$playerData = playerData;
+    }
+
+    @Unique
+    public PlayerProfile ec$profile;
+
+    @Override
+    public PlayerProfile ec$getProfile() {
+        if (ec$profile != null) {
+            return ec$profile;
+        }
+
+        ServerPlayerEntity playerEntity = (ServerPlayerEntity) (Object) this;
+        EssentialCommands.LOGGER.info(String.format(
+            "[Essential Commands] Loading PlayerProfile for player with uuid '%s'.", playerEntity.getUuidAsString()));
+        PlayerProfile profile = PlayerProfileFactory.create(playerEntity);
+        ec$setProfile(profile);
+        return profile;
+    }
+
+    @Override
+    public void ec$setProfile(PlayerProfile profile) {
+        ec$profile = profile;
     }
 
     // Teleport hook (for /back)
