@@ -164,7 +164,7 @@ public final class TeleportManager {
         playerData.sendMessage(
             "teleport.queued",
             queuedTeleport.getDestName().setStyle(playerAccess.ec$getProfile().getStyle(TextFormatType.Accent)),
-            playerAccess.ec$getEcText().accent(String.format("%.1f", CONFIG.TELEPORT_DELAY))
+            playerAccess.ec$getEcText().accent(String.format("%.1f", TimeUtil.ticksToSeconds(CONFIG.TELEPORT_DELAY_TICKS)))
         );
     }
 }

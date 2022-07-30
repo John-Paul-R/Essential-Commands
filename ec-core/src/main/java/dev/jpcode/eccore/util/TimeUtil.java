@@ -40,4 +40,8 @@ public final class TimeUtil {
     public static int durationToTicks(Duration duration) {
         return TimeUtil.msToTicks(duration.toMillis());
     }
+
+    public static double ticksToSeconds(int teleportDelayTicks) {
+        return teleportDelayTicks * SECONDS_PER_TICK;
+    }
 }

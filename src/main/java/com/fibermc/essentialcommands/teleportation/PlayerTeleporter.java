@@ -13,9 +13,6 @@ import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-/**
- * Teleporter
- */
 public final class PlayerTeleporter {
     private PlayerTeleporter() {}
 
@@ -28,7 +25,7 @@ public final class PlayerTeleporter {
 //        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
-        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY <= 0) {
+        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY_TICKS <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
             TeleportManager.getInstance().queueTeleport(queuedTeleport);
@@ -85,7 +82,7 @@ public final class PlayerTeleporter {
         );
     }
 
-    public static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
+    static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
         return (
             (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
                 || ECPerms.check(player.getCommandSource(), permission, 5)
