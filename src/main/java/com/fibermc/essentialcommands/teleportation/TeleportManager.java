@@ -8,7 +8,6 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
-import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
@@ -17,25 +16,22 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 
+import dev.jpcode.eccore.util.TimeUtil;
+
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-/**
- * TeleportRequestManager
- */
 public final class TeleportManager {
-
-    private static final int TPS = 20;
-    private final LinkedList<TeleportRequest> activeTpRequestList;
-    private final LinkedList<PlayerData> tpCooldownList;
-    private final ConcurrentHashMap<UUID, QueuedTeleport> delayedQueuedTeleportMap;
+    private final List<TeleportRequest> activeTeleportRequests;
+    private final List<PlayerData> playersOnTeleportCooldown;
+    private final Map<UUID, QueuedTeleport> queuedTeleportMap;
 
     private static TeleportManager instance;
 
     private TeleportManager() {
         instance = this;
-        activeTpRequestList = new LinkedList<>();
-        tpCooldownList = new LinkedList<>();
-        delayedQueuedTeleportMap = new ConcurrentHashMap<>();
+        activeTeleportRequests = new LinkedList<>();
+        playersOnTeleportCooldown = new LinkedList<>();
+        queuedTeleportMap = new ConcurrentHashMap<>();
     }
 
     public static TeleportManager getInstance() {
@@ -53,20 +49,18 @@ public final class TeleportManager {
 
     public void tick(MinecraftServer server) {
         // Remove any requests that have ended since the last tick.
-        activeTpRequestList.removeIf(TeleportRequest::isEnded);
-        var lang = ECText.getInstance();
+        activeTeleportRequests.removeIf(TeleportRequest::isEnded);
         // decrement the tp timer for all players that have put in a tp request
-        for (TeleportRequest teleportRequest : activeTpRequestList) {
-            PlayerData requesterPlayerData = ((ServerPlayerEntityAccess) teleportRequest.getSenderPlayer()).ec$getPlayerData();
-            requesterPlayerData.tickTpTimer();
-            if (requesterPlayerData.getTpTimer() < 0) {
+        for (TeleportRequest teleportRequest : activeTeleportRequests) {
+            teleportRequest.incrementAgeTicks();
+
+            // Handle teleport expiry
+            if (teleportRequest.getAgeTicks() > CONFIG.TELEPORT_REQUEST_DURATION_TICKS) {
                 teleportRequest.end();
-                // Teleport expiry message to sender
                 teleportRequest.getSenderPlayerData().sendMessage(
                     "teleport.request.expired.sender",
                     teleportRequest.getTargetPlayer().getDisplayName()
                 );
-                // Teleport expiry message to receiver
                 teleportRequest.getTargetPlayerData().sendMessage(
                     "teleport.request.expired.receiver",
                     teleportRequest.getSenderPlayer().getDisplayName()
@@ -74,18 +68,18 @@ public final class TeleportManager {
             }
         }
 
-        ListIterator<PlayerData> toCooldownIterator = tpCooldownList.listIterator();
-        while (toCooldownIterator.hasNext()) {
-            PlayerData e = toCooldownIterator.next();
-            e.tickTpCooldown();
-            if (e.getTpCooldown() < 0) {
-                toCooldownIterator.remove();
+        ListIterator<PlayerData> tpCooldownIterator = playersOnTeleportCooldown.listIterator();
+        while (tpCooldownIterator.hasNext()) {
+            PlayerData playerData = tpCooldownIterator.next();
+            playerData.tickTpCooldown();
+            if (playerData.getTpCooldown() < 0) {
+                tpCooldownIterator.remove();
             }
         }
 
         var shouldInterruptTeleportOnMove = CONFIG.TELEPORT_INTERRUPT_ON_MOVE;
         var maxMoveBeforeInterrupt = CONFIG.TELEPORT_INTERRUPT_ON_MOVE_AMOUNT;
-        Iterator<Map.Entry<UUID, QueuedTeleport>> tpQueueIter = delayedQueuedTeleportMap.entrySet().iterator();
+        Iterator<Map.Entry<UUID, QueuedTeleport>> tpQueueIter = queuedTeleportMap.entrySet().iterator();
         while (tpQueueIter.hasNext()) {
             Map.Entry<UUID, QueuedTeleport> entry = tpQueueIter.next();
             QueuedTeleport queuedTeleport = entry.getValue();
@@ -109,45 +103,48 @@ public final class TeleportManager {
     }
 
     public void onPlayerDamaged(ServerPlayerEntity playerEntity, DamageSource damageSource) {
-        if (CONFIG.TELEPORT_INTERRUPT_ON_DAMAGED
+        if (!CONFIG.TELEPORT_INTERRUPT_ON_DAMAGED) {
+            return;
+        }
+        var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
+        if (playerAccess.ec$getQueuedTeleport() != null
             && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)
         ) {
-            try {
-                var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
-                Objects.requireNonNull(playerAccess.ec$endQueuedTeleport());
-
-                delayedQueuedTeleportMap.remove(playerEntity.getUuid());
-                playerAccess.ec$getPlayerData().sendError("teleport.interrupted.damage");
-            } catch (NullPointerException ignored) {}
+            playerAccess.ec$endQueuedTeleport();
+            queuedTeleportMap.remove(playerEntity.getUuid());
+            playerAccess.ec$getPlayerData().sendError("teleport.interrupted.damage");
         }
     }
 
-    public void startTpRequest(ServerPlayerEntity requestSender, ServerPlayerEntity targetPlayer, TeleportRequest.Type requestType) {
-        PlayerData requestSenderData = ((ServerPlayerEntityAccess) requestSender).ec$getPlayerData();
-        PlayerData targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
+    public void startTpRequest(
+        ServerPlayerEntity requestSender,
+        ServerPlayerEntity targetPlayer,
+        TeleportRequest.Type requestType
+    )
+    {
+        var senderPlayerData = PlayerData.access(requestSender);
+        var targetPlayerData = PlayerData.access(targetPlayer);
 
-        final int teleportRequestDurationTicks = CONFIG.TELEPORT_REQUEST_DURATION * TPS; //sec * ticks per sec
-        requestSenderData.setTpTimer(teleportRequestDurationTicks);
-        TeleportRequest teleportRequest = new TeleportRequest(requestSender, targetPlayer, requestType);
-        requestSenderData.setSentTeleportRequest(teleportRequest);
+        var teleportRequest = new TeleportRequest(requestSender, targetPlayer, requestType);
+        senderPlayerData.setSentTeleportRequest(teleportRequest);
         targetPlayerData.addIncomingTeleportRequest(teleportRequest);
-        activeTpRequestList.add(teleportRequest);
+        activeTeleportRequests.add(teleportRequest);
     }
 
     public void startTpCooldown(ServerPlayerEntity player) {
-        PlayerData pData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
+        final int teleportCooldownTicks = (int) (CONFIG.TELEPORT_COOLDOWN * TimeUtil.TPS);
+        var playerData = PlayerData.access(player);
 
-        final int teleportCooldownTicks = (int) (CONFIG.TELEPORT_COOLDOWN * TPS);
-        pData.setTpCooldown(teleportCooldownTicks);
-        tpCooldownList.add(pData);
+        playerData.setTpCooldown(teleportCooldownTicks);
+        playersOnTeleportCooldown.add(playerData);
     }
 
     public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, MutableText destName) {
-        queueTeleport(new QueuedLocationTeleport(((ServerPlayerEntityAccess) player).ec$getPlayerData(), dest, destName));
+        queueTeleport(new QueuedLocationTeleport(PlayerData.access(player), dest, destName));
     }
 
     public void queueTeleport(QueuedTeleport queuedTeleport) {
-        QueuedTeleport prevValue = delayedQueuedTeleportMap.put(
+        QueuedTeleport prevValue = queuedTeleportMap.put(
             queuedTeleport.getPlayerData().getPlayer().getUuid(),
             queuedTeleport
         );

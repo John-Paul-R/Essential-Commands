@@ -5,6 +5,8 @@ import java.util.List;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
+import dev.jpcode.eccore.util.TimeUtil;
+
 @SuppressWarnings("checkstyle:all")
 public final class EssentialCommandsConfigSnapshot {
 
@@ -35,7 +37,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final double TELEPORT_COOLDOWN;
     public final double TELEPORT_DELAY;
     public final boolean ALLOW_BACK_ON_DEATH;
-    public final int TELEPORT_REQUEST_DURATION;
+    public final int TELEPORT_REQUEST_DURATION_TICKS;
     public final boolean USE_PERMISSIONS_API;
     public final boolean CHECK_FOR_UPDATES;
     public final boolean TELEPORT_INTERRUPT_ON_DAMAGED;
@@ -89,7 +91,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.TELEPORT_COOLDOWN                 = config.TELEPORT_COOLDOWN.getValue();
         this.TELEPORT_DELAY                    = config.TELEPORT_DELAY.getValue();
         this.ALLOW_BACK_ON_DEATH               = config.ALLOW_BACK_ON_DEATH.getValue();
-        this.TELEPORT_REQUEST_DURATION         = config.TELEPORT_REQUEST_DURATION.getValue();
+        this.TELEPORT_REQUEST_DURATION_TICKS   = config.TELEPORT_REQUEST_DURATION.getValue() * TimeUtil.TPS;
         this.USE_PERMISSIONS_API               = config.USE_PERMISSIONS_API.getValue();
         this.CHECK_FOR_UPDATES                 = config.CHECK_FOR_UPDATES.getValue();
         this.TELEPORT_INTERRUPT_ON_DAMAGED     = config.TELEPORT_INTERRUPT_ON_DAMAGED.getValue();

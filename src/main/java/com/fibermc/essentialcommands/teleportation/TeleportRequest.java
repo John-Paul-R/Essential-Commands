@@ -33,6 +33,7 @@ public class TeleportRequest {
     private final PlayerData senderPlayer;
     private final PlayerData targetPlayer;
     private boolean isEnded = false;
+    private int ageTicks = 0;
 
     public TeleportRequest(ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer, Type requestType) {
         this.requestType = requestType;
@@ -58,10 +59,18 @@ public class TeleportRequest {
         PlayerTeleporter.requestTeleport(new QueuedPlayerTeleport(teleportee, tpDestination));
     }
 
+    public void incrementAgeTicks() {
+        ageTicks++;
+    }
+
+    public int getAgeTicks() {
+        return ageTicks;
+    }
+
     public void end() {
-        PlayerData target = this.getTargetPlayerData();
-        if (target != null) {
-            target.removeIncomingTeleportRequest(this.getSenderPlayer().getUuid());
+        var targetPlayerData = this.getTargetPlayerData();
+        if (targetPlayerData != null) {
+            targetPlayerData.removeIncomingTeleportRequest(this.getSenderPlayer().getUuid());
             this.getSenderPlayerData().setSentTeleportRequest(null);
         }
         isEnded = true;
