@@ -26,11 +26,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
 
         //TODO if home with given name is already set, warn of overwrite and require that the command be typed again, or a confirmation message be given
         var homeNameText = ECText.access(senderPlayer).accentText(homeName);
-//        try {
         playerData.addHome(homeName, new MinecraftLocation(senderPlayer));
-//        } catch (CommandSyntaxException e) {
-//            playerData.sendCommandError("cmd.home.set.error.exists", homeNameText);
-//        }
 
         playerData.save();
         //inform command sender that the home has been set
