@@ -145,12 +145,16 @@ public final class TeleportManager {
     }
 
     void queueTeleport(QueuedTeleport queuedTeleport) {
+        var playerData = queuedTeleport.getPlayerData();
+        var playerAccess = ((ServerPlayerEntityAccess) playerData.getPlayer());
+
         QueuedTeleport prevValue = queuedTeleportMap.put(
             queuedTeleport.getPlayerData().getPlayer().getUuid(),
             queuedTeleport
         );
         if (prevValue != null) {
-            var styleUpdater = TextFormatType.Accent.nonOverwritingStyleUpdater();
+            var profile = playerAccess.ec$getProfile();
+            var styleUpdater = TextFormatType.nonOverwritingStyleUpdater(profile.getStyle(TextFormatType.Accent));
             prevValue.getPlayerData().sendMessage(
                 "teleport.request.canceled_by_new",
                 prevValue.getDestName().styled(styleUpdater),
@@ -158,8 +162,6 @@ public final class TeleportManager {
             );
         }
 
-        var playerData = queuedTeleport.getPlayerData();
-        var playerAccess = ((ServerPlayerEntityAccess) playerData.getPlayer());
         playerAccess.ec$setQueuedTeleport(queuedTeleport);
         playerData.sendMessage(
             "teleport.queued",

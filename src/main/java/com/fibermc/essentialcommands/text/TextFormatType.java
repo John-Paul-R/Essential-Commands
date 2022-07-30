@@ -34,6 +34,18 @@ public enum TextFormatType {
         };
     }
 
+    public static UnaryOperator<Style> nonOverwritingStyleUpdater(Style style) {
+        return (s) -> {
+            // The goal here is to overwrite defaults, but not custom styles (e.g. from nickname).
+            boolean shouldApply = s.getColor() == null
+                || s == Default.getStyle()
+                || s == Accent.getStyle()
+                || s == Error.getStyle()
+                || s == Empty.getStyle();
+            return shouldApply ? s.withColor(style.getColor()) : s;
+        };
+    }
+
     TextFormatType(Option<Style> style) {
         this.style = style;
     }

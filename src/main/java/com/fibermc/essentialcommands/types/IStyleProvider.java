@@ -1,5 +1,7 @@
 package com.fibermc.essentialcommands.types;
 
+import java.util.function.UnaryOperator;
+
 import com.fibermc.essentialcommands.text.TextFormatType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,4 +27,6 @@ public interface IStyleProvider {
             ? styleOverride
             : textFormatType.getStyle();
     }
+
+    UnaryOperator<Style> nonOverwritingStyleUpdater();
 }
