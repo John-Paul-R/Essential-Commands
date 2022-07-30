@@ -51,7 +51,7 @@ public final class ListCommandFactory {
         IStyleProvider styleProvider)
     {
         MutableText responseText = Text.empty()
-            .append(ECText.literal(responsePreText));
+            .append(Text.literal(responsePreText).setStyle(styleProvider.getStyle(TextFormatType.Default)));
 
         List<Text> suggestionTextList = suggestionsList.stream()
             .map((entry) -> clickableTeleport(

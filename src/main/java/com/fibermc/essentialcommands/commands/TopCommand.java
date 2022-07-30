@@ -39,7 +39,7 @@ public class TopCommand implements Command<ServerCommandSource> {
         PlayerTeleporter.requestTeleport(
             player,
             new MinecraftLocation(world.getRegistryKey(), new_x, new_y, new_z, player.getHeadYaw(), player.getPitch()),
-            ECText.getInstance().getText("cmd.top.location_name")
+            ECText.access(player).getText("cmd.top.location_name")
         );
 
         return 0;

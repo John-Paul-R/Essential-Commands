@@ -1,8 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.TextFormatType;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -20,8 +20,6 @@ import dev.jpcode.eccore.util.TextUtil;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class NicknameSetCommand implements Command<ServerCommandSource> {
-    public NicknameSetCommand() {}
-
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Get specified new nickname
@@ -34,40 +32,31 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
     }
 
     public static int exec(CommandContext<ServerCommandSource> context, Text nicknameText) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
-
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+        int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText);
 
-        ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
-        int successCode = targetPlayerEntityAccess.ec$getPlayerData().setNickname(nicknameText);
+        var senderPlayerData = PlayerData.access(context.getSource().getPlayerOrThrow());
+        var ecText = ECText.access(senderPlayerData.getPlayer());
 
         //inform command sender that the nickname has been set
         if (successCode >= 0) {
-            source.sendFeedback(
-                ECText.getInstance().getText(
-                    "cmd.nickname.set.feedback",
-                    (nicknameText != null) ? nicknameText : Text.literal(targetPlayer.getGameProfile().getName())),
-                CONFIG.BROADCAST_TO_OPS);
+            senderPlayerData.sendCommandFeedback(
+                "cmd.nickname.set.feedback",
+                nicknameText != null ? nicknameText : Text.literal(targetPlayer.getGameProfile().getName())
+            );
         } else {
             MutableText failReason = switch (successCode) {
-                case -1 -> ECText.getInstance().getText("cmd.nickname.set.error.perms");
-                case -2 -> ECText.getInstance().getText(
-                    "cmd.nickname.set.error.length",
-                    ECText.accent(String.valueOf(nicknameText.getString().length())),
-                    ECText.accent(String.valueOf(CONFIG.NICKNAME_MAX_LENGTH))
+                case -1 -> ecText.getText("cmd.nickname.set.error.perms", TextFormatType.Error);
+                case -2 -> ecText.getText(
+                    "cmd.nickname.set.error.length", TextFormatType.Error,
+                    ecText.accentText(String.valueOf(nicknameText.getString().length())),
+                    ecText.accentText(String.valueOf(CONFIG.NICKNAME_MAX_LENGTH))
                 );
-                default -> ECText.getInstance().getText("generic.error.unknown");
+                default -> ecText.getText("generic.error.unknown", TextFormatType.Error);
             };
-            source.sendError(
-                ECText.getInstance().getText(
-                    "cmd.nickname.set.error",
-                    TextFormatType.Error,
-                    nicknameText,
-                    failReason.setStyle(CONFIG.FORMATTING_ERROR))
-            );
+            senderPlayerData.sendCommandError("cmd.nickname.set.error", nicknameText, failReason);
         }
 
         return successCode;
     }
-
 }

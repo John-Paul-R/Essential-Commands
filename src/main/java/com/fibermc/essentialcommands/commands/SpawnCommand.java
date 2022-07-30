@@ -8,7 +8,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 public class SpawnCommand implements Command<ServerCommandSource> {
 
@@ -25,13 +24,10 @@ public class SpawnCommand implements Command<ServerCommandSource> {
             return -2;
         }
 
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        var senderPlayer = context.getSource().getPlayerOrThrow();
 
         // Teleport & chat message
-        var styledLocationName = ECText.getInstance().getText(
-            "cmd.spawn.location_name",
-            TextFormatType.Default,
-            PlayerProfile.accessFromContextOrThrow(context));
+        var styledLocationName = ECText.access(senderPlayer).getText("cmd.spawn.location_name");
 
         PlayerTeleporter.requestTeleport(senderPlayer, loc, styledLocationName);
         return 1;

@@ -18,13 +18,21 @@ import dev.jpcode.eccore.util.TextUtil;
 public class ECTextImpl extends ECText {
     private final ParserContext parserContext;
 
-    public ECTextImpl(Map<String, String> stringMap, @Nullable MinecraftServer server) {
+    public ECTextImpl(
+        Map<String, String> stringMap,
+        ParserContext parserContext)
+    {
         super(stringMap);
         // In normal operation, `server` should always be present. For testing and other contexts,
         // that is not guaranteed. This is admittedly a bit hacky.
-        parserContext = server != null
-            ? ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(server))
-            : ParserContext.of();
+        this.parserContext = parserContext;
+    }
+
+    public static ECText forServer(Map<String, String> stringMap, MinecraftServer server) {
+        return new ECTextImpl(
+            stringMap,
+            ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(server))
+        );
     }
 
     public String getString(String key) {
@@ -99,7 +107,7 @@ public class ECTextImpl extends ECText {
                                     "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
                                         + placeholderId);
                             }
-                            yield ECTextImpl.this.getTextLiteral(idxAndFormattingCode[1], textFormatType, styleProvider);
+                            yield getTextLiteral(idxAndFormattingCode[1], textFormatType, styleProvider);
                         }
 
                         default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));
@@ -149,11 +157,6 @@ public class ECTextImpl extends ECText {
                 : text.copy().setStyle(specifiedStyle))
             .collect(TextUtil.collect());
     }
-
-    // Other stuff
-//    public MutableText getText(String key, Object... args) {
-//        return ECText.literal(String.format(getString(key), args));
-//    }
 
     public boolean hasTranslation(String key) {
         return super.stringMap.containsKey(key);

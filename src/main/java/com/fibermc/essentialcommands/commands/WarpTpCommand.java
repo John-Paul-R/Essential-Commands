@@ -7,13 +7,10 @@ import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.types.WarpLocation;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
-import net.minecraft.command.CommandException;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -35,21 +32,22 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity targetPlayer) throws CommandSyntaxException
     {
         var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        var senderPlayer = context.getSource().getPlayer();
+        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var ecText = ECText.access(senderPlayer);
+
         String warpName = StringArgumentType.getString(context, "warp_name");
-        var warpNameText = ECText.accent(warpName);
+        var warpNameText = ecText.accentText(warpName);
         WarpLocation loc = worldDataManager.getWarp(warpName);
 
         if (loc == null) {
-            Message msg = ECText.getInstance().getText(
+            throw CommandUtil.createSimpleException(ecText.getText(
                 "cmd.warp.tp.error.not_found",
                 TextFormatType.Error,
-                warpNameText);
-            throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
+                warpNameText));
         }
 
         if (!loc.hasPermission(senderPlayer)) {
-            throw new CommandException(ECText.getInstance().getText(
+            throw CommandUtil.createSimpleException(ecText.getText(
                 "cmd.warp.tp.error.permission",
                 TextFormatType.Error,
                 warpNameText));
@@ -59,7 +57,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
         PlayerTeleporter.requestTeleport(
             targetPlayer,
             loc,
-            ECText.getInstance().getText("cmd.warp.location_name", warpNameText));
+            ecText.getText("cmd.warp.location_name", warpNameText));
     }
 
     public int runOther(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {

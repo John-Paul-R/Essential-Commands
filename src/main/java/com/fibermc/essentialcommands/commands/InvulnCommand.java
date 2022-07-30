@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECAbilitySources;
-import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import io.github.ladysnake.pal.Pal;
@@ -35,10 +34,9 @@ public class InvulnCommand implements Command<ServerCommandSource> {
         // TODO Label boolean values in suggestions, or switch to single state value (present, or it's not)
 
         var senderPlayerAccess = ((ServerPlayerEntityAccess) source.getPlayerOrThrow());
-        var enabledText = ECText.getInstance().getText(
+        var enabledText = senderPlayerAccess.ec$getEcText().getText(
             shouldEnableInvuln ? "generic.enabled" : "generic.disabled",
-            TextFormatType.Accent,
-            senderPlayerAccess.ec$getProfile());
+            TextFormatType.Accent);
 
         senderPlayerAccess.ec$getPlayerData().sendCommandFeedback(
             "cmd.invuln.feedback",

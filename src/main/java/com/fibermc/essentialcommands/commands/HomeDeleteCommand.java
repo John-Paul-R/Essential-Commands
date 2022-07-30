@@ -28,7 +28,7 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         //Remove Home - TODO Require player to type the command again to confirm deletion.
         boolean wasSuccessful = senderPlayerData.removeHome(homeName);
 
-        var homeNameText = ECText.accent(homeName);
+        var homeNameText = ECText.access(senderPlayer).accentText(homeName);
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             senderPlayerData.sendCommandFeedback("cmd.home.delete.feedback", homeNameText);

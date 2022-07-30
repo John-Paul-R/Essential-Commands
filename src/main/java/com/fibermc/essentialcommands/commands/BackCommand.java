@@ -1,6 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
@@ -31,10 +33,7 @@ public class BackCommand implements Command<ServerCommandSource> {
         }
 
         //Teleport player to home location
-        var prevLocationName = ECText.getInstance().getText(
-            "cmd.back.location_name",
-            TextFormatType.Default,
-            PlayerProfile.accessFromPlayer(player));
+        var prevLocationName = ECText.access(player).getText("cmd.back.location_name");
         PlayerTeleporter.requestTeleport(playerData, loc, prevLocationName);
 
         return 1;

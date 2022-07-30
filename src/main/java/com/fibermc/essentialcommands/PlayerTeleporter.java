@@ -32,8 +32,8 @@ public final class PlayerTeleporter {
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
             playerAccess.ec$getPlayerData().sendMessage(
                 "teleport.queued",
-                queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT),
-                ECText.accent(String.format("%.1f", CONFIG.TELEPORT_DELAY))
+                queuedTeleport.getDestName().setStyle(PlayerProfile.access(player).getStyle(TextFormatType.Accent)),
+                ECText.access(player).accentText(String.format("%.1f", CONFIG.TELEPORT_DELAY))
             );
         }
     }

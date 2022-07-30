@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.PlayerTeleporter;
+import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -37,15 +40,17 @@ public class HomeCommand implements Command<ServerCommandSource> {
         return ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
     }
 
+    // TODO: Ideally the styling here should come from a context, intead of from the player we're
+    //  accessing, but I don't think it matters, practically speaking, for now.
     public static String getSoleHomeName(PlayerData playerData) throws CommandSyntaxException {
         Set<String> homeNames = playerData.getHomeNames();
-        var playerProfile = PlayerProfile.accessFromPlayer(playerData.getPlayer());
+        var ecText = ECText.access(playerData.getPlayer());
         if (homeNames.size() > 1) {
             throw CommandUtil.createSimpleException(
-                ECText.getInstance().getText("cmd.home.tp.error.shortcut_more_than_one", TextFormatType.Error, playerProfile));
+                ecText.getText("cmd.home.tp.error.shortcut_more_than_one", TextFormatType.Error));
         } else if (homeNames.isEmpty()) {
             throw CommandUtil.createSimpleException(
-                ECText.getInstance().getText("cmd.home.tp.error.shortcut_none_exist", TextFormatType.Error, playerProfile));
+                ecText.getText("cmd.home.tp.error.shortcut_none_exist", TextFormatType.Error));
         }
 
         return homeNames.stream().findAny().get();
@@ -67,22 +72,20 @@ public class HomeCommand implements Command<ServerCommandSource> {
     public static int exec(PlayerData senderPlayerData, PlayerData targetPlayerData, String homeName) throws CommandSyntaxException {
         //Get home location
         MinecraftLocation loc = targetPlayerData.getHomeLocation(homeName);
-        var senderPlayerProfile = PlayerProfile.accessFromPlayer(senderPlayerData.getPlayer());
+        var ecText = ECText.access(senderPlayerData.getPlayer());
         if (loc == null) {
-            Message msg = ECText.getInstance().getText(
+            Message msg = ecText.getText(
                 "cmd.home.tp.error.not_found",
                 TextFormatType.Error,
-                senderPlayerProfile,
                 Text.literal(homeName));
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
         }
 
         // Teleport & chat message
-        var homeNameText = ECText.getInstance().getText(
+        var homeNameText = ecText.getText(
             "cmd.home.location_name",
             TextFormatType.Default,
-            senderPlayerProfile,
-            Text.literal(homeName).setStyle(senderPlayerProfile.getStyle(TextFormatType.Accent)));
+            ecText.accentText(homeName));
 
         PlayerTeleporter.requestTeleport(senderPlayerData, loc, homeNameText);
         return 1;
@@ -106,6 +109,5 @@ public class HomeCommand implements Command<ServerCommandSource> {
         public static Set<Map.Entry<String, MinecraftLocation>> getSuggestionEntries(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
             return HomeCommand.getTargetPlayerData(context).getHomeEntries();
         }
-
     }
 }

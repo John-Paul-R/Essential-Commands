@@ -10,6 +10,7 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
+import org.jetbrains.annotations.NotNull;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -154,12 +155,12 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             homes.putCommand(homeName, minecraftLocation);
             this.markDirty();
         } else {
-            var homeNameText = ECText.accent(homeName);
-            var maxHomesText = ECText.accent(String.valueOf(playerMaxHomes));
-            throw CommandUtil.createSimpleException(ECText.getInstance().getText(
+            var ecText = ECText.access(this.player);
+            var homeNameText = ecText.accentText(homeName);
+            var maxHomesText = ecText.accentText(String.valueOf(playerMaxHomes));
+            throw CommandUtil.createSimpleException(ecText.getText(
                 "cmd.home.set.error.limit",
                 TextFormatType.Error,
-                PlayerProfile.accessFromPlayer(this.player),
                 homeNameText,
                 maxHomesText));
         }
@@ -167,43 +168,27 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
     public void sendCommandFeedback(String messageKey, Text... args) {
         this.player.getCommandSource().sendFeedback(
-            ECText.getInstance().getText(
-                messageKey,
-                TextFormatType.Default,
-                PlayerProfile.accessFromPlayer(this.player),
-                args),
+            ECText.access(this.player).getText(messageKey, TextFormatType.Default, args),
             CONFIG.BROADCAST_TO_OPS
         );
     }
 
     public void sendCommandError(String messageKey, Text... args) {
         this.player.getCommandSource().sendError(
-            ECText.getInstance().getText(
-                messageKey,
-                TextFormatType.Error,
-                PlayerProfile.accessFromPlayer(this.player),
-                args)
+            ECText.access(this.player).getText(messageKey, TextFormatType.Error, args)
         );
     }
 
     public void sendMessage(String messageKey, Text... args) {
         this.player.sendMessage(
-            ECText.getInstance().getText(
-                messageKey,
-                TextFormatType.Default,
-                PlayerProfile.accessFromPlayer(this.player),
-                args),
+            ECText.access(this.player).getText(messageKey, TextFormatType.Default, args),
             MessageType.SYSTEM
         );
     }
 
     public void sendError(String messageKey, Text... args) {
         this.player.sendMessage(
-            ECText.getInstance().getText(
-                messageKey,
-                TextFormatType.Error,
-                PlayerProfile.accessFromPlayer(this.player),
-                args),
+            ECText.access(this.player).getText(messageKey, TextFormatType.Error, args),
             MessageType.SYSTEM
         );
     }
@@ -537,13 +522,13 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         this.fullNickname = tempFullNickname;
     }
 
-    public static PlayerData accessFromPlayer(ServerPlayerEntity player) {
+    public static PlayerData access(@NotNull ServerPlayerEntity player) {
         return ((ServerPlayerEntityAccess) player).ec$getPlayerData();
     }
 
     public static PlayerData accessFromContextOrThrow(CommandContext<ServerCommandSource> context)
         throws CommandSyntaxException
     {
-        return accessFromPlayer(context.getSource().getPlayerOrThrow());
+        return access(context.getSource().getPlayerOrThrow());
     }
 }

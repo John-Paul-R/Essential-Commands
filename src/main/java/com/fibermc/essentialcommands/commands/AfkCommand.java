@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 
@@ -24,7 +23,7 @@ public class AfkCommand implements Command<ServerCommandSource> {
 
         if (CONFIG.INVULN_WHILE_AFK) {
             if (playerData.isInCombat()) {
-                throw new CommandException(ECText.getInstance().getText(
+                throw new CommandException(playerAccess.ec$getEcText().getText(
                     "cmd.afk.error.in_combat",
                     TextFormatType.Error,
                     playerProfile));

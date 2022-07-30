@@ -141,13 +141,13 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
         this.player = newPlayerEntity;
     }
 
-    public static PlayerProfile accessFromPlayer(ServerPlayerEntity player) {
+    public static PlayerProfile access(@NotNull ServerPlayerEntity player) {
         return ((ServerPlayerEntityAccess) player).ec$getProfile();
     }
 
     public static PlayerProfile accessFromContextOrThrow(CommandContext<ServerCommandSource> context)
         throws CommandSyntaxException
     {
-        return accessFromPlayer(context.getSource().getPlayerOrThrow());
+        return access(context.getSource().getPlayerOrThrow());
     }
 }

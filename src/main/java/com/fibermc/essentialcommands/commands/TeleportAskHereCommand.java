@@ -1,18 +1,14 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.*;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class TeleportAskHereCommand implements Command<ServerCommandSource> {
 
@@ -21,32 +17,29 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         TeleportRequestManager tpMgr = ManagerLocator.getInstance().getTpManager();
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
+        var senderPlayerData = PlayerData.access(senderPlayer);
+        var targetPlayerData = PlayerData.access(targetPlayer);
 
         // Don't allow spamming same target.
         {
-            var existingTeleportRequest = ((ServerPlayerEntityAccess) senderPlayer)
-                .ec$getPlayerData()
-                .getSentTeleportRequest();
+            var existingTeleportRequest = senderPlayerData.getSentTeleportRequest();
             if (existingTeleportRequest != null && existingTeleportRequest.getTargetPlayer().equals(targetPlayer)) {
-                senderPlayer.sendMessage(
-                    ECText.getInstance().getText(
-                        "cmd.tpask.error.exists",
-                        existingTeleportRequest.getTargetPlayer().getDisplayName()),
-                    MessageType.SYSTEM);
+                PlayerData.access(senderPlayer).sendCommandError(
+                    "cmd.tpask.error.exists",
+                    existingTeleportRequest.getTargetPlayer().getDisplayName());
                 return 0;
             }
         }
 
         //inform target player of tp request via chat
-        targetPlayer.sendMessage(
-            ECText.getInstance().getText(
-                "cmd.tpaskhere.receive",
-                ECText.accent(senderPlayer.getEntityName())),
-            MessageType.SYSTEM);
+        targetPlayerData.sendMessage(
+            "cmd.tpaskhere.receive",
+            ECText.access(targetPlayer).accentText(senderPlayer.getEntityName())
+        );
 
-        String senderName = context.getSource().getPlayer().getGameProfile().getName();
+        String senderName = senderPlayer.getGameProfile().getName();
         new ChatConfirmationPrompt(
             targetPlayer,
             "/tpaccept " + senderName,
@@ -58,11 +51,9 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_HERE);
 
-        var targetPlayerText = ECText.accent(targetPlayer.getEntityName());
         //inform command sender that request has been sent
-        context.getSource().sendFeedback(
-            ECText.getInstance().getText("cmd.tpask.send", targetPlayerText),
-            CONFIG.BROADCAST_TO_OPS);
+        var targetPlayerText = ECText.access(senderPlayer).accentText(targetPlayer.getEntityName());
+        senderPlayerData.sendCommandFeedback("cmd.tpask.send", targetPlayerText);
 
         return 1;
     }
