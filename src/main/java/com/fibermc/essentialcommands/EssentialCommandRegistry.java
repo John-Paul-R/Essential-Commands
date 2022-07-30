@@ -12,6 +12,7 @@ import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
+import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
 import org.spongepowered.asm.util.IConsumer;
 

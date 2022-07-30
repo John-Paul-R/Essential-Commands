@@ -1,4 +1,6 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.util;
+
+import com.fibermc.essentialcommands.ECPerms;
 
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Style;

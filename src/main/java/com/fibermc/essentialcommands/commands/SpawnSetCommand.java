@@ -3,7 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerProfile;
-import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import com.mojang.brigadier.Command;

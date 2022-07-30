@@ -1,9 +1,9 @@
 package com.fibermc.essentialcommands.access;
 
-import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerProfile;
 import com.fibermc.essentialcommands.QueuedTeleport;
+import com.fibermc.essentialcommands.text.ECText;
 
 public interface ServerPlayerEntityAccess {
     QueuedTeleport ec$getQueuedTeleport();

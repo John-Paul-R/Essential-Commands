@@ -3,10 +3,10 @@ package com.fibermc.essentialcommands.commands;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.TeleportRequest;
-import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;

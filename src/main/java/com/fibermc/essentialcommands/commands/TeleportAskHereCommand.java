@@ -1,6 +1,11 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.TeleportRequest;
+import com.fibermc.essentialcommands.TeleportRequestManager;
+import com.fibermc.essentialcommands.text.ChatConfirmationPrompt;
+import com.fibermc.essentialcommands.text.ECText;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
