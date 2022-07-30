@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.teleportation;
 
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;

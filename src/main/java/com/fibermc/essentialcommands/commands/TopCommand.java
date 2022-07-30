@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.PlayerTeleporter;
+import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 

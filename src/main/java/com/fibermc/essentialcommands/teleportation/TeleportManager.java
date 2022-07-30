@@ -1,8 +1,9 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.teleportation;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
@@ -21,25 +22,25 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 /**
  * TeleportRequestManager
  */
-public final class TeleportRequestManager {
+public final class TeleportManager {
 
     private static final int TPS = 20;
     private final LinkedList<TeleportRequest> activeTpRequestList;
     private final LinkedList<PlayerData> tpCooldownList;
     private final ConcurrentHashMap<UUID, QueuedTeleport> delayedQueuedTeleportMap;
 
-    private static TeleportRequestManager instance;
+    private static TeleportManager instance;
 
-    private TeleportRequestManager() {
+    private TeleportManager() {
         instance = this;
         activeTpRequestList = new LinkedList<>();
         tpCooldownList = new LinkedList<>();
         delayedQueuedTeleportMap = new ConcurrentHashMap<>();
     }
 
-    public static TeleportRequestManager getInstance() {
+    public static TeleportManager getInstance() {
         if (instance == null) {
-            instance = new TeleportRequestManager();
+            instance = new TeleportManager();
         }
         return instance;
     }

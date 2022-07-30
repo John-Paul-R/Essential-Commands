@@ -3,8 +3,8 @@ package com.fibermc.essentialcommands.commands;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-import com.fibermc.essentialcommands.TeleportRequest;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.teleportation.TeleportRequest;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 

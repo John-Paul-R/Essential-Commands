@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.suggestions.OfflinePlayerRepo;
 import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
+import com.fibermc.essentialcommands.teleportation.TeleportManager;
 
 import net.minecraft.server.MinecraftServer;
 
@@ -10,7 +11,7 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 public final class ManagerLocator {
 
     private PlayerDataManager playerDataManager;
-    private TeleportRequestManager tpManager;
+    private TeleportManager tpManager;
     private WorldDataManager worldDataManager;
     private OfflinePlayerRepo offlinePlayerRepo;
 
@@ -25,7 +26,7 @@ public final class ManagerLocator {
         return instance = new ManagerLocator();
     }
 
-    static boolean playerDataEnabled() {
+    public static boolean playerDataEnabled() {
         return CONFIG.ENABLE_HOME
             || CONFIG.ENABLE_TPA
             || CONFIG.ENABLE_BACK
@@ -35,7 +36,7 @@ public final class ManagerLocator {
             ;
     }
 
-    static boolean teleportRequestEnabled() {
+    public static boolean teleportRequestEnabled() {
         return (CONFIG.ENABLE_TPA);
     }
 
@@ -44,13 +45,13 @@ public final class ManagerLocator {
             PlayerDataManager.init();
         }
         if (teleportRequestEnabled()) {
-            TeleportRequestManager.init();
+            TeleportManager.init();
         }
     }
 
     public void onServerStart(MinecraftServer server) {
         this.playerDataManager = PlayerDataManager.getInstance();
-        this.tpManager = TeleportRequestManager.getInstance();
+        this.tpManager = TeleportManager.getInstance();
         this.worldDataManager = WorldDataManager.createForServer(server);
         this.offlinePlayerRepo = new OfflinePlayerRepo(server);
     }
@@ -59,7 +60,7 @@ public final class ManagerLocator {
         return playerDataManager;
     }
 
-    public TeleportRequestManager getTpManager() {
+    public TeleportManager getTpManager() {
         return tpManager;
     }
 

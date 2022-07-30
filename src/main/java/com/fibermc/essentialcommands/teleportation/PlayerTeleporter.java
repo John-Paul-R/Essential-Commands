@@ -1,5 +1,7 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.teleportation;
 
+import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
@@ -33,7 +35,7 @@ public final class PlayerTeleporter {
         } else {
             var playerAccess = ((ServerPlayerEntityAccess) player);
             playerAccess.ec$setQueuedTeleport(queuedTeleport);
-            TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
+            TeleportManager.getInstance().queueTeleport(queuedTeleport);
             playerAccess.ec$getPlayerData().sendMessage(
                 "teleport.queued",
                 queuedTeleport.getDestName().setStyle(PlayerProfile.access(player).getStyle(TextFormatType.Accent)),
