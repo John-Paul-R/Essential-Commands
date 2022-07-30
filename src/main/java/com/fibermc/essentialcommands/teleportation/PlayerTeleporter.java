@@ -4,8 +4,6 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
-import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
@@ -33,14 +31,7 @@ public final class PlayerTeleporter {
         if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
-            var playerAccess = ((ServerPlayerEntityAccess) player);
-            playerAccess.ec$setQueuedTeleport(queuedTeleport);
             TeleportManager.getInstance().queueTeleport(queuedTeleport);
-            playerAccess.ec$getPlayerData().sendMessage(
-                "teleport.queued",
-                queuedTeleport.getDestName().setStyle(PlayerProfile.access(player).getStyle(TextFormatType.Accent)),
-                ECText.access(player).accent(String.format("%.1f", CONFIG.TELEPORT_DELAY))
-            );
         }
     }
 

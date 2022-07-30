@@ -139,11 +139,12 @@ public final class TeleportManager {
         playersOnTeleportCooldown.add(playerData);
     }
 
-    public void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, MutableText destName) {
+    // Generally, you should use PlayerTeleporter.requestTeleport instead of calling the queueTeleport methods directly.
+    void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, MutableText destName) {
         queueTeleport(new QueuedLocationTeleport(PlayerData.access(player), dest, destName));
     }
 
-    public void queueTeleport(QueuedTeleport queuedTeleport) {
+    void queueTeleport(QueuedTeleport queuedTeleport) {
         QueuedTeleport prevValue = queuedTeleportMap.put(
             queuedTeleport.getPlayerData().getPlayer().getUuid(),
             queuedTeleport
@@ -157,5 +158,13 @@ public final class TeleportManager {
             );
         }
 
+        var playerData = queuedTeleport.getPlayerData();
+        var playerAccess = ((ServerPlayerEntityAccess) playerData.getPlayer());
+        playerAccess.ec$setQueuedTeleport(queuedTeleport);
+        playerData.sendMessage(
+            "teleport.queued",
+            queuedTeleport.getDestName().setStyle(playerAccess.ec$getProfile().getStyle(TextFormatType.Accent)),
+            playerAccess.ec$getEcText().accent(String.format("%.1f", CONFIG.TELEPORT_DELAY))
+        );
     }
 }
