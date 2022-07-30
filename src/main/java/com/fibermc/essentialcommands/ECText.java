@@ -9,13 +9,19 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import eu.pb4.placeholders.api.ParserContext;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
@@ -91,7 +97,9 @@ public abstract class ECText {
         }
 
         final Map<String, String> map = builder.build();
-        return new ECTextImpl(map, server);
+        return instance = server == null
+            ? new ECTextImpl(map, ParserContext.of())
+            : ECTextImpl.forServer(map, server);
     }
 
     public static void load(InputStream inputStream, BiConsumer<String, String> entryConsumer) {
@@ -117,7 +125,8 @@ public abstract class ECText {
 
     public abstract MutableText getText(String key, TextFormatType textFormatType, Text... args);
 
-    public abstract MutableText getText(String key, Object... args);
+    //    public abstract MutableText getText(String key, Object... args);
+    public abstract MutableText getText(String key, TextFormatType textFormatType, IStyleProvider styleProvider, Text... args);
 
     public abstract MutableText getText(String key);
 
@@ -127,8 +136,31 @@ public abstract class ECText {
 
     public abstract OrderedText reorder(StringVisitable text);
 
+    public MutableText literalText(String str) {
+        return ECText.literal(str);
+    }
+
+    public MutableText accentText(String str) {
+        return ECText.accent(str);
+    }
+
+    public MutableText errorText(String str) {
+        return ECText.error(str);
+    }
+
     public List<OrderedText> reorder(List<StringVisitable> texts) {
         return texts.stream().map(this::reorder).collect(ImmutableList.toImmutableList());
     }
 
+    public static ECText forPlayer(ServerPlayerEntity player) {
+        return new PlayerECTextImpl(
+            ECText.getInstance().stringMap,
+            ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(player)),
+            PlayerProfile.access(player)
+        );
+    }
+
+    public static ECText access(@NotNull ServerPlayerEntity player) {
+        return ((ServerPlayerEntityAccess) player).ec$getEcText();
+    }
 }

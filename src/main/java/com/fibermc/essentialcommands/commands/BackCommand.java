@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
-import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
@@ -21,7 +20,7 @@ public class BackCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Store command sender
-        ServerPlayerEntity player = context.getSource().getPlayer();
+        ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
         PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
 
         //Get previous location
@@ -29,14 +28,13 @@ public class BackCommand implements Command<ServerCommandSource> {
 
         //chat message
         if (loc == null) {
-            context.getSource().sendError(
-                ECText.getInstance().getText("cmd.back.error.no_prev_location", TextFormatType.Error)
-            );
+            playerData.sendCommandError("cmd.back.error.no_prev_location");
             return 0;
         }
 
         //Teleport player to home location
-        PlayerTeleporter.requestTeleport(playerData, loc, ECText.getInstance().getText("cmd.back.location_name"));
+        var prevLocationName = ECText.access(player).getText("cmd.back.location_name");
+        PlayerTeleporter.requestTeleport(playerData, loc, prevLocationName);
 
         return 1;
     }

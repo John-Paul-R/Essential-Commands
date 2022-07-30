@@ -43,13 +43,13 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayer();
+        ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
         ServerWorld world = context.getSource().getWorld();
-
+        var ecText = ECText.access(player);
         if (!world.getRegistryKey().equals(World.OVERWORLD)) {
             throw new CommandException(TextUtil.concat(
-                ECText.getInstance().getText("cmd.rtp.error.pre", TextFormatType.Error),
-                ECText.getInstance().getText("cmd.rtp.error.not_overworld", TextFormatType.Error)
+                ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
+                ecText.getText("cmd.rtp.error.not_overworld", TextFormatType.Error)
             ));
         }
 
@@ -62,10 +62,10 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
             if (rtpCooldownRemaining > 0) {
                 throw new CommandException(
-                    ECText.getInstance().getText(
+                    ecText.getText(
                         "cmd.rtp.error.cooldown",
                         TextFormatType.Error,
-                        ECText.accent(String.format("%.1f", rtpCooldownRemaining / 20D)))
+                        ecText.accentText(String.format("%.1f", rtpCooldownRemaining / 20D)))
                 );
             }
             // if cooldown has expired
@@ -94,10 +94,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
         // Position relative to EC spawn locaiton.
         MinecraftLocation center = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
+        var ecText = ECText.access(source.getPlayerOrThrow());
         if (center == null) {
             source.sendError(TextUtil.concat(
-                ECText.getInstance().getText("cmd.rtp.error.pre"),
-                ECText.getInstance().getText("cmd.rtp.error.no_spawn_set")
+                ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
+                ecText.getText("cmd.rtp.error.no_spawn_set, TextFormatType.Error")
             ));
             return -1;
         }
@@ -107,6 +108,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
 
     private static int exec(ServerPlayerEntity player, ServerWorld world, MinecraftLocation center, int timesRun) {
+        var ecText = ECText.access(player);
         if (timesRun > CONFIG.RTP_MAX_ATTEMPTS) {
             return -1;
         }
@@ -134,7 +136,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         {
             Stopwatch timer = Stopwatch.createStarted();
             new_y = getTop(chunk, (int) new_x, (int) new_z);
-            EssentialCommands.LOGGER.info(ECText.getInstance().getText("cmd.rtp.log.location_validate_time", timer.stop()).getString());
+            EssentialCommands.LOGGER.info(
+                ECText.getInstance().getText(
+                    "cmd.rtp.log.location_validate_time",
+                    ECText.accent(String.valueOf(timer.stop()))
+                ).getString());
         }
 
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
@@ -147,7 +153,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         PlayerTeleporter.requestTeleport(
             player,
             new MinecraftLocation(world.getRegistryKey(), new_x, new_y, new_z, 0, 0),
-            ECText.getInstance().getText("cmd.rtp.location_name")
+            ecText.getText("cmd.rtp.location_name")
         );
 
         return 1;

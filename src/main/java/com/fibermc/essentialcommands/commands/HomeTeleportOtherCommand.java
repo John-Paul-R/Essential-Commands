@@ -8,6 +8,7 @@ import java.util.Set;
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.PlayerProfile;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -25,12 +26,9 @@ import net.minecraft.text.Text;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class HomeTeleportOtherCommand extends HomeCommand implements Command<ServerCommandSource> {
-
-    public HomeTeleportOtherCommand() {}
-
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return HomeCommand.exec(senderPlayerData, getTargetPlayerData(context), homeName);
@@ -41,7 +39,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
     }
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
+        var senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
         var targetPlayerData = getTargetPlayerData(context);
 
         return HomeCommand.exec(
@@ -52,7 +50,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
     }
 
     public int runOfflinePlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         var targetPlayerName = StringArgumentType.getString(context, "target_player");
@@ -83,20 +81,22 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
 
     public static int runListOffline(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var targetPlayerName = StringArgumentType.getString(context, "target_player");
+        var senderPlayerProfile = PlayerProfile.accessFromContextOrThrow(context);
         ManagerLocator.getInstance()
             .getOfflinePlayerRepo()
             .getOfflinePlayerByNameAsync(targetPlayerName)
-            .whenComplete((playerEntity, err) -> {
-                if (playerEntity == null) {
+            .whenComplete((targetPlayerEntity, err) -> {
+                if (targetPlayerEntity == null) {
                     context.getSource().sendError(Text.of("No player with the specified name found."));
                     return;
                 }
 
-                var targetPlayerData = ((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData();
+                var targetPlayerData = ((ServerPlayerEntityAccess) targetPlayerEntity).ec$getPlayerData();
                 var suggestionText = ListCommandFactory.getSuggestionText(
                     ECText.getInstance().getString("cmd.home.list.start"),
                     "home tp_offline %s".formatted(targetPlayerName),
-                    targetPlayerData.getHomeEntries()
+                    targetPlayerData.getHomeEntries(),
+                    senderPlayerProfile
                 );
 
                 context.getSource().sendFeedback(

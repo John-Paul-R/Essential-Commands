@@ -16,8 +16,6 @@ import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-
 public class FlyCommand implements Command<ServerCommandSource> {
 
     public FlyCommand() {
@@ -47,7 +45,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
         return 0;
     }
 
-    public static void exec(ServerCommandSource source, ServerPlayerEntity target, boolean shouldEnableFly) {
+    public static void exec(ServerCommandSource source, ServerPlayerEntity target, boolean shouldEnableFly) throws CommandSyntaxException {
         PlayerAbilities playerAbilities = target.getAbilities();
 
         PlayerData playerData = ((ServerPlayerEntityAccess) target).ec$getPlayerData();
@@ -65,17 +63,17 @@ public class FlyCommand implements Command<ServerCommandSource> {
 
         // Label boolean values in suggestions, or switch to single state value (present or it's not)
 
-        var enabledText = ECText.getInstance().getText(
+        var senderPlayer = source.getPlayerOrThrow();
+        var senderPlayerData = PlayerData.access(senderPlayer);
+        var ecText = ECText.access(senderPlayer);
+        var enabledText = ecText.getText(
             shouldEnableFly ? "generic.enabled" : "generic.disabled",
             TextFormatType.Accent);
 
-        source.sendFeedback(
-            ECText.getInstance().getText(
-                "cmd.fly.feedback",
-                enabledText,
-                target.getDisplayName()
-            ),
-            CONFIG.BROADCAST_TO_OPS
+        senderPlayerData.sendCommandFeedback(
+            "cmd.fly.feedback",
+            enabledText,
+            target.getDisplayName()
         );
     }
 }

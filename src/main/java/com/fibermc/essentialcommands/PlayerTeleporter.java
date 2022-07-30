@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -28,14 +27,13 @@ public final class PlayerTeleporter {
         if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
-            ((ServerPlayerEntityAccess) player).ec$setQueuedTeleport(queuedTeleport);
+            var playerAccess = ((ServerPlayerEntityAccess) player);
+            playerAccess.ec$setQueuedTeleport(queuedTeleport);
             TeleportRequestManager.getInstance().queueTeleport(queuedTeleport);
-            player.sendMessage(
-                ECText.getInstance().getText(
-                    "teleport.queued",
-                    queuedTeleport.getDestName().setStyle(CONFIG.FORMATTING_ACCENT),
-                    ECText.accent(String.format("%.1f", CONFIG.TELEPORT_DELAY))),
-                MessageType.SYSTEM
+            playerAccess.ec$getPlayerData().sendMessage(
+                "teleport.queued",
+                queuedTeleport.getDestName().setStyle(PlayerProfile.access(player).getStyle(TextFormatType.Accent)),
+                ECText.access(player).accentText(String.format("%.1f", CONFIG.TELEPORT_DELAY))
             );
         }
     }
@@ -57,10 +55,7 @@ public final class PlayerTeleporter {
             && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
             if (dest.dim != player.getWorld().getRegistryKey()) {
-                player.sendMessage(
-                    ECText.getInstance().getText("teleport.error.interdimensional_teleport_disabled", TextFormatType.Error),
-                    MessageType.SYSTEM
-                );
+                pData.sendError("teleport.error.interdimensional_teleport_disabled");
                 return;
             }
         }
@@ -82,14 +77,14 @@ public final class PlayerTeleporter {
             dest.pos.x, dest.pos.y, dest.pos.z,
             dest.headYaw, dest.pitch
         );
-        playerEntity.sendMessage(
-            ECText.getInstance().getText(
-                "teleport.done",
-                ((ServerPlayerEntityAccess) playerEntity).ec$getProfile().shouldPrintTeleportCoordinates()
-                    ? dest.toLiteralTextSimple().setStyle(CONFIG.FORMATTING_ACCENT)
-                    : Text.literal("destination").setStyle(CONFIG.FORMATTING_DEFAULT)
-            ),
-            MessageType.SYSTEM
+
+        var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
+        var playerProfile = playerAccess.ec$getProfile();
+        playerAccess.ec$getPlayerData().sendMessage(
+            "teleport.done",
+            playerProfile.shouldPrintTeleportCoordinates()
+                ? dest.toLiteralTextSimple().setStyle(playerProfile.getStyle(TextFormatType.Accent))
+                : Text.literal("destination").setStyle(playerProfile.getStyle(TextFormatType.Default))
         );
     }
 

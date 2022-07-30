@@ -1,8 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECAbilitySources;
-import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
 
@@ -14,13 +14,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-
 public class InvulnCommand implements Command<ServerCommandSource> {
-
-    public InvulnCommand() {
-    }
-
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
@@ -35,31 +29,30 @@ public class InvulnCommand implements Command<ServerCommandSource> {
                 .getTracker(targetPlayer).isGrantedBy(ECAbilitySources.INVULN_COMMAND);
         }
 
-        exec(source, targetPlayer, shouldEnableInvuln);
+        exec(targetPlayer, shouldEnableInvuln);
+
+        // TODO Label boolean values in suggestions, or switch to single state value (present, or it's not)
+
+        var senderPlayerAccess = ((ServerPlayerEntityAccess) source.getPlayerOrThrow());
+        var enabledText = senderPlayerAccess.ec$getEcText().getText(
+            shouldEnableInvuln ? "generic.enabled" : "generic.disabled",
+            TextFormatType.Accent);
+
+        senderPlayerAccess.ec$getPlayerData().sendCommandFeedback(
+            "cmd.invuln.feedback",
+            enabledText,
+            targetPlayer.getDisplayName()
+        );
+
         return 0;
     }
 
-    public static void exec(ServerCommandSource source, ServerPlayerEntity target, boolean shouldEnableInvuln) {
+    public static void exec(ServerPlayerEntity target, boolean shouldEnableInvuln) throws CommandSyntaxException {
         if (shouldEnableInvuln) {
             Pal.grantAbility(target, VanillaAbilities.INVULNERABLE, ECAbilitySources.INVULN_COMMAND);
         } else {
             Pal.revokeAbility(target, VanillaAbilities.INVULNERABLE, ECAbilitySources.INVULN_COMMAND);
         }
         target.sendAbilitiesUpdate();
-
-        // Label boolean values in suggestions, or switch to single state value (present or it's not)
-
-        var enabledText = ECText.getInstance().getText(
-            shouldEnableInvuln ? "generic.enabled" : "generic.disabled",
-            TextFormatType.Accent);
-
-        source.sendFeedback(
-            ECText.getInstance().getText(
-                "cmd.invuln.feedback",
-                enabledText,
-                target.getDisplayName()
-            ),
-            CONFIG.BROADCAST_TO_OPS
-        );
     }
 }

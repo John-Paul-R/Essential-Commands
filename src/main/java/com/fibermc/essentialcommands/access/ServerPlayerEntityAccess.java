@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.access;
 
+import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerProfile;
 import com.fibermc.essentialcommands.QueuedTeleport;
@@ -18,4 +19,6 @@ public interface ServerPlayerEntityAccess {
     PlayerProfile ec$getProfile();
 
     void ec$setProfile(PlayerProfile profile);
+
+    ECText ec$getEcText();
 }

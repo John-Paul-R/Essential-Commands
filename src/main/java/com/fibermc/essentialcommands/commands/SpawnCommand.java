@@ -8,7 +8,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 public class SpawnCommand implements Command<ServerCommandSource> {
 
@@ -19,19 +18,18 @@ public class SpawnCommand implements Command<ServerCommandSource> {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         MinecraftLocation loc = worldDataManager.getSpawn();
 
+        var playerData = PlayerData.accessFromContextOrThrow(context);
         if (loc == null) {
-            context.getSource().sendError(
-                ECText.getInstance().getText("cmd.spawn.tp.error.no_spawn_set", TextFormatType.Error));
+            playerData.sendCommandError("cmd.spawn.tp.error.no_spawn_set");
             return -2;
         }
 
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        var senderPlayer = context.getSource().getPlayerOrThrow();
 
         // Teleport & chat message
-        PlayerTeleporter.requestTeleport(
-            senderPlayer,
-            loc,
-            ECText.getInstance().getText("cmd.spawn.location_name"));
+        var styledLocationName = ECText.access(senderPlayer).getText("cmd.spawn.location_name");
+
+        PlayerTeleporter.requestTeleport(senderPlayer, loc, styledLocationName);
         return 1;
     }
 

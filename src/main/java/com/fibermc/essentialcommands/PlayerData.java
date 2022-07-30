@@ -3,18 +3,23 @@ package com.fibermc.essentialcommands;
 import java.io.File;
 import java.util.*;
 
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.events.PlayerActCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
+import org.jetbrains.annotations.NotNull;
 
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.message.MessageType;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
@@ -144,34 +149,48 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     // Homes
-    public int addHome(String homeName, MinecraftLocation minecraftLocation) throws CommandSyntaxException {
-        int outCode = 0;
+    public void addHome(String homeName, MinecraftLocation minecraftLocation) throws CommandSyntaxException {
         int playerMaxHomes = ECPerms.getHighestNumericPermission(this.player.getCommandSource(), ECPerms.Registry.Group.home_limit_group);
         if (this.homes.size() < playerMaxHomes) {
             homes.putCommand(homeName, minecraftLocation);
             this.markDirty();
-            outCode = 1;
         } else {
-            var homeNameText = ECText.accent(homeName);
-            var maxHomesText = ECText.accent(String.valueOf(playerMaxHomes));
-            this.sendError(
-                ECText.getInstance().getText(
-                    "cmd.home.set.error.limit",
-                    TextFormatType.Error,
-                    homeNameText,
-                    maxHomesText
-                ));
+            var ecText = ECText.access(this.player);
+            var homeNameText = ecText.accentText(homeName);
+            var maxHomesText = ecText.accentText(String.valueOf(playerMaxHomes));
+            throw CommandUtil.createSimpleException(ecText.getText(
+                "cmd.home.set.error.limit",
+                TextFormatType.Error,
+                homeNameText,
+                maxHomesText));
         }
-
-        return outCode;
     }
 
-    public void sendError(Text message) {
+    public void sendCommandFeedback(String messageKey, Text... args) {
+        this.player.getCommandSource().sendFeedback(
+            ECText.access(this.player).getText(messageKey, TextFormatType.Default, args),
+            CONFIG.BROADCAST_TO_OPS
+        );
+    }
+
+    public void sendCommandError(String messageKey, Text... args) {
+        this.player.getCommandSource().sendError(
+            ECText.access(this.player).getText(messageKey, TextFormatType.Error, args)
+        );
+    }
+
+    public void sendMessage(String messageKey, Text... args) {
         this.player.sendMessage(
-            Text.empty()
-                .append(message)
-                .setStyle(CONFIG.FORMATTING_ERROR),
-            MessageType.SYSTEM);
+            ECText.access(this.player).getText(messageKey, TextFormatType.Default, args),
+            MessageType.SYSTEM
+        );
+    }
+
+    public void sendError(String messageKey, Text... args) {
+        this.player.sendMessage(
+            ECText.access(this.player).getText(messageKey, TextFormatType.Error, args),
+            MessageType.SYSTEM
+        );
     }
 
     public Set<String> getHomeNames() {
@@ -503,4 +522,13 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         this.fullNickname = tempFullNickname;
     }
 
+    public static PlayerData access(@NotNull ServerPlayerEntity player) {
+        return ((ServerPlayerEntityAccess) player).ec$getPlayerData();
+    }
+
+    public static PlayerData accessFromContextOrThrow(CommandContext<ServerCommandSource> context)
+        throws CommandSyntaxException
+    {
+        return access(context.getSource().getPlayerOrThrow());
+    }
 }

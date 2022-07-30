@@ -1,7 +1,9 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.EssentialCommands;
+import com.fibermc.essentialcommands.PlayerProfile;
+import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.types.IStyleProvider;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -10,10 +12,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
-
-import dev.jpcode.eccore.util.TextUtil;
-
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class GametimeCommand implements Command<ServerCommandSource> {
 
@@ -28,10 +26,11 @@ public class GametimeCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-
-        context.getSource().sendFeedback(TextUtil.concat(
-            getFormattedTime(context.getSource().getWorld().getTimeOfDay())
-        ), false);
+        context.getSource().sendFeedback(
+            getFormattedTime(
+                context.getSource().getWorld().getTimeOfDay(),
+                PlayerProfile.accessFromContextOrThrow(context)),
+            false);
 
         return 0;
     }
@@ -48,11 +47,11 @@ public class GametimeCommand implements Command<ServerCommandSource> {
         );
     }
 
-    private static Text getFormattedTime(long time) {
+    private static Text getFormattedTime(long time, IStyleProvider styleProvider) {
         return Text.translatable(
                 "commands.time.query",
-                ECText.accent(formatGameTimeOfDay(time)))
-            .setStyle(CONFIG.FORMATTING_DEFAULT
+                Text.literal(formatGameTimeOfDay(time)).setStyle(styleProvider.getStyle(TextFormatType.Accent)))
+            .setStyle(styleProvider.getStyle(TextFormatType.Default)
                 .withHoverEvent(
                     new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(String.valueOf(time % 24000L)))));
     }

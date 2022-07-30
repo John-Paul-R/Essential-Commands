@@ -5,19 +5,26 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.fibermc.essentialcommands.types.ProfileOption;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.world.PersistentState;
 
 import dev.jpcode.eccore.config.ConfigUtil;
 
-public class PlayerProfile extends PersistentState implements IServerPlayerEntityData {
+public class PlayerProfile extends PersistentState implements IServerPlayerEntityData, IStyleProvider {
 
     private ServerPlayerEntity player;
     private final File saveFile;
@@ -43,16 +50,49 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
                 BoolArgumentType.bool(),
                 false,
                 (context, name, profile) -> profile.profileOptions.printTeleportCoordinates = BoolArgumentType.getBool(context, name),
-                (profile) -> profile.profileOptions.printTeleportCoordinates))
+                (profile) -> profile.profileOptions.printTeleportCoordinates)),
+        new SimpleEntry<>(
+            StorageKey.FORMATTING_DEAULT,
+            new ProfileOption<>(
+                StringArgumentType.greedyString(),
+                null,
+                (context, name, profile) -> profile.profileOptions.formattingDefault = ConfigUtil.parseStyle(StringArgumentType.getString(context, name)),
+                (profile) -> ConfigUtil.serializeStyle(profile.profileOptions.formattingDefault))),
+        new SimpleEntry<>(
+            StorageKey.FORMATTING_ACCENT,
+            new ProfileOption<>(
+                StringArgumentType.greedyString(),
+                null,
+                (context, name, profile) -> profile.profileOptions.formattingAccent = ConfigUtil.parseStyle(StringArgumentType.getString(context, name)),
+                (profile) -> ConfigUtil.serializeStyle(profile.profileOptions.formattingAccent)))
+//        new SimpleEntry<>(
+//            StorageKey.FORMATTING_ERROR,
+//            new ProfileOption<>(
+//                StringArgumentType.greedyString(),
+//                null,
+//                (context, name, profile) -> profile.profileOptions.formattingError = ConfigUtil.parseStyle(StringArgumentType.getString(context, name)),
+//                (profile) -> ConfigUtil.serializeStyle(profile.profileOptions.formattingError)))
     );
 
     public boolean shouldPrintTeleportCoordinates() {
         return profileOptions.printTeleportCoordinates;
     }
 
+    public @Nullable Style getFormattingDefault() {
+        return profileOptions.formattingDefault;
+    }
+
+    public @Nullable Style getFormattingAccent() {
+        return profileOptions.formattingAccent;
+    }
+
+    public @Nullable Style getFormattingError() {
+        return profileOptions.formattingError;
+    }
+
     private static final class StorageKey {
         static final String FORMATTING_DEAULT = "formattingDeault";
-        static final String FORMATTING_ACENT = "formattingAcent";
+        static final String FORMATTING_ACCENT = "formattingAccent";
         static final String FORMATTING_ERROR = "formattingError";
         static final String PRINT_TELEPORT_COORDINATES = "printTeleportCoordinates";
     }
@@ -63,7 +103,7 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
         this.profileOptions.formattingDefault = Optional.of(dataTag.getString(StorageKey.FORMATTING_DEAULT))
             .map(ConfigUtil::parseStyle)
             .orElse(null);
-        this.profileOptions.formattingAccent = Optional.of(dataTag.getString(StorageKey.FORMATTING_ACENT))
+        this.profileOptions.formattingAccent = Optional.of(dataTag.getString(StorageKey.FORMATTING_ACCENT))
             .map(ConfigUtil::parseStyle)
             .orElse(null);
         this.profileOptions.formattingError = Optional.of(dataTag.getString(StorageKey.FORMATTING_ERROR))
@@ -78,7 +118,7 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
             tag.putString(StorageKey.FORMATTING_DEAULT, ConfigUtil.serializeStyle(this.profileOptions.formattingDefault));
         }
         if (this.profileOptions.formattingAccent != null) {
-            tag.putString(StorageKey.FORMATTING_ACENT, ConfigUtil.serializeStyle(this.profileOptions.formattingAccent));
+            tag.putString(StorageKey.FORMATTING_ACCENT, ConfigUtil.serializeStyle(this.profileOptions.formattingAccent));
         }
         if (this.profileOptions.formattingError != null) {
             tag.putString(StorageKey.FORMATTING_ERROR, ConfigUtil.serializeStyle(this.profileOptions.formattingError));
@@ -101,4 +141,13 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
         this.player = newPlayerEntity;
     }
 
+    public static PlayerProfile access(@NotNull ServerPlayerEntity player) {
+        return ((ServerPlayerEntityAccess) player).ec$getProfile();
+    }
+
+    public static PlayerProfile accessFromContextOrThrow(CommandContext<ServerCommandSource> context)
+        throws CommandSyntaxException
+    {
+        return access(context.getSource().getPlayerOrThrow());
+    }
 }

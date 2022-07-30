@@ -130,6 +130,18 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
         ec$profile = profile;
     }
 
+    @Unique
+    public ECText ec$ecText;
+
+    @Override
+    public ECText ec$getEcText() {
+        if (ec$ecText != null) {
+            return ec$ecText;
+        }
+
+        return ec$ecText = ECText.forPlayer((ServerPlayerEntity) (Object) this);
+    }
+
     // Teleport hook (for /back)
     @Inject(method = "teleport", at = @At("HEAD"))
     public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {

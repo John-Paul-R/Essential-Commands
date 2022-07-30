@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands.bench;
 
-import com.fibermc.essentialcommands.ECText;
+import com.fibermc.essentialcommands.PlayerData;
 import org.jetbrains.annotations.NotNull;
 
 import com.mojang.brigadier.Command;
@@ -14,21 +14,15 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-
 public abstract class SimpleScreenCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity senderPlayer = source.getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayerData = PlayerData.access(senderPlayer);
 
         senderPlayer.openHandledScreen(createNamedScreenHandlerFactory());
 
-        source.sendFeedback(
-            ECText.getInstance().getText(
-                "cmd.workbench.feedback",
-                getScreenTitle()),
-            CONFIG.BROADCAST_TO_OPS);
+        senderPlayerData.sendCommandFeedback("cmd.workbench.feedback", getScreenTitle());
 
         onOpen(senderPlayer);
 

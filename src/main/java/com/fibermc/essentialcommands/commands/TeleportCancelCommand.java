@@ -1,13 +1,11 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.PlayerData;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -18,26 +16,22 @@ public class TeleportCancelCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayerData = PlayerData.access(senderPlayer);
 
-        var existingTeleportRequest = ((ServerPlayerEntityAccess) senderPlayer)
-            .ec$getPlayerData()
-            .getSentTeleportRequest();
+        var existingTeleportRequest = senderPlayerData.getSentTeleportRequest();
 
         if (existingTeleportRequest == null) {
-            senderPlayer.sendMessage(
-                ECText.getInstance().getText("cmd.tpcancel.error.no_exists"),
-                MessageType.SYSTEM);
+            senderPlayerData.sendCommandError("cmd.tpcancel.error.no_exists");
             return 0;
         }
 
         existingTeleportRequest.end();
 
-        senderPlayer.sendMessage(
-            ECText.getInstance().getText(
-                "cmd.tpcancel.feedback",
-                existingTeleportRequest.getTargetPlayer().getDisplayName()),
-            MessageType.SYSTEM);
+        senderPlayerData.sendCommandFeedback(
+            "cmd.tpcancel.feedback",
+            existingTeleportRequest.getTargetPlayer().getDisplayName()
+        );
 
         return 1;
     }

@@ -126,11 +126,12 @@ public class PlayerDataManager {
 
     // EVENTS
     private static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
+        var playerAccess = ((ServerPlayerEntityAccess) player);
         PlayerData playerData = getInstance().loadPlayerData(player);
-        ((ServerPlayerEntityAccess) player).ec$setPlayerData(playerData);
+        playerAccess.ec$setPlayerData(playerData);
 
-        PlayerProfile profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
-        ((ServerPlayerEntityAccess) player).ec$setProfile(profile);
+        playerAccess.ec$getProfile();
+        playerAccess.ec$getEcText();
     }
 
     private static void onPlayerLeave(ServerPlayerEntity player) {
@@ -139,13 +140,16 @@ public class PlayerDataManager {
     }
 
     private static void onPlayerRespawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
-        PlayerData pData = ((ServerPlayerEntityAccess) oldPlayerEntity).ec$getPlayerData();
-        pData.updatePlayerEntity(newPlayerEntity);
-        ((ServerPlayerEntityAccess) newPlayerEntity).ec$setPlayerData(pData);
+        var oldPlayerAccess = ((ServerPlayerEntityAccess) oldPlayerEntity);
+        var newPlayerAccess = ((ServerPlayerEntityAccess) newPlayerEntity);
 
-        PlayerProfile profile = ((ServerPlayerEntityAccess) oldPlayerEntity).ec$getProfile();
+        PlayerData playerData = oldPlayerAccess.ec$getPlayerData();
+        playerData.updatePlayerEntity(newPlayerEntity);
+        newPlayerAccess.ec$setPlayerData(playerData);
+
+        PlayerProfile profile = oldPlayerAccess.ec$getProfile();
         profile.updatePlayerEntity(newPlayerEntity);
-        ((ServerPlayerEntityAccess) newPlayerEntity).ec$setProfile(profile);
+        newPlayerAccess.ec$setProfile(profile);
     }
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
