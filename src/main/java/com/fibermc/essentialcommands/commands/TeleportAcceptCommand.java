@@ -11,7 +11,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public class TeleportAcceptCommand extends TeleportResponseCommand {
     protected int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer) {
-        ServerCommandSource source = context.getSource();
         var senderPlayerData = PlayerData.access(senderPlayer);
         var targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
 
@@ -28,8 +27,6 @@ public class TeleportAcceptCommand extends TeleportResponseCommand {
             //Send message to command sender confirming that request has been accepted
             senderPlayerData.sendMessage("cmd.tpaccept.feedback");
 
-            //Clean up TPAsk
-            targetPlayerData.setTpTimer(-1);
             // Remove the tp request, as it has been completed.
             teleportRequest.end();
 

@@ -26,8 +26,6 @@ public class TeleportDenyCommand extends TeleportResponseCommand {
         //Send message to command sender confirming that request has been accepted
         senderPlayerData.sendCommandFeedback("cmd.tpdeny.feedback");
 
-        // Clean up TPAsk
-        targetPlayerData.setTpTimer(-1);
         // Remove the tp request, as it has been completed.
         teleportRequest.end();
 

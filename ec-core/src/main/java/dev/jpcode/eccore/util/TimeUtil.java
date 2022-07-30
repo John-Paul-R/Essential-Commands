@@ -7,9 +7,9 @@ import net.minecraft.server.MinecraftServer;
 public final class TimeUtil {
     private TimeUtil() {}
 
-    private static final double TPS = 20;
-    private static final double SECONDS_PER_TICK = 1 / TPS;
-    private static final long MS_PER_TICK = (long) (SECONDS_PER_TICK * 1000);
+    public static final int TPS = 20;
+    public static final double SECONDS_PER_TICK = 1 / (double) TPS;
+    public static final long MS_PER_TICK = (long) (SECONDS_PER_TICK * 1000);
     private static MinecraftServer server;
 
     public static void init(MinecraftServer server) {
@@ -39,5 +39,9 @@ public final class TimeUtil {
 
     public static int durationToTicks(Duration duration) {
         return TimeUtil.msToTicks(duration.toMillis());
+    }
+
+    public static double ticksToSeconds(int teleportDelayTicks) {
+        return teleportDelayTicks * SECONDS_PER_TICK;
     }
 }

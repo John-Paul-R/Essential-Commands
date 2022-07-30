@@ -49,11 +49,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     private UUID pUuid;
     private final File saveFile;
 
-    // TELEPORT
-    // Remaining time before current tp Ask (sent by this player) expires.
-    private int tpTimer;
     // Target of tpAsk
-    private TeleportRequest teleportRequest;
+    private TeleportRequest outgoingTeleportRequest;
 
     // players that have asked to teleport to this player
     // This list exists for autofilling the 'tpaccept' command
@@ -84,7 +81,6 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         this.lastActionTick = player.server.getTicks();
         this.pUuid = player.getUuid();
         this.saveFile = saveFile;
-        tpTimer = -1;
         incomingTeleportRequests = new LinkedHashMap<>();
         homes = new NamedLocationStorage();
         playerActEvent.register((packet) -> {
@@ -110,29 +106,16 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     public PlayerData(UUID playerUuid, NamedLocationStorage homes, File saveFile) {
         this.pUuid = playerUuid;
         this.saveFile = saveFile;
-        tpTimer = -1;
         incomingTeleportRequests = new LinkedHashMap<>();
         this.homes = homes;
     }
 
-    public int getTpTimer() {
-        return tpTimer;
-    }
-
-    public void setTpTimer(int tpTimer) {
-        this.tpTimer = tpTimer;
-    }
-
-    public void tickTpTimer() {
-        tpTimer--;
-    }
-
     public TeleportRequest getSentTeleportRequest() {
-        return teleportRequest;
+        return outgoingTeleportRequest;
     }
 
     public void setSentTeleportRequest(TeleportRequest request) {
-        this.teleportRequest = request;
+        this.outgoingTeleportRequest = request;
     }
 
     public LinkedHashMap<UUID, TeleportRequest> getIncomingTeleportRequests() {

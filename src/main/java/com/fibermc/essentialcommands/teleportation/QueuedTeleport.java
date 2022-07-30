@@ -21,7 +21,7 @@ public abstract class QueuedTeleport {
     public QueuedTeleport(PlayerData playerData, Text destName) {
         this.playerData = playerData;
         this.destName = destName;
-        this.ticksRemaining = (int) (CONFIG.TELEPORT_DELAY * 20);
+        this.ticksRemaining = CONFIG.TELEPORT_DELAY_TICKS;
         this.initialPosition = playerData.getPlayer().getPos();
     }
 

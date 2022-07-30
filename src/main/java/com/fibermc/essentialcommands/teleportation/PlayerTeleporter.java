@@ -4,8 +4,6 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
-import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
@@ -15,9 +13,6 @@ import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-/**
- * Teleporter
- */
 public final class PlayerTeleporter {
     private PlayerTeleporter() {}
 
@@ -30,17 +25,10 @@ public final class PlayerTeleporter {
 //        if (pData.getTpCooldown() < 0 || player.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
-        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY <= 0) {
+        if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY_TICKS <= 0) {
             teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
         } else {
-            var playerAccess = ((ServerPlayerEntityAccess) player);
-            playerAccess.ec$setQueuedTeleport(queuedTeleport);
             TeleportManager.getInstance().queueTeleport(queuedTeleport);
-            playerAccess.ec$getPlayerData().sendMessage(
-                "teleport.queued",
-                queuedTeleport.getDestName().setStyle(PlayerProfile.access(player).getStyle(TextFormatType.Accent)),
-                ECText.access(player).accent(String.format("%.1f", CONFIG.TELEPORT_DELAY))
-            );
         }
     }
 
@@ -94,7 +82,7 @@ public final class PlayerTeleporter {
         );
     }
 
-    public static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
+    static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
         return (
             (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
                 || ECPerms.check(player.getCommandSource(), permission, 5)
