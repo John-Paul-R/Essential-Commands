@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fibermc.essentialcommands.ManagerLocator;
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerProfile;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 

@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
-import com.fibermc.essentialcommands.PlayerProfile;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

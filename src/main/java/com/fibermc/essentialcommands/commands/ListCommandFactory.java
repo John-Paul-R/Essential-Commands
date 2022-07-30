@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.fibermc.essentialcommands.PlayerProfile;
 import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.IStyleProvider;

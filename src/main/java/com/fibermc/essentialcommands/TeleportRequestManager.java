@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;

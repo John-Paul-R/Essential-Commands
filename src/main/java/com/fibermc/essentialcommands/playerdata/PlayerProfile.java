@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.playerdata;
 
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;

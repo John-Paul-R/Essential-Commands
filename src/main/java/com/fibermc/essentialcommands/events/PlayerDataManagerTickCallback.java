@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.events;
 
-import com.fibermc.essentialcommands.PlayerDataManager;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 
 import net.minecraft.server.MinecraftServer;
 

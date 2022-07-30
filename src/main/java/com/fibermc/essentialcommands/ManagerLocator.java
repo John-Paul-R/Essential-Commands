@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.suggestions.OfflinePlayerRepo;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 
 import net.minecraft.server.MinecraftServer;
 

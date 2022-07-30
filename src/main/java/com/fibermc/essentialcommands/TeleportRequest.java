@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 

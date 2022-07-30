@@ -2,8 +2,8 @@ package com.fibermc.essentialcommands.commands;
 
 import java.util.List;
 
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataManager;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 import com.fibermc.essentialcommands.text.ECText;
 
 import com.mojang.brigadier.Command;

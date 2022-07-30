@@ -12,9 +12,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataFactory;
 import com.fibermc.essentialcommands.mixin.PersistentStateManagerInvoker;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerDataFactory;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import org.apache.logging.log4j.Level;

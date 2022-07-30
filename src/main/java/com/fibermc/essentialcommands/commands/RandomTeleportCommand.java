@@ -4,9 +4,9 @@ import java.util.Random;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
-import com.fibermc.essentialcommands.PlayerData;
 import com.fibermc.essentialcommands.PlayerTeleporter;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;

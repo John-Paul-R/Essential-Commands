@@ -1,10 +1,15 @@
 package com.fibermc.essentialcommands.mixin;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.EssentialCommands;
+import com.fibermc.essentialcommands.QueuedTeleport;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerDataFactory;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
+import com.fibermc.essentialcommands.playerdata.PlayerProfileFactory;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import org.spongepowered.asm.mixin.Mixin;

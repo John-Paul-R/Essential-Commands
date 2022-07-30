@@ -1,8 +1,12 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.playerdata;
 
 import java.io.File;
 import java.util.*;
 
+import com.fibermc.essentialcommands.ECAbilitySources;
+import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.EssentialCommands;
+import com.fibermc.essentialcommands.TeleportRequest;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.events.PlayerActCallback;

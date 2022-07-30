@@ -2,8 +2,8 @@ package com.fibermc.essentialcommands.commands.suggestions;
 
 import java.util.Optional;
 
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataManager;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 

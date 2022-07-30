@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.playerdata;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.UUID;
 
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import com.fibermc.essentialcommands.util.FileUtil;
 import org.apache.logging.log4j.Level;

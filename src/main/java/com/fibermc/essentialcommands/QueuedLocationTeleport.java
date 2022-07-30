@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands;
 
+import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import net.minecraft.text.MutableText;
