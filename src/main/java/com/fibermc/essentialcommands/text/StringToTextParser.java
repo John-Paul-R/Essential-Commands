@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.util;
+package com.fibermc.essentialcommands.text;
 
 import net.minecraft.text.Text;
 

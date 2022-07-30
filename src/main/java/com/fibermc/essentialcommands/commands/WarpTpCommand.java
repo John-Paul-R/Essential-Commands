@@ -1,9 +1,9 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.ManagerLocator;
-import com.fibermc.essentialcommands.PlayerTeleporter;
-import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
+import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.WarpLocation;
 
 import com.mojang.brigadier.Command;

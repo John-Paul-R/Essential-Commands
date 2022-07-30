@@ -2,8 +2,8 @@ package com.fibermc.essentialcommands.commands;
 
 import java.util.Map;
 
-import com.fibermc.essentialcommands.PlayerProfile;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.types.ProfileOption;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;

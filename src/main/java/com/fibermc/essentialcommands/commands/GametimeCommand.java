@@ -1,8 +1,8 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.PlayerProfile;
-import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.IStyleProvider;
 
 import com.mojang.brigadier.Command;

@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.text.TextFormatType;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;

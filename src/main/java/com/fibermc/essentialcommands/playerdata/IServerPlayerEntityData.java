@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.playerdata;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 

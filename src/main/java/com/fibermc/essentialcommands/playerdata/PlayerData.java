@@ -1,13 +1,20 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.playerdata;
 
 import java.io.File;
 import java.util.*;
 
+import com.fibermc.essentialcommands.ECAbilitySources;
+import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.events.PlayerActCallback;
+import com.fibermc.essentialcommands.teleportation.TeleportRequest;
+import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import com.fibermc.essentialcommands.util.NicknameTextUtil;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
 import org.jetbrains.annotations.NotNull;

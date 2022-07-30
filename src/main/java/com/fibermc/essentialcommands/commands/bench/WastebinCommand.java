@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands.commands.bench;
 
-import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.inventory.SimpleInventory;

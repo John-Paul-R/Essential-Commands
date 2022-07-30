@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands.bench;
 
-import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
 import org.jetbrains.annotations.NotNull;
 
 import com.mojang.brigadier.Command;

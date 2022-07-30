@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.TeleportRequest;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.teleportation.TeleportRequest;
 
 import com.mojang.brigadier.context.CommandContext;
 

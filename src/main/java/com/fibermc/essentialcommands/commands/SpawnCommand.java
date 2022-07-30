@@ -1,6 +1,10 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.WorldDataManager;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
+import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import com.mojang.brigadier.Command;

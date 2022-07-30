@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.types;
 
-import com.fibermc.essentialcommands.TextFormatType;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

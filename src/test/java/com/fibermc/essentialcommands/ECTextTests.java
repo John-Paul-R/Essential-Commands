@@ -2,6 +2,8 @@ package com.fibermc.essentialcommands;
 
 import java.util.NoSuchElementException;
 
+import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

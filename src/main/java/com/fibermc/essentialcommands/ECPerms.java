@@ -131,7 +131,7 @@ public final class ECPerms {
         return Integer.parseInt(permission.substring(permission.lastIndexOf('.') + 1));
     }
 
-    static int getHighestNumericPermission(@NotNull CommandSource source, @NotNull String[] permissionGroup) {
+    public static int getHighestNumericPermission(@NotNull CommandSource source, @NotNull String[] permissionGroup) {
         // No effective numeric limits for ops.
         if (isSuperAdmin(source)) {
             return Integer.MAX_VALUE;

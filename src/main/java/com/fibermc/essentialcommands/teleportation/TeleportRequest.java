@@ -1,6 +1,8 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.teleportation;
 
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 

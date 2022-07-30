@@ -2,10 +2,9 @@ package com.fibermc.essentialcommands.types;
 
 import java.util.HashMap;
 
-import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.NbtSerializable;
-import com.fibermc.essentialcommands.TextFormatType;
 import com.fibermc.essentialcommands.commands.CommandUtil;
+import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 

@@ -5,11 +5,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Objects;
-import java.util.function.UnaryOperator;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -31,17 +28,16 @@ public final class Updater {
         ).thenAcceptAsync((HttpResponse<String> response) -> {
             String latestVersionStr = response.body();
 
-            ModMetadata modMetadata = FabricLoader.getInstance().getModContainer("essential_commands").get().getMetadata();
-            if (Objects.isNull(modMetadata)) {
+            ModMetadata modMetadata = EssentialCommands.MOD_METADATA;
+            if (modMetadata == null) {
                 EssentialCommands.LOGGER.warn("Failed to check for Essential Commands updates.");
                 return;
             }
 
-            UnaryOperator<String> stripMinecraftVersion = (String versionStr) -> versionStr.substring(0, versionStr.indexOf("-mc"));
             String currentVersionStr = modMetadata.getVersion().getFriendlyString();
             try {
-                Version currentVers = Version.parse(stripMinecraftVersion.apply(currentVersionStr));//VersionDeserializer.deserializeSemantic(stripMinecraftVersion.apply(currentVersionStr));
-                Version latestVers = Version.parse(stripMinecraftVersion.apply(latestVersionStr));
+                Version currentVers = Version.parse(stripMinecraftVersion(currentVersionStr));//VersionDeserializer.deserializeSemantic(stripMinecraftVersion.apply(currentVersionStr));
+                Version latestVers = Version.parse(stripMinecraftVersion(latestVersionStr));
                 if (latestVers.compareTo(currentVers) > 0) {
                     String updateMessage = String.format(
                             "A new version of Essential Commands is available. Current: '%s' Latest: '%s'. Get the new version at %s",
@@ -58,5 +54,9 @@ public final class Updater {
                 e.printStackTrace();
             }
         });
+    }
+
+    private static String stripMinecraftVersion(String versionStr) {
+        return versionStr.substring(0, versionStr.indexOf("-mc"));
     }
 }

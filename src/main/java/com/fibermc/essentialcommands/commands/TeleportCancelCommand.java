@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;

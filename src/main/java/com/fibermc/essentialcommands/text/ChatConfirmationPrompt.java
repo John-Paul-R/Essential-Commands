@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands;
+package com.fibermc.essentialcommands.text;
 
 import com.fibermc.essentialcommands.commands.CommandUtil;
 

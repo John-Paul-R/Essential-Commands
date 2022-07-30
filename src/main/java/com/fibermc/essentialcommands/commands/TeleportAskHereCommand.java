@@ -1,6 +1,11 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
+import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.teleportation.TeleportManager;
+import com.fibermc.essentialcommands.teleportation.TeleportRequest;
+import com.fibermc.essentialcommands.text.ChatConfirmationPrompt;
+import com.fibermc.essentialcommands.text.ECText;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -16,7 +21,7 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        TeleportRequestManager tpMgr = ManagerLocator.getInstance().getTpManager();
+        TeleportManager tpMgr = ManagerLocator.getInstance().getTpManager();
         ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
         var senderPlayerData = PlayerData.access(senderPlayer);

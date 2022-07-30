@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.types;
 
-import com.fibermc.essentialcommands.PlayerProfile;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 
 import com.mojang.brigadier.context.CommandContext;
 
