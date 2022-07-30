@@ -85,7 +85,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
         var homeNameText = ecText.getText(
             "cmd.home.location_name",
             TextFormatType.Default,
-            ecText.accentText(homeName));
+            ecText.accent(homeName));
 
         PlayerTeleporter.requestTeleport(senderPlayerData, loc, homeNameText);
         return 1;

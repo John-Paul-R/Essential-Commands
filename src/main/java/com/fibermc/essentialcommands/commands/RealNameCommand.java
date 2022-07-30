@@ -26,7 +26,7 @@ public class RealNameCommand implements Command<ServerCommandSource> {
         MutableText responseText = Text.empty();
 
         var ecText = ECText.access(context.getSource().getPlayerOrThrow());
-        var nicknameText = ecText.accentText(nicknameStr);
+        var nicknameText = ecText.accent(nicknameStr);
         // If no players matched the provided nickname
         if (nicknamePlayers.size() == 0) {
             responseText

@@ -24,7 +24,7 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
 
         boolean wasSuccessful = worldDataManager.delWarp(warpName);
 
-        var warpNameText = ECText.access(senderPlayerData.getPlayer()).accentText(warpName);
+        var warpNameText = ECText.access(senderPlayerData.getPlayer()).accent(warpName);
         //inform command sender that the warp has been removed
         if (!wasSuccessful) {
             senderPlayerData.sendCommandError("cmd.warp.delete.error", warpNameText);

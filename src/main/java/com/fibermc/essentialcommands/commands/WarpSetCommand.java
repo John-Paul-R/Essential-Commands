@@ -32,7 +32,7 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
             requiresPermission = false;
         }
 
-        var warpNameText = ECText.access(senderPlayer).accentText(warpName);
+        var warpNameText = ECText.access(senderPlayer).accent(warpName);
         //Add warp
         try {
             worldDataManager.setWarp(warpName, new MinecraftLocation(senderPlayer), requiresPermission);

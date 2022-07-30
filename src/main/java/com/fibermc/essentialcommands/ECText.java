@@ -1,14 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.regex.Pattern;
-
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.google.common.collect.ImmutableList;
@@ -18,7 +9,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
-import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,6 +17,17 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.JsonHelper;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 
 import static com.fibermc.essentialcommands.EssentialCommands.*;
 
@@ -50,18 +51,6 @@ public abstract class ECText {
 
     public static void init(MinecraftServer server) {
         ECText.server = server;
-    }
-
-    public static MutableText literal(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_DEFAULT);
-    }
-
-    public static MutableText accent(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_ACCENT);
-    }
-
-    public static MutableText error(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_ERROR);
     }
 
     private static ECText create(String langId) {
@@ -136,16 +125,16 @@ public abstract class ECText {
 
     public abstract OrderedText reorder(StringVisitable text);
 
-    public MutableText literalText(String str) {
-        return ECText.literal(str);
+    public MutableText literal(String str) {
+        return Text.literal(str).setStyle(CONFIG.FORMATTING_DEFAULT);
     }
 
-    public MutableText accentText(String str) {
-        return ECText.accent(str);
+    public MutableText accent(String str) {
+        return Text.literal(str).setStyle(CONFIG.FORMATTING_ACCENT);
     }
 
-    public MutableText errorText(String str) {
-        return ECText.error(str);
+    public MutableText error(String str) {
+        return Text.literal(str).setStyle(CONFIG.FORMATTING_ERROR);
     }
 
     public List<OrderedText> reorder(List<StringVisitable> texts) {

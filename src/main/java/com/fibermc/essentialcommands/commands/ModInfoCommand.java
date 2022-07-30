@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECText;
 import com.fibermc.essentialcommands.EssentialCommands;
+import com.fibermc.essentialcommands.PlayerData;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -18,12 +19,13 @@ public class ModInfoCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-
-        context.getSource().sendFeedback(TextUtil.concat(
-            ECText.literal(EssentialCommands.MOD_METADATA.getName()),
+        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var ecText = ECText.access(senderPlayer);
+        PlayerData.access(senderPlayer).sendCommandFeedback(TextUtil.concat(
+            ecText.literal(EssentialCommands.MOD_METADATA.getName()),
             Text.literal(" "),
-            ECText.accent(modVersion)
-        ), false);
+            ecText.accent(modVersion)
+        ));
 
         return 0;
     }

@@ -42,17 +42,17 @@ public class PlayerECTextImpl extends ECTextImpl {
     }
 
     @Override
-    public MutableText literalText(String str) {
+    public MutableText literal(String str) {
         return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Default));
     }
 
     @Override
-    public MutableText accentText(String str) {
+    public MutableText accent(String str) {
         return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Accent));
     }
 
     @Override
-    public MutableText errorText(String str) {
+    public MutableText error(String str) {
         return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Error));
     }
 }

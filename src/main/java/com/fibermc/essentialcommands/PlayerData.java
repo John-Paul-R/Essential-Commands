@@ -156,8 +156,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             this.markDirty();
         } else {
             var ecText = ECText.access(this.player);
-            var homeNameText = ecText.accentText(homeName);
-            var maxHomesText = ecText.accentText(String.valueOf(playerMaxHomes));
+            var homeNameText = ecText.accent(homeName);
+            var maxHomesText = ecText.accent(String.valueOf(playerMaxHomes));
             throw CommandUtil.createSimpleException(ecText.getText(
                 "cmd.home.set.error.limit",
                 TextFormatType.Error,
@@ -166,17 +166,20 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         }
     }
 
+    public void sendCommandFeedback(Text text) {
+        this.player.getCommandSource().sendFeedback(text, CONFIG.BROADCAST_TO_OPS);
+    }
+
     public void sendCommandFeedback(String messageKey, Text... args) {
-        this.player.getCommandSource().sendFeedback(
-            ECText.access(this.player).getText(messageKey, TextFormatType.Default, args),
-            CONFIG.BROADCAST_TO_OPS
-        );
+        sendCommandFeedback(ECText.access(this.player).getText(messageKey, TextFormatType.Default, args));
+    }
+
+    public void sendCommandError(Text text) {
+        this.player.getCommandSource().sendError(text);
     }
 
     public void sendCommandError(String messageKey, Text... args) {
-        this.player.getCommandSource().sendError(
-            ECText.access(this.player).getText(messageKey, TextFormatType.Error, args)
-        );
+        sendCommandError(ECText.access(this.player).getText(messageKey, TextFormatType.Error, args));
     }
 
     public void sendMessage(String messageKey, Text... args) {

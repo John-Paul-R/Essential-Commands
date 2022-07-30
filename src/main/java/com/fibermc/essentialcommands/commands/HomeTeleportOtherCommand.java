@@ -72,7 +72,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
                         homeName
                     );
                 } catch (CommandSyntaxException e) {
-                    context.getSource().sendError(ECText.error(e.getMessage()));
+                    context.getSource().sendError(ECText.access(senderPlayerData.getPlayer()).error(e.getMessage()));
                 }
             });
         return 1;

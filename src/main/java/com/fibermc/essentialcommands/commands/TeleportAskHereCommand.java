@@ -34,9 +34,10 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
         }
 
         //inform target player of tp request via chat
+        var targetPlayerEcText = ECText.access(targetPlayer);
         targetPlayerData.sendMessage(
             "cmd.tpaskhere.receive",
-            ECText.access(targetPlayer).accentText(senderPlayer.getEntityName())
+            targetPlayerEcText.accent(senderPlayer.getEntityName())
         );
 
         String senderName = senderPlayer.getGameProfile().getName();
@@ -44,15 +45,15 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
             targetPlayer,
             "/tpaccept " + senderName,
             "/tpdeny " + senderName,
-            ECText.accent("[" + ECText.getInstance().getString("generic.accept") + "]"),
-            ECText.error("[" + ECText.getInstance().getString("generic.deny") + "]")
+            targetPlayerEcText.accent("[" + ECText.getInstance().getString("generic.accept") + "]"),
+            targetPlayerEcText.error("[" + ECText.getInstance().getString("generic.deny") + "]")
         ).send();
 
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_HERE);
 
         //inform command sender that request has been sent
-        var targetPlayerText = ECText.access(senderPlayer).accentText(targetPlayer.getEntityName());
+        var targetPlayerText = ECText.access(senderPlayer).accent(targetPlayer.getEntityName());
         senderPlayerData.sendCommandFeedback("cmd.tpask.send", targetPlayerText);
 
         return 1;

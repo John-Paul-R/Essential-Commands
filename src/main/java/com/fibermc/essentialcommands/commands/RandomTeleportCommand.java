@@ -17,6 +17,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -65,7 +66,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                     ecText.getText(
                         "cmd.rtp.error.cooldown",
                         TextFormatType.Error,
-                        ecText.accentText(String.format("%.1f", rtpCooldownRemaining / 20D)))
+                        ecText.accent(String.format("%.1f", rtpCooldownRemaining / 20D)))
                 );
             }
             // if cooldown has expired
@@ -139,7 +140,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             EssentialCommands.LOGGER.info(
                 ECText.getInstance().getText(
                     "cmd.rtp.log.location_validate_time",
-                    ECText.accent(String.valueOf(timer.stop()))
+                    Text.literal(String.valueOf(timer.stop()))
                 ).getString());
         }
 

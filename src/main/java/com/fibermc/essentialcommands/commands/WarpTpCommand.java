@@ -36,7 +36,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
         var ecText = ECText.access(senderPlayer);
 
         String warpName = StringArgumentType.getString(context, "warp_name");
-        var warpNameText = ecText.accentText(warpName);
+        var warpNameText = ecText.accent(warpName);
         WarpLocation loc = worldDataManager.getWarp(warpName);
 
         if (loc == null) {

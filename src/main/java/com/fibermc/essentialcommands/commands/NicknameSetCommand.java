@@ -49,8 +49,8 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
                 case -1 -> ecText.getText("cmd.nickname.set.error.perms", TextFormatType.Error);
                 case -2 -> ecText.getText(
                     "cmd.nickname.set.error.length", TextFormatType.Error,
-                    ecText.accentText(String.valueOf(nicknameText.getString().length())),
-                    ecText.accentText(String.valueOf(CONFIG.NICKNAME_MAX_LENGTH))
+                    ecText.accent(String.valueOf(nicknameText.getString().length())),
+                    ecText.accent(String.valueOf(CONFIG.NICKNAME_MAX_LENGTH))
                 );
                 default -> ecText.getText("generic.error.unknown", TextFormatType.Error);
             };
