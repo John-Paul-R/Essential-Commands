@@ -154,7 +154,7 @@ public final class TeleportManager {
         );
         if (prevValue != null) {
             var profile = playerAccess.ec$getProfile();
-            var styleUpdater = TextFormatType.nonOverwritingStyleUpdater(profile.getStyle(TextFormatType.Accent));
+            var styleUpdater = profile.nonOverwritingColorUpdater(TextFormatType.Accent);
             prevValue.getPlayerData().sendMessage(
                 "teleport.request.canceled_by_new",
                 prevValue.getDestName().styled(styleUpdater),
