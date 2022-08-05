@@ -25,7 +25,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
@@ -173,17 +172,11 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public void sendMessage(String messageKey, Text... args) {
-        this.player.sendMessage(
-            ECText.access(this.player).getText(messageKey, TextFormatType.Default, args),
-            MessageType.SYSTEM
-        );
+        this.player.sendMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Default, args));
     }
 
     public void sendError(String messageKey, Text... args) {
-        this.player.sendMessage(
-            ECText.access(this.player).getText(messageKey, TextFormatType.Error, args),
-            MessageType.SYSTEM
-        );
+        this.player.sendMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Error, args));
     }
 
     public Set<String> getHomeNames() {
@@ -223,7 +216,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
                 ECText.getInstance().getText(
                     "player.afk.enter",
                     this.player.getDisplayName()),
-                MessageType.SYSTEM);
+                false);
 
             // This assignment should happen after the message, otherwise
             // `getDisplayName` will include the `[AFK]` prefix.
@@ -239,7 +232,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
                 ECText.getInstance().getText(
                     "player.afk.exit",
                     this.player.getDisplayName()),
-                MessageType.SYSTEM);
+                false);
         }
 
         PlayerDataManager.getInstance().markNicknameDirty(this);

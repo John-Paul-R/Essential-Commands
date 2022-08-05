@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
@@ -57,10 +56,7 @@ public final class ChatConfirmationPrompt {
     }
 
     public void send() {
-        this.player.sendMessage(
-            this.text,
-            MessageType.SYSTEM
-        );
+        this.player.sendMessage(this.text);
     }
 
     public MutableText getText() {
