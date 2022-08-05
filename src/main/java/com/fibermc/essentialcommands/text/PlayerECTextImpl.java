@@ -22,16 +22,6 @@ public class PlayerECTextImpl extends ECTextImpl {
     }
 
     @Override
-    public MutableText getText(String key) {
-        return getTextLiteral(key, TextFormatType.Default, this.styleProvider);
-    }
-
-    @Override
-    public MutableText getText(String key, TextFormatType textFormatType) {
-        return getTextLiteral(key, textFormatType, this.styleProvider);
-    }
-
-    @Override
     public MutableText getText(String key, Text... args) {
         return getTextInternal(key, TextFormatType.Default, this.styleProvider, args);
     }

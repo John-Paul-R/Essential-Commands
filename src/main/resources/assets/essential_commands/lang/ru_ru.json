@@ -70,6 +70,6 @@
 
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
-  "cmd.config.reload": "Конфиг перезагружен."
+  "cmd.config.reload": "${l:essentialcommands.fullprefix} Конфиг перезагружен."
 
 }

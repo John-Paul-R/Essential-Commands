@@ -82,6 +82,6 @@
 
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
-  "cmd.config.reload": "已重新加载配置。"
+  "cmd.config.reload": "${l:essentialcommands.fullprefix} 已重新加载配置。"
 
 }

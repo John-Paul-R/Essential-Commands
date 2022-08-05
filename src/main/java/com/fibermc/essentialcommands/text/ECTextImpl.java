@@ -55,14 +55,6 @@ public class ECTextImpl extends ECText {
                 : styleProvider.getStyle(textFormatType));
     }
 
-    public MutableText getText(String key) {
-        return getTextLiteral(key, TextFormatType.Default);
-    }
-
-    public MutableText getText(String key, TextFormatType textFormatType) {
-        return getTextLiteral(key, textFormatType);
-    }
-
     // Interpolated
     public MutableText getText(String key, Text... args) {
         return getTextInternal(key, TextFormatType.Default, null, args);
@@ -107,7 +99,7 @@ public class ECTextImpl extends ECText {
                                     "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
                                         + placeholderId);
                             }
-                            yield getTextLiteral(idxAndFormattingCode[1], textFormatType, styleProvider);
+                            yield getTextInternal(idxAndFormattingCode[1], textFormatType, styleProvider);
                         }
 
                         default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));

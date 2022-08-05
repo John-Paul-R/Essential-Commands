@@ -117,8 +117,6 @@ public abstract class ECText {
     //    public abstract MutableText getText(String key, Object... args);
     public abstract MutableText getText(String key, TextFormatType textFormatType, IStyleProvider styleProvider, Text... args);
 
-    public abstract MutableText getText(String key);
-
     public abstract boolean hasTranslation(String key);
 
     public abstract boolean isRightToLeft();
