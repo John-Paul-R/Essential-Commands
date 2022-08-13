@@ -460,7 +460,8 @@ public final class EssentialCommandRegistry {
             .then(CommandManager.literal("reload")
                 .executes((context) -> {
                     BACKING_CONFIG.loadOrCreateProperties();
-                    var ecText = ECText.access(context.getSource().getPlayerOrThrow());
+                    var player = context.getSource().getPlayer();
+                    var ecText = player != null ? ECText.access(player) : ECText.getInstance();
                     context.getSource().sendFeedback(
                         ecText.getText("cmd.config.reload"),
                         true
