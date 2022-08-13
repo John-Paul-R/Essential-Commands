@@ -25,7 +25,7 @@
   "cmd.rtp.error.cooldown": "Команда на перезарядке. (${0} секунд осталось)",
   "cmd.rtp.error.no_spawn_set": "Точка спавна не установлена. (RTP учитывает позицию точки спавна)",
   "cmd.rtp.location_name": "случайная позиция",
-  "cmd.rtp.log.location_validate_time": "Время, затраченное на вычисление того, является ли местоположение RTP действительным: %s",
+  "cmd.rtp.log.location_validate_time": "Время, затраченное на вычисление того, является ли местоположение RTP действительным: ${0}",
   "cmd.realname.feedback.none_match": "Нет игроков в сети с таким именем '${0}'.",
   "cmd.realname.feedback.matching": "Следующие игроки соответствуют имени '${0}':",
   "cmd.spawn.location_name": "Точка спавна",
