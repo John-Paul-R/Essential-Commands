@@ -77,8 +77,8 @@ public class WorldDataManager extends PersistentState {
     }
 
     public void fromNbt(NbtCompound tag) {
-        MinecraftLocation tempSpawnLocation = new MinecraftLocation(tag.getCompound(SPAWN_KEY));
-        if (tempSpawnLocation.dim.getValue().getPath().isEmpty()) {
+        MinecraftLocation tempSpawnLocation = MinecraftLocation.fromNbt(tag.getCompound(SPAWN_KEY));
+        if (tempSpawnLocation.dim().getValue().getPath().isEmpty()) {
             this.spawnLocation = null;
         } else {
             this.spawnLocation = tempSpawnLocation;
@@ -123,7 +123,8 @@ public class WorldDataManager extends PersistentState {
     public void setWarp(String warpName, MinecraftLocation location, boolean requiresPermission) throws CommandSyntaxException {
         warps.putCommand(warpName, new WarpLocation(
             location,
-            requiresPermission ? warpName : null
+            requiresPermission ? warpName : null,
+            warpName
         ));
         this.markDirty();
         this.save();

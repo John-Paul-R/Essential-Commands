@@ -130,8 +130,8 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         final double delta_x = r * Math.cos(angle);
         final double delta_z = r * Math.sin(angle);
 
-        final double new_x = center.pos.x + delta_x;
-        final double new_z = center.pos.z + delta_z;
+        final double new_x = center.pos().x + delta_x;
+        final double new_z = center.pos().z + delta_z;
 
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
         int new_y;

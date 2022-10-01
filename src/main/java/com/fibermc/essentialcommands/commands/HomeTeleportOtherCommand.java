@@ -11,7 +11,7 @@ import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.text.ECText;
-import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -123,7 +123,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
         /**
          * Gets a set of suggestion entries to be used with ListCommandFactory
          */
-        public static Set<Map.Entry<String, MinecraftLocation>> getSuggestionEntries(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        public static Set<Map.Entry<String, NamedMinecraftLocation>> getSuggestionEntries(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
             return HomeTeleportOtherCommand.getTargetPlayerData(context).getHomeEntries();
         }
 

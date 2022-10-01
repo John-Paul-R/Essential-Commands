@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands.commands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import com.mojang.brigadier.Command;
@@ -29,7 +28,7 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been set
         playerData.sendCommandFeedback(
             "cmd.spawn.set.feedback",
-            loc.toLiteralTextSimple().setStyle(PlayerProfile.access(senderPlayer).getStyle(TextFormatType.Accent))
+            loc.toText(PlayerProfile.access(senderPlayer))
         );
 
         return 1;

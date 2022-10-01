@@ -62,21 +62,21 @@ public final class TextUtil {
      * @return the joined String, <code>null</code> if null array input
      * @since 2.0
      */
-    public static Text join(Text[] array, Text separator) {
+    public static MutableText join(Text[] array, Text separator) {
         if (array == null) {
             return null;
         }
         return join(array, separator, 0, array.length);
     }
 
-    public static Text join(Collection<Text> textCollection, Text separator) {
+    public static MutableText join(Collection<Text> textCollection, Text separator) {
         if (textCollection == null) {
             return null;
         }
         return join(textCollection.toArray(new Text[0]), separator, 0, textCollection.size());
     }
 
-    public static Text join(Collection<String> stringCollection, Text separator, Style stringsFormatting) {
+    public static MutableText join(Collection<String> stringCollection, Text separator, Style stringsFormatting) {
         if (stringCollection == null) {
             return null;
         }
@@ -116,7 +116,7 @@ public final class TextUtil {
         return buf.toString();
     }
 
-    public static Text join(Text[] array, Text separator, int startIndex, int endIndex) {
+    public static MutableText join(Text[] array, Text separator, int startIndex, int endIndex) {
         if (array == null) {
             return null;
         }
@@ -136,7 +136,7 @@ public final class TextUtil {
         return buf;
     }
 
-    public static Text spaceBetween(Text[] array, int totalWidth, int padding) {
+    public static MutableText spaceBetween(Text[] array, int totalWidth, int padding) {
         int totalTextSize = 0;
         for (Text txt : array) {
             String str = txt.getString();
@@ -165,7 +165,7 @@ public final class TextUtil {
         return outText;
     }
 
-    public static Text clickableTeleport(MutableText originalText, String destinationName, String commandBaseString) {
+    public static MutableText clickableTeleport(MutableText originalText, String destinationName, String commandBaseString) {
         String teleportCommand = String.format("%s %s", commandBaseString, destinationName);
 
         Style outStyle = originalText.getStyle()

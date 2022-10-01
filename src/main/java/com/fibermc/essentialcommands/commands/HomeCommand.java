@@ -12,6 +12,7 @@ import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.Message;
@@ -106,7 +107,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
         /**
          * Gets a set of suggestion entries to be used with ListCommandFactory
          */
-        public static Set<Map.Entry<String, MinecraftLocation>> getSuggestionEntries(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        public static Set<Map.Entry<String, NamedMinecraftLocation>> getSuggestionEntries(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
             return HomeCommand.getTargetPlayerData(context).getHomeEntries();
         }
     }
