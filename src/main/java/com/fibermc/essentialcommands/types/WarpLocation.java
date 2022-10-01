@@ -7,33 +7,35 @@ import com.fibermc.essentialcommands.ECPerms;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class WarpLocation extends MinecraftLocation {
+public class WarpLocation extends NamedMinecraftLocation {
 
-    private final String permissionString;
+    private String permissionString;
+
+    private WarpLocation() {}
 
     /**
      * @param permissionString The string permission node for the warp. Null for no required permisison.
      */
-    public WarpLocation(MinecraftLocation location, String permissionString) {
-        super(
-            location.dim,
-            location.pos.x,
-            location.pos.y,
-            location.pos.z,
-            location.headYaw,
-            location.pitch
-        );
+    public WarpLocation(NamedMinecraftLocation location, String permissionString) {
+        super(location, location.getName());
         this.permissionString = permissionString;
     }
 
-    public WarpLocation(NbtCompound tag) {
-        super(tag);
-        String permissionString1;
-        permissionString1 = tag.getString("permissionString");
+    public WarpLocation(MinecraftLocation location, String permissionString, String name) {
+        super(location, name);
+        this.permissionString = permissionString;
+    }
+
+    public static WarpLocation fromNbt(NbtCompound tag, String name) {
+        String permissionString1 = tag.getString("permissionString");
         if (Objects.equals(permissionString1, "")) {
             permissionString1 = null;
         }
-        this.permissionString = permissionString1;
+
+        var loc = new WarpLocation();
+        loc.loadNbt(tag, name);
+        loc.permissionString = permissionString1;
+        return loc;
     }
 
     @Override

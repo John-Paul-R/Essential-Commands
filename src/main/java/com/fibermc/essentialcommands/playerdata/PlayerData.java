@@ -14,6 +14,7 @@ import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import com.fibermc.essentialcommands.util.NicknameTextUtil;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
@@ -183,11 +184,11 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         return homes.keySet();
     }
 
-    public Set<Map.Entry<String, MinecraftLocation>> getHomeEntries() {
+    public Set<Map.Entry<String, NamedMinecraftLocation>> getHomeEntries() {
         return homes.entrySet();
     }
 
-    public MinecraftLocation getHomeLocation(String homeName) {
+    public NamedMinecraftLocation getHomeLocation(String homeName) {
         return homes.get(homeName);
     }
 

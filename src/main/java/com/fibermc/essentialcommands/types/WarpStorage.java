@@ -37,11 +37,12 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
             NbtList homesNbtList = (NbtList) nbt;
             for (NbtElement t : homesNbtList) {
                 NbtCompound homeTag = (NbtCompound) t;
-                super.put(homeTag.getString("homeName"), new WarpLocation(homeTag));
+                String name = homeTag.getString("homeName");
+                super.put(name, WarpLocation.fromNbt(homeTag, name));
             }
         } else {
             NbtCompound nbtCompound = (NbtCompound) nbt;
-            nbtCompound.getKeys().forEach((key) -> super.put(key, new WarpLocation(nbtCompound.getCompound(key))));
+            nbtCompound.getKeys().forEach((key) -> super.put(key, WarpLocation.fromNbt(nbtCompound.getCompound(key), key)));
         }
 
     }

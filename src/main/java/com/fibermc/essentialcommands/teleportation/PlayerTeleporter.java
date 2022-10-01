@@ -48,7 +48,7 @@ public final class PlayerTeleporter {
         if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS
             && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
-            if (dest.dim != player.getWorld().getRegistryKey()) {
+            if (dest.dim() != player.getWorld().getRegistryKey()) {
                 pData.sendError("teleport.error.interdimensional_teleport_disabled");
                 return;
             }
@@ -67,9 +67,9 @@ public final class PlayerTeleporter {
 
     private static void execTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
         playerEntity.teleport(
-            playerEntity.getServer().getWorld(dest.dim),
-            dest.pos.x, dest.pos.y, dest.pos.z,
-            dest.headYaw, dest.pitch
+            playerEntity.getServer().getWorld(dest.dim()),
+            dest.pos().x, dest.pos().y, dest.pos().z,
+            dest.headYaw(), dest.pitch()
         );
 
         var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
@@ -77,7 +77,7 @@ public final class PlayerTeleporter {
         playerAccess.ec$getPlayerData().sendMessage(
             "teleport.done",
             playerProfile.shouldPrintTeleportCoordinates()
-                ? dest.toLiteralTextSimple().setStyle(playerProfile.getStyle(TextFormatType.Accent))
+                ? dest.toText(playerProfile)
                 : Text.literal("destination").setStyle(playerProfile.getStyle(TextFormatType.Default))
         );
     }

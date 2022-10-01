@@ -15,8 +15,8 @@ import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.mixin.PersistentStateManagerInvoker;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.playerdata.PlayerDataFactory;
-import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
@@ -47,13 +47,14 @@ public final class EssentialsXParser {
 
             homes.put(
                 name,
-                new MinecraftLocation(
+                new NamedMinecraftLocation(
                     worldRegistryKey,
                     (Double) locData.get("x"),
                     (Double) locData.get("y"),
                     (Double) locData.get("z"),
                     ((Double) locData.get("yaw")).floatValue(),
-                    ((Double) locData.get("pitch")).floatValue()
+                    ((Double) locData.get("pitch")).floatValue(),
+                    name
                 ));
         });
 

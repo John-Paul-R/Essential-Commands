@@ -13,7 +13,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
 
-public class NamedLocationStorage extends HashMap<String, MinecraftLocation> implements NbtSerializable {
+public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation> implements NbtSerializable {
 
     public NamedLocationStorage() {}
 
@@ -37,15 +37,20 @@ public class NamedLocationStorage extends HashMap<String, MinecraftLocation> imp
             NbtList homesNbtList = (NbtList) nbt;
             for (NbtElement t : homesNbtList) {
                 NbtCompound homeTag = (NbtCompound) t;
-                super.put(homeTag.getString("homeName"), new MinecraftLocation(homeTag));
+                var homeName = homeTag.getString("homeName");
+                super.put(homeName, NamedMinecraftLocation.fromNbt(homeTag, homeName));
             }
         } else {
             NbtCompound nbtCompound = (NbtCompound) nbt;
-            nbtCompound.getKeys().forEach((key) -> super.put(key, new MinecraftLocation(nbtCompound.getCompound(key))));
+            nbtCompound.getKeys().forEach((key) -> super.put(key, NamedMinecraftLocation.fromNbt(nbtCompound.getCompound(key), key)));
         }
     }
 
     public MinecraftLocation putCommand(String name, MinecraftLocation location) throws CommandSyntaxException {
+        return putCommand(name, new NamedMinecraftLocation(location, name));
+    }
+
+    private MinecraftLocation putCommand(String name, NamedMinecraftLocation location) throws CommandSyntaxException {
         if (this.get(name) == null) {
             return super.put(name, location);
         } else {
