@@ -5,9 +5,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.types.RespawnCondition;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.TextParserUtils;
@@ -150,6 +152,19 @@ public class PlayerDataManager {
         PlayerProfile profile = oldPlayerAccess.ec$getProfile();
         profile.updatePlayerEntity(newPlayerEntity);
         newPlayerAccess.ec$setProfile(profile);
+
+        var worldMgr = ManagerLocator.getInstance().getWorldDataManager();
+        var spawnLoc = worldMgr.getSpawn();
+        if (CONFIG.RESPAWN_AT_EC_SPAWN == RespawnCondition.Always
+            || CONFIG.RESPAWN_AT_EC_SPAWN == RespawnCondition.SameWorld
+                && oldPlayerEntity.getWorld().getRegistryKey() == spawnLoc.dim()
+        ) {
+            // respawn at spawn loc
+            // This event handler executes just before the player is truly respawned, so we can just
+            // modify the entity's location to achieve this.
+            newPlayerEntity.setPosition(spawnLoc.pos());
+            newPlayerEntity.setWorld(newPlayerEntity.getServer().getWorld(spawnLoc.dim()));
+        }
     }
 
     private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
