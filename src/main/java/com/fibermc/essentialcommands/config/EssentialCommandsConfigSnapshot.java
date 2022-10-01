@@ -2,6 +2,8 @@ package com.fibermc.essentialcommands.config;
 
 import java.util.List;
 
+import com.fibermc.essentialcommands.types.RespawnCondition;
+
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
@@ -62,6 +64,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final int AUTO_AFK_TICKS;
     public final boolean REGISTER_TOP_LEVEL_COMMANDS;
     public final List<String> EXCLUDED_TOP_LEVEL_COMMANDS;
+    public final RespawnCondition RESPAWN_AT_EC_SPAWN;
 
     private EssentialCommandsConfigSnapshot(EssentialCommandsConfig config) {
         this.FORMATTING_DEFAULT                = config.FORMATTING_DEFAULT.getValue();
@@ -116,6 +119,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.AUTO_AFK_TICKS                    = config.AUTO_AFK_TICKS.getValue();
         this.REGISTER_TOP_LEVEL_COMMANDS       = config.REGISTER_TOP_LEVEL_COMMANDS.getValue();
         this.EXCLUDED_TOP_LEVEL_COMMANDS       = config.EXCLUDED_TOP_LEVEL_COMMANDS.getValue();
+        this.RESPAWN_AT_EC_SPAWN               = config.RESPAWN_AT_EC_SPAWN.getValue();
     }
 
     public static EssentialCommandsConfigSnapshot create(EssentialCommandsConfig config) {
