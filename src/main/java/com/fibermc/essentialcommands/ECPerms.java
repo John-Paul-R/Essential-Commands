@@ -38,6 +38,8 @@ public class ECPerms {
         public static final String nickname_style_fancy = "essentialcommands.nickname.style.fancy";
         public static final String nickname_style_hover = "essentialcommands.nickname.style.hover";
         public static final String nickname_style_click = "essentialcommands.nickname.style.click";
+        public static final String nickname_selector_and_ctx = "essentialcommands.nickname.style.selector_and_context";
+        public static final String nickname_placeholders = "essentialcommands.nickname.placeholders";
         public static final String randomteleport = "essentialcommands.randomteleport";
         public static final String fly_self = "essentialcommands.fly.self";
         public static final String fly_others = "essentialcommands.fly.others";
