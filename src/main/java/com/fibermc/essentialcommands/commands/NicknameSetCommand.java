@@ -1,8 +1,11 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -14,6 +17,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
 
 import dev.jpcode.eccore.util.TextUtil;
 
@@ -22,8 +26,16 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 public class NicknameSetCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        var nicknameText = TextArgumentType.getTextArgument(context, "nickname");
+        var nicknameWithContext = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_selector_and_ctx)
+            ? Texts.parse(
+                context.getSource(),
+                nicknameText,
+                context.getSource().getPlayerOrThrow(),
+                0)
+            : nicknameText;
         //Get specified new nickname
-        return exec(context, TextArgumentType.getTextArgument(context, "nickname"));
+        return exec(context, nicknameWithContext);
     }
 
     public static int runStringToText(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -31,8 +43,11 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
         return 1;
     }
 
-    public static int exec(CommandContext<ServerCommandSource> context, Text nicknameText) throws CommandSyntaxException {
+    public static int exec(CommandContext<ServerCommandSource> context, Text rawNicknameText) throws CommandSyntaxException {
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+        var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders)
+            ? Placeholders.parseText(rawNicknameText, PlaceholderContext.of(targetPlayer))
+            : rawNicknameText;
         int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText);
 
         var senderPlayerData = PlayerData.access(context.getSource().getPlayerOrThrow());
