@@ -101,6 +101,7 @@ public class EssentialCommandRegistry {
                 .build());
         }
 
+        //poke to trigger workflow
         if (CONFIG.ENABLE_HOME.getValue()) {
             LiteralArgumentBuilder<ServerCommandSource> homeBuilder = CommandManager.literal("home");
             LiteralArgumentBuilder<ServerCommandSource> homeSetBuilder = CommandManager.literal("set");
