@@ -34,6 +34,7 @@ import net.minecraft.text.Text;
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
+import static net.minecraft.server.command.CommandManager.literal;
 
 /**
  * Primary registry class for EssentialCommands.
@@ -449,6 +450,16 @@ public final class EssentialCommandRegistry {
                     playerData.sendCommandFeedback("cmd.day.feedback");
                     return 1;
                 })
+                .build());
+        }
+
+        if (CONFIG.ENABLE_RULES) {
+            registerNode.accept(CommandManager.literal("rules")
+                .requires(ECPerms.require(ECPerms.Registry.rules, 0))
+                .executes(RulesCommand::run)
+                .then(literal("reload")
+                    .requires(ECPerms.require(ECPerms.Registry.rules_reload, 4))
+                    .executes(RulesCommand::reloadCommand))
                 .build());
         }
 

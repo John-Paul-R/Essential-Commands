@@ -1,7 +1,9 @@
 package com.fibermc.essentialcommands;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
+import com.fibermc.essentialcommands.commands.RulesCommand;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfigSnapshot;
 import com.fibermc.essentialcommands.text.ECText;
@@ -57,6 +59,15 @@ public final class EssentialCommands implements ModInitializer {
             TimeUtil.init(server);
             managers.onServerStart(server);
             ECPerms.init(); // ECPerms must start after WorldDataManager at present (for warps).
+
+            if (CONFIG.ENABLE_RULES) {
+                try {
+                    RulesCommand.reload(server);
+                } catch (IOException e) {
+                    LOGGER.error("An error occurred while loading EssentialCommands rules file.");
+                    e.printStackTrace();
+                }
+            }
         });
 
         CommandRegistrationCallback.EVENT.register(EssentialCommandRegistry::register);
