@@ -8,6 +8,7 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.CommandUtil;
+import com.fibermc.essentialcommands.commands.helpers.IFeedbackReceiver;
 import com.fibermc.essentialcommands.events.PlayerActCallback;
 import com.fibermc.essentialcommands.teleportation.TeleportRequest;
 import com.fibermc.essentialcommands.text.ECText;
@@ -43,7 +44,7 @@ import dev.jpcode.eccore.util.TimeUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class PlayerData extends PersistentState implements IServerPlayerEntityData {
+public class PlayerData extends PersistentState implements IServerPlayerEntityData, IFeedbackReceiver {
 
     // ServerPlayerEntity
     private ServerPlayerEntity player;

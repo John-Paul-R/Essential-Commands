@@ -19,7 +19,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -147,7 +147,7 @@ public abstract class ECText {
         );
     }
 
-    public static ECText access(@NotNull ServerPlayerEntity player) {
-        return ((ServerPlayerEntityAccess) player).ec$getEcText();
+    public static ECText access(@Nullable ServerPlayerEntity player) {
+        return player == null ? ECText.getInstance() : ((ServerPlayerEntityAccess) player).ec$getEcText();
     }
 }
