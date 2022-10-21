@@ -19,21 +19,10 @@ import net.minecraft.text.Texts;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class NicknameSetCommand implements Command<ServerCommandSource>  {
-    public NicknameSetCommand() {}
-
+public class NicknameSetCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var nicknameText = TextArgumentType.getTextArgument(context, "nickname");
-        var nicknameWithContext = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_selector_and_ctx)
-            ? Texts.parse(
-                context.getSource(),
-                nicknameText,
-                context.getSource().getPlayer(),
-                0)
-            : nicknameText;
-        //Get specified new nickname
-        return exec(context, nicknameWithContext);
+        return exec(context, TextArgumentType.getTextArgument(context, "nickname"));
     }
 
     public static int runStringToText(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -44,9 +33,18 @@ public class NicknameSetCommand implements Command<ServerCommandSource>  {
     public static int exec(CommandContext<ServerCommandSource> context, Text rawNicknameText) throws CommandSyntaxException {
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
         var source = context.getSource();
-        var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders)
-            ? PlaceholderAPI.parseText(rawNicknameText, targetPlayer)
+
+        var nicknameWithContext = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_selector_and_ctx, 2)
+            ? Texts.parse(
+                context.getSource(),
+                rawNicknameText,
+                targetPlayer,
+                0)
             : rawNicknameText;
+
+        var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders, 2)
+            ? PlaceholderAPI.parseText(nicknameWithContext, targetPlayer)
+            : nicknameWithContext;
 
         ServerPlayerEntityAccess targetPlayerEntityAccess = (ServerPlayerEntityAccess) targetPlayer;
         int successCode = targetPlayerEntityAccess.getEcPlayerData().setNickname(nicknameText);
