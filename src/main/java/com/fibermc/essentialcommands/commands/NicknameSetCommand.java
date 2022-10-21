@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.commands.helpers.FeedbackReceiver;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
@@ -26,16 +27,7 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 public class NicknameSetCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var nicknameText = TextArgumentType.getTextArgument(context, "nickname");
-        var nicknameWithContext = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_selector_and_ctx)
-            ? Texts.parse(
-                context.getSource(),
-                nicknameText,
-                context.getSource().getPlayerOrThrow(),
-                0)
-            : nicknameText;
-        //Get specified new nickname
-        return exec(context, nicknameWithContext);
+        return exec(context, TextArgumentType.getTextArgument(context, "nickname"));
     }
 
     public static int runStringToText(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -45,17 +37,28 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
 
     public static int exec(CommandContext<ServerCommandSource> context, Text rawNicknameText) throws CommandSyntaxException {
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
-        var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders)
-            ? Placeholders.parseText(rawNicknameText, PlaceholderContext.of(targetPlayer))
+
+        var nicknameWithContext = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_selector_and_ctx, 2)
+            ? Texts.parse(
+                context.getSource(),
+                rawNicknameText,
+                targetPlayer,
+                0)
             : rawNicknameText;
+
+        var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders, 2)
+            ? Placeholders.parseText(nicknameWithContext, PlaceholderContext.of(targetPlayer))
+            : nicknameWithContext;
         int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText);
 
-        var senderPlayerData = PlayerData.access(context.getSource().getPlayerOrThrow());
-        var ecText = ECText.access(senderPlayerData.getPlayer());
+        var senderPlayer = context.getSource().getPlayer();
+        var senderFeedbackReceiver = FeedbackReceiver.ofSource(context.getSource());
+
+        var ecText = ECText.access(senderPlayer);
 
         //inform command sender that the nickname has been set
         if (successCode >= 0) {
-            senderPlayerData.sendCommandFeedback(
+            senderFeedbackReceiver.sendCommandFeedback(
                 "cmd.nickname.set.feedback",
                 nicknameText != null ? nicknameText : Text.literal(targetPlayer.getGameProfile().getName())
             );
@@ -69,7 +72,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
                 );
                 default -> ecText.getText("generic.error.unknown", TextFormatType.Error);
             };
-            senderPlayerData.sendCommandError("cmd.nickname.set.error", nicknameText, failReason);
+            senderFeedbackReceiver.sendCommandError("cmd.nickname.set.error", nicknameText, failReason);
         }
 
         return successCode;
