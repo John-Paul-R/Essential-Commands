@@ -1,5 +1,16 @@
 package com.fibermc.essentialcommands.util;
 
+import com.fibermc.essentialcommands.PlayerData;
+import com.fibermc.essentialcommands.PlayerDataFactory;
+import com.fibermc.essentialcommands.mixin.PersistentStateManagerInvoker;
+import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.types.NamedLocationStorage;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
+import org.apache.logging.log4j.Level;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,35 +22,28 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.types.NamedLocationStorage;
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataFactory;
-import com.fibermc.essentialcommands.mixin.PersistentStateManagerInvoker;
-import com.fibermc.essentialcommands.types.MinecraftLocation;
+import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 
-import net.minecraft.world.World;
+public final class EssentialsXParser {
+    private EssentialsXParser() {}
 
-import org.apache.logging.log4j.Level;
-import org.yaml.snakeyaml.Yaml;
-
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.registry.RegistryKey;
-
-public class EssentialsXParser {
-
-    public static NamedLocationStorage parsePlayerHomes(File yamlSource, MinecraftServer server, Map<UUID, RegistryKey<World>> uuidRegistryKeyMap) {
+    public static NamedLocationStorage parsePlayerHomes(
+        File yamlSource,
+        Map<UUID, RegistryKey<World>> uuidRegistryKeyMap
+    ) {
         NamedLocationStorage homes = new NamedLocationStorage();
         String yamlStr = null;
         try {
             yamlStr = Files.readString(yamlSource.toPath());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error while reading yaml file {}", yamlSource);
+            LOGGER.error("Err Detail:", e);
         }
-//        server.getWorlds().forEach(world -> world.);
+
         Yaml yaml = new Yaml();
         Map<Object, Object> ydoc = yaml.load(yamlStr);
         Map<String, Map<String, Object>> homesMap = (Map<String, Map<String, Object>>) ydoc.get("homes");
+        LOGGER.info("Found {} homes in file '{}'.", homesMap.size(), yamlSource.toPath().toString());
         homesMap.forEach((String name, Map<String, Object> locData) -> {
             RegistryKey<World> worldRegistryKey = uuidRegistryKeyMap.get(UUID.fromString((String)locData.get("world")));
             if (worldRegistryKey == null)
@@ -60,26 +64,29 @@ public class EssentialsXParser {
         return homes;
     }
 
-    public record WorldUids(UUID overworld, UUID nether, UUID end) {}
-
-//    public static void WorldUids
-
     public static Map<UUID, RegistryKey<World>> getWorldUids(MinecraftServer server) {
 
         Map<UUID, RegistryKey<World>> uuidRegistryKeyMap = new LinkedHashMap<>();
         server.getWorlds().forEach(world -> {
-            File uidFile = ((PersistentStateManagerInvoker) world.getPersistentStateManager()).invokeGetFile("uid");
+            // This is dumb. We're taking fabric/vanilla's ideas of these worlds to look for the
+            // bukkit/spigot/paper UID. Instead, we should be reading those mods' config files to
+            // find the correct directory. Rn this will essentially (heh) always be wrong.
+            var persistentStateManager = ((PersistentStateManagerInvoker) world.getPersistentStateManager());
+            File uidFile = persistentStateManager.invokeGetFile("uid");
+            if (!uidFile.exists()) {
+                uidFile = persistentStateManager.invokeGetFile("../uid");
+            }
 
             try {
-                EssentialCommands.LOGGER.info(String.format("Attempting to read file: %s", uidFile.getPath()));
+                LOGGER.info(String.format("Attempting to read file: %s", uidFile.getPath()));
                 byte[] uuidBytes = Files.readAllBytes(uidFile.toPath());
-                EssentialCommands.LOGGER.info(String.format("File: %s, UUID: %s", uidFile.getPath(), UUID.nameUUIDFromBytes(uuidBytes)));
+                LOGGER.info(String.format("File: %s, UUID: %s", uidFile.getPath(), UUID.nameUUIDFromBytes(uuidBytes)));
                 uuidRegistryKeyMap.put(
                     UUID.nameUUIDFromBytes(uuidBytes),
                     world.getRegistryKey()
                 );
             } catch (IOException e) {
-                EssentialCommands.LOGGER.log(
+                LOGGER.log(
                     Level.WARN,
                     String.format(
                         "World, %s, did not have a valid uid.dat file. EssentialsX homes set in this dim will likely be remapped to %s.",
@@ -107,14 +114,19 @@ public class EssentialsXParser {
         Path targetPath = targetDir.toPath();
 
         File[] playerDataFiles = Objects.requireNonNull(sourceDir.listFiles());
+        LOGGER.info("Preparing to convert homes for {} players in directory '{}'", sourceDir.listFiles(), sourceDir);
 
         for (File file : playerDataFiles) {
-            NamedLocationStorage homes = parsePlayerHomes(file, server, worldUuidRegistryKeyMap);
-            // WARN: Currently, this will still overwrite player's new homes with EssentialsX homes.
+            LOGGER.info("Begin pasring homes for '{}'", file);
+
+            NamedLocationStorage homes = parsePlayerHomes(file, worldUuidRegistryKeyMap);
+            // WARN: Currently, this will still overwrite player's new homes of the same name with
+            // EssentialsX homes.
             String targetFilePathStr = targetPath.resolve(file.getName()).toString();
             targetFilePathStr = targetFilePathStr.substring(0, targetFilePathStr.indexOf(".yml")) + ".dat";
             File targetFile = new File(targetFilePathStr);
 
+            LOGGER.info("Creating temporary playerdata for '{}', with {} homes.", file, homes.size());
             PlayerData playerData = PlayerDataFactory.create(homes, targetFile);
             playerData.save();
         }
