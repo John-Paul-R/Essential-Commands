@@ -41,8 +41,8 @@ allprojects {
         include	"me.lucko:fabric-permissions-api:${project.permissions_api_version}"
         modApi  "eu.pb4:placeholder-api:${project.placeholder_api_version}"
         include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
-        modImplementation 	'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'
-        include 			'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2'
+        modImplementation 'org.yaml:snakeyaml:1.33'
+        include 'org.yaml:snakeyaml:1.33'
         modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
         include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
 
