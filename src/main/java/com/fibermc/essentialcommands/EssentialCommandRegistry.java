@@ -79,18 +79,24 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
             : essentialCommandsRootNode::addChild;
 
         if (CONFIG.ENABLE_TPA) {
-            registerNode.accept(CommandManager.literal("tpa")
+            var tpaBuilder      = CommandManager.literal("tpa");
+            var tpcancelBuilder = CommandManager.literal("tpcancel");
+            var tpacceptBuilder = CommandManager.literal("tpaccept");
+            var tpdenyBuilder   = CommandManager.literal("tpdeny");
+            var tpahereBuilder  = CommandManager.literal("tpahere");
+
+            registerNode.accept(tpaBuilder
                 .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                 .then(CommandUtil.targetPlayerArgument()
                     .executes(new TeleportAskCommand()))
                 .build());
 
-            registerNode.accept(CommandManager.literal("tpcancel")
+            registerNode.accept(tpcancelBuilder
                 .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                 .executes(new TeleportCancelCommand())
                 .build());
 
-            registerNode.accept(CommandManager.literal("tpaccept")
+            registerNode.accept(tpacceptBuilder
                 .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                 .executes(new TeleportAcceptCommand()::runDefault)
                 .then(CommandUtil.targetPlayerArgument()
@@ -98,7 +104,7 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
                     .executes(new TeleportAcceptCommand()))
                 .build());
 
-            registerNode.accept(CommandManager.literal("tpdeny")
+            registerNode.accept(tpdenyBuilder
                 .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                 .executes(new TeleportDenyCommand()::runDefault)
                 .then(CommandUtil.targetPlayerArgument()
@@ -106,7 +112,7 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
                     .executes(new TeleportDenyCommand()))
                 .build());
 
-            registerNode.accept(CommandManager.literal("tpahere")
+            registerNode.accept(tpahereBuilder
                 .requires(ECPerms.require(ECPerms.Registry.tpahere, 0))
                 .then(CommandUtil.targetPlayerArgument()
                     .executes(new TeleportAskHereCommand()))
@@ -183,6 +189,7 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         //Back
         if (CONFIG.ENABLE_BACK) {
             var backBuilder = CommandManager.literal("back");
+
             backBuilder
                 .requires(ECPerms.require(ECPerms.Registry.back, 0))
                 .executes(new BackCommand());
@@ -321,12 +328,16 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         }
 
         if (CONFIG.ENABLE_RTP) {
-            registerNode.accept(CommandManager.literal("randomteleport")
+            var randomteleportBuilder = CommandManager.literal("randomteleport");
+            var rtpBuilder            = CommandManager.literal("rtp");
+
+            // TODO @jp Surely there is a better way to do an alias?
+            registerNode.accept(randomteleportBuilder
                 .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
                 .executes(new RandomTeleportCommand())
                 .build());
 
-            registerNode.accept(CommandManager.literal("rtp")
+            registerNode.accept(rtpBuilder
                 .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
                 .executes(new RandomTeleportCommand())
                 .build()
@@ -334,7 +345,9 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         }
 
         if (CONFIG.ENABLE_FLY) {
-            registerNode.accept(CommandManager.literal("fly")
+            var flyBuilder = CommandManager.literal("fly");
+
+            registerNode.accept(flyBuilder
                 .requires(ECPerms.require(ECPerms.Registry.fly_self, 2))
                 .executes(new FlyCommand())
                 .then(CommandUtil.targetPlayerArgument()
@@ -345,8 +358,10 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         }
 
         if (CONFIG.ENABLE_INVULN) {
+            var invulnBuilder = CommandManager.literal("invuln");
+
             registerNode.accept(
-                CommandManager.literal("invuln")
+                invulnBuilder
                     .requires(ECPerms.require(ECPerms.Registry.invuln_self, 2))
                     .executes(new InvulnCommand())
                     .then(CommandUtil.targetPlayerArgument()
@@ -357,59 +372,76 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         }
 
         if (CONFIG.ENABLE_WORKBENCH) {
-            registerNode.accept(CommandManager.literal("workbench")
+            var workbenchBuilder   = CommandManager.literal("workbench");
+            var stonecutterBuilder = CommandManager.literal("stonecutter");
+            var grindstoneBuilder  = CommandManager.literal("grindstone");
+
+            // TODO @jp: 1.0.0 - let these be individually toggled in the config
+            registerNode.accept(workbenchBuilder
                 .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
                 .executes(new WorkbenchCommand())
                 .build());
 
-            registerNode.accept(CommandManager.literal("stonecutter")
+            registerNode.accept(stonecutterBuilder
                 .requires(ECPerms.require(ECPerms.Registry.stonecutter, 0))
                 .executes(new StonecutterCommand())
                 .build());
 
-            registerNode.accept(CommandManager.literal("grindstone")
+            registerNode.accept(grindstoneBuilder
                 .requires(ECPerms.require(ECPerms.Registry.grindstone, 0))
                 .executes(new GrindstoneCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_ANVIL) {
-            registerNode.accept(CommandManager.literal("anvil")
+            var anvilBuilder = CommandManager.literal("anvil");
+
+            registerNode.accept(anvilBuilder
                 .requires(ECPerms.require(ECPerms.Registry.anvil, 0))
                 .executes(new AnvilCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_ENDERCHEST) {
-            registerNode.accept(CommandManager.literal("enderchest")
+            var enderchestBuilder = CommandManager.literal("enderchest");
+
+            registerNode.accept(enderchestBuilder
                     .requires(ECPerms.require(ECPerms.Registry.enderchest, 0))
                     .executes(new EnderchestCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_WASTEBIN) {
-            registerNode.accept(CommandManager.literal("wastebin")
+            var wastebinBuilder = CommandManager.literal("wastebin");
+
+            registerNode.accept(wastebinBuilder
                 .requires(ECPerms.require(ECPerms.Registry.wastebin, 0))
                 .executes(new WastebinCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_TOP) {
-            registerNode.accept(CommandManager.literal("top")
+            var topBuilder = CommandManager.literal("top");
+
+            registerNode.accept(topBuilder
                 .requires(ECPerms.require(ECPerms.Registry.top, 2))
                 .executes(new TopCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_GAMETIME) {
-            registerNode.accept(CommandManager.literal("gametime")
+            var gametimeBuilder = CommandManager.literal("gametime");
+
+            registerNode.accept(gametimeBuilder
                 .requires(ECPerms.require(ECPerms.Registry.gametime, 0))
                 .executes(new GametimeCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_AFK) {
-            registerNode.accept(CommandManager.literal("afk")
+            var afkBuilder = CommandManager.literal("afk");
+
+            registerNode.accept(afkBuilder
                 .requires(ECPerms.require(ECPerms.Registry.afk, 0))
                 .executes(new AfkCommand())
                 .build());
@@ -444,7 +476,9 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
             .build());
 
         if (CONFIG.ENABLE_DAY) {
-            registerNode.accept(CommandManager.literal("day")
+            var dayBuilder = CommandManager.literal("day");
+
+            registerNode.accept(dayBuilder
                 .requires(ECPerms.require(ECPerms.Registry.time_set_day, 2))
                 .executes((context) -> {
                     var source = context.getSource();
@@ -465,7 +499,9 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         }
 
         if (CONFIG.ENABLE_RULES) {
-            registerNode.accept(CommandManager.literal("rules")
+            var rulesBuilder = CommandManager.literal("rules");
+
+            registerNode.accept(rulesBuilder
                 .requires(ECPerms.require(ECPerms.Registry.rules, 0))
                 .executes(RulesCommand::run)
                 .then(literal("reload")
@@ -521,7 +557,9 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         essentialCommandsRootNode.addChild(configNode);
 
         if (CONFIG.ENABLE_ESSENTIALSX_CONVERT) {
-            essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
+            var convertEssentialsXPlayerHomesBuilder = CommandManager.literal("convertEssentialsXPlayerHomes");
+
+            essentialCommandsRootNode.addChild(convertEssentialsXPlayerHomesBuilder
                 .requires(source -> source.hasPermissionLevel(4))
                 .executes((source) -> {
                     Path mcDir = source.getSource().getServer().getRunDirectory().toPath();
