@@ -56,6 +56,7 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
 
         LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode;
+        // Info Command & "/essentialcommands" root node init
         {
             LiteralCommandNode<ServerCommandSource> ecInfoNode = CommandManager.literal("info")
                 .executes(new ModInfoCommand())
@@ -286,8 +287,8 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
             var nickClearBuilder  = CommandManager.literal("clear");
             var nickRevealBuilder = CommandManager.literal("reveal");
 
-            Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.nickname_self, 2);
-            Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 2);
+            Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.nickname_self, 0);
+            Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 3);
             nickSetBuilder.requires(permissionSelf)
                 .then(argument("nickname", TextArgumentType.text())
                     .executes(new NicknameSetCommand())
@@ -304,21 +305,21 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
                 );
 
             nickClearBuilder
-                .requires(ECPerms.require(ECPerms.Registry.nickname_self, 2))
+                .requires(ECPerms.require(ECPerms.Registry.nickname_self, 0))
                 .executes(new NicknameClearCommand())
                 .then(CommandUtil.targetPlayerArgument()
-                    .requires(ECPerms.require(ECPerms.Registry.nickname_others, 2))
+                    .requires(ECPerms.require(ECPerms.Registry.nickname_others, 3))
                     .executes(new NicknameClearCommand()));
 
             nickRevealBuilder
-                .requires(ECPerms.require(ECPerms.Registry.nickname_reveal, 2))
+                .requires(ECPerms.require(ECPerms.Registry.nickname_reveal, 0))
                 .then(argument("player_nickname", StringArgumentType.word())
                     .suggests(NicknamePlayersSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new RealNameCommand())
                 );
 
             LiteralCommandNode<ServerCommandSource> nickNode = nickBuilder
-                .requires(ECPerms.requireAny(ECPerms.Registry.Group.nickname_group, 2))
+                .requires(ECPerms.requireAny(ECPerms.Registry.Group.nickname_group, 0))
                 .build();
             nickNode.addChild(nickSetBuilder.build());
             nickNode.addChild(nickClearBuilder.build());
