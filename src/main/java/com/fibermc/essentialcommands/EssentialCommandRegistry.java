@@ -1,11 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import java.io.FileNotFoundException;
-import java.nio.file.NotDirectoryException;
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.function.Predicate;
-
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.bench.*;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
@@ -16,13 +10,14 @@ import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
-import org.spongepowered.asm.util.IConsumer;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -31,7 +26,13 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import org.spongepowered.asm.util.IConsumer;
+
+import java.io.FileNotFoundException;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.function.Predicate;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
@@ -224,7 +225,7 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
                     .executes(new WarpTpCommand()));
 
             warpTpOtherBuilder
-                .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
+                .requires(ECPerms.require(ECPerms.Registry.warp_tp_others, 2))
                 .then(argument("target_player", EntityArgumentType.player())
                     .then(argument("warp_name", StringArgumentType.word())
                         .suggests(WarpSuggestion.STRING_SUGGESTIONS_PROVIDER)
