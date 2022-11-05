@@ -58,7 +58,7 @@ public final class EssentialCommands implements ModInitializer {
             ECText.init(server);
             TimeUtil.init(server);
             managers.onServerStart(server);
-            ECPerms.init(); // ECPerms must start after WorldDataManager at present (for warps).
+            ECPerms.init(managers.getWorldDataManager()); // ECPerms must start after WorldDataManager at present (for warps).
 
             if (CONFIG.ENABLE_RULES) {
                 try {

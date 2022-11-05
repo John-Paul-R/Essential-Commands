@@ -88,8 +88,7 @@ public final class ECPerms {
     /**
      * Registers PermissionCheckEvent handler if permissions api enabled in config.
      */
-    static void init() {
-        var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
+    static void init(WorldDataManager worldDataManager) {
         Registry.per_warp_permissions = worldDataManager.getWarpNames().toArray(String[]::new);
         worldDataManager.warpsLoadEvent.register((warps) -> {
             Registry.per_warp_permissions = warps.keySet().toArray(String[]::new);
