@@ -70,7 +70,7 @@ public final class EssentialCommands implements ModInitializer {
             }
         });
 
-        CommandRegistrationCallback.EVENT.register(EssentialCommandRegistry::register);
+        CommandRegistrationCallback.EVENT.register(new EssentialCommandRegistry());
 
         if (CONFIG.CHECK_FOR_UPDATES) {
             Updater.checkForUpdates();

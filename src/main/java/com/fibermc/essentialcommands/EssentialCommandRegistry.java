@@ -32,6 +32,8 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -42,10 +44,11 @@ import static net.minecraft.server.command.CommandManager.literal;
  * Contains logic for building the brigaider command trees, and registers
  * required permissions for each node.
  */
-public final class EssentialCommandRegistry {
-    private EssentialCommandRegistry() {}
+public final class EssentialCommandRegistry implements CommandRegistrationCallback {
+    EssentialCommandRegistry() {}
 
-    public static void register(
+    @Override
+    public void register(
         CommandDispatcher<ServerCommandSource> dispatcher,
         CommandRegistryAccess commandRegistryAccess,
         CommandManager.RegistrationEnvironment registrationEnvironment
