@@ -21,7 +21,6 @@ import org.spongepowered.asm.util.IConsumer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 
@@ -44,6 +43,7 @@ import static net.minecraft.server.command.CommandManager.literal;
  * Contains logic for building the brigaider command trees, and registers
  * required permissions for each node.
  */
+@SuppressWarnings("CheckStyle")
 public final class EssentialCommandRegistry implements CommandRegistrationCallback {
     EssentialCommandRegistry() {}
 
@@ -114,14 +114,14 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         }
 
         if (CONFIG.ENABLE_HOME) {
-            LiteralArgumentBuilder<ServerCommandSource> homeBuilder = CommandManager.literal("home");
-            LiteralArgumentBuilder<ServerCommandSource> homeSetBuilder = CommandManager.literal("set");
-            LiteralArgumentBuilder<ServerCommandSource> homeTpBuilder = CommandManager.literal("tp");
-            LiteralArgumentBuilder<ServerCommandSource> homeTpOtherBuilder = CommandManager.literal("tp_other");
-            LiteralArgumentBuilder<ServerCommandSource> homeTpOfflineBuilder = CommandManager.literal("tp_offline");
-            LiteralArgumentBuilder<ServerCommandSource> homeDeleteBuilder = CommandManager.literal("delete");
-            LiteralArgumentBuilder<ServerCommandSource> homeListBuilder = CommandManager.literal("list");
-            LiteralArgumentBuilder<ServerCommandSource> homeListOfflineBuilder = CommandManager.literal("list_offline");
+           var homeBuilder            = CommandManager.literal("home");
+           var homeSetBuilder         = CommandManager.literal("set");
+           var homeTpBuilder          = CommandManager.literal("tp");
+           var homeTpOtherBuilder     = CommandManager.literal("tp_other");
+           var homeTpOfflineBuilder   = CommandManager.literal("tp_offline");
+           var homeDeleteBuilder      = CommandManager.literal("delete");
+           var homeListBuilder        = CommandManager.literal("list");
+           var homeListOfflineBuilder = CommandManager.literal("list_offline");
 
             homeSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
@@ -182,7 +182,7 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
 
         //Back
         if (CONFIG.ENABLE_BACK) {
-            LiteralArgumentBuilder<ServerCommandSource> backBuilder = CommandManager.literal("back");
+            var backBuilder = CommandManager.literal("back");
             backBuilder
                 .requires(ECPerms.require(ECPerms.Registry.back, 0))
                 .executes(new BackCommand());
@@ -195,12 +195,12 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
 
         //Warp
         if (CONFIG.ENABLE_WARP) {
-            LiteralArgumentBuilder<ServerCommandSource> warpBuilder = CommandManager.literal("warp");
-            LiteralArgumentBuilder<ServerCommandSource> warpSetBuilder = CommandManager.literal("set");
-            LiteralArgumentBuilder<ServerCommandSource> warpTpBuilder = CommandManager.literal("tp");
-            LiteralArgumentBuilder<ServerCommandSource> warpTpOtherBuilder = CommandManager.literal("tp_other");
-            LiteralArgumentBuilder<ServerCommandSource> warpDeleteBuilder = CommandManager.literal("delete");
-            LiteralArgumentBuilder<ServerCommandSource> warpListBuilder = CommandManager.literal("list");
+            var warpBuilder        = CommandManager.literal("warp");
+            var warpSetBuilder     = CommandManager.literal("set");
+            var warpTpBuilder      = CommandManager.literal("tp");
+            var warpTpOtherBuilder = CommandManager.literal("tp_other");
+            var warpDeleteBuilder  = CommandManager.literal("delete");
+            var warpListBuilder    = CommandManager.literal("list");
 
             warpSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.warp_set, 4))
@@ -250,9 +250,9 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
 
         //Spawn
         if (CONFIG.ENABLE_SPAWN) {
-            LiteralArgumentBuilder<ServerCommandSource> spawnBuilder = CommandManager.literal("spawn");
-            LiteralArgumentBuilder<ServerCommandSource> spawnSetBuilder = CommandManager.literal("set");
-            LiteralArgumentBuilder<ServerCommandSource> spawnTpBuilder = CommandManager.literal("tp");
+            var spawnBuilder    = CommandManager.literal("spawn");
+            var spawnSetBuilder = CommandManager.literal("set");
+            var spawnTpBuilder  = CommandManager.literal("tp");
 
             spawnSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.spawn_set, 4))
@@ -274,10 +274,10 @@ public final class EssentialCommandRegistry implements CommandRegistrationCallba
         }
 
         if (CONFIG.ENABLE_NICK) {
-            LiteralArgumentBuilder<ServerCommandSource> nickBuilder = CommandManager.literal("nickname");
-            LiteralArgumentBuilder<ServerCommandSource> nickSetBuilder = CommandManager.literal("set");
-            LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
-            LiteralArgumentBuilder<ServerCommandSource> nickRevealBuilder = CommandManager.literal("reveal");
+            var nickBuilder       = CommandManager.literal("nickname");
+            var nickSetBuilder    = CommandManager.literal("set");
+            var nickClearBuilder  = CommandManager.literal("clear");
+            var nickRevealBuilder = CommandManager.literal("reveal");
 
             Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.nickname_self, 2);
             Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 2);
