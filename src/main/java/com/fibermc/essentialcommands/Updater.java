@@ -14,6 +14,8 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 public final class Updater {
     private Updater() {}
 
+    // TODO @jp: 1.0.0 - move this to eccore, use GH releases for identifying latest versions _per MC vers_
+    //  (or, ig, add something to build process to update the listings on jpcode.dev, or compute at jpcode.dev from GH, not here)
     public static void checkForUpdates() {
         HttpClient client = HttpClient.newBuilder()
             .connectTimeout(Duration.ofMillis(1500))
