@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import com.fibermc.essentialcommands.mixin.PersistentStateManagerInvoker;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
@@ -117,10 +114,18 @@ public final class EssentialsXParser {
         // Existing EC player data files
         Path targetPath = targetDir.toPath();
 
-        File[] playerDataFiles = Objects.requireNonNull(sourceDir.listFiles());
-        LOGGER.info("Preparing to convert homes for {} players in directory '{}'", sourceDir.listFiles(), sourceDir);
+        var filesArr = Objects.requireNonNull(sourceDir.listFiles());
+
+        LOGGER.info("Preparing to convert homes for {} players in directory '{}'", filesArr, sourceDir);
+
+        int filesAttempted = 0;
+        int filesSucceeded = 0;
+        var playerDataFiles = Arrays.stream(filesArr)
+            .filter(file -> file.getName().endsWith("yml"))
+            .toList();
 
         for (File file : playerDataFiles) {
+            filesAttempted++;
             LOGGER.info("Begin pasring homes for '{}'", file);
 
             NamedLocationStorage homes = parsePlayerHomes(file, worldUuidRegistryKeyMap);
@@ -131,10 +136,19 @@ public final class EssentialsXParser {
             File targetFile = new File(targetFilePathStr);
 
             LOGGER.info("Creating temporary playerdata for '{}', with {} homes.", file, homes.size());
-            PlayerData playerData = PlayerDataFactory.create(homes, targetFile);
-            playerData.save();
+            try {
+                PlayerData playerData = PlayerDataFactory.create(homes, targetFile);
+                playerData.save();
+                filesSucceeded++;
+            } catch (Exception ex) {
+                LOGGER.error("An unexpected error occurred while parsing player data file '{}'", targetFile.getPath(), ex);
+            }
         }
 
+        LOGGER.info(
+            "Finished converting EssentialsX homes to EssentialCommands homes. (Players Attempted: {}, Players Succeeded: {})",
+            filesAttempted,
+            filesSucceeded);
     }
 
 }
