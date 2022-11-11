@@ -128,15 +128,18 @@ public final class EssentialsXParser {
             filesAttempted++;
             LOGGER.info("Begin pasring homes for '{}'", file);
 
-            NamedLocationStorage homes = parsePlayerHomes(file, worldUuidRegistryKeyMap);
             // WARN: Currently, this will still overwrite player's new homes of the same name with
             // EssentialsX homes.
-            String targetFilePathStr = targetPath.resolve(file.getName()).toString();
-            targetFilePathStr = targetFilePathStr.substring(0, targetFilePathStr.indexOf(".yml")) + ".dat";
+            String fileName = file.getName();
+            String fileNameAsDat = fileName.substring(0, fileName.indexOf(".yml")) + ".dat";
+            String targetFilePathStr = targetPath.resolve(fileNameAsDat).toString();
             File targetFile = new File(targetFilePathStr);
 
-            LOGGER.info("Creating temporary playerdata for '{}', with {} homes.", file, homes.size());
             try {
+                NamedLocationStorage homes = parsePlayerHomes(file, worldUuidRegistryKeyMap);
+
+                LOGGER.info("Creating temporary playerdata for '{}', with {} homes.", file, homes.size());
+
                 PlayerData playerData = PlayerDataFactory.create(homes, targetFile);
                 playerData.save();
                 filesSucceeded++;
