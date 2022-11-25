@@ -1,9 +1,6 @@
 package dev.jpcode.eccore.config;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
@@ -32,6 +29,13 @@ public abstract class Config<T extends Config<T>> {
     private final String displayName;
     private final String documentationLink;
 
+    private String existingPropsStr;
+    private String getNonCommentsLines(String propsContent) {
+        return propsContent.lines()
+            .skip(displayName.lines().count() + 2)
+            .collect(Collectors.joining("\n"));
+    }
+
     public Config(Path savePath, String displayName, String documentationLink) {
         this.configPath = savePath;
         this.displayName = displayName;
@@ -47,6 +51,10 @@ public abstract class Config<T extends Config<T>> {
             inFile.getParentFile().mkdirs();
             boolean fileAlreadyExisted = !inFile.createNewFile();
             if (fileAlreadyExisted) {
+                var stringWriter = new StringWriter();
+                new FileReader(inFile).transferTo(stringWriter);
+                existingPropsStr = stringWriter.toString();
+
                 props.load(new FileReader(inFile));
             }
         } catch (IOException e) {
@@ -74,14 +82,22 @@ public abstract class Config<T extends Config<T>> {
 
     public void storeProperties() {
         try {
-            File outFile = configPath.toFile();
-            FileWriter writer = new FileWriter(outFile);
+            var propsComments = displayName + "\n" + "Config Documentation: " + documentationLink;
 
-            props.storeSorted(writer, displayName
-                + "\n"
-                + "Config Documentation: "
-                + documentationLink
-            );
+            var stringWriter = new StringWriter();
+            props.storeSorted(stringWriter, propsComments);
+            stringWriter.close();
+
+            var strinifiedProps = stringWriter.toString();
+            var stringifiedPropsNoComments = getNonCommentsLines(strinifiedProps);
+            var existingPropsStrNoComments = getNonCommentsLines(existingPropsStr);
+            if (!stringifiedPropsNoComments.equals(existingPropsStrNoComments)) {
+                File outFile = configPath.toFile();
+                FileWriter writer = new FileWriter(outFile);
+                props.storeSorted(writer, propsComments);
+                existingPropsStr = strinifiedProps;
+            }
+
         } catch (IOException e) {
             LOGGER.warn("Failed to store preferences to disk.");
             LOGGER.error(e.getMessage());
