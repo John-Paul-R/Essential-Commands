@@ -67,7 +67,7 @@ public final class EssentialCommandRegistry {
         var excludedTopLevelCommands = new HashSet<>(CONFIG.EXCLUDED_TOP_LEVEL_COMMANDS);
         IConsumer<LiteralCommandNode<ServerCommandSource>> registerNode = CONFIG.REGISTER_TOP_LEVEL_COMMANDS
             ? (node) -> {
-                if (!excludedTopLevelCommands.toString().contains(node.getLiteral())) {
+                if (!excludedTopLevelCommands.contains(node.getLiteral())) {
                     rootNode.addChild(node);
                 }
                 essentialCommandsRootNode.addChild(node);
