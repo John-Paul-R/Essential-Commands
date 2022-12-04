@@ -53,9 +53,11 @@ public class EssentialsConvertor {
         List<File> oldWarpFiles = getAllFile(oldWarpsDictionary);
         if(oldWarpFiles.size() > 0){
             LOGGER.info("Found the old warp file(s), converting!");
+
             WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
             Map<String, World> worldMap = new HashMap<>();
             Map<String, MinecraftLocation> locationMap = new HashMap<>();
+            int counter = 0;
 
             for(World world : EssentialCommands.WORLD_LIST){
                 worldMap.put(world.getRegistryKey().getValue().toString(), world);
@@ -63,13 +65,13 @@ public class EssentialsConvertor {
 
             for(File oldWarpFile : oldWarpFiles){
                 try{
-                    if(oldWarpFile.getName().contains("yaml") && !oldWarpFile.getName().contains(".converted")){
+                    if((oldWarpFile.getName().contains("yaml") || oldWarpFile.getName().contains("yml")) && !oldWarpFile.getName().contains(".converted")){
                         Map<String, Object> data = YAML_INSTANCE.load(new FileInputStream(oldWarpFile));
                         double x = (double) data.get("x");
                         double y = (double) data.get("y");
                         double z = (double) data.get("z");
-                        float yaw = (float) data.get("yaw");
-                        float pitch = (float) data.get("pitch");
+                        float yaw = (float) ((double) data.get("yaw"));
+                        float pitch = (float) ((double) data.get("pitch"));
                         String worldName = (String) data.get("world-name");
                         String warpName = (String) data.get("name");
                         locationMap.put(warpName, new MinecraftLocation(worldMap.get(COMPARISON_TABLE.get(worldName)).getRegistryKey(), x, y, z, yaw, pitch));
@@ -85,6 +87,7 @@ public class EssentialsConvertor {
 
             for(Map.Entry<String, MinecraftLocation> entry : locationMap.entrySet()){
                 try{
+                    counter++;
                     worldDataManager.setWarp(entry.getKey(), entry.getValue(), false);
                 }
                 catch (Exception e){
@@ -92,6 +95,8 @@ public class EssentialsConvertor {
                     e.printStackTrace();
                 }
             }
+
+            LOGGER.info("Convert finished, converted " + counter + " file(s)!");
         }
     }
 }
