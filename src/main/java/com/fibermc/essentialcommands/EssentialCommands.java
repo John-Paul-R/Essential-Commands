@@ -2,11 +2,20 @@ package com.fibermc.essentialcommands;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fibermc.essentialcommands.commands.RulesCommand;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfigSnapshot;
 import com.fibermc.essentialcommands.text.ECText;
+
+import com.fibermc.essentialcommands.util.EssentialsConvertor;
+
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+
+import net.minecraft.world.World;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +41,8 @@ public final class EssentialCommands implements ModInitializer {
     );
     @SuppressWarnings("checkstyle:StaticVariableName")
     public static EssentialCommandsConfigSnapshot CONFIG = EssentialCommandsConfigSnapshot.create(BACKING_CONFIG);
+
+    public static final List<World> WORLD_LIST = new ArrayList<>();
 
     public static void log(Level level, String message, Object... args) {
         final String logPrefix = "[EssentialCommands]: ";
@@ -71,6 +82,17 @@ public final class EssentialCommands implements ModInitializer {
         });
 
         CommandRegistrationCallback.EVENT.register(EssentialCommandRegistry::register);
+
+        ServerWorldEvents.LOAD.register((server, world) ->{
+            if(!WORLD_LIST.contains(world)){
+                WORLD_LIST.add(world);
+            }
+        });
+
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            // load converter
+            EssentialsConvertor.warpConvert();
+        });
 
         if (CONFIG.CHECK_FOR_UPDATES) {
             Updater.checkForUpdates();
