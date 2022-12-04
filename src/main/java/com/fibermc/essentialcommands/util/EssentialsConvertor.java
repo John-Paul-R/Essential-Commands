@@ -8,14 +8,22 @@ import java.util.*;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.WorldDataManager;
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 
+@SuppressWarnings("unchecked")
 public class EssentialsConvertor {
     private static final Yaml YAML_INSTANCE = new Yaml();
     private static final Map<String, String> COMPARISON_TABLE = new HashMap<>(){{
@@ -24,7 +32,8 @@ public class EssentialsConvertor {
         put("world_the_end", "minecraft:the_end");
     }};
 
-    public static final Path OLD_CONF_PATH = Path.of("./config", "EssentialCommands", "Old-Config");
+    public static final Path OLD_WARP_PATH = Path.of("./config", "EssentialCommands", "Old-Config", "Warps");
+    public static final Path OLD_USERDATA_PATH = Path.of("./config", "EssentialCommands", "Old-Config", "UsersData");
 
     @NotNull
     private static List<File> getAllFile(File dirFile) {
@@ -43,9 +52,78 @@ public class EssentialsConvertor {
         return files;
     }
 
+    public static void homeConvert(){
+        File oldUsersDataDictionary = OLD_USERDATA_PATH.toFile();
+        if (!oldUsersDataDictionary.exists() || oldUsersDataDictionary.isFile()) {
+            oldUsersDataDictionary.mkdirs();
+        }
+
+        List<File> oldUserDataFiles = getAllFile(oldUsersDataDictionary);
+        if(oldUserDataFiles.size() > 0) {
+            LOGGER.info("Found the old home file(s), converting!");
+
+            Map<String, ServerWorld> worldMap = new HashMap<>();
+            int counter = 0;
+
+            for (ServerWorld world : EssentialCommands.WORLD_LIST) {
+                worldMap.put(world.getRegistryKey().getValue().toString(), world);
+            }
+
+            for (File oldUserDataFile : oldUserDataFiles) {
+                try {
+                    if ((oldUserDataFile.getName().contains("yaml") || oldUserDataFile.getName().contains("yml"))
+                        && !oldUserDataFile.getName().contains(".converted")) {
+                        Map<String, Object> data = YAML_INSTANCE.load(new FileInputStream(oldUserDataFile));
+
+                        if (data.containsKey("homes")) {
+                            String playerName = (String) data.get("last-account-name");
+                            Optional<GameProfile> playerCache = EssentialCommands.SERVER_INSTANCE.getUserCache().findByName(playerName);
+
+                            GameProfile playerProfile = new GameProfile(UUID.fromString(oldUserDataFile.getName().replaceAll(".yml", "").replaceAll(".yaml", "")), playerName);
+
+                            Map<String, Map<String, Object>> homesMap = (Map<String, Map<String, Object>>) data.get("homes");
+                            for (Map.Entry<String, Map<String, Object>> entry : homesMap.entrySet()) {
+                                ServerWorld world = worldMap.get(COMPARISON_TABLE.get((String) entry.getValue().get("world-name")));
+                                ServerPlayerEntity player = new ServerPlayerEntity(EssentialCommands.SERVER_INSTANCE, world, playerProfile, null);
+
+                                PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
+
+                                double x = (double) entry.getValue().get("x");
+                                double y = (double) entry.getValue().get("y");
+                                double z = (double) entry.getValue().get("z");
+                                float yaw = (float) ((double) entry.getValue().get("yaw"));
+                                float pitch = (float) ((double) entry.getValue().get("pitch"));
+                                String homeName = entry.getKey();
+
+                                playerData.addHome(homeName, new MinecraftLocation(world.getRegistryKey(), x, y, z, yaw, pitch));
+                                playerData.save();
+
+                                oldUserDataFile.renameTo(new File(oldUsersDataDictionary, oldUserDataFile.getName() + ".converted"));
+                                counter++;
+                            }
+                        }
+                        else {
+                            oldUserDataFile.renameTo(new File(oldUsersDataDictionary, oldUserDataFile.getName() + ".converted"));
+                        }
+                    }
+                }
+                catch (CommandSyntaxException ce){
+                    LOGGER.error("There was an error occurred while converting home config:" + oldUserDataFile.getName());
+                    ce.printStackTrace();
+                }
+                catch (Exception e) {
+                    LOGGER.error("There was an error occurred while converting home config:" + oldUserDataFile.getName());
+                    e.printStackTrace();
+                    return;
+                }
+            }
+
+            LOGGER.info("Convert finished, converted " + counter + " file(s)!");
+        }
+    }
 
     public static void warpConvert() {
-        File oldWarpsDictionary = OLD_CONF_PATH.toFile();
+        File oldWarpsDictionary = OLD_WARP_PATH.toFile();
         if (!oldWarpsDictionary.exists() || oldWarpsDictionary.isFile()) {
             oldWarpsDictionary.mkdirs();
         }
@@ -75,7 +153,6 @@ public class EssentialsConvertor {
                         String worldName = (String) data.get("world-name");
                         String warpName = (String) data.get("name");
                         locationMap.put(warpName, new MinecraftLocation(worldMap.get(COMPARISON_TABLE.get(worldName)).getRegistryKey(), x, y, z, yaw, pitch));
-                        oldWarpFile.renameTo(new File(oldWarpsDictionary, oldWarpFile.getName() + ".converted"));
                     }
                 }
                 catch (Exception e){
@@ -83,6 +160,10 @@ public class EssentialsConvertor {
                     e.printStackTrace();
                     return;
                 }
+            }
+
+            for(File oldWarpFile : oldWarpFiles){
+                oldWarpFile.renameTo(new File(oldWarpsDictionary, oldWarpFile.getName() + ".converted"));
             }
 
             for(Map.Entry<String, MinecraftLocation> entry : locationMap.entrySet()){

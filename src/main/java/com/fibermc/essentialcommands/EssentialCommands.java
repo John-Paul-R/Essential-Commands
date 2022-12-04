@@ -9,20 +9,18 @@ import com.fibermc.essentialcommands.commands.RulesCommand;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfigSnapshot;
 import com.fibermc.essentialcommands.text.ECText;
-
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
-
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-
-import net.minecraft.world.World;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -42,7 +40,9 @@ public final class EssentialCommands implements ModInitializer {
     @SuppressWarnings("checkstyle:StaticVariableName")
     public static EssentialCommandsConfigSnapshot CONFIG = EssentialCommandsConfigSnapshot.create(BACKING_CONFIG);
 
-    public static final List<World> WORLD_LIST = new ArrayList<>();
+    public static final List<ServerWorld> WORLD_LIST = new ArrayList<>();
+
+    public static MinecraftServer SERVER_INSTANCE = null;
 
     public static void log(Level level, String message, Object... args) {
         final String logPrefix = "[EssentialCommands]: ";
@@ -84,6 +84,8 @@ public final class EssentialCommands implements ModInitializer {
         CommandRegistrationCallback.EVENT.register(EssentialCommandRegistry::register);
 
         ServerWorldEvents.LOAD.register((server, world) ->{
+            SERVER_INSTANCE = server;
+
             if(!WORLD_LIST.contains(world)){
                 WORLD_LIST.add(world);
             }
@@ -91,6 +93,7 @@ public final class EssentialCommands implements ModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             // load converter
+            EssentialsConvertor.homeConvert();
             EssentialsConvertor.warpConvert();
         });
 
