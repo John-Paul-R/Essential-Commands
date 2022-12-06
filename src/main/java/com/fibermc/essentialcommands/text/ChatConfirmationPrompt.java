@@ -59,7 +59,7 @@ public final class ChatConfirmationPrompt {
     public void send() {
         this.player.sendMessage(
             this.text,
-            MessageType.SYSTEM
+            false
         );
     }
 
