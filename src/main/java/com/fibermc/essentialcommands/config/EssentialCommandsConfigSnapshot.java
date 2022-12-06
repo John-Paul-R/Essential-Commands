@@ -66,6 +66,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean REGISTER_TOP_LEVEL_COMMANDS;
     public final List<String> EXCLUDED_TOP_LEVEL_COMMANDS;
     public final RespawnCondition RESPAWN_AT_EC_SPAWN;
+    public final boolean RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE;
 
     private EssentialCommandsConfigSnapshot(EssentialCommandsConfig config) {
         this.FORMATTING_DEFAULT                 = config.FORMATTING_DEFAULT.getValue();
@@ -122,6 +123,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.REGISTER_TOP_LEVEL_COMMANDS        = config.REGISTER_TOP_LEVEL_COMMANDS.getValue();
         this.EXCLUDED_TOP_LEVEL_COMMANDS        = config.EXCLUDED_TOP_LEVEL_COMMANDS.getValue();
         this.RESPAWN_AT_EC_SPAWN                = config.RESPAWN_AT_EC_SPAWN.getValue();
+        this.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = config.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE.getValue();
     }
 
     public static EssentialCommandsConfigSnapshot create(EssentialCommandsConfig config) {
