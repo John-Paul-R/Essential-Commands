@@ -179,7 +179,9 @@ public final class ECPerms {
     }
 
     public static Stream<String> getGrantedStatefulPlayerAbilityPermissions(ServerPlayerEntity player) {
-        return Arrays.stream(Registry.Group.stateful_player_abilities)
-            .filter(permission -> check(player.getCommandSource(), permission));
+        var list = Arrays.stream(Registry.Group.stateful_player_abilities);
+        return player.hasPermissionLevel(2)
+            ? list // TODO: this is hacky
+            : list.filter(permission -> check(player.getCommandSource(), permission));
     }
 }
