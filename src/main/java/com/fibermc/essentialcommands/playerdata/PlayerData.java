@@ -8,6 +8,7 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.CommandUtil;
+import com.fibermc.essentialcommands.commands.InvulnCommand;
 import com.fibermc.essentialcommands.commands.helpers.IFeedbackReceiver;
 import com.fibermc.essentialcommands.events.PlayerActCallback;
 import com.fibermc.essentialcommands.teleportation.TeleportRequest;
@@ -223,11 +224,11 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
             // This assignment should happen after the message, otherwise
             // `getDisplayName` will include the `[AFK]` prefix.
-            this.afk = afk;
+            this.afk = true;
         } else {
             // This assignment should happen before the message, otherwise
             // `getDisplayName` will include the `[AFK]` prefix.
-            this.afk = afk;
+            this.afk = false;
 
             Pal.revokeAbility(this.player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
 
@@ -405,6 +406,20 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             Pal.revokeAbility(this.player, VanillaAbilities.ALLOW_FLYING, ECAbilitySources.FLY_COMMAND);
         }
         this.player.sendAbilitiesUpdate();
+    }
+
+    public void clearAbilitiesWithoutPermisisons() {
+        var grantedAbilityPerms = ECPerms.getGrantedStatefulPlayerAbilityPermissions(this.player).toList();
+
+        var flyPermisisons = List.of(ECPerms.Registry.Group.fly_group);
+        if (grantedAbilityPerms.stream().noneMatch(flyPermisisons::contains)) {
+            setFlight(false);
+        }
+
+        var invulnPermissions = List.of(ECPerms.Registry.Group.invuln_group);
+        if (grantedAbilityPerms.stream().noneMatch(invulnPermissions::contains)) {
+            InvulnCommand.exec(this.player, false);
+        }
     }
 
     public void tickTpCooldown() {

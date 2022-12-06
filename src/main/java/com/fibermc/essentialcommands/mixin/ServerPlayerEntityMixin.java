@@ -13,6 +13,7 @@ import com.fibermc.essentialcommands.teleportation.QueuedTeleport;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,13 +25,18 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.WorldProperties;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 @Mixin(ServerPlayerEntity.class)
-public class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
+public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
+
+    @Shadow
+    public abstract ServerWorld getWorld();
 
     @Unique
     public QueuedTeleport ecQueuedTeleport;
@@ -64,7 +70,16 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
                                         ServerWorld serverWorld,
                                         WorldProperties worldProperties)
     {
-        ((ServerPlayerEntityAccess) this).ec$getPlayerData().updatePlayerEntity((ServerPlayerEntity) (Object) this);
+        var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
+        playerData.updatePlayerEntity((ServerPlayerEntity) (Object) this);
+    }
+
+    @Inject(method = "worldChanged", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    public void onWorldChanged(ServerWorld origin, CallbackInfo ci, RegistryKey registryKey, RegistryKey registryKey2) {
+        var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
+        if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
+            playerData.clearAbilitiesWithoutPermisisons();
+        }
     }
 
     @Override
