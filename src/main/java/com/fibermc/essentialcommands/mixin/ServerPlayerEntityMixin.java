@@ -28,6 +28,7 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.WorldProperties;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
@@ -64,7 +65,11 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
                                         ServerWorld serverWorld,
                                         WorldProperties worldProperties)
     {
-        ((ServerPlayerEntityAccess) this).ec$getPlayerData().updatePlayerEntity((ServerPlayerEntity) (Object) this);
+        var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
+        playerData.updatePlayerEntity((ServerPlayerEntity) (Object) this);
+        if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
+            playerData.clearAbilitiesWithoutPermisisons();
+        }
     }
 
     @Override
