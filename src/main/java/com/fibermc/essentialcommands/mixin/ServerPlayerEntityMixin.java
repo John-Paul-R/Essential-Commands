@@ -27,6 +27,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
@@ -72,10 +73,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     {
         var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
         playerData.updatePlayerEntity((ServerPlayerEntity) (Object) this);
+        if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
+            playerData.clearAbilitiesWithoutPermisisons();
+        }
     }
 
     @Inject(method = "worldChanged", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    public void onWorldChanged(ServerWorld origin, CallbackInfo ci, RegistryKey registryKey, RegistryKey registryKey2) {
+    public void onWorldChanged(ServerWorld origin, CallbackInfo ci, RegistryKey<World> registryKey, RegistryKey<World> registryKey2) {
         var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
         if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
             playerData.clearAbilitiesWithoutPermisisons();
