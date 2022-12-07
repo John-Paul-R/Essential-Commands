@@ -5,10 +5,7 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
-import com.fibermc.essentialcommands.playerdata.PlayerData;
-import com.fibermc.essentialcommands.playerdata.PlayerDataFactory;
-import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.playerdata.PlayerProfileFactory;
+import com.fibermc.essentialcommands.playerdata.*;
 import com.fibermc.essentialcommands.teleportation.QueuedTeleport;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -73,16 +70,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     {
         var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
         playerData.updatePlayerEntity((ServerPlayerEntity) (Object) this);
-        if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
-            playerData.clearAbilitiesWithoutPermisisons();
-        }
     }
 
     @Inject(method = "worldChanged", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILSOFT)
     public void onWorldChanged(ServerWorld origin, CallbackInfo ci, RegistryKey<World> registryKey, RegistryKey<World> registryKey2) {
         var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
         if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
-            playerData.clearAbilitiesWithoutPermisisons();
+            PlayerDataManager.getInstance().scheduleTask(playerData::clearAbilitiesWithoutPermisisons);
         }
     }
 
