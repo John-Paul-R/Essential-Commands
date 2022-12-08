@@ -30,8 +30,7 @@ public class OfflinePlayerRepo {
         var player = new ServerPlayerEntity(
             server,
             server.getOverworld(),
-            playerProfile,
-            null);
+            playerProfile);
 
         server.getPlayerManager().loadPlayerData(player);
 
