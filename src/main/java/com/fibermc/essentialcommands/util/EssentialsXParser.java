@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
