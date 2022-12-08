@@ -46,7 +46,7 @@ public class MinecraftLocation {
 
     public MinecraftLocation(NbtCompound tag) {
         this.dim = RegistryKey.of(
-            Registry.WORLD_KEY,
+            RegistryKeys.WORLD,
             Identifier.tryParse(tag.getString("WorldRegistryKey"))
         );
         this.pos = new Vec3d(
@@ -66,7 +66,7 @@ public class MinecraftLocation {
 
     protected void loadNbt(NbtCompound tag) {
         this.dim = RegistryKey.of(
-            Registry.WORLD_KEY,
+            RegistryKeys.WORLD,
             Identifier.tryParse(tag.getString("WorldRegistryKey"))
         );
         this.pos = new Vec3d(
