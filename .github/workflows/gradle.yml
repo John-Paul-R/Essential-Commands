@@ -57,7 +57,7 @@ jobs:
 
       - name: 🔨 Build artifacts and Run Tests
         run: |
-          gradlew migrateMappings --mappings "1.19.3+build.2"
+          gradle -b build-github-action.gradle -c settings-github-action.gradle migrateMappings --mappings "1.19.3+build.2"
           gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
 
       - name: 📦 Upload artifacts
