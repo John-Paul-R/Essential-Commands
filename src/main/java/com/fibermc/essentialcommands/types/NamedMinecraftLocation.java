@@ -5,7 +5,7 @@ import com.fibermc.essentialcommands.text.TextFormatType;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 
 import dev.jpcode.eccore.util.TextUtil;
