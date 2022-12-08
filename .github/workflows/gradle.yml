@@ -56,7 +56,9 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: 🔨 Build artifacts and Run Tests
-        run: gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
+        run: |
+          gradlew migrateMappings --mappings "1.19.3+build.2"
+          gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
 
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v2
