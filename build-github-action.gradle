@@ -1,7 +1,7 @@
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.0-SNAPSHOT'
 }
 
 build {
