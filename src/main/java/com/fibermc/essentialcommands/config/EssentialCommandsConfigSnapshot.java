@@ -36,6 +36,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean ENABLE_AFK;
     public final boolean ENABLE_DAY;
     public final boolean ENABLE_RULES;
+    public final boolean ENABLE_BED;
     public final List<Integer> HOME_LIMIT;
     public final double TELEPORT_COOLDOWN;
     public final int TELEPORT_DELAY_TICKS;
@@ -93,6 +94,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.ENABLE_AFK                         = config.ENABLE_AFK.getValue();
         this.ENABLE_DAY                         = config.ENABLE_DAY.getValue();
         this.ENABLE_RULES                       = config.ENABLE_RULES.getValue();
+        this.ENABLE_BED                         = config.ENABLE_BED.getValue();
         this.HOME_LIMIT                         = config.HOME_LIMIT.getValue();
         this.TELEPORT_COOLDOWN                  = config.TELEPORT_COOLDOWN.getValue();
         this.TELEPORT_DELAY_TICKS               = (int) (config.TELEPORT_DELAY.getValue() * TimeUtil.TPS);
