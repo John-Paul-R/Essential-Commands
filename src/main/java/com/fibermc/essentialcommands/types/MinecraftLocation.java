@@ -9,8 +9,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
 
 public class MinecraftLocation {
@@ -46,7 +46,7 @@ public class MinecraftLocation {
 
     public MinecraftLocation(NbtCompound tag) {
         this.dim = RegistryKey.of(
-            Registry.WORLD_KEY,
+            RegistryKeys.WORLD,
             Identifier.tryParse(tag.getString("WorldRegistryKey"))
         );
         this.pos = new Vec3d(
@@ -66,7 +66,7 @@ public class MinecraftLocation {
 
     protected void loadNbt(NbtCompound tag) {
         this.dim = RegistryKey.of(
-            Registry.WORLD_KEY,
+            RegistryKeys.WORLD,
             Identifier.tryParse(tag.getString("WorldRegistryKey"))
         );
         this.pos = new Vec3d(
