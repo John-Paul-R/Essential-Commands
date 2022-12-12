@@ -14,7 +14,7 @@ build {
 
 ext.env = loadenv()
 
-String getenv(String key) {
+static String getenv(String key) {
     return env.getOrDefault(key, "NOT FOUND")
 }
 
@@ -24,7 +24,10 @@ allprojects {
 
 
     group = project.maven_group
-    String full_version = "${project.mod_version}-mc${project.minecraft_version}"
+    String full_version = Boolean.parseBoolean(getenv("IS_PIPELINE"))
+        ? "${project.mod_version}-mc${project.minecraft_version}"
+        : "${project.mod_version}-mc${project.minecraft_version}+${getTimestamp()}"
+
     version = full_version
     archivesBaseName = "${project.mod_id}"
 
@@ -284,7 +287,7 @@ githubRelease {
 
 generatePomFileForMavenJavaPublication {}
 
-def static loadenv(path = ".env") {
+def static loadenv(String path = ".env") {
     def env = [:]
 
     def file = new File(path)
@@ -293,6 +296,9 @@ def static loadenv(path = ".env") {
             def (name, value) = line.tokenize("=")
             env[name.trim()] = value.trim()
         }
+    }
+    for (el in System.getenv()) {
+        env[el.key] = el.value;
     }
     return env
 }
@@ -305,4 +311,8 @@ String readChangelogFromFile() {
         return "changelog file not found"
     }
     return file.getText('UTF-8')
+}
+
+static def getTimestamp() {
+    return new Date().format('yyyyMMddHHmmss')
 }

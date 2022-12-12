@@ -9,7 +9,6 @@ on:
     paths:
       - '**/src/**'
       - '**/build.gradle'
-      - '**/build-github-action.gradle'
       - '**/gradle.properties'
       - '**/settings.gradle'
       - .github/workflows/gradle.yml
@@ -20,7 +19,6 @@ on:
     paths:
       - '**/src/**'
       - '**/build.gradle'
-      - '**/build-github-action.gradle'
       - '**/gradle.properties'
       - '**/settings.gradle'
       - .github/workflows/gradle.yml
@@ -56,7 +54,9 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: 🔨 Build artifacts and Run Tests
-        run: gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
+        env:
+          IS_PIPELINE: true
+        run: gradle clean build
 
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v2
