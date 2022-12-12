@@ -14,7 +14,7 @@ build {
 
 ext.env = loadenv()
 
-static String getenv(String key) {
+String getenv(String key) {
     return env.getOrDefault(key, "NOT FOUND")
 }
 
