@@ -54,6 +54,8 @@
   "cmd.afk.error.in_combat": "Cannot enter AFK while in combat.",
   "rules.reload.success": "Rules file reloaded.",
   "cmd.rules.reload.error.unexpected": "An unexpected error occurred while reloading the rules file. The server console may contain more information.",
+  "cmd.bed.error.none_set":  "Player spawnpoint not set.",
+  "cmd.bed.bed_destination_name":  "bed",
 
   "cmd.workbench.feedback": "Opened ${0}.",
   "cmd.workbench.container_ui_name": "EC ${0}",

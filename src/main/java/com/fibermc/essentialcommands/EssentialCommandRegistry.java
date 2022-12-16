@@ -411,6 +411,13 @@ public final class EssentialCommandRegistry {
                 .build());
         }
 
+        if (CONFIG.ENABLE_BED) {
+            registerNode.accept(CommandManager.literal("bed")
+                .requires(ECPerms.require(ECPerms.Registry.bed, 0))
+                .executes(new BedCommand())
+                .build());
+        }
+
         registerNode.accept(CommandManager.literal("lastPos")
             .requires(ECPerms.require("essentialcommands.admin.lastpos", 2))
                 .then(argument("target_player", StringArgumentType.word())
