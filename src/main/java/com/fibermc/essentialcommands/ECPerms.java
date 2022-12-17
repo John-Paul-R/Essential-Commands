@@ -3,12 +3,14 @@ package com.fibermc.essentialcommands;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -59,6 +61,7 @@ public final class ECPerms {
         public static final String gametime = "essentialcommands.gametime";
         public static final String time_set_day = "essentialcommands.day";
         public static final String afk = "essentialcommands.afk";
+        public static final String bed = "essentialcommands.bed";
         public static final String config_reload = "essentialcommands.config.reload";
         public static final String bypass_teleport_delay = "essentialcommands.bypass.teleport_delay";
         public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";
@@ -75,8 +78,10 @@ public final class ECPerms {
             public static final String[] spawn_group = {spawn_tp, spawn_set};
             public static final String[] nickname_group = {nickname_self, nickname_others, nickname_reveal};
             public static final String[] fly_group = {fly_self, fly_others};
+            public static final String[] invuln_group = {invuln_self, invuln_others};
             public static final String[] config_group = {config_reload};
             public static String[] home_limit_group;
+            public static final String[] stateful_player_abilities = {fly_self, fly_others, invuln_self, invuln_others};
         }
 
         public static String[] per_warp_permissions = null;
@@ -173,5 +178,12 @@ public final class ECPerms {
     public static String[] makeNumericPermissionGroup(String basePermission, Collection<Integer> numericValues) {
         String trueBasePermission = basePermission.endsWith(".") ? basePermission : basePermission + ".";
         return numericValues.stream().map(el -> trueBasePermission.concat(el.toString())).toArray(String[]::new);
+    }
+
+    public static Stream<String> getGrantedStatefulPlayerAbilityPermissions(ServerPlayerEntity player) {
+        var list = Arrays.stream(Registry.Group.stateful_player_abilities);
+        return player.hasPermissionLevel(2)
+            ? list // TODO: this is hacky
+            : list.filter(permission -> check(player.getCommandSource(), permission));
     }
 }

@@ -47,7 +47,7 @@ public class InvulnCommand implements Command<ServerCommandSource> {
         return 0;
     }
 
-    public static void exec(ServerPlayerEntity target, boolean shouldEnableInvuln) throws CommandSyntaxException {
+    public static void exec(ServerPlayerEntity target, boolean shouldEnableInvuln) {
         if (shouldEnableInvuln) {
             Pal.grantAbility(target, VanillaAbilities.INVULNERABLE, ECAbilitySources.INVULN_COMMAND);
         } else {

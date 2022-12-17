@@ -37,6 +37,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean ENABLE_DAY;
     public final boolean ENABLE_RULES;
     public final boolean ENABLE_INVSEE;
+    public final boolean ENABLE_BED;
     public final List<Integer> HOME_LIMIT;
     public final double TELEPORT_COOLDOWN;
     public final int TELEPORT_DELAY_TICKS;
@@ -67,6 +68,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean REGISTER_TOP_LEVEL_COMMANDS;
     public final List<String> EXCLUDED_TOP_LEVEL_COMMANDS;
     public final RespawnCondition RESPAWN_AT_EC_SPAWN;
+    public final boolean RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE;
 
     private EssentialCommandsConfigSnapshot(EssentialCommandsConfig config) {
         this.FORMATTING_DEFAULT                 = config.FORMATTING_DEFAULT.getValue();
@@ -93,6 +95,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.ENABLE_AFK                         = config.ENABLE_AFK.getValue();
         this.ENABLE_DAY                         = config.ENABLE_DAY.getValue();
         this.ENABLE_RULES                       = config.ENABLE_RULES.getValue();
+        this.ENABLE_BED                         = config.ENABLE_BED.getValue();
         this.HOME_LIMIT                         = config.HOME_LIMIT.getValue();
         this.TELEPORT_COOLDOWN                  = config.TELEPORT_COOLDOWN.getValue();
         this.TELEPORT_DELAY_TICKS               = (int) (config.TELEPORT_DELAY.getValue() * TimeUtil.TPS);
@@ -124,6 +127,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.EXCLUDED_TOP_LEVEL_COMMANDS        = config.EXCLUDED_TOP_LEVEL_COMMANDS.getValue();
         this.RESPAWN_AT_EC_SPAWN                = config.RESPAWN_AT_EC_SPAWN.getValue();
         this.ENABLE_INVSEE                      = config.ENABLE_INVSEE.getValue();
+        this.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = config.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE.getValue();
     }
 
     public static EssentialCommandsConfigSnapshot create(EssentialCommandsConfig config) {
