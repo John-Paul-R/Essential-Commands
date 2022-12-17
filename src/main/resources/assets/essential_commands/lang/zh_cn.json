@@ -52,10 +52,15 @@
   "cmd.day.error.already_daytime": "当前已是白天。",
   "cmd.day.feedback": "将时间设为白天。",
   "cmd.afk.error.in_combat": "无法在战斗中将状态设置为离开。",
+  "rules.reload.success": "已重新加载规则文件.",
+  "cmd.rules.reload.error.unexpected": "加载规则文件时发生意外错误，服务器控制台可能会有更多信息。",
 
   "cmd.workbench.feedback": "已打开 ${0} 。",
   "cmd.workbench.container_ui_name": "EC ${0}",
   "cmd.wastebin.name": "垃圾箱",
+
+  "invsee.name": "${0} 的背包",
+  "invsee.not_available": "此格子不可用",
 
   "cmd.list.feedback.empty": "找不到地点。",
   "cmd.top.location_name": "地表",

@@ -36,6 +36,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean ENABLE_AFK;
     public final boolean ENABLE_DAY;
     public final boolean ENABLE_RULES;
+    public final boolean ENABLE_INVSEE;
     public final List<Integer> HOME_LIMIT;
     public final double TELEPORT_COOLDOWN;
     public final int TELEPORT_DELAY_TICKS;
@@ -122,6 +123,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.REGISTER_TOP_LEVEL_COMMANDS        = config.REGISTER_TOP_LEVEL_COMMANDS.getValue();
         this.EXCLUDED_TOP_LEVEL_COMMANDS        = config.EXCLUDED_TOP_LEVEL_COMMANDS.getValue();
         this.RESPAWN_AT_EC_SPAWN                = config.RESPAWN_AT_EC_SPAWN.getValue();
+        this.ENABLE_INVSEE                      = config.ENABLE_INVSEE.getValue();
     }
 
     public static EssentialCommandsConfigSnapshot create(EssentialCommandsConfig config) {

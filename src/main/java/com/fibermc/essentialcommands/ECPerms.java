@@ -66,6 +66,7 @@ public final class ECPerms {
         public static final String bypass_teleport_interrupt_on_move = "essentialcommands.bypass.teleport_interrupt_on_move";
         public static final String rules_reload = "essentialcommands.rules_reload";
         public static final String rules = "essentialcommands.rules";
+        public static final String invsee = "essentialcommands.invsee";
 
         public static final class Group {
             public static final String[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};

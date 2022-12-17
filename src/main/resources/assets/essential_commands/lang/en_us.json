@@ -59,6 +59,9 @@
   "cmd.workbench.container_ui_name": "EC ${0}",
   "cmd.wastebin.name": "Wastebin",
 
+  "invsee.name": "${0}'s Inventory",
+  "invsee.not_available": "This slot is not available.",
+
   "cmd.list.feedback.empty": "No locations found.",
   "cmd.top.location_name": "world surface",
 

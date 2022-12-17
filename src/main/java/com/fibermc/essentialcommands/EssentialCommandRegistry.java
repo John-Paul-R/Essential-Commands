@@ -316,6 +316,14 @@ public final class EssentialCommandRegistry {
             registerNode.accept(nickNode);
         }
 
+        if (CONFIG.ENABLE_INVSEE) {
+            registerNode.accept(CommandManager.literal("invsee")
+                    .then(argument("target", EntityArgumentType.player())
+                        .requires(ECPerms.require(ECPerms.Registry.invsee, 2).and(ServerCommandSource::isExecutedByPlayer))
+                        .executes(new InvseeCommand()))
+                .build());
+        }
+
         if (CONFIG.ENABLE_RTP) {
             registerNode.accept(CommandManager.literal("randomteleport")
                 .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
