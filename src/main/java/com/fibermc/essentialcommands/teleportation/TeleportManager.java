@@ -93,6 +93,7 @@ public final class TeleportManager {
             ) {
                 playerData.sendError("teleport.interruped.moved");
                 tpQueueIter.remove();
+                continue;
             }
 
             if (queuedTeleport.getTicksRemaining() < 0) {
