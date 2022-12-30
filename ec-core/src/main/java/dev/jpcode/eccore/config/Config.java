@@ -29,7 +29,7 @@ public abstract class Config<T extends Config<T>> {
     private final String displayName;
     private final String documentationLink;
 
-    private String existingPropsStr;
+    private @Nullable String existingPropsStr;
     private String getNonCommentsLines(String propsContent) {
         return propsContent.lines()
             .skip(displayName.lines().count() + 2)
@@ -90,8 +90,9 @@ public abstract class Config<T extends Config<T>> {
 
             var strinifiedProps = stringWriter.toString();
             var stringifiedPropsNoComments = getNonCommentsLines(strinifiedProps);
-            var existingPropsStrNoComments = getNonCommentsLines(existingPropsStr);
-            if (!stringifiedPropsNoComments.equals(existingPropsStrNoComments)) {
+            if (existingPropsStr == null
+                || !stringifiedPropsNoComments.equals(getNonCommentsLines(existingPropsStr)))
+            {
                 File outFile = configPath.toFile();
                 FileWriter writer = new FileWriter(outFile);
                 props.storeSorted(writer, propsComments);
