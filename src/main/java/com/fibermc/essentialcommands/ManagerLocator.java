@@ -33,6 +33,7 @@ public final class ManagerLocator {
             || CONFIG.ENABLE_WARP
             || CONFIG.ENABLE_SPAWN
             || CONFIG.ENABLE_NICK
+            || CONFIG.ENABLE_AFK
             ;
     }
 
