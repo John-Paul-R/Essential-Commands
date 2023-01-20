@@ -60,7 +60,7 @@ public abstract class ECText {
         try {
             InputStream inputStream = ECText.class.getResourceAsStream(resourceLocation);
             if (inputStream == null) {
-                LOGGER.info(String.format("No EC lang file for the language '%s' found. Defulting to 'en_us'.", langId));
+                LOGGER.info(String.format("No EC lang file for the language '%s' found. Defaulting to 'en_us'.", langId));
                 inputStream = ECText.class.getResourceAsStream(String.format(resourceFString, DEFAULT_LANGUAGE_SPEC));
             }
 
