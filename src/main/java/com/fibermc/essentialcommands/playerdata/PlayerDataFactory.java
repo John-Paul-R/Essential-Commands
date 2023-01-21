@@ -51,14 +51,14 @@ public final class PlayerDataFactory {
     public static PlayerData create(NamedLocationStorage homes, File saveFile) {
         String fileName = saveFile.getName();
         UUID playerUuid = UUID.fromString(fileName.substring(0, fileName.indexOf(".dat")));
-        PlayerData pData = new PlayerData(playerUuid, homes, saveFile);
+        PlayerData pData = new PlayerData(playerUuid, saveFile);
         if (Files.exists(saveFile.toPath()) && saveFile.length() != 0) {
             try {
                 NbtCompound nbtCompound3 = NbtIo.readCompressed(new FileInputStream(saveFile));
                 pData.fromNbt(nbtCompound3);
                 // If a EC data already existed, the homes we just initialized the pData with (from paramater) just got overwritten.
                 // Now, add them back if their keys do not already exist in the set we just loaded from EC save file.
-                homes.forEach((name, minecraftLocation) -> pData.homes.putIfAbsent(name, minecraftLocation));
+                pData.homes.putAll(homes);
                 //Testing:
 
             } catch (IOException e) {

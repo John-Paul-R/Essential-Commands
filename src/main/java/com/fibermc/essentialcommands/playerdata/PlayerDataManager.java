@@ -13,6 +13,7 @@ import com.fibermc.essentialcommands.types.RespawnCondition;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.TextParserUtils;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.ClientConnection;
@@ -75,6 +76,9 @@ public class PlayerDataManager {
         }
     }
 
+    public static boolean exists() {
+        return instance != null;
+    }
     public static PlayerDataManager getInstance() {
         return instance != null ? instance : new PlayerDataManager();
     }
@@ -192,6 +196,11 @@ public class PlayerDataManager {
 
     public Collection<PlayerData> getAllPlayerData() {
         return dataMap.values();
+    }
+
+    @Nullable
+    public PlayerData getByUuid(UUID uuid) {
+        return dataMap.get(uuid);
     }
 
     /**
