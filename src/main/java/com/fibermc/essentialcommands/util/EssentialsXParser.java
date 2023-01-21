@@ -16,8 +16,8 @@ import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
@@ -41,9 +41,19 @@ public final class EssentialsXParser {
         Yaml yaml = new Yaml();
         Map<Object, Object> ydoc = yaml.load(yamlStr);
         Map<String, Map<String, Object>> homesMap = (Map<String, Map<String, Object>>) ydoc.get("homes");
-        LOGGER.info("Found {} homes in file '{}'.", homesMap.size(), yamlSource.toPath().toString());
+        if (homesMap == null) {
+            LOGGER.info("No homes key in file '{}'. Skipping.", yamlSource.toPath().toString());
+            return homes;
+        }
+        LOGGER.info("Found {} homes in file '{}'.", homesMap, yamlSource.toPath().toString());
         homesMap.forEach((String name, Map<String, Object> locData) -> {
-            RegistryKey<World> worldRegistryKey = uuidRegistryKeyMap.get(UUID.fromString((String) locData.get("world")));
+            var worldIdentifier = (String) locData.get("world");
+            UUID worldUuid = null;
+            try {
+                worldUuid = UUID.fromString(worldIdentifier);
+            } catch (Exception ign) {}
+
+            RegistryKey<World> worldRegistryKey = worldUuid != null ? uuidRegistryKeyMap.get(worldUuid) : null;
             if (worldRegistryKey == null) {
                 worldRegistryKey = World.OVERWORLD;
             }
