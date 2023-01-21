@@ -16,8 +16,8 @@ import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
@@ -41,11 +41,52 @@ public final class EssentialsXParser {
         Yaml yaml = new Yaml();
         Map<Object, Object> ydoc = yaml.load(yamlStr);
         Map<String, Map<String, Object>> homesMap = (Map<String, Map<String, Object>>) ydoc.get("homes");
+        if (homesMap == null) {
+            LOGGER.info("No homes key in file '{}'. Skipping.", yamlSource.toPath().toString());
+            return homes;
+        }
         LOGGER.info("Found {} homes in file '{}'.", homesMap.size(), yamlSource.toPath().toString());
         homesMap.forEach((String name, Map<String, Object> locData) -> {
-            RegistryKey<World> worldRegistryKey = uuidRegistryKeyMap.get(UUID.fromString((String) locData.get("world")));
+            var worldIdentifier = (String) locData.get("world");
+            UUID worldUuid = null;
+            RegistryKey<World> worldRegistryKey;
+            try {
+                worldUuid = UUID.fromString(worldIdentifier);
+                worldRegistryKey = uuidRegistryKeyMap.get(worldUuid);
+            } catch (Exception ign) {
+                worldRegistryKey = switch (worldIdentifier) {
+                    case "world" -> World.OVERWORLD;
+                    case "world_nether" -> World.NETHER;
+                    case "world_the_end" -> World.END;
+                    default -> null;
+                };
+            }
+
             if (worldRegistryKey == null) {
-                worldRegistryKey = World.OVERWORLD;
+                var worldName = (String) locData.get("world-name");
+                if (worldName != null) {
+                    worldRegistryKey = switch (worldName) {
+                        case "world" -> {
+                            if (worldUuid != null) {
+                                uuidRegistryKeyMap.putIfAbsent(worldUuid, World.OVERWORLD);
+                            }
+                            yield World.OVERWORLD;
+                        }
+                        case "world_nether" -> {
+                            if (worldUuid != null) {
+                                uuidRegistryKeyMap.putIfAbsent(worldUuid, World.NETHER);
+                            }
+                            yield World.NETHER;
+                        }
+                        case "world_the_end" -> {
+                            if (worldUuid != null) {
+                                uuidRegistryKeyMap.putIfAbsent(worldUuid, World.END);
+                            }
+                            yield World.END;
+                        }
+                        default -> World.OVERWORLD;
+                    };
+                }
             }
 
             homes.put(
@@ -116,7 +157,7 @@ public final class EssentialsXParser {
 
         var filesArr = Objects.requireNonNull(sourceDir.listFiles());
 
-        LOGGER.info("Preparing to convert homes for {} players in directory '{}'", filesArr, sourceDir);
+        LOGGER.info("Preparing to convert homes for {} players in directory '{}'", filesArr.length, sourceDir);
 
         int filesAttempted = 0;
         int filesSucceeded = 0;
@@ -126,7 +167,7 @@ public final class EssentialsXParser {
 
         for (File file : playerDataFiles) {
             filesAttempted++;
-            LOGGER.info("Begin pasring homes for '{}'", file);
+            LOGGER.info("Begin parsing homes for '{}'", file);
 
             // WARN: Currently, this will still overwrite player's new homes of the same name with
             // EssentialsX homes.

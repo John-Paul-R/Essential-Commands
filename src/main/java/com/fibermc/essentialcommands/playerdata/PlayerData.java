@@ -102,14 +102,13 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
      * </p>
      *
      * @param playerUuid UUID of the player whose data we want to grab or modify.
-     * @param homes      NamedLocationStorage of the player's homes (fills field)
      * @param saveFile   The save file for this PlayerData instance.
      */
-    public PlayerData(UUID playerUuid, NamedLocationStorage homes, File saveFile) {
+    public PlayerData(UUID playerUuid, File saveFile) {
         this.pUuid = playerUuid;
         this.saveFile = saveFile;
         incomingTeleportRequests = new LinkedHashMap<>();
-        this.homes = homes;
+        homes = new NamedLocationStorage();
     }
 
     public TeleportRequest getSentTeleportRequest() {
