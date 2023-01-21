@@ -14,6 +14,7 @@ import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSugges
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.util.EssentialsConvertor;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
 import org.spongepowered.asm.util.IConsumer;
 
@@ -534,6 +535,19 @@ public final class EssentialCommandRegistry {
                     return 0;
                 }).build()
             );
+            essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXWarps")
+                .requires(source -> source.hasPermissionLevel(4))
+                .executes((source) -> {
+                    Path mcDir = source.getSource().getServer().getRunDirectory().toPath();
+                    EssentialsConvertor.warpConvert(
+                        source.getSource().getServer(),
+                        mcDir.resolve("plugins/Essentials/warps").toFile()
+                    );
+                    source.getSource().sendFeedback(Text.literal("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
+                    return 0;
+                }).build()
+            );
+
         }
 
         rootNode.addChild(essentialCommandsRootNode);
