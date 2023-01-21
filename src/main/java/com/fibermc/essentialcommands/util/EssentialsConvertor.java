@@ -51,6 +51,8 @@ public class EssentialsConvertor {
         return files;
     }
 
+    // TODO @jp: currently unused because EssentialsXParser.convertPlayerDataDir exists, but there
+    //  are some good ideas here that might be worth carrying over
     public static void homeConvert(MinecraftServer server){
         File oldUsersDataDictionary = OLD_USERDATA_PATH.toFile();
         if (!oldUsersDataDictionary.exists() || oldUsersDataDictionary.isFile()) {
