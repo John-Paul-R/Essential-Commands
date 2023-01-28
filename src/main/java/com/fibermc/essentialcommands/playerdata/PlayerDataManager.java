@@ -10,9 +10,7 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.events.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.RespawnCondition;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
-import eu.pb4.placeholders.api.TextParserUtils;
+import eu.pb4.placeholders.PlaceholderAPI;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.damage.DamageSource;
@@ -28,6 +26,8 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -68,9 +68,9 @@ public class PlayerDataManager {
     private static void onPlayerConnected(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
         if (CONFIG.ENABLE_MOTD) {
             var player = handler.getPlayer();
-            var message = Placeholders.parseText(
-                TextParserUtils.formatText(CONFIG.MOTD),
-                PlaceholderContext.of(player)
+            var message = PlaceholderAPI.parseText(
+                TextUtil.literal(CONFIG.MOTD),
+                player
             );
             player.getCommandSource().sendFeedback(message, false);
         }
@@ -102,7 +102,7 @@ public class PlayerDataManager {
                 ).filter(Objects::nonNull).collect(Collectors.toSet());
 
                 server.getPlayerManager().sendToAll(new PlayerListS2CPacket(
-                    EnumSet.of(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME),
+                    PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME,
                     allChangedNicknamePlayers
                 ));
 
