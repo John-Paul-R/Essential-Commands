@@ -28,11 +28,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.PersistentState;
 
@@ -174,11 +176,11 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public void sendMessage(String messageKey, Text... args) {
-        this.player.sendMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Default, args));
+        this.player.sendMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Default, args), false);
     }
 
     public void sendError(String messageKey, Text... args) {
-        this.player.sendMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Error, args));
+        this.player.sendMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Error, args), false);
     }
 
     public Set<String> getHomeNames() {
@@ -218,7 +220,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
                 ECText.getInstance().getText(
                     "player.afk.enter",
                     this.player.getDisplayName()),
-                false);
+                MessageType.SYSTEM,
+                Util.NIL_UUID);
 
             // This assignment should happen after the message, otherwise
             // `getDisplayName` will include the `[AFK]` prefix.
@@ -234,7 +237,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
                 ECText.getInstance().getText(
                     "player.afk.exit",
                     this.player.getDisplayName()),
-                false);
+                MessageType.SYSTEM,
+                Util.NIL_UUID);
         }
 
         PlayerDataManager.getInstance().markNicknameDirty(this);
@@ -503,7 +507,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
     private void reloadFullNickname() {
         MutableText baseName = ECText.unstyled(this.getPlayer().getGameProfile().getName());
-        MutableText tempFullNickname = Text.empty();
+        MutableText tempFullNickname = TextUtil.empty();
         // Note: this doesn't ever display if nickname is null,
         //  because our mixin to getDisplayName does a null check on getNickname
         if (this.nickname != null) {

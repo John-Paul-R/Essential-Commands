@@ -21,7 +21,7 @@ import dev.jpcode.eccore.ECCore;
 public final class TextUtil {
     private TextUtil() {}
 
-    private static MutableText empty() {
+    public static MutableText empty() {
         return new LiteralText("");
     }
 
