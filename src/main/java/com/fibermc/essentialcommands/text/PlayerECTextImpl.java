@@ -3,15 +3,15 @@ package com.fibermc.essentialcommands.text;
 import java.util.Map;
 
 import com.fibermc.essentialcommands.types.IStyleProvider;
-import eu.pb4.placeholders.api.ParserContext;
 
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
 public class PlayerECTextImpl extends ECTextImpl {
     private final IStyleProvider styleProvider;
 
-    public PlayerECTextImpl(Map<String, String> stringMap, ParserContext parserContext, IStyleProvider styleProvider) {
+    public PlayerECTextImpl(Map<String, String> stringMap, ServerPlayerEntity parserContext, IStyleProvider styleProvider) {
         super(stringMap, parserContext);
         this.styleProvider = styleProvider;
     }

@@ -1,30 +1,29 @@
 package com.fibermc.essentialcommands.text;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.regex.Pattern;
-
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.types.IStyleProvider;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import eu.pb4.placeholders.api.ParserContext;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.*;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.JsonHelper;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 
 import static com.fibermc.essentialcommands.EssentialCommands.*;
 
@@ -88,7 +87,7 @@ public abstract class ECText {
 
         final Map<String, String> map = builder.build();
         return instance = server == null
-            ? new ECTextImpl(map, ParserContext.of())
+            ? new ECTextImpl(map, (MinecraftServer) null)
             : ECTextImpl.forServer(map, server);
     }
 
@@ -122,8 +121,6 @@ public abstract class ECText {
 
     public abstract boolean isRightToLeft();
 
-    public abstract OrderedText reorder(StringVisitable text);
-
     public MutableText literal(String str) {
         return ECText.unstyled(str).setStyle(CONFIG.FORMATTING_DEFAULT);
     }
@@ -136,14 +133,10 @@ public abstract class ECText {
         return ECText.unstyled(str).setStyle(CONFIG.FORMATTING_ERROR);
     }
 
-    public List<OrderedText> reorder(List<StringVisitable> texts) {
-        return texts.stream().map(this::reorder).collect(ImmutableList.toImmutableList());
-    }
-
     public static ECText forPlayer(ServerPlayerEntity player) {
         return new PlayerECTextImpl(
             ECText.getInstance().stringMap,
-            ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(player)),
+            player,
             PlayerProfile.access(player)
         );
     }

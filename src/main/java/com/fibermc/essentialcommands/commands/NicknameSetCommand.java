@@ -5,8 +5,7 @@ import com.fibermc.essentialcommands.commands.helpers.FeedbackReceiver;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.PlaceholderAPI;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -47,7 +46,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
             : rawNicknameText;
 
         var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders, 2)
-            ? Placeholders.parseText(nicknameWithContext, PlaceholderContext.of(targetPlayer))
+            ? PlaceholderAPI.parseText(nicknameWithContext, targetPlayer)
             : nicknameWithContext;
         int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText);
 

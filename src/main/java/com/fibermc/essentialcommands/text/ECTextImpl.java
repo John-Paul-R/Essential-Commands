@@ -3,35 +3,48 @@ package com.fibermc.essentialcommands.text;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.fibermc.essentialcommands.types.ECPlaceholderApiCompat;
 import com.fibermc.essentialcommands.types.IStyleProvider;
-import eu.pb4.placeholders.api.*;
-import eu.pb4.placeholders.api.node.TextNode;
+import eu.pb4.placeholders.PlaceholderAPI;
+import eu.pb4.placeholders.PlaceholderHandler;
+import eu.pb4.placeholders.PlaceholderResult;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.*;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import dev.jpcode.eccore.util.TextUtil;
 
 public class ECTextImpl extends ECText {
-    private final ParserContext parserContext;
+    private final MinecraftServer serverParserContext;
+    private final ServerPlayerEntity playerParserContext;
+
+//    private final MinecraftServer parserContext;
 
     public ECTextImpl(
         Map<String, String> stringMap,
-        ParserContext parserContext)
+        MinecraftServer playerParserContext)
     {
         super(stringMap);
         // In normal operation, `server` should always be present. For testing and other contexts,
         // that is not guaranteed. This is admittedly a bit hacky.
-        this.parserContext = parserContext;
+        this.serverParserContext = playerParserContext;
+        this.playerParserContext = null;
+    }
+
+    public ECTextImpl(
+        Map<String, String> stringMap,
+        ServerPlayerEntity playerParserContext)
+    {
+        super(stringMap);
+        this.serverParserContext = null;
+        this.playerParserContext = playerParserContext;
     }
 
     public static ECText forServer(Map<String, String> stringMap, MinecraftServer server) {
-        return new ECTextImpl(
-            stringMap,
-            ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(server))
-        );
+        return new ECTextImpl(stringMap, server);
     }
 
     public String getString(String key) {
@@ -67,50 +80,51 @@ public class ECTextImpl extends ECText {
         return getTextInternal(key, textFormatType, styleProvider, args);
     }
 
-    private Placeholders.PlaceholderGetter placeholderGetterForContext(
-        TextFormatType textFormatType,
-        @Nullable IStyleProvider styleProvider,
-        List<MutableText> args)
-    {
-        return new Placeholders.PlaceholderGetter() {
-            @Override
-            public boolean isContextOptional() {
-                // In some situations (Notably, unit tests), the MinecraftServer from which to init
-                // the PlaceholderContext will be unavailable, so we set the context to Optional.
-                // (At time of writing, none of EC's PlaceholderGetter tech depends on the server
-                // context)
-                return true;
-            }
-
-            @Override
-            public PlaceholderHandler getPlaceholder(String placeholderId) {
-                return (ctx, abc) -> {
-                    var idxAndFormattingCode = placeholderId.split(":");
-                    if (idxAndFormattingCode.length < 1) {
-                        throw new IllegalArgumentException("lang string placeholder did not contain an index");
-                    }
-
-                    var firstToken = idxAndFormattingCode[0];
-                    var text = switch (firstToken) {
-                        case "l" -> {
-                            if (idxAndFormattingCode.length < 2) {
-                                throw new IllegalArgumentException(
-                                    "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
-                                        + placeholderId);
-                            }
-                            yield getTextInternal(idxAndFormattingCode[1], textFormatType, styleProvider);
-                        }
-
-                        default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));
-                    };
-                    return PlaceholderResult.value(text);
-                };
-            }
-        };
-    }
+    // TODO Later, make this work on 1.18.2
+//    private Placeholders.PlaceholderGetter placeholderGetterForContext(
+//        TextFormatType textFormatType,
+//        @Nullable IStyleProvider styleProvider,
+//        List<MutableText> args)
+//    {
+//        return new Placeholders.PlaceholderGetter() {
+//            @Override
+//            public boolean isContextOptional() {
+//                // In some situations (Notably, unit tests), the MinecraftServer from which to init
+//                // the PlaceholderContext will be unavailable, so we set the context to Optional.
+//                // (At time of writing, none of EC's PlaceholderGetter tech depends on the server
+//                // context)
+//                return true;
+//            }
+//
+//            @Override
+//            public PlaceholderHandler getPlaceholder(String placeholderId) {
+//                return (ctx, abc) -> {
+//                    var idxAndFormattingCode = placeholderId.split(":");
+//                    if (idxAndFormattingCode.length < 1) {
+//                        throw new IllegalArgumentException("lang string placeholder did not contain an index");
+//                    }
+//
+//                    var firstToken = idxAndFormattingCode[0];
+//                    var text = switch (firstToken) {
+//                        case "l" -> {
+//                            if (idxAndFormattingCode.length < 2) {
+//                                throw new IllegalArgumentException(
+//                                    "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
+//                                        + placeholderId);
+//                            }
+//                            yield getTextInternal(idxAndFormattingCode[1], textFormatType, styleProvider);
+//                        }
+//
+//                        default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));
+//                    };
+//                    return PlaceholderResult.value(text);
+//                };
+//            }
+//        };
+//    }
 
     private static int hashText(Text text) {
-        return Objects.hash(text.getContent(), text.getStyle());
+        return Objects.hash(text.getString(), text.getStyle());
     }
 
     public MutableText getTextInternal(
@@ -124,12 +138,25 @@ public class ECTextImpl extends ECText {
             .map(ECTextImpl::hashText)
             .collect(Collectors.toCollection(HashSet::new));
 
-        var placeholderGetter = placeholderGetterForContext(textFormatType, styleProvider, argsList);
-        var nodes = Placeholders.parseNodes(
-            TextNode.convert(ECText.unstyled(getString(key))),
-            Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
-            placeholderGetter);
-        var retVal = ECPlaceholderApiCompat.toText(nodes, parserContext);
+        HashMap<Identifier, PlaceholderHandler> argumentsMap = new HashMap<>();
+        for (int i = 0; i < args.length; i++) {
+            argumentsMap.put(
+                new Identifier("ec", String.valueOf(i)),
+                (a) -> PlaceholderResult.value(args[Integer.parseInt(a.getIdentifier().getPath())]));
+        }
+        // Really this should be implemented per-extending class, in those
+        // extending classes, but I cannot be bothered rn.
+        var retVal = playerParserContext != null
+            ? PlaceholderAPI.parseTextCustom(
+                ECText.unstyled(placeholderAsIdentifier_1_18_Compat(getString(key))),
+                playerParserContext,
+                argumentsMap,
+                PlaceholderAPI.PREDEFINED_PLACEHOLDER_PATTERN)
+            : PlaceholderAPI.parseTextCustom(
+                ECText.unstyled(placeholderAsIdentifier_1_18_Compat(getString(key))),
+                serverParserContext,
+                argumentsMap,
+                PlaceholderAPI.PREDEFINED_PLACEHOLDER_PATTERN);
 
         var retValSiblings = retVal.getSiblings();
 
@@ -149,20 +176,16 @@ public class ECTextImpl extends ECText {
             .collect(TextUtil.collect());
     }
 
+    private String placeholderAsIdentifier_1_18_Compat(String langTemplateText) {
+        return PlaceholderAPI.PREDEFINED_PLACEHOLDER_PATTERN.matcher(langTemplateText).replaceAll("ec:$1");
+    }
+
     public boolean hasTranslation(String key) {
         return super.stringMap.containsKey(key);
     }
 
     public boolean isRightToLeft() {
         return false;
-    }
-
-    public OrderedText reorder(StringVisitable text) {
-        return (visitor) ->
-            text.visit((style, string) ->
-                TextVisitFactory.visitFormatted(string, style, visitor)
-                    ? Optional.empty()
-                    : StringVisitable.TERMINATE_VISIT, Style.EMPTY).isPresent();
     }
 
 }
