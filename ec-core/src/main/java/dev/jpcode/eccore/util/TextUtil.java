@@ -1,9 +1,6 @@
 package dev.jpcode.eccore.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -262,5 +259,23 @@ public final class TextUtil {
                 return Collections.emptySet();
             }
         };
+    }
+
+    /**
+     * indempotent
+     *
+     * @return flattened text
+     */
+    public static List<Text> flattenRoot(Text text) {
+        var siblings = text.getSiblings();
+        if (siblings.size() == 0) {
+            return List.of(text);
+        }
+
+        List<Text> content = new ArrayList<>(siblings.size() + 1);
+        content.add(text.copy().setStyle(text.getStyle()));
+        content.addAll(siblings);
+
+        return content;
     }
 }

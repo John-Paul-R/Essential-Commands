@@ -133,8 +133,7 @@ public class ECTextImpl extends ECText {
         @Nullable IStyleProvider styleProvider,
         Text... args)
     {
-        var argsList = Arrays.stream(args).map(Text::copy).toList();
-        var argsHashes = argsList.stream()
+        var argsHashes = Arrays.stream(args)
             .map(ECTextImpl::hashText)
             .collect(Collectors.toCollection(HashSet::new));
 
@@ -158,26 +157,20 @@ public class ECTextImpl extends ECText {
                 argumentsMap,
                 PlaceholderAPI.PREDEFINED_PLACEHOLDER_PATTERN);
 
-        var retValSiblings = retVal.getSiblings();
-
         var specifiedStyle = styleProvider == null
             ? textFormatType.getStyle()
             : styleProvider.getStyle(textFormatType);
 
-        if (retValSiblings.size() == 0) {
-            return retVal.copy().setStyle(specifiedStyle);
-        }
-
-        return retValSiblings
+        return TextUtil.flattenRoot(retVal)
             .stream()
-            .map(text -> argsHashes.contains(hashText(text))
+            .map(text -> argsHashes.contains(ECTextImpl.hashText(text))
                 ? text
                 : text.copy().setStyle(specifiedStyle))
             .collect(TextUtil.collect());
     }
 
     private String placeholderAsIdentifier_1_18_Compat(String langTemplateText) {
-        return PlaceholderAPI.PREDEFINED_PLACEHOLDER_PATTERN.matcher(langTemplateText).replaceAll("ec:$1");
+        return PlaceholderAPI.PREDEFINED_PLACEHOLDER_PATTERN.matcher(langTemplateText).replaceAll("\\${ec:$1}");
     }
 
     public boolean hasTranslation(String key) {
