@@ -33,7 +33,7 @@ public class InvulnCommand implements Command<ServerCommandSource> {
 
         // TODO Label boolean values in suggestions, or switch to single state value (present, or it's not)
 
-        var senderPlayerAccess = ((ServerPlayerEntityAccess) source.getPlayerOrThrow());
+        var senderPlayerAccess = ((ServerPlayerEntityAccess) source.getPlayer());
         var enabledText = senderPlayerAccess.ec$getEcText().getText(
             shouldEnableInvuln ? "generic.enabled" : "generic.disabled",
             TextFormatType.Accent);

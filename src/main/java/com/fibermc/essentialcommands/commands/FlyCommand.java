@@ -63,7 +63,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
 
         // Label boolean values in suggestions, or switch to single state value (present or it's not)
 
-        var senderPlayer = source.getPlayerOrThrow();
+        var senderPlayer = source.getPlayer();
         var senderPlayerData = PlayerData.access(senderPlayer);
         var ecText = ECText.access(senderPlayer);
         var enabledText = ecText.getText(

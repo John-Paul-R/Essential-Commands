@@ -20,7 +20,7 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         //Store command sender
-        ServerPlayerEntity senderPlayer = source.getPlayerOrThrow();
+        ServerPlayerEntity senderPlayer = source.getPlayer();
         PlayerData senderPlayerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
         //Store home name
         String homeName = StringArgumentType.getString(context, "home_name");

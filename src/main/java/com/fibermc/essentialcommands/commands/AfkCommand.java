@@ -16,7 +16,7 @@ public class AfkCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var source = context.getSource();
-        var player = source.getPlayerOrThrow();
+        var player = source.getPlayer();
         var playerAccess = ((ServerPlayerEntityAccess) player);
         var playerData = playerAccess.ec$getPlayerData();
         var playerProfile = playerAccess.ec$getProfile();
