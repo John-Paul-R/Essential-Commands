@@ -1,18 +1,33 @@
 package dev.jpcode.eccore.util;
 
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+
 import com.google.gson.JsonParseException;
-import dev.jpcode.eccore.ECCore;
 import eu.pb4.placeholders.TextParser;
-import net.minecraft.text.*;
 import org.apache.logging.log4j.Level;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import net.minecraft.text.*;
 
-public class TextUtil {
+import dev.jpcode.eccore.ECCore;
+
+public final class TextUtil {
+    private TextUtil() {}
+
+    public static MutableText empty() {
+        return new LiteralText("");
+    }
+
+    public static MutableText literal(String content) {
+        return new LiteralText(content);
+    }
 
     public static MutableText concat(Text... arr) {
-        MutableText out = new LiteralText("");
+        MutableText out = empty();
         for (Text text : arr) {
             out.append(text);
         }
@@ -21,7 +36,7 @@ public class TextUtil {
 
     public static MutableText deepCopy(Text text) {
         if (text.getSiblings().isEmpty()) {
-            return text.shallowCopy();
+            return text.copy();
         }
 
         var siblings = text.getSiblings();
@@ -30,49 +45,51 @@ public class TextUtil {
             .toList();
         siblings.clear();
         siblings.addAll(newSiblings);
-        return text.shallowCopy();
+        return text.copy();
     }
 
     /**
-  * <p>Joins the elements of the provided array into a single Text
-  * containing the provided list of elements.</p>
-  *
-  * <p>No delimiter is added before or after the list.
-  * Null objects or empty strings within the array are represented by
-  * empty strings.</p>
-  *
-  * <pre>
-  * StringUtils.join(null, *)               = null
-  * StringUtils.join([], *)                 = ""
-  * StringUtils.join([null], *)             = ""
-  * StringUtils.join(["a", "b", "c"], ';')  = "a;b;c"
-  * StringUtils.join(["a", "b", "c"], null) = "abc"
-  * StringUtils.join([null, "", "a"], ';')  = ";;a"
-  * </pre>
-  *
-  * @param array  the array of values to join together, may be null
-  * @param separator  the separator character to use
-  * @return the joined String, <code>null</code> if null array input
-  * @since 2.0
-  */
-    public static Text join(Text[] array, Text separator) {
+     * <p>Joins the elements of the provided array into a single Text
+     * containing the provided list of elements.</p>
+     *
+     * <p>No delimiter is added before or after the list.
+     * Null objects or empty strings within the array are represented by
+     * empty strings.</p>
+     *
+     * <pre>
+     * StringUtils.join(null, *)               = null
+     * StringUtils.join([], *)                 = ""
+     * StringUtils.join([null], *)             = ""
+     * StringUtils.join(["a", "b", "c"], ';')  = "a;b;c"
+     * StringUtils.join(["a", "b", "c"], null) = "abc"
+     * StringUtils.join([null, "", "a"], ';')  = ";;a"
+     * </pre>
+     *
+     * @param array     the array of values to join together, may be null
+     * @param separator the separator character to use
+     * @return the joined String, <code>null</code> if null array input
+     * @since 2.0
+     */
+    public static MutableText join(Text[] array, Text separator) {
         if (array == null) {
-                return null;
-            }
+            return null;
+        }
         return join(array, separator, 0, array.length);
     }
-    public static Text join(Collection<Text> textCollection, Text separator) {
+
+    public static MutableText join(Collection<Text> textCollection, Text separator) {
         if (textCollection == null) {
             return null;
         }
         return join(textCollection.toArray(new Text[0]), separator, 0, textCollection.size());
     }
-    public static Text join(Collection<String> stringCollection, Text separator, Style stringsFormatting) {
+
+    public static MutableText join(Collection<String> stringCollection, Text separator, Style stringsFormatting) {
         if (stringCollection == null) {
             return null;
         }
         return join(
-            stringCollection.stream().map(str -> new LiteralText(str).setStyle(stringsFormatting)).toArray(Text[]::new),
+            stringCollection.stream().map(str -> literal(str).setStyle(stringsFormatting)).toArray(Text[]::new),
             separator, 0, stringCollection.size()
         );
     }
@@ -82,8 +99,8 @@ public class TextUtil {
             return null;
         }
         return joinStrings(
-                stringCollection.toArray(String[]::new),
-                separator, 0, stringCollection.size()
+            stringCollection.toArray(String[]::new),
+            separator, 0, stringCollection.size()
         );
     }
 
@@ -107,8 +124,7 @@ public class TextUtil {
         return buf.toString();
     }
 
-
-    public static Text join(Text[] array, Text separator, int startIndex, int endIndex) {
+    public static MutableText join(Text[] array, Text separator, int startIndex, int endIndex) {
         if (array == null) {
             return null;
         }
@@ -116,7 +132,7 @@ public class TextUtil {
         if (bufSize <= 0) {
             return null;
         }
-        MutableText buf = new LiteralText("");
+        MutableText buf = empty();
         for (int i = startIndex; i < endIndex; i++) {
             if (i > startIndex) {
                 buf.append(separator);
@@ -128,12 +144,10 @@ public class TextUtil {
         return buf;
     }
 
-    public static Text spaceBetween(Text[] array, int totalWidth, int padding) {
+    public static MutableText spaceBetween(Text[] array, int totalWidth, int padding) {
         int totalTextSize = 0;
-        ArrayList<String> strings = new ArrayList<>(array.length);
         for (Text txt : array) {
             String str = txt.getString();
-            strings.add(str);
             totalTextSize += str.length();
         }
 
@@ -142,39 +156,42 @@ public class TextUtil {
             return concat(array);
         }
 
-        MutableText outText = new LiteralText("");//new ArrayList<>(strings.size() * 2 - 1);
+        MutableText outText = empty();
         String lrPadStr = " ".repeat(padding);
         String spaceStr = " ".repeat((totalWidth - padding * 2 - totalTextSize) / (array.length - 1));
-        outText.append(new LiteralText(lrPadStr));
+        outText.append(literal(lrPadStr));
 
         for (int i = 0; i < array.length; i++) {
             outText.append(array[i]);
-            if (i != array.length - 1)
-                outText.append(new LiteralText(spaceStr));
+            if (i != array.length - 1) {
+                outText.append(literal(spaceStr));
+            }
         }
 
-        outText.append(new LiteralText(lrPadStr));
+        outText.append(literal(lrPadStr));
 
         return outText;
     }
 
-    public static Text clickableTeleport(MutableText originalText, String destinationName, String commandBaseString) {
+    public static MutableText clickableTeleport(MutableText originalText, String destinationName, String commandBaseString) {
         String teleportCommand = String.format("%s %s", commandBaseString, destinationName);
 
         Style outStyle = originalText.getStyle()
             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, teleportCommand))
-            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText("Click to teleport to " + destinationName +".")));
+            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, literal("Click to teleport to "
+                + destinationName
+                + ".")));
 
         return originalText.setStyle(outStyle);
     }
 
+    private static final Collection<StringToTextParser> TEXT_PARSERS = new ArrayList<>();
 
-    private static final Collection<StringToTextParser> textParsers = new ArrayList<>();
     /**
      * Parsers should be registered in order of most-restrictive to least restrictive.
      */
     public static void registerTextParser(StringToTextParser parser) {
-        textParsers.add(parser);
+        TEXT_PARSERS.add(parser);
     }
 
     static {
@@ -195,18 +212,70 @@ public class TextUtil {
             ));
         }
     }
+
     public static Text parseText(String textStr) {
         Text outText = null;
-        for (StringToTextParser parser : textParsers) {
+        for (StringToTextParser parser : TEXT_PARSERS) {
             try {
                 outText = parser.parseText(textStr);
             } catch (JsonParseException e) {
                 ECCore.LOGGER.log(Level.INFO, String.format("Failed to parse string '%s' as MinecraftText, trying Fabric Placeholder API...", textStr));
             }
 
-            if (outText != null)
+            if (outText != null) {
                 break;
+            }
         }
         return outText;
+    }
+
+    public static Collector<Text, MutableText, MutableText> collect() {
+        return new Collector<>() {
+            @Override
+            public Supplier<MutableText> supplier() {
+                return TextUtil::empty;
+            }
+
+            @Override
+            public BiConsumer<MutableText, Text> accumulator() {
+                return MutableText::append;
+            }
+
+            @Override
+            public BinaryOperator<MutableText> combiner() {
+                return (r1, r2) -> {
+                    r1.append(r2);
+                    return r1;
+                };
+            }
+
+            @Override
+            public Function<MutableText, MutableText> finisher() {
+                return (a) -> a;
+            }
+
+            @Override
+            public Set<Characteristics> characteristics() {
+                return Collections.emptySet();
+            }
+        };
+    }
+
+    /**
+     * indempotent
+     *
+     * @return flattened text
+     */
+    public static List<Text> flattenRoot(Text text) {
+        var siblings = text.getSiblings();
+        if (siblings.size() == 0) {
+            return List.of(text);
+        }
+
+        List<Text> content = new ArrayList<>(siblings.size() + 1);
+        content.add(text.copy().setStyle(text.getStyle()));
+        content.addAll(siblings);
+
+        return content;
     }
 }

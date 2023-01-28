@@ -1,41 +1,44 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.commands.suggestions.OfflinePlayerRepo;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
+import com.fibermc.essentialcommands.teleportation.TeleportManager;
+
 import net.minecraft.server.MinecraftServer;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class ManagerLocator {
+public final class ManagerLocator {
 
     private PlayerDataManager playerDataManager;
-    private TeleportRequestManager tpManager;
+    private TeleportManager tpManager;
     private WorldDataManager worldDataManager;
     private OfflinePlayerRepo offlinePlayerRepo;
 
-    public static ManagerLocator INSTANCE;
+    public static ManagerLocator instance;
 
-    private ManagerLocator() {
-        INSTANCE = this;
-    }
+    private ManagerLocator() {}
 
     public static ManagerLocator getInstance() {
-        if (INSTANCE != null)
-            return INSTANCE;
-        return new ManagerLocator();
+        if (instance != null) {
+            return instance;
+        }
+        return instance = new ManagerLocator();
     }
 
-    static boolean playerDataEnabled() {
-        return (CONFIG.ENABLE_HOME.getValue()
-            || CONFIG.ENABLE_TPA.getValue()
-            || CONFIG.ENABLE_BACK.getValue()
-            || CONFIG.ENABLE_WARP.getValue()
-            || CONFIG.ENABLE_SPAWN.getValue()
-            || CONFIG.ENABLE_NICK.getValue()
-        );
+    public static boolean playerDataEnabled() {
+        return CONFIG.ENABLE_HOME
+            || CONFIG.ENABLE_TPA
+            || CONFIG.ENABLE_BACK
+            || CONFIG.ENABLE_WARP
+            || CONFIG.ENABLE_SPAWN
+            || CONFIG.ENABLE_NICK
+            || CONFIG.ENABLE_AFK
+            ;
     }
 
-    static boolean teleportRequestEnabled() {
-        return (CONFIG.ENABLE_TPA.getValue());
+    public static boolean teleportRequestEnabled() {
+        return (CONFIG.ENABLE_TPA);
     }
 
     public void init() {
@@ -43,13 +46,13 @@ public class ManagerLocator {
             PlayerDataManager.init();
         }
         if (teleportRequestEnabled()) {
-            TeleportRequestManager.init();
+            TeleportManager.init();
         }
     }
 
     public void onServerStart(MinecraftServer server) {
         this.playerDataManager = PlayerDataManager.getInstance();
-        this.tpManager = new TeleportRequestManager();
+        this.tpManager = TeleportManager.getInstance();
         this.worldDataManager = WorldDataManager.createForServer(server);
         this.offlinePlayerRepo = new OfflinePlayerRepo(server);
     }
@@ -58,7 +61,7 @@ public class ManagerLocator {
         return playerDataManager;
     }
 
-    public TeleportRequestManager getTpManager() {
+    public TeleportManager getTpManager() {
         return tpManager;
     }
 

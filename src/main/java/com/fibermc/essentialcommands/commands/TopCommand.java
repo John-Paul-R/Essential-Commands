@@ -1,11 +1,13 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.PlayerTeleporter;
+import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
+import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +18,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 
 public class TopCommand implements Command<ServerCommandSource> {
+    @SuppressWarnings("checkstyle:LocalVariableName")
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
@@ -30,17 +33,16 @@ public class TopCommand implements Command<ServerCommandSource> {
         final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
 
         Chunk chunk = world.getChunk(targetXZ);
-        new_y = getTop(chunk, (int)new_x, (int)new_z);
+        new_y = getTop(chunk, (int) new_x, (int) new_z);
 
         // Teleport the player
         PlayerTeleporter.requestTeleport(
-                player,
-                new MinecraftLocation(world.getRegistryKey(), new_x, new_y, new_z, player.getHeadYaw(), player.getPitch()),
-                ECText.getInstance().getText("cmd.top.location_name")
+            player,
+            new MinecraftLocation(world.getRegistryKey(), new_x, new_y, new_z, player.getHeadYaw(), player.getPitch()),
+            ECText.access(player).getText("cmd.top.location_name")
         );
 
         return 0;
-
     }
 
     public static int getTop(Chunk chunk, int x, int z) {
@@ -81,6 +83,5 @@ public class TopCommand implements Command<ServerCommandSource> {
 
         return Integer.MAX_VALUE;
     }
-
 
 }

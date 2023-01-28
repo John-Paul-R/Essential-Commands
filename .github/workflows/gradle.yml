@@ -1,26 +1,24 @@
 # This workflow will build a Java project with Gradle
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Build with Gradle
+name: Build and Test with Gradle
 
 on:
   push:
-    branches: [ "1.18" ]
+    branches: [ "1.18", "1.19", "1.19.x" ]
     paths:
       - '**/src/**'
       - '**/build.gradle'
-      - '**/build-github-action.gradle'
       - '**/gradle.properties'
       - '**/settings.gradle'
       - .github/workflows/gradle.yml
       - LICENCE
 
   pull_request:
-    branches: [ "1.18" ]
+    branches: [ "1.18", "1.19", "1.19.x" ]
     paths:
       - '**/src/**'
       - '**/build.gradle'
-      - '**/build-github-action.gradle'
       - '**/gradle.properties'
       - '**/settings.gradle'
       - .github/workflows/gradle.yml
@@ -28,7 +26,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Build and Test
 
     runs-on: ubuntu-latest
 
@@ -54,8 +52,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: 🔨 Build artifacts
-        run: gradle -b build-github-action.gradle -c settings-github-action.gradle clean build
+
+      - name: 🔨 Build artifacts and Run Tests
+        env:
+          IS_PIPELINE: true
+        run: gradle clean build
 
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v2

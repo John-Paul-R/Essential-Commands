@@ -1,21 +1,30 @@
 package com.fibermc.essentialcommands.types;
 
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
+import com.fibermc.essentialcommands.text.TextFormatType;
+
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
+import dev.jpcode.eccore.util.TextUtil;
+
 public class MinecraftLocation {
 
-    public final Vec3d pos;
-    public final float pitch, headYaw;
-    public final RegistryKey<World> dim;
+    private Vec3d pos;
+    private float pitch;
+    private float headYaw;
+    private RegistryKey<World> dim;
 
-    public MinecraftLocation(RegistryKey<World>  dim, double x, double y, double z) {
+    protected MinecraftLocation() {}
+
+    public MinecraftLocation(RegistryKey<World> dim, double x, double y, double z) {
         this.dim = dim;
         this.pos = new Vec3d(x, y, z);
         this.pitch = 0f;
@@ -23,11 +32,11 @@ public class MinecraftLocation {
         //todo world.getPersistentStateManager().
     }
 
-    public MinecraftLocation(RegistryKey<World>  dim, double x, double y, double z, float headYaw, float pitch) {
+    public MinecraftLocation(RegistryKey<World> dim, double x, double y, double z, float headYaw, float pitch) {
         this.dim = dim;
         this.pos = new Vec3d(x, y, z);
         this.headYaw = headYaw;
-        this.pitch = pitch; 
+        this.pitch = pitch;
     }
 
     public MinecraftLocation(ServerPlayerEntity player) {
@@ -50,22 +59,64 @@ public class MinecraftLocation {
         this.headYaw = tag.getFloat("headYaw");
         this.pitch = tag.getFloat("pitch");
     }
+
+    public static MinecraftLocation fromNbt(NbtCompound tag) {
+        var loc = new MinecraftLocation();
+        loc.loadNbt(tag);
+        return loc;
+    }
+
+    protected void loadNbt(NbtCompound tag) {
+        this.dim = RegistryKey.of(
+            Registry.WORLD_KEY,
+            Identifier.tryParse(tag.getString("WorldRegistryKey"))
+        );
+        this.pos = new Vec3d(
+            tag.getDouble("x"),
+            tag.getDouble("y"),
+            tag.getDouble("z")
+        );
+        this.headYaw = tag.getFloat("headYaw");
+        this.pitch = tag.getFloat("pitch");
+    }
+
     public NbtCompound asNbt() {
         return this.writeNbt(new NbtCompound());
     }
+
     public NbtCompound writeNbt(NbtCompound tag) {
-        tag.putString("WorldRegistryKey", dim.getValue().toString());
-        tag.putDouble("x", pos.x);
-        tag.putDouble("y", pos.y);
-        tag.putDouble("z", pos.z);
-        tag.putFloat("headYaw", headYaw);
-        tag.putFloat("pitch", pitch);
+        tag.putString("WorldRegistryKey", dim().getValue().toString());
+        tag.putDouble("x", pos().x);
+        tag.putDouble("y", pos().y);
+        tag.putDouble("z", pos().z);
+        tag.putFloat("headYaw", headYaw());
+        tag.putFloat("pitch", pitch());
 
         return tag;
     }
 
-    public LiteralText toLiteralTextSimple() {
-        return new LiteralText(String.format("(%.1f, %.1f, %.1f)", pos.x, pos.y, pos.z));
+    protected MutableText toLiteralTextSimple() {
+        return TextUtil.literal(String.format("(%.1f, %.1f, %.1f)", pos().x, pos().y, pos().z));
     }
 
+    public Text toText(PlayerProfile playerProfile) {
+        return toLiteralTextSimple()
+            .setStyle(playerProfile.getStyle(TextFormatType.Accent));
+    }
+
+    public Vec3d pos() {
+        return pos;
+    }
+
+    public float pitch() {
+        return pitch;
+    }
+
+    public float headYaw() {
+        return headYaw;
+    }
+
+    public RegistryKey<World> dim() {
+        return dim;
+    }
 }
