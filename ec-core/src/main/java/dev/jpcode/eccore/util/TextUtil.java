@@ -1,6 +1,9 @@
 package dev.jpcode.eccore.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -8,7 +11,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import com.google.gson.JsonParseException;
-import eu.pb4.placeholders.api.TextParserUtils;
+import eu.pb4.placeholders.TextParser;
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.text.*;
@@ -18,8 +21,16 @@ import dev.jpcode.eccore.ECCore;
 public final class TextUtil {
     private TextUtil() {}
 
+    private static MutableText empty() {
+        return new LiteralText("");
+    }
+
+    private static MutableText literal(String content) {
+        return new LiteralText(content);
+    }
+
     public static MutableText concat(Text... arr) {
-        MutableText out = Text.empty();
+        MutableText out = empty();
         for (Text text : arr) {
             out.append(text);
         }
@@ -81,7 +92,7 @@ public final class TextUtil {
             return null;
         }
         return join(
-            stringCollection.stream().map(str -> ECText.unstyled(str).setStyle(stringsFormatting)).toArray(Text[]::new),
+            stringCollection.stream().map(str -> literal(str).setStyle(stringsFormatting)).toArray(Text[]::new),
             separator, 0, stringCollection.size()
         );
     }
@@ -124,7 +135,7 @@ public final class TextUtil {
         if (bufSize <= 0) {
             return null;
         }
-        MutableText buf = Text.empty();
+        MutableText buf = empty();
         for (int i = startIndex; i < endIndex; i++) {
             if (i > startIndex) {
                 buf.append(separator);
@@ -148,19 +159,19 @@ public final class TextUtil {
             return concat(array);
         }
 
-        MutableText outText = Text.empty();
+        MutableText outText = empty();
         String lrPadStr = " ".repeat(padding);
         String spaceStr = " ".repeat((totalWidth - padding * 2 - totalTextSize) / (array.length - 1));
-        outText.append(ECText.unstyled(lrPadStr));
+        outText.append(literal(lrPadStr));
 
         for (int i = 0; i < array.length; i++) {
             outText.append(array[i]);
             if (i != array.length - 1) {
-                outText.append(ECText.unstyled(spaceStr));
+                outText.append(literal(spaceStr));
             }
         }
 
-        outText.append(ECText.unstyled(lrPadStr));
+        outText.append(literal(lrPadStr));
 
         return outText;
     }
@@ -170,7 +181,7 @@ public final class TextUtil {
 
         Style outStyle = originalText.getStyle()
             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, teleportCommand))
-            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ECText.unstyled("Click to teleport to "
+            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, literal("Click to teleport to "
                 + destinationName
                 + ".")));
 
@@ -195,7 +206,7 @@ public final class TextUtil {
                 javaVersion,
                 16
             ));
-            registerTextParser(TextParserUtils::formatText);
+            registerTextParser(TextParser::parse);
         } else {
             ECCore.LOGGER.log(Level.WARN, String.format(
                 "Detected Java version %d. Some features require Java %d. Some text formatting features will be disabled.",
@@ -225,7 +236,7 @@ public final class TextUtil {
         return new Collector<>() {
             @Override
             public Supplier<MutableText> supplier() {
-                return Text::empty;
+                return TextUtil::empty;
             }
 
             @Override
@@ -251,27 +262,5 @@ public final class TextUtil {
                 return Collections.emptySet();
             }
         };
-    }
-
-    /**
-     * indempotent
-     *
-     * @return flattened text
-     */
-    public static List<Text> flattenRoot(Text text) {
-        var siblings = text.getSiblings();
-        if (text.getContent().equals(TextContent.EMPTY) && siblings.size() == 1) {
-            return siblings;
-        } else if (siblings.size() == 0) {
-            return List.of(text);
-        }
-
-        List<Text> content = new ArrayList<>(siblings.size() + 1);
-        if (!text.getContent().equals(TextContent.EMPTY)) {
-            content.add(text.copyContentOnly().setStyle(text.getStyle()));
-        }
-        content.addAll(siblings);
-
-        return content;
     }
 }
