@@ -20,7 +20,7 @@ public class BackCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Store command sender
-        ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+        ServerPlayerEntity player = context.getSource().getPlayer();
         PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
 
         //Get previous location

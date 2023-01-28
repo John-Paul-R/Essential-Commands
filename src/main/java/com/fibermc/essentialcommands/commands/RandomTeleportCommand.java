@@ -49,7 +49,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+        ServerPlayerEntity player = context.getSource().getPlayer();
         ServerWorld world = context.getSource().getWorld();
         var ecText = ECText.access(player);
         if (!world.getRegistryKey().equals(World.OVERWORLD)) {

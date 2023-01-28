@@ -16,7 +16,7 @@ public class TeleportCancelCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
+        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         var senderPlayerData = PlayerData.access(senderPlayer);
 
         var existingTeleportRequest = senderPlayerData.getSentTeleportRequest();

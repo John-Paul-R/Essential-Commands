@@ -18,7 +18,7 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayer();
         var playerData = PlayerData.access(senderPlayer);
 
         //Set spawn

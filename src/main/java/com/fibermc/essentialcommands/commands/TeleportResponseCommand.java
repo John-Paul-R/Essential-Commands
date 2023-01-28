@@ -27,7 +27,7 @@ public abstract class TeleportResponseCommand implements Command<ServerCommandSo
     }
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayer();
         var senderPlayerData = PlayerData.access(senderPlayer);
         var ecText = ECText.access(senderPlayer);
         LinkedHashMap<UUID, TeleportRequest> incomingTeleportRequests = senderPlayerData.getIncomingTeleportRequests();

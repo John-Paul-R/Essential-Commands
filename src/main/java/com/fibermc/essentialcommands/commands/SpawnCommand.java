@@ -28,7 +28,7 @@ public class SpawnCommand implements Command<ServerCommandSource> {
             return -2;
         }
 
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayer();
 
         // Teleport & chat message
         var styledLocationName = ECText.access(senderPlayer).getText("cmd.spawn.location_name");

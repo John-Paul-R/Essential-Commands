@@ -29,7 +29,7 @@ public final class ProfileCommand {
 
             set.then(CommandManager.literal(name)
                 .then(argument("value", option.argumentType()).executes((context) -> {
-                    var player = context.getSource().getPlayerOrThrow();
+                    var player = context.getSource().getPlayer();
                     var profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
                     option.profileSetter().setValue(context, "value", profile);
                     profile.markDirty();
@@ -40,7 +40,7 @@ public final class ProfileCommand {
 
             get.then(CommandManager.literal(name)
                 .executes((context) -> {
-                    var player = context.getSource().getPlayerOrThrow();
+                    var player = context.getSource().getPlayer();
                     var profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
                     context.getSource().sendFeedback(
                         Text.literal(option.profileGetter().getValue(profile).toString()),

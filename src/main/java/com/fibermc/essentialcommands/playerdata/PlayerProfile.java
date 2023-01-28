@@ -148,6 +148,6 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
     public static PlayerProfile accessFromContextOrThrow(CommandContext<ServerCommandSource> context)
         throws CommandSyntaxException
     {
-        return access(context.getSource().getPlayerOrThrow());
+        return access(context.getSource().getPlayer());
     }
 }

@@ -32,7 +32,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity targetPlayer) throws CommandSyntaxException
     {
         var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayer();
         var ecText = ECText.access(senderPlayer);
 
         String warpName = StringArgumentType.getString(context, "warp_name");

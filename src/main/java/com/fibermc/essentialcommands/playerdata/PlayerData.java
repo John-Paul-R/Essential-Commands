@@ -531,6 +531,6 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     public static PlayerData accessFromContextOrThrow(CommandContext<ServerCommandSource> context)
         throws CommandSyntaxException
     {
-        return access(context.getSource().getPlayerOrThrow());
+        return access(context.getSource().getPlayer());
     }
 }

@@ -21,7 +21,7 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayer();
         var senderPlayerData = PlayerData.access(senderPlayer);
         String warpName = StringArgumentType.getString(context, "warp_name");
 

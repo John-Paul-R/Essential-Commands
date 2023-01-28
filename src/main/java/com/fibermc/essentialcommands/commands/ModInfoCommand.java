@@ -19,7 +19,7 @@ public class ModInfoCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayer();
         var ecText = ECText.access(senderPlayer);
         PlayerData.access(senderPlayer).sendCommandFeedback(TextUtil.concat(
             ecText.literal(EssentialCommands.MOD_METADATA.getName()),

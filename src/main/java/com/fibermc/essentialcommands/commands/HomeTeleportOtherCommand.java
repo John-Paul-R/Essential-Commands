@@ -28,7 +28,7 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 public class HomeTeleportOtherCommand extends HomeCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return HomeCommand.exec(senderPlayerData, getTargetPlayerData(context), homeName);
@@ -39,7 +39,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
     }
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+        var senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
         var targetPlayerData = getTargetPlayerData(context);
 
         return HomeCommand.exec(
@@ -50,7 +50,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
     }
 
     public int runOfflinePlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         var targetPlayerName = StringArgumentType.getString(context, "target_player");

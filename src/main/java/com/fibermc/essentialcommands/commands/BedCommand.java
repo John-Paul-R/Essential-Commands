@@ -15,7 +15,7 @@ import net.minecraft.server.command.ServerCommandSource;
 public class BedCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var player = context.getSource().getPlayerOrThrow();
+        var player = context.getSource().getPlayer();
         var spawnPos = player.getSpawnPointPosition();
         var spawnDim = player.getSpawnPointDimension();
 

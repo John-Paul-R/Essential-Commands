@@ -31,14 +31,14 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return exec(senderPlayerData, homeName);
     }
 
     private static PlayerData getTargetPlayerData(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        return ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+        return ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
     }
 
     // TODO: Ideally the styling here should come from a context, intead of from the player we're
@@ -58,7 +58,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
     }
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData playerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+        PlayerData playerData = ((ServerPlayerEntityAccess) context.getSource().getPlayer()).ec$getPlayerData();
 
         return exec(
             playerData,
