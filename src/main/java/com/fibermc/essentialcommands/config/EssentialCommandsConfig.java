@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.List;
 
 import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,8 +83,6 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<List<String>> EXCLUDED_TOP_LEVEL_COMMANDS = new Option<>("excluded_top_level_commands", List.of(), ConfigUtil.arrayParser(Object::toString));
     @ConfigOption public final Option<RespawnCondition> RESPAWN_AT_EC_SPAWN = new Option<>("respawn_at_ec_spawn", RespawnCondition.Never, RespawnCondition::valueOf);
     @ConfigOption public final Option<Boolean> RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = new Option<>("recheck_player_ability_permissions_on_dimension_change", false, Boolean::parseBoolean);
-    @ConfigOption public final Option<Boolean> REGISTER_TOP_LEVEL_COMMANDS = new Option<>("register_top_level_commands", true, Boolean::parseBoolean);
-    @ConfigOption public final Option<List<String>> EXCLUDED_TOP_LEVEL_COMMANDS = new Option<>("excluded_top_level_commands", List.of(), ConfigUtil.arrayParser(Object::toString));
 
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);
