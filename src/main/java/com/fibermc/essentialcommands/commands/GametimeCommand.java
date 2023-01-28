@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
+import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.IStyleProvider;
 
@@ -12,6 +13,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 public class GametimeCommand implements Command<ServerCommandSource> {
 
@@ -48,7 +50,7 @@ public class GametimeCommand implements Command<ServerCommandSource> {
     }
 
     private static Text getFormattedTime(long time, IStyleProvider styleProvider) {
-        return Text.translatable(
+        return new TranslatableText(
                 "commands.time.query",
                 ECText.unstyled(formatGameTimeOfDay(time)).setStyle(styleProvider.getStyle(TextFormatType.Accent)))
             .setStyle(styleProvider.getStyle(TextFormatType.Default)

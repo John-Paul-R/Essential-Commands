@@ -50,7 +50,7 @@ public final class ListCommandFactory {
         Collection<Entry<String, T>> suggestionsList,
         IStyleProvider styleProvider)
     {
-        MutableText responseText = Text.empty()
+        MutableText responseText = TextUtil.empty()
             .append(ECText.unstyled(responsePreText).setStyle(styleProvider.getStyle(TextFormatType.Default)));
 
         List<Text> suggestionTextList = suggestionsList.stream()

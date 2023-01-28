@@ -13,7 +13,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -23,7 +24,7 @@ public class RealNameCommand implements Command<ServerCommandSource> {
 
         String nicknameStr = StringArgumentType.getString(context, "player_nickname");
         List<PlayerData> nicknamePlayers = PlayerDataManager.getInstance().getPlayerDataMatchingNickname(nicknameStr);
-        MutableText responseText = Text.empty();
+        MutableText responseText = TextUtil.empty();
 
         var ecText = ECText.access(context.getSource().getPlayer());
         var nicknameText = ecText.accent(nicknameStr);

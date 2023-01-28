@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
+import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.ProfileOption;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
