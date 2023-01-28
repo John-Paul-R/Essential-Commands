@@ -21,6 +21,8 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import dev.jpcode.eccore.util.TextUtil;
+
 public abstract class Config<T extends Config<T>> {
     static final Logger LOGGER = LogManager.getLogger("ec-core-config");
 
@@ -110,12 +112,12 @@ public abstract class Config<T extends Config<T>> {
     static final Style ACCENT_STYLE = Style.EMPTY.withFormatting(Formatting.GREEN);
 
     public @NotNull Text stateAsText() {
-        var result = Text.empty();
+        var result = TextUtil.empty();
         String newLine = "\n";//System.getProperty("line.separator");
 
-        result.append(ECText.unstyled(displayName + " {").setStyle(DEFAULT_STYLE));
+        result.append(TextUtil.literal(displayName + " {").setStyle(DEFAULT_STYLE));
         result.append(newLine);
-        var propsText = Text.empty();
+        var propsText = TextUtil.empty();
         result.append(propsText);
 
         //print field names paired with their values
@@ -128,7 +130,7 @@ public abstract class Config<T extends Config<T>> {
                 ex.printStackTrace();
             }
         }
-        result.append(ECText.unstyled("}").setStyle(ACCENT_STYLE));
+        result.append(TextUtil.literal("}").setStyle(ACCENT_STYLE));
 
         return result;
 
@@ -157,9 +159,9 @@ public abstract class Config<T extends Config<T>> {
 
     private MutableText fieldAsText(Field field) throws IllegalAccessException {
         var value = (Option<?>) field.get(this);
-        return Text.empty()
-            .append(ECText.unstyled(field.getName() + ": ").setStyle(DEFAULT_STYLE))
-            .append(ECText.unstyled(value.getValue().toString()));
+        return TextUtil.empty()
+            .append(TextUtil.literal(field.getName() + ": ").setStyle(DEFAULT_STYLE))
+            .append(TextUtil.literal(value.getValue().toString()));
     }
 
     public @Nullable MutableText getFieldValueAsText(String fieldName) throws NoSuchFieldException {

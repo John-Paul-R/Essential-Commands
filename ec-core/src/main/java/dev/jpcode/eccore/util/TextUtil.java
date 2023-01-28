@@ -25,7 +25,7 @@ public final class TextUtil {
         return new LiteralText("");
     }
 
-    private static MutableText literal(String content) {
+    public static MutableText literal(String content) {
         return new LiteralText(content);
     }
 
