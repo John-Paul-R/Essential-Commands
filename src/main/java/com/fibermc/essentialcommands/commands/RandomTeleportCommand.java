@@ -104,7 +104,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         if (center == null) {
             source.sendError(TextUtil.concat(
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
-                ecText.getText("cmd.rtp.error.no_spawn_set, TextFormatType.Error")
+                ecText.getText("cmd.rtp.error.no_spawn_set", TextFormatType.Error)
             ));
             return -1;
         }
