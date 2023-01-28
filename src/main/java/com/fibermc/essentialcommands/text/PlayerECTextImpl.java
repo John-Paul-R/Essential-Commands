@@ -33,16 +33,16 @@ public class PlayerECTextImpl extends ECTextImpl {
 
     @Override
     public MutableText literal(String str) {
-        return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Default));
+        return ECText.unstyled(str).setStyle(this.styleProvider.getStyle(TextFormatType.Default));
     }
 
     @Override
     public MutableText accent(String str) {
-        return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Accent));
+        return ECText.unstyled(str).setStyle(this.styleProvider.getStyle(TextFormatType.Accent));
     }
 
     @Override
     public MutableText error(String str) {
-        return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Error));
+        return ECText.unstyled(str).setStyle(this.styleProvider.getStyle(TextFormatType.Error));
     }
 }

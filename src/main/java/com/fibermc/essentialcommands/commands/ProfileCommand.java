@@ -10,7 +10,6 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -43,7 +42,7 @@ public final class ProfileCommand {
                     var player = context.getSource().getPlayer();
                     var profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
                     context.getSource().sendFeedback(
-                        Text.literal(option.profileGetter().getValue(profile).toString()),
+                        ECText.unstyled(option.profileGetter().getValue(profile).toString()),
                         CONFIG.BROADCAST_TO_OPS);
                     return 0;
                 })

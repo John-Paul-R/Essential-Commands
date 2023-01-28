@@ -11,7 +11,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.text.Text;
 
 public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSerializable {
 
@@ -52,7 +51,7 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
             return super.put(name, location);
         } else {
             throw CommandUtil.createSimpleException(
-                ECText.getInstance().getText("cmd.warp.set.error.exists", TextFormatType.Error, Text.literal(name)));
+                ECText.getInstance().getText("cmd.warp.set.error.exists", TextFormatType.Error, ECText.unstyled(name)));
         }
     }
 

@@ -9,7 +9,6 @@ import eu.pb4.placeholders.api.*;
 import eu.pb4.placeholders.api.node.TextNode;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.text.TextVisitFactory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.*;
 
@@ -49,7 +48,7 @@ public class ECTextImpl extends ECText {
         TextFormatType textFormatType,
         @Nullable IStyleProvider styleProvider)
     {
-        return Text.literal(getString(key))
+        return ECText.unstyled(getString(key))
             .setStyle(styleProvider == null
                 ? textFormatType.getStyle()
                 : styleProvider.getStyle(textFormatType));
@@ -127,7 +126,7 @@ public class ECTextImpl extends ECText {
 
         var placeholderGetter = placeholderGetterForContext(textFormatType, styleProvider, argsList);
         var nodes = Placeholders.parseNodes(
-            TextNode.convert(Text.literal(getString(key))),
+            TextNode.convert(ECText.unstyled(getString(key))),
             Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
             placeholderGetter);
         var retVal = ECPlaceholderApiCompat.toText(nodes, parserContext);

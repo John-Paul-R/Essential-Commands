@@ -4,13 +4,13 @@ import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
 
 public class MinecraftLocation {
@@ -94,7 +94,7 @@ public class MinecraftLocation {
     }
 
     protected MutableText toLiteralTextSimple() {
-        return Text.literal(String.format("(%.1f, %.1f, %.1f)", pos().x, pos().y, pos().z));
+        return ECText.unstyled(String.format("(%.1f, %.1f, %.1f)", pos().x, pos().y, pos().z));
     }
 
     public Text toText(PlayerProfile playerProfile) {

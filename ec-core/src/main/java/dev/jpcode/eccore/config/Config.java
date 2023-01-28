@@ -113,7 +113,7 @@ public abstract class Config<T extends Config<T>> {
         var result = Text.empty();
         String newLine = "\n";//System.getProperty("line.separator");
 
-        result.append(Text.literal(displayName + " {").setStyle(DEFAULT_STYLE));
+        result.append(ECText.unstyled(displayName + " {").setStyle(DEFAULT_STYLE));
         result.append(newLine);
         var propsText = Text.empty();
         result.append(propsText);
@@ -128,7 +128,7 @@ public abstract class Config<T extends Config<T>> {
                 ex.printStackTrace();
             }
         }
-        result.append(Text.literal("}").setStyle(ACCENT_STYLE));
+        result.append(ECText.unstyled("}").setStyle(ACCENT_STYLE));
 
         return result;
 
@@ -158,8 +158,8 @@ public abstract class Config<T extends Config<T>> {
     private MutableText fieldAsText(Field field) throws IllegalAccessException {
         var value = (Option<?>) field.get(this);
         return Text.empty()
-            .append(Text.literal(field.getName() + ": ").setStyle(DEFAULT_STYLE))
-            .append(Text.literal(value.getValue().toString()));
+            .append(ECText.unstyled(field.getName() + ": ").setStyle(DEFAULT_STYLE))
+            .append(ECText.unstyled(value.getValue().toString()));
     }
 
     public @Nullable MutableText getFieldValueAsText(String fieldName) throws NoSuchFieldException {

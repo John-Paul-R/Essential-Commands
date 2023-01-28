@@ -31,7 +31,7 @@ public class ECTextTests {
     @DisplayName("getTextInternal - no interplolation")
     void getTextInternal_FormatsCorrectly()
     {
-        var expected = Text.literal("enabled").setStyle(TextFormatType.Default.getStyle());
+        var expected = ECText.unstyled("enabled").setStyle(TextFormatType.Default.getStyle());
         var enabledText = ecText.getText("generic.enabled");
 
         assertEquals(enabledText.getContent(), expected.getContent());
@@ -42,15 +42,15 @@ public class ECTextTests {
     @DisplayName("getTextInternal - two interpolated tokens")
     void getTextInternal_TwoInterpolatedTokens_FormatsCorrectly()
     {
-        var playerNameText = Text.literal("Steve").formatted(Formatting.AQUA);
+        var playerNameText = ECText.unstyled("Steve").formatted(Formatting.AQUA);
         var defaultStyle = TextFormatType.Default.getStyle();
         var accentStyle = TextFormatType.Accent.getStyle();
         var expectedMessage = Text.empty()
-            .append(Text.literal("Flight ").setStyle(defaultStyle))
-            .append(Text.literal("enabled").setStyle(accentStyle))
-            .append(Text.literal(" for ").setStyle(defaultStyle))
+            .append(ECText.unstyled("Flight ").setStyle(defaultStyle))
+            .append(ECText.unstyled("enabled").setStyle(accentStyle))
+            .append(ECText.unstyled(" for ").setStyle(defaultStyle))
             .append(playerNameText)
-            .append(Text.literal(".").setStyle(defaultStyle));
+            .append(ECText.unstyled(".").setStyle(defaultStyle));
 
         var enabledText = ecText.getText("generic.enabled").setStyle(accentStyle);
 
@@ -77,12 +77,12 @@ public class ECTextTests {
     void getTextInternal_FirstTokenInterpolated_FormatsCorrectly()
     {
         var playerNameText = Text.empty()
-            .append(Text.literal("[UnstyledPrefix] "))
-            .append(Text.literal("Steve").formatted(Formatting.AQUA));
+            .append(ECText.unstyled("[UnstyledPrefix] "))
+            .append(ECText.unstyled("Steve").formatted(Formatting.AQUA));
         var defaultStyle = TextFormatType.Default.getStyle();
         var expectedMessage = Text.empty()
             .append(playerNameText)
-            .append(Text.literal(" is now AFK.").setStyle(defaultStyle));
+            .append(ECText.unstyled(" is now AFK.").setStyle(defaultStyle));
 
         var actualMessage = ecText.getText("player.afk.enter", playerNameText);
 

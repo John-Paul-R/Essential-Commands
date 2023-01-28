@@ -23,10 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.JsonHelper;
 
 import static com.fibermc.essentialcommands.EssentialCommands.*;
@@ -47,6 +44,10 @@ public abstract class ECText {
 
     static {
         BACKING_CONFIG.LANGUAGE.changeEvent.register((langId) -> instance = create(langId));
+    }
+
+    public static MutableText unstyled(String content) {
+        return new LiteralText(content);
     }
 
     public static void init(MinecraftServer server) {
@@ -124,15 +125,15 @@ public abstract class ECText {
     public abstract OrderedText reorder(StringVisitable text);
 
     public MutableText literal(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_DEFAULT);
+        return ECText.unstyled(str).setStyle(CONFIG.FORMATTING_DEFAULT);
     }
 
     public MutableText accent(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_ACCENT);
+        return ECText.unstyled(str).setStyle(CONFIG.FORMATTING_ACCENT);
     }
 
     public MutableText error(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_ERROR);
+        return ECText.unstyled(str).setStyle(CONFIG.FORMATTING_ERROR);
     }
 
     public List<OrderedText> reorder(List<StringVisitable> texts) {

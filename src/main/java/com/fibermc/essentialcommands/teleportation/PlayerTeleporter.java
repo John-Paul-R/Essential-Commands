@@ -9,7 +9,6 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -78,7 +77,7 @@ public final class PlayerTeleporter {
             "teleport.done",
             playerProfile.shouldPrintTeleportCoordinates()
                 ? dest.toText(playerProfile)
-                : Text.literal("destination").setStyle(playerProfile.getStyle(TextFormatType.Default))
+                : ECText.unstyled("destination").setStyle(playerProfile.getStyle(TextFormatType.Default))
         );
     }
 

@@ -50,9 +50,9 @@ public class GametimeCommand implements Command<ServerCommandSource> {
     private static Text getFormattedTime(long time, IStyleProvider styleProvider) {
         return Text.translatable(
                 "commands.time.query",
-                Text.literal(formatGameTimeOfDay(time)).setStyle(styleProvider.getStyle(TextFormatType.Accent)))
+                ECText.unstyled(formatGameTimeOfDay(time)).setStyle(styleProvider.getStyle(TextFormatType.Accent)))
             .setStyle(styleProvider.getStyle(TextFormatType.Default)
                 .withHoverEvent(
-                    new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(String.valueOf(time % 24000L)))));
+                    new HoverEvent(HoverEvent.Action.SHOW_TEXT, ECText.unstyled(String.valueOf(time % 24000L)))));
     }
 }

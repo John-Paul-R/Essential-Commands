@@ -7,7 +7,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 
 public class NicknameClearCommand implements Command<ServerCommandSource> {
     @Override
@@ -22,7 +21,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource> {
         //inform command sender that the nickname has been set
         senderPlayerData.sendCommandFeedback(
             "cmd.nickname.set.feedback",
-            Text.literal(targetPlayer.getGameProfile().getName())
+            ECText.unstyled(targetPlayer.getGameProfile().getName())
         );
 
         return 1;

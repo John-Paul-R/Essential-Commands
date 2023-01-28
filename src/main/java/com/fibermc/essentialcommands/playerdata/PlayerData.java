@@ -502,7 +502,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     private void reloadFullNickname() {
-        MutableText baseName = Text.literal(this.getPlayer().getGameProfile().getName());
+        MutableText baseName = ECText.unstyled(this.getPlayer().getGameProfile().getName());
         MutableText tempFullNickname = Text.empty();
         // Note: this doesn't ever display if nickname is null,
         //  because our mixin to getDisplayName does a null check on getNickname

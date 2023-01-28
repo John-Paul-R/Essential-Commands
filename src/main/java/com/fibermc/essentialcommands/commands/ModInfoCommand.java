@@ -9,7 +9,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 
 import dev.jpcode.eccore.util.TextUtil;
 
@@ -23,7 +22,7 @@ public class ModInfoCommand implements Command<ServerCommandSource> {
         var ecText = ECText.access(senderPlayer);
         PlayerData.access(senderPlayer).sendCommandFeedback(TextUtil.concat(
             ecText.literal(EssentialCommands.MOD_METADATA.getName()),
-            Text.literal(" "),
+            ECText.unstyled(" "),
             ecText.accent(modVersion)
         ));
 

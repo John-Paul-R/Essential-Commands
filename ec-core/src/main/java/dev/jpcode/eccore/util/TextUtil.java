@@ -81,7 +81,7 @@ public final class TextUtil {
             return null;
         }
         return join(
-            stringCollection.stream().map(str -> Text.literal(str).setStyle(stringsFormatting)).toArray(Text[]::new),
+            stringCollection.stream().map(str -> ECText.unstyled(str).setStyle(stringsFormatting)).toArray(Text[]::new),
             separator, 0, stringCollection.size()
         );
     }
@@ -151,16 +151,16 @@ public final class TextUtil {
         MutableText outText = Text.empty();
         String lrPadStr = " ".repeat(padding);
         String spaceStr = " ".repeat((totalWidth - padding * 2 - totalTextSize) / (array.length - 1));
-        outText.append(Text.literal(lrPadStr));
+        outText.append(ECText.unstyled(lrPadStr));
 
         for (int i = 0; i < array.length; i++) {
             outText.append(array[i]);
             if (i != array.length - 1) {
-                outText.append(Text.literal(spaceStr));
+                outText.append(ECText.unstyled(spaceStr));
             }
         }
 
-        outText.append(Text.literal(lrPadStr));
+        outText.append(ECText.unstyled(lrPadStr));
 
         return outText;
     }
@@ -170,7 +170,7 @@ public final class TextUtil {
 
         Style outStyle = originalText.getStyle()
             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, teleportCommand))
-            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to teleport to "
+            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ECText.unstyled("Click to teleport to "
                 + destinationName
                 + ".")));
 

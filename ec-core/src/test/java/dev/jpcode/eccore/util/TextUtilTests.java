@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import net.minecraft.text.Style;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import static org.gradle.internal.impldep.org.junit.Assert.assertEquals;
@@ -16,7 +15,7 @@ public class TextUtilTests {
     void flattenRoot_flattensCorrectly()
     {
         var baseStyle = Style.EMPTY.withColor(Formatting.AQUA);
-        var input = Text.literal("testing").setStyle(baseStyle)
+        var input = ECText.unstyled("testing").setStyle(baseStyle)
             .append("token2")
             .append("token3");
 

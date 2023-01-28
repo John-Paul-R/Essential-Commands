@@ -22,7 +22,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -145,7 +144,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             EssentialCommands.LOGGER.info(
                 ECText.getInstance().getText(
                     "cmd.rtp.log.location_validate_time",
-                    Text.literal(String.valueOf(timer.stop()))
+                    ECText.unstyled(String.valueOf(timer.stop()))
                 ).getString());
         }
 

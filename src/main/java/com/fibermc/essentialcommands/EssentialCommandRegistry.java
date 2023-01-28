@@ -523,7 +523,7 @@ public final class EssentialCommandRegistry {
                             mcDir.resolve("world/modplayerdata").toFile(),
                             source.getSource().getServer()
                         );
-                        source.getSource().sendFeedback(Text.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
+                        source.getSource().sendFeedback(ECText.unstyled("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
                     } catch (NotDirectoryException | FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -538,7 +538,7 @@ public final class EssentialCommandRegistry {
                         source.getSource().getServer(),
                         mcDir.resolve("plugins/Essentials/warps").toFile()
                     );
-                    source.getSource().sendFeedback(Text.literal("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
+                    source.getSource().sendFeedback(ECText.unstyled("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
                     return 0;
                 }).build()
             );

@@ -51,11 +51,11 @@ public final class ListCommandFactory {
         IStyleProvider styleProvider)
     {
         MutableText responseText = Text.empty()
-            .append(Text.literal(responsePreText).setStyle(styleProvider.getStyle(TextFormatType.Default)));
+            .append(ECText.unstyled(responsePreText).setStyle(styleProvider.getStyle(TextFormatType.Default)));
 
         List<Text> suggestionTextList = suggestionsList.stream()
             .map((entry) -> clickableTeleport(
-                Text.literal(entry.getKey()).setStyle(styleProvider.getStyle(TextFormatType.Accent)),
+                ECText.unstyled(entry.getKey()).setStyle(styleProvider.getStyle(TextFormatType.Accent)),
                 entry.getKey(),
                 String.format("/%s", commandExecText)
             ))
@@ -64,7 +64,7 @@ public final class ListCommandFactory {
         if (suggestionTextList.size() > 0) {
             responseText.append(TextUtil.join(
                 suggestionTextList,
-                Text.literal(", ").setStyle(styleProvider.getStyle(TextFormatType.Default))
+                ECText.unstyled(", ").setStyle(styleProvider.getStyle(TextFormatType.Default))
             ));
         } else {
             responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty", TextFormatType.Error, styleProvider));

@@ -4,8 +4,8 @@ import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
 import net.minecraft.world.World;
 
 import dev.jpcode.eccore.util.TextUtil;
@@ -60,10 +60,10 @@ public class NamedMinecraftLocation extends MinecraftLocation {
     public Text toText(PlayerProfile playerProfile) {
         return TextUtil.join(
             new Text[]{
-                Text.literal(name),
+                ECText.unstyled(name),
                 toLiteralTextSimple(),
             },
-            Text.literal(" ")
+            ECText.unstyled(" ")
         ).setStyle(playerProfile.getStyle(TextFormatType.Accent));
     }
 }
