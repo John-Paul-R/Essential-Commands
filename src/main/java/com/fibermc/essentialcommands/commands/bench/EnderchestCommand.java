@@ -8,11 +8,12 @@ import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 public class EnderchestCommand extends SimpleScreenCommand {
     @Override
     protected Text getScreenTitle() {
-        return Text.translatable("container.enderchest");
+        return new TranslatableText("container.enderchest");
     }
 
     @Override
@@ -20,7 +21,7 @@ public class EnderchestCommand extends SimpleScreenCommand {
         return new SimpleNamedScreenHandlerFactory(
             (syncId, inventory, player) ->
                 GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, player.getEnderChestInventory()),
-            Text.translatable("container.enderchest")
+            new TranslatableText("container.enderchest")
         );
     }
 

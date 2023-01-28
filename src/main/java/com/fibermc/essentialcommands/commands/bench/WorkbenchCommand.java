@@ -8,6 +8,7 @@ import net.minecraft.screen.ScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 public class WorkbenchCommand extends SimpleScreenCommand {
     private static final ScreenHandlerFactory SCREEN_HANDLER_FACTORY = (syncId, inventory, player) ->
@@ -19,7 +20,7 @@ public class WorkbenchCommand extends SimpleScreenCommand {
 
     @Override
     protected Text getScreenTitle() {
-        return Text.translatable("block.minecraft.crafting_table");
+        return new TranslatableText("block.minecraft.crafting_table");
     }
 
     @Override
