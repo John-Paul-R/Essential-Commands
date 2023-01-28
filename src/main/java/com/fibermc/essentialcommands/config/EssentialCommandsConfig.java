@@ -1,23 +1,30 @@
 package com.fibermc.essentialcommands.config;
 
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.List;
+
 import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.types.RespawnCondition;
+import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+
 import dev.jpcode.eccore.config.Config;
 import dev.jpcode.eccore.config.ConfigOption;
 import dev.jpcode.eccore.config.ConfigUtil;
 import dev.jpcode.eccore.config.Option;
 import dev.jpcode.eccore.util.TextUtil;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
-import java.util.List;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 import static dev.jpcode.eccore.config.ConfigUtil.*;
 import static dev.jpcode.eccore.util.TextUtil.parseText;
+import static dev.jpcode.eccore.util.TimeUtil.durationToTicks;
 
-public final class EssentialCommandsConfig extends Config {
+@SuppressWarnings("checkstyle:all")
+public final class EssentialCommandsConfig extends Config<EssentialCommandsConfig> {
 
     @ConfigOption public final Option<Style> FORMATTING_DEFAULT =     new Option<>("formatting_default", parseStyle("gold"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
     @ConfigOption public final Option<Style> FORMATTING_ACCENT =      new Option<>("formatting_accent", parseStyle("light_purple"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
@@ -40,6 +47,10 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<Boolean> ENABLE_TOP =             new Option<>("enable_top", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_GAMETIME =        new Option<>("enable_gametime", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_MOTD =            new Option<>("enable_motd", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_AFK =             new Option<>("enable_afk", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_DAY =             new Option<>("enable_day", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_RULES =           new Option<>("enable_rules", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_BED =             new Option<>("enable_bed", false, Boolean::parseBoolean);
     @ConfigOption public final Option<List<Integer>> HOME_LIMIT =       new Option<>("home_limit", List.of(1, 2, 5), arrayParser(ConfigUtil::parseInt));
     @ConfigOption public final Option<Double>  TELEPORT_COOLDOWN =      new Option<>("teleport_cooldown", 1.0, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Double>  TELEPORT_DELAY =         new Option<>("teleport_delay", 0.0, ConfigUtil::parseDouble);
@@ -48,6 +59,8 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<Boolean> USE_PERMISSIONS_API =    new Option<>("use_permissions_api", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> CHECK_FOR_UPDATES =      new Option<>("check_for_updates", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> TELEPORT_INTERRUPT_ON_DAMAGED = new Option<>("teleport_interrupt_on_damaged", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> TELEPORT_INTERRUPT_ON_MOVE = new Option<>("teleport_interrupt_on_move", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Double>  TELEPORT_INTERRUPT_ON_MOVE_AMOUNT = new Option<>("teleport_interrupt_on_move_max_blocks", 3D, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Boolean> ALLOW_TELEPORT_BETWEEN_DIMENSIONS = new Option<>("allow_teleport_between_dimensions", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> OPS_BYPASS_TELEPORT_RULES =  new Option<>("ops_bypass_teleport_rules", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICKNAMES_IN_PLAYER_LIST =   new Option<>("nicknames_in_player_list", true, Boolean::parseBoolean);
@@ -61,6 +74,14 @@ public final class EssentialCommandsConfig extends Config {
     @ConfigOption public final Option<Boolean> GRANT_LOWEST_NUMERIC_BY_DEFAULT = new Option<>("grant_lowest_numeric_by_default", true, Boolean::parseBoolean);
     @ConfigOption public final Option<String> LANGUAGE = new Option<>("language", "en_us", String::toString);
     @ConfigOption public final Option<String> MOTD = new Option<>("motd", "<yellow>Welcome to our server <blue>%player:displayname%</blue>!\nPlease read the rules.</yellow>", String::toString);
+    @ConfigOption public final Option<Text> AFK_PREFIX = new Option<>("afk_prefix", Text.literal("[AFK] ").formatted(Formatting.GRAY), TextUtil::parseText, Text.Serializer::toJson);
+    @ConfigOption public final Option<Boolean> INVULN_WHILE_AFK = new Option<>("invuln_while_afk", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> AUTO_AFK_ENABLED = new Option<>("auto_afk_enabled", true,  Boolean::parseBoolean);
+    @ConfigOption public final Option<Integer> AUTO_AFK_TICKS = new Option<>("auto_afk_time", durationToTicks(Duration.ofMinutes(15)), ConfigUtil::parseDurationToTicks, ConfigUtil::serializeTicksAsDuration);
+    @ConfigOption public final Option<Boolean> REGISTER_TOP_LEVEL_COMMANDS = new Option<>("register_top_level_commands", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<List<String>> EXCLUDED_TOP_LEVEL_COMMANDS = new Option<>("excluded_top_level_commands", List.of(), ConfigUtil.arrayParser(Object::toString));
+    @ConfigOption public final Option<RespawnCondition> RESPAWN_AT_EC_SPAWN = new Option<>("respawn_at_ec_spawn", RespawnCondition.Never, RespawnCondition::valueOf);
+    @ConfigOption public final Option<Boolean> RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = new Option<>("recheck_player_ability_permissions_on_dimension_change", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> REGISTER_TOP_LEVEL_COMMANDS = new Option<>("register_top_level_commands", true, Boolean::parseBoolean);
     @ConfigOption public final Option<List<String>> EXCLUDED_TOP_LEVEL_COMMANDS = new Option<>("excluded_top_level_commands", List.of(), ConfigUtil.arrayParser(Object::toString));
 

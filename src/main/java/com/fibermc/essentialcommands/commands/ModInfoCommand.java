@@ -1,14 +1,17 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.EssentialCommands;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.text.ECText;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 public class ModInfoCommand implements Command<ServerCommandSource> {
 
@@ -16,12 +19,13 @@ public class ModInfoCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-
-        context.getSource().sendFeedback(TextUtil.concat(
-            new LiteralText(EssentialCommands.MOD_METADATA.getName()).setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            new LiteralText(" "),
-            new LiteralText(modVersion).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
-        ), false);
+        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var ecText = ECText.access(senderPlayer);
+        PlayerData.access(senderPlayer).sendCommandFeedback(TextUtil.concat(
+            ecText.literal(EssentialCommands.MOD_METADATA.getName()),
+            Text.literal(" "),
+            ecText.accent(modVersion)
+        ));
 
         return 0;
     }

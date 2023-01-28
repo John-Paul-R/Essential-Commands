@@ -1,14 +1,13 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.ECText;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Util;
 
 public class TeleportCancelCommand implements Command<ServerCommandSource> {
 
@@ -17,27 +16,22 @@ public class TeleportCancelCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayerData = PlayerData.access(senderPlayer);
 
-        var existingTeleportRequest = ((ServerPlayerEntityAccess) senderPlayer)
-            .getEcPlayerData()
-            .getSentTeleportRequest();
+        var existingTeleportRequest = senderPlayerData.getSentTeleportRequest();
 
         if (existingTeleportRequest == null) {
-            senderPlayer.sendSystemMessage(
-                ECText.getInstance().getText("cmd.tpcancel.error.no_exists"),
-                Util.NIL_UUID);
+            senderPlayerData.sendCommandError("cmd.tpcancel.error.no_exists");
             return 0;
         }
 
         existingTeleportRequest.end();
 
-        senderPlayer.sendSystemMessage(
-            TextUtil.concat(
-                ECText.getInstance().getText("cmd.tpcancel.feedback.1"),
-                existingTeleportRequest.getTargetPlayer().getDisplayName(),
-                ECText.getInstance().getText("cmd.tpcancel.feedback.2")),
-            Util.NIL_UUID);
+        senderPlayerData.sendCommandFeedback(
+            "cmd.tpcancel.feedback",
+            existingTeleportRequest.getTargetPlayer().getDisplayName()
+        );
 
         return 1;
     }

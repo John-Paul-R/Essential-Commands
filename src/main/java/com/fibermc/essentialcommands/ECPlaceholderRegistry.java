@@ -1,21 +1,23 @@
 package com.fibermc.essentialcommands;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import eu.pb4.placeholders.PlaceholderAPI;
-import eu.pb4.placeholders.PlaceholderResult;
+import eu.pb4.placeholders.api.PlaceholderResult;
+import eu.pb4.placeholders.api.Placeholders;
+
 import net.minecraft.util.Identifier;
 
-class ECPlaceholderRegistry {
+final class ECPlaceholderRegistry {
+    private ECPlaceholderRegistry() {}
 
     public static void register() {
         var namespace = EssentialCommands.MOD_ID;
-        PlaceholderAPI.register(
+        Placeholders.register(
             new Identifier(namespace, "nickname"),
-            (ctx) -> {
+            (ctx, arg) -> {
                 if (ctx.hasPlayer()) {
                     return PlaceholderResult.value(
-                        ((ServerPlayerEntityAccess)ctx.getPlayer())
-                            .getEcPlayerData()
+                        ((ServerPlayerEntityAccess)ctx.player())
+                            .ec$getPlayerData()
                             .getFullNickname());
                 }
                 return PlaceholderResult.invalid("No player!");

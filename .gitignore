@@ -45,6 +45,9 @@ temp.md
 
 remappedSrc
 
+/ec-core/logs
+/logs
+
 */logs/*
 *.log.gz
 *.log

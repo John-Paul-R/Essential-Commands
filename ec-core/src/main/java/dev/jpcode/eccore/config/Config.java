@@ -1,34 +1,40 @@
 package dev.jpcode.eccore.config;
 
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
-public abstract class Config {
+public abstract class Config<T extends Config<T>> {
     static final Logger LOGGER = LogManager.getLogger("ec-core-config");
 
     protected SortedProperties props;
     private final Path configPath;
     private final String displayName;
     private final String documentationLink;
+
+    private @Nullable String existingPropsStr;
+    private String getNonCommentsLines(String propsContent) {
+        return propsContent.lines()
+            .skip(displayName.lines().count() + 2)
+            .collect(Collectors.joining("\n"));
+    }
 
     public Config(Path savePath, String displayName, String documentationLink) {
         this.configPath = savePath;
@@ -45,6 +51,10 @@ public abstract class Config {
             inFile.getParentFile().mkdirs();
             boolean fileAlreadyExisted = !inFile.createNewFile();
             if (fileAlreadyExisted) {
+                var stringWriter = new StringWriter();
+                new FileReader(inFile).transferTo(stringWriter);
+                existingPropsStr = stringWriter.toString();
+
                 props.load(new FileReader(inFile));
             }
         } catch (IOException e) {
@@ -53,6 +63,7 @@ public abstract class Config {
         }
         initProperties();
         storeProperties();
+        configLoadHandlers.forEach(consumer -> consumer.accept((T) this));
     }
 
     private void initProperties() {
@@ -71,16 +82,23 @@ public abstract class Config {
 
     public void storeProperties() {
         try {
-            File outFile = configPath.toFile();
-            FileWriter writer = new FileWriter(outFile);
+            var propsComments = displayName + "\n" + "Config Documentation: " + documentationLink;
 
-            props.storeSorted(writer, new StringBuilder(80)
-                .append(displayName)
-                .append("\n")
-                .append("Config Documentation: ")
-                .append(documentationLink)
-                .toString()
-            );
+            var stringWriter = new StringWriter();
+            props.storeSorted(stringWriter, propsComments);
+            stringWriter.close();
+
+            var strinifiedProps = stringWriter.toString();
+            var stringifiedPropsNoComments = getNonCommentsLines(strinifiedProps);
+            if (existingPropsStr == null
+                || !stringifiedPropsNoComments.equals(getNonCommentsLines(existingPropsStr)))
+            {
+                File outFile = configPath.toFile();
+                FileWriter writer = new FileWriter(outFile);
+                props.storeSorted(writer, propsComments);
+                existingPropsStr = strinifiedProps;
+            }
+
         } catch (IOException e) {
             LOGGER.warn("Failed to store preferences to disk.");
             LOGGER.error(e.getMessage());
@@ -92,12 +110,12 @@ public abstract class Config {
     static final Style ACCENT_STYLE = Style.EMPTY.withFormatting(Formatting.GREEN);
 
     public @NotNull Text stateAsText() {
-        LiteralText result = new LiteralText("");
+        var result = Text.empty();
         String newLine = "\n";//System.getProperty("line.separator");
 
-        result.append(new LiteralText(displayName + " {").setStyle(DEFAULT_STYLE));
+        result.append(Text.literal(displayName + " {").setStyle(DEFAULT_STYLE));
         result.append(newLine);
-        LiteralText propsText = new LiteralText("");
+        var propsText = Text.empty();
         result.append(propsText);
 
         //print field names paired with their values
@@ -110,7 +128,7 @@ public abstract class Config {
                 ex.printStackTrace();
             }
         }
-        result.append(new LiteralText("}").setStyle(ACCENT_STYLE));
+        result.append(Text.literal("}").setStyle(ACCENT_STYLE));
 
         return result;
 
@@ -138,10 +156,10 @@ public abstract class Config {
     }
 
     private MutableText fieldAsText(Field field) throws IllegalAccessException {
-        var value = (Option)field.get(this);
-        return new LiteralText("")
-            .append(new LiteralText(field.getName() + ": ").setStyle(DEFAULT_STYLE))
-            .append(new LiteralText(value.getValue().toString()));
+        var value = (Option<?>) field.get(this);
+        return Text.empty()
+            .append(Text.literal(field.getName() + ": ").setStyle(DEFAULT_STYLE))
+            .append(Text.literal(value.getValue().toString()));
     }
 
     public @Nullable MutableText getFieldValueAsText(String fieldName) throws NoSuchFieldException {
@@ -153,4 +171,9 @@ public abstract class Config {
         return null;
     }
 
+    private final List<Consumer<T>> configLoadHandlers = new ArrayList<>();
+
+    public void registerLoadHandler(Consumer<T> handler) {
+        configLoadHandlers.add(handler);
+    }
 }

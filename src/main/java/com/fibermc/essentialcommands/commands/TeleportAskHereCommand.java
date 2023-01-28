@@ -1,18 +1,19 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.*;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.teleportation.TeleportManager;
+import com.fibermc.essentialcommands.teleportation.TeleportRequest;
+import com.fibermc.essentialcommands.text.ChatConfirmationPrompt;
+import com.fibermc.essentialcommands.text.ECText;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.jpcode.eccore.util.TextUtil;
+
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Util;
-
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class TeleportAskHereCommand implements Command<ServerCommandSource> {
 
@@ -20,48 +21,45 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        TeleportRequestManager tpMgr = ManagerLocator.getInstance().getTpManager();
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+        TeleportManager tpMgr = ManagerLocator.getInstance().getTpManager();
+        ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
+        var senderPlayerData = PlayerData.access(senderPlayer);
+        var targetPlayerData = PlayerData.access(targetPlayer);
 
         // Don't allow spamming same target.
         {
-            var existingTeleportRequest = ((ServerPlayerEntityAccess) senderPlayer)
-                .getEcPlayerData()
-                .getSentTeleportRequest();
+            var existingTeleportRequest = senderPlayerData.getSentTeleportRequest();
             if (existingTeleportRequest != null && existingTeleportRequest.getTargetPlayer().equals(targetPlayer)) {
-                senderPlayer.sendMessage(
-                    ECText.getInstance().getText(
-                        "cmd.tpask.error.exists",
-                        existingTeleportRequest.getTargetPlayer().getDisplayName())
-                    , false);
+                PlayerData.access(senderPlayer).sendCommandError(
+                    "cmd.tpask.error.exists",
+                    existingTeleportRequest.getTargetPlayer().getDisplayName());
                 return 0;
             }
         }
 
         //inform target player of tp request via chat
-        targetPlayer.sendSystemMessage(TextUtil.concat(
-            new LiteralText(senderPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-            ECText.getInstance().getText("cmd.tpaskhere.receive").setStyle(CONFIG.FORMATTING_DEFAULT.getValue())
-        ), Util.NIL_UUID);
+        var targetPlayerEcText = ECText.access(targetPlayer);
+        targetPlayerData.sendMessage(
+            "cmd.tpaskhere.receive",
+            targetPlayerEcText.accent(senderPlayer.getEntityName())
+        );
 
-        String senderName = context.getSource().getPlayer().getGameProfile().getName();
+        String senderName = senderPlayer.getGameProfile().getName();
         new ChatConfirmationPrompt(
             targetPlayer,
             "/tpaccept " + senderName,
             "/tpdeny " + senderName,
-            new LiteralText("[" + ECText.getInstance().get("generic.accept") + "]").setStyle(CONFIG.FORMATTING_ACCENT.getValue()),
-            new LiteralText("[" + ECText.getInstance().get("generic.deny") + "]").setStyle(CONFIG.FORMATTING_ERROR.getValue())
+            targetPlayerEcText.accent("[" + ECText.getInstance().getString("generic.accept") + "]"),
+            targetPlayerEcText.error("[" + ECText.getInstance().getString("generic.deny") + "]")
         ).send();
 
         //Mark TPRequest Sender as having requested a teleport
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_HERE);
 
         //inform command sender that request has been sent
-        context.getSource().sendFeedback(TextUtil.concat(
-            new LiteralText("Teleport request has been sent to ").setStyle(CONFIG.FORMATTING_DEFAULT.getValue()),
-            new LiteralText(targetPlayer.getEntityName()).setStyle(CONFIG.FORMATTING_ACCENT.getValue())
-        ), CONFIG.BROADCAST_TO_OPS.getValue());
+        var targetPlayerText = ECText.access(senderPlayer).accent(targetPlayer.getEntityName());
+        senderPlayerData.sendCommandFeedback("cmd.tpask.send", targetPlayerText);
 
         return 1;
     }

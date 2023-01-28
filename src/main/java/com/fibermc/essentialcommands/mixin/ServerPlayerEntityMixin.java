@@ -1,21 +1,16 @@
 package com.fibermc.essentialcommands.mixin;
 
 import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataFactory;
-import com.fibermc.essentialcommands.QueuedTeleport;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.events.PlayerDamageCallback;
 import com.fibermc.essentialcommands.events.PlayerDeathCallback;
+import com.fibermc.essentialcommands.playerdata.*;
+import com.fibermc.essentialcommands.teleportation.QueuedTeleport;
+import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.WorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,10 +18,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.GameMode;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
+
+import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 @Mixin(ServerPlayerEntity.class)
-public class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
+public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
+
+    @Shadow
+    public abstract ServerWorld getWorld();
 
     @Unique
     public QueuedTeleport ecQueuedTeleport;
@@ -57,24 +65,33 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
         target = "Lnet/minecraft/server/PlayerManager;sendPlayerStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
     ), locals = LocalCapture.CAPTURE_FAILSOFT)
     public void onTeleportBetweenWorlds(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci,
-                                        ServerWorld  serverWorld,
-                                        WorldProperties worldProperties
-    ) {
-        ((ServerPlayerEntityAccess) this).getEcPlayerData().updatePlayer((ServerPlayerEntity) (Object) this);
+                                        ServerWorld serverWorld,
+                                        WorldProperties worldProperties)
+    {
+        var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
+        playerData.updatePlayerEntity((ServerPlayerEntity) (Object) this);
+    }
+
+    @Inject(method = "worldChanged", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    public void onWorldChanged(ServerWorld origin, CallbackInfo ci, RegistryKey<World> registryKey, RegistryKey<World> registryKey2) {
+        var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
+        if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
+            PlayerDataManager.getInstance().scheduleTask(playerData::clearAbilitiesWithoutPermisisons);
+        }
     }
 
     @Override
-    public QueuedTeleport getEcQueuedTeleport() {
+    public QueuedTeleport ec$getQueuedTeleport() {
         return ecQueuedTeleport;
     }
 
     @Override
-    public void setEcQueuedTeleport(QueuedTeleport queuedTeleport) {
+    public void ec$setQueuedTeleport(QueuedTeleport queuedTeleport) {
         ecQueuedTeleport = queuedTeleport;
     }
 
     @Override
-    public QueuedTeleport endEcQueuedTeleport() {
+    public QueuedTeleport ec$endQueuedTeleport() {
         QueuedTeleport prevQueuedTeleport = ecQueuedTeleport;
         ecQueuedTeleport = null;
         return prevQueuedTeleport;
@@ -82,37 +99,81 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin implements Server
 
     @Inject(method = "getPlayerListName", at = @At("RETURN"), cancellable = true)
     public void getPlayerListName(CallbackInfoReturnable<Text> cir) {
-        if (EssentialCommandsConfig.getValueSafe(CONFIG.NICKNAMES_IN_PLAYER_LIST, true)) {
-            cir.setReturnValue(((ServerPlayerEntity)(Object)this).getDisplayName());
+        if (EssentialCommandsConfig.getValueSafe(BACKING_CONFIG.NICKNAMES_IN_PLAYER_LIST, true)) {
+            cir.setReturnValue(((ServerPlayerEntity) (Object) this).getDisplayName());
             cir.cancel();
         }
     }
 
     @Unique
-    public PlayerData ecPlayerData;
+    public PlayerData ec$playerData;
 
     @Override
-    public PlayerData getEcPlayerData() {
-        if (ecPlayerData != null) {
-            return ecPlayerData;
+    public PlayerData ec$getPlayerData() {
+        if (ec$playerData != null) {
+            return ec$playerData;
         }
 
-        ServerPlayerEntity playerEntity = (ServerPlayerEntity)(Object)this;
+        ServerPlayerEntity playerEntity = (ServerPlayerEntity) (Object) this;
         EssentialCommands.LOGGER.info(String.format(
-                "[Essential Commands] Loading PlayerData for player with uuid '%s'.", playerEntity.getUuidAsString()));
+            "[Essential Commands] Loading PlayerData for player with uuid '%s'.", playerEntity.getUuidAsString()));
         PlayerData playerData = PlayerDataFactory.create(playerEntity);
-        setEcPlayerData(playerData);
+        ec$setPlayerData(playerData);
         return playerData;
     }
 
     @Override
-    public void setEcPlayerData(PlayerData playerData) {
-        ecPlayerData = playerData;
+    public void ec$setPlayerData(PlayerData playerData) {
+        ec$playerData = playerData;
+    }
+
+    @Unique
+    public PlayerProfile ec$profile;
+
+    @Override
+    public PlayerProfile ec$getProfile() {
+        if (ec$profile != null) {
+            return ec$profile;
+        }
+
+        ServerPlayerEntity playerEntity = (ServerPlayerEntity) (Object) this;
+        EssentialCommands.LOGGER.info(String.format(
+            "[Essential Commands] Loading PlayerProfile for player with uuid '%s'.", playerEntity.getUuidAsString()));
+        PlayerProfile profile = PlayerProfileFactory.create(playerEntity);
+        ec$setProfile(profile);
+        return profile;
+    }
+
+    @Override
+    public void ec$setProfile(PlayerProfile profile) {
+        ec$profile = profile;
+    }
+
+    @Unique
+    public ECText ec$ecText;
+
+    @Override
+    public ECText ec$getEcText() {
+        if (ec$ecText != null) {
+            return ec$ecText;
+        }
+
+        return ec$ecText = ECText.forPlayer((ServerPlayerEntity) (Object) this);
     }
 
     // Teleport hook (for /back)
     @Inject(method = "teleport", at = @At("HEAD"))
     public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
-        this.getEcPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity)(Object)this));
+        this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
+    }
+
+    @Inject(method = "enterCombat", at = @At("RETURN"))
+    public void onEnterCombat(CallbackInfo ci) {
+        ec$playerData.setInCombat(true);
+    }
+
+    @Inject(method = "endCombat", at = @At("RETURN"))
+    public void onExitCombat(CallbackInfo ci) {
+        ec$playerData.setInCombat(false);
     }
 }

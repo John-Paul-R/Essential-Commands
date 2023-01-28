@@ -1,10 +1,10 @@
 package dev.jpcode.eccore.config;
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-
 import java.util.Properties;
 import java.util.function.Consumer;
+
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 
 public class Option<T> {
 
