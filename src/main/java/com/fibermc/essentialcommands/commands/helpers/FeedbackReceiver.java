@@ -4,6 +4,8 @@ import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
@@ -17,7 +19,7 @@ public final class FeedbackReceiver implements IFeedbackReceiver {
         this.commandSource = commandSource;
     }
 
-    public static IFeedbackReceiver ofSource(ServerCommandSource commandSource) {
+    public static IFeedbackReceiver ofSource(ServerCommandSource commandSource) throws CommandSyntaxException {
         var player = commandSource.getPlayer();
         return player != null
             ? PlayerData.access(player)

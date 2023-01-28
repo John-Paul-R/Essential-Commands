@@ -15,6 +15,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
+import dev.jpcode.eccore.util.TextUtil;
+
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 @Mixin(PlayerEntity.class)
@@ -40,7 +42,7 @@ public abstract class PlayerEntityMixin {
         var name = getNicknameStyledName(teamDecoratedName, playerData);
 
         return playerData.isAfk()
-            ? Text.empty()
+            ? TextUtil.empty()
                 .append(CONFIG.AFK_PREFIX)
                 .append(name)
             : name;

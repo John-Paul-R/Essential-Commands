@@ -56,7 +56,7 @@ public final class ChatConfirmationPrompt {
     }
 
     public void send() {
-        this.player.sendMessage(this.text);
+        this.player.sendMessage(this.text, false);
     }
 
     public MutableText getText() {
