@@ -144,7 +144,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             EssentialCommands.LOGGER.info(
                 ECText.getInstance().getText(
                     "cmd.rtp.log.location_validate_time",
-                    ECText.unstyled(String.valueOf(timer.stop()))
+                    TextUtil.literal(String.valueOf(timer.stop()))
                 ).getString());
         }
 

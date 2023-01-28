@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.types;
 
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
 import net.minecraft.nbt.NbtCompound;
@@ -61,10 +60,10 @@ public class NamedMinecraftLocation extends MinecraftLocation {
     public Text toText(PlayerProfile playerProfile) {
         return TextUtil.join(
             new Text[]{
-                ECText.unstyled(name),
+                TextUtil.literal(name),
                 toLiteralTextSimple(),
             },
-            ECText.unstyled(" ")
+            TextUtil.literal(" ")
         ).setStyle(playerProfile.getStyle(TextFormatType.Accent));
     }
 }

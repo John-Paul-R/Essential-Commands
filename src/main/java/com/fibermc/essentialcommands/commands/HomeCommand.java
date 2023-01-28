@@ -24,6 +24,8 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import net.minecraft.server.command.ServerCommandSource;
 
+import dev.jpcode.eccore.util.TextUtil;
+
 public class HomeCommand implements Command<ServerCommandSource> {
 
     public HomeCommand() {}
@@ -77,7 +79,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
             Message msg = ecText.getText(
                 "cmd.home.tp.error.not_found",
                 TextFormatType.Error,
-                ECText.unstyled(homeName));
+                TextUtil.literal(homeName));
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
         }
 

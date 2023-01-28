@@ -4,13 +4,14 @@ import java.util.Map;
 
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.ProfileOption;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -43,7 +44,7 @@ public final class ProfileCommand {
                     var player = context.getSource().getPlayer();
                     var profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
                     context.getSource().sendFeedback(
-                        ECText.unstyled(option.profileGetter().getValue(profile).toString()),
+                        TextUtil.literal(option.profileGetter().getValue(profile).toString()),
                         CONFIG.BROADCAST_TO_OPS);
                     return 0;
                 })

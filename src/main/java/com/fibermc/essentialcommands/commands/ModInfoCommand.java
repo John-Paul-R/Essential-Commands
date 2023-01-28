@@ -22,7 +22,7 @@ public class ModInfoCommand implements Command<ServerCommandSource> {
         var ecText = ECText.access(senderPlayer);
         PlayerData.access(senderPlayer).sendCommandFeedback(TextUtil.concat(
             ecText.literal(EssentialCommands.MOD_METADATA.getName()),
-            ECText.unstyled(" "),
+            TextUtil.literal(" "),
             ecText.accent(modVersion)
         ));
 

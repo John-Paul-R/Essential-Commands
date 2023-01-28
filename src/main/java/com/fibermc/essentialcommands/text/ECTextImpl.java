@@ -61,7 +61,7 @@ public class ECTextImpl extends ECText {
         TextFormatType textFormatType,
         @Nullable IStyleProvider styleProvider)
     {
-        return ECText.unstyled(getString(key))
+        return TextUtil.literal(getString(key))
             .setStyle(styleProvider == null
                 ? textFormatType.getStyle()
                 : styleProvider.getStyle(textFormatType));
@@ -148,12 +148,12 @@ public class ECTextImpl extends ECText {
         // extending classes, but I cannot be bothered rn.
         var retVal = playerParserContext != null
             ? PlaceholderAPI.parseTextCustom(
-                ECText.unstyled(placeholderAsIdentifier_1_18_Compat(getString(key))),
+                TextUtil.literal(placeholderAsIdentifier_1_18_Compat(getString(key))),
                 playerParserContext,
                 argumentsMap,
                 PlaceholderAPI.PREDEFINED_PLACEHOLDER_PATTERN)
             : PlaceholderAPI.parseTextCustom(
-                ECText.unstyled(placeholderAsIdentifier_1_18_Compat(getString(key))),
+                TextUtil.literal(placeholderAsIdentifier_1_18_Compat(getString(key))),
                 serverParserContext,
                 argumentsMap,
                 PlaceholderAPI.PREDEFINED_PLACEHOLDER_PATTERN);

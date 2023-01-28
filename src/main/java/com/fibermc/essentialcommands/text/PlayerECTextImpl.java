@@ -8,6 +8,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
+import dev.jpcode.eccore.util.TextUtil;
+
 public class PlayerECTextImpl extends ECTextImpl {
     private final IStyleProvider styleProvider;
 
@@ -33,16 +35,16 @@ public class PlayerECTextImpl extends ECTextImpl {
 
     @Override
     public MutableText literal(String str) {
-        return ECText.unstyled(str).setStyle(this.styleProvider.getStyle(TextFormatType.Default));
+        return TextUtil.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Default));
     }
 
     @Override
     public MutableText accent(String str) {
-        return ECText.unstyled(str).setStyle(this.styleProvider.getStyle(TextFormatType.Accent));
+        return TextUtil.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Accent));
     }
 
     @Override
     public MutableText error(String str) {
-        return ECText.unstyled(str).setStyle(this.styleProvider.getStyle(TextFormatType.Error));
+        return TextUtil.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Error));
     }
 }

@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.util.List;
 
 import com.fibermc.essentialcommands.ECPerms;
-import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import org.jetbrains.annotations.NotNull;
 
@@ -75,7 +74,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> GRANT_LOWEST_NUMERIC_BY_DEFAULT = new Option<>("grant_lowest_numeric_by_default", true, Boolean::parseBoolean);
     @ConfigOption public final Option<String> LANGUAGE = new Option<>("language", "en_us", String::toString);
     @ConfigOption public final Option<String> MOTD = new Option<>("motd", "<yellow>Welcome to our server <blue>%player:displayname%</blue>!\nPlease read the rules.</yellow>", String::toString);
-    @ConfigOption public final Option<Text> AFK_PREFIX = new Option<>("afk_prefix", ECText.unstyled("[AFK] ").formatted(Formatting.GRAY), TextUtil::parseText, Text.Serializer::toJson);
+    @ConfigOption public final Option<Text> AFK_PREFIX = new Option<>("afk_prefix", TextUtil.literal("[AFK] ").formatted(Formatting.GRAY), TextUtil::parseText, Text.Serializer::toJson);
     @ConfigOption public final Option<Boolean> INVULN_WHILE_AFK = new Option<>("invuln_while_afk", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> AUTO_AFK_ENABLED = new Option<>("auto_afk_enabled", true,  Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> AUTO_AFK_TICKS = new Option<>("auto_afk_time", durationToTicks(Duration.ofMinutes(15)), ConfigUtil::parseDurationToTicks, ConfigUtil::serializeTicksAsDuration);

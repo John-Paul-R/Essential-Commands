@@ -4,12 +4,13 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
-import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -78,7 +79,7 @@ public final class PlayerTeleporter {
             "teleport.done",
             playerProfile.shouldPrintTeleportCoordinates()
                 ? dest.toText(playerProfile)
-                : ECText.unstyled("destination").setStyle(playerProfile.getStyle(TextFormatType.Default))
+                : TextUtil.literal("destination").setStyle(playerProfile.getStyle(TextFormatType.Default))
         );
     }
 

@@ -1,22 +1,5 @@
 package com.fibermc.essentialcommands.text;
 
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.types.IStyleProvider;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.JsonHelper;
-
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +7,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
+
+import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
+import com.fibermc.essentialcommands.types.IStyleProvider;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.JsonHelper;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.*;
 
@@ -43,10 +43,6 @@ public abstract class ECText {
 
     static {
         BACKING_CONFIG.LANGUAGE.changeEvent.register((langId) -> instance = create(langId));
-    }
-
-    public static MutableText unstyled(String content) {
-        return new LiteralText(content);
     }
 
     public static void init(MinecraftServer server) {
@@ -122,15 +118,15 @@ public abstract class ECText {
     public abstract boolean isRightToLeft();
 
     public MutableText literal(String str) {
-        return ECText.unstyled(str).setStyle(CONFIG.FORMATTING_DEFAULT);
+        return TextUtil.literal(str).setStyle(CONFIG.FORMATTING_DEFAULT);
     }
 
     public MutableText accent(String str) {
-        return ECText.unstyled(str).setStyle(CONFIG.FORMATTING_ACCENT);
+        return TextUtil.literal(str).setStyle(CONFIG.FORMATTING_ACCENT);
     }
 
     public MutableText error(String str) {
-        return ECText.unstyled(str).setStyle(CONFIG.FORMATTING_ERROR);
+        return TextUtil.literal(str).setStyle(CONFIG.FORMATTING_ERROR);
     }
 
     public static ECText forPlayer(ServerPlayerEntity player) {

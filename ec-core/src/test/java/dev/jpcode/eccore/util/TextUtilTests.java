@@ -11,7 +11,7 @@ public class TextUtilTests {
 //    void flattenRoot_flattensCorrectly()
 //    {
 //        var baseStyle = Style.EMPTY.withColor(Formatting.AQUA);
-//        var input = ECText.unstyled("testing").setStyle(baseStyle)
+//        var input = TextUtil.literal("testing").setStyle(baseStyle)
 //            .append("token2")
 //            .append("token3");
 //

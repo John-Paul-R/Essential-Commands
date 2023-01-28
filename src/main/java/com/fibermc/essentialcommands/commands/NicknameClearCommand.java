@@ -1,13 +1,14 @@
 package com.fibermc.essentialcommands.commands;
 
 import com.fibermc.essentialcommands.playerdata.PlayerData;
-import com.fibermc.essentialcommands.text.ECText;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.server.command.ServerCommandSource;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 public class NicknameClearCommand implements Command<ServerCommandSource> {
     @Override
@@ -22,7 +23,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource> {
         //inform command sender that the nickname has been set
         senderPlayerData.sendCommandFeedback(
             "cmd.nickname.set.feedback",
-            ECText.unstyled(targetPlayer.getGameProfile().getName())
+            TextUtil.literal(targetPlayer.getGameProfile().getName())
         );
 
         return 1;

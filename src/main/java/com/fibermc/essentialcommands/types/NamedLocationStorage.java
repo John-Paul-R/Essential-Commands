@@ -12,6 +12,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 
+import dev.jpcode.eccore.util.TextUtil;
+
 public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation> implements NbtSerializable {
 
     public NamedLocationStorage() {}
@@ -54,7 +56,7 @@ public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation
             return super.put(name, location);
         } else {
             throw CommandUtil.createSimpleException(
-                ECText.getInstance().getText("cmd.home.set.error.exists", TextFormatType.Error, ECText.unstyled(name)));
+                ECText.getInstance().getText("cmd.home.set.error.exists", TextFormatType.Error, TextUtil.literal(name)));
         }
     }
 

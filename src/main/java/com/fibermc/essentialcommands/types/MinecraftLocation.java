@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.types;
 
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
 import net.minecraft.nbt.NbtCompound;
@@ -13,6 +12,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 public class MinecraftLocation {
 
@@ -95,7 +96,7 @@ public class MinecraftLocation {
     }
 
     protected MutableText toLiteralTextSimple() {
-        return ECText.unstyled(String.format("(%.1f, %.1f, %.1f)", pos().x, pos().y, pos().z));
+        return TextUtil.literal(String.format("(%.1f, %.1f, %.1f)", pos().x, pos().y, pos().z));
     }
 
     public Text toText(PlayerProfile playerProfile) {

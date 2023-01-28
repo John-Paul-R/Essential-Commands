@@ -31,6 +31,8 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
+import dev.jpcode.eccore.util.TextUtil;
+
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -523,7 +525,7 @@ public final class EssentialCommandRegistry {
                             mcDir.resolve("world/modplayerdata").toFile(),
                             source.getSource().getServer()
                         );
-                        source.getSource().sendFeedback(ECText.unstyled("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
+                        source.getSource().sendFeedback(TextUtil.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
                     } catch (NotDirectoryException | FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -538,7 +540,7 @@ public final class EssentialCommandRegistry {
                         source.getSource().getServer(),
                         mcDir.resolve("plugins/Essentials/warps").toFile()
                     );
-                    source.getSource().sendFeedback(ECText.unstyled("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
+                    source.getSource().sendFeedback(TextUtil.literal("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
                     return 0;
                 }).build()
             );
