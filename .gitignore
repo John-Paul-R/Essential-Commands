@@ -30,7 +30,24 @@ bin/
 
 # fabric
 
+run_orig/
 run/
 
 # env
 .env
+
+*.orig
+changelog*.md
+cfmd.py
+*cf.md
+showcase.md
+temp.md
+
+remappedSrc
+
+/ec-core/logs
+/logs
+
+*/logs/*
+*.log.gz
+*.log

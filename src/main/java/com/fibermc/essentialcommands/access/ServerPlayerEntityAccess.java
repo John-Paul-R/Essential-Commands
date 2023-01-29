@@ -1,17 +1,24 @@
 package com.fibermc.essentialcommands.access;
 
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.QueuedTeleport;
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerProfile;
+import com.fibermc.essentialcommands.teleportation.QueuedTeleport;
+import com.fibermc.essentialcommands.text.ECText;
 
 public interface ServerPlayerEntityAccess {
-    QueuedTeleport getEcQueuedTeleport();
+    QueuedTeleport ec$getQueuedTeleport();
 
-    void setEcQueuedTeleport(QueuedTeleport queuedTeleport);
+    void ec$setQueuedTeleport(QueuedTeleport queuedTeleport);
 
-    QueuedTeleport endEcQueuedTeleport();
+    QueuedTeleport ec$endQueuedTeleport();
 
-    PlayerData getEcPlayerData();
+    PlayerData ec$getPlayerData();
 
-    void setEcPlayerData(PlayerData playerData);
+    void ec$setPlayerData(PlayerData playerData);
 
+    PlayerProfile ec$getProfile();
+
+    void ec$setProfile(PlayerProfile profile);
+
+    ECText ec$getEcText();
 }

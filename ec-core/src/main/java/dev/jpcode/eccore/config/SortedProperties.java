@@ -1,10 +1,10 @@
 package dev.jpcode.eccore.config;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
+
+import org.jetbrains.annotations.NotNull;
 
 class SortedProperties extends Properties {
 

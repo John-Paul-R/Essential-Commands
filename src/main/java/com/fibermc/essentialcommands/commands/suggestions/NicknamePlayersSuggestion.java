@@ -1,23 +1,27 @@
 package com.fibermc.essentialcommands.commands.suggestions;
 
-import com.fibermc.essentialcommands.PlayerData;
-import com.fibermc.essentialcommands.PlayerDataManager;
+import java.util.Optional;
+
+import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
+
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 
-import java.util.Objects;
+public final class NicknamePlayersSuggestion {
+    private NicknamePlayersSuggestion() {}
 
-public class NicknamePlayersSuggestion {
     //Brigader Suggestions
-    public static SuggestionProvider<ServerCommandSource> suggestedStrings() {
-        return ListSuggestion.ofContext(context ->
+    public static final SuggestionProvider<ServerCommandSource> STRING_SUGGESTIONS_PROVIDER =
+        ListSuggestion.ofContext(context ->
             PlayerDataManager.getInstance().getAllPlayerData().stream()
                 .map(PlayerData::getNickname)
-                .filter(Objects::nonNull)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .map(MutableText::getString)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList()
         );
-    }
 }

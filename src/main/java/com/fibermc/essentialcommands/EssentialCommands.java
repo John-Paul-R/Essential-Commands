@@ -1,54 +1,81 @@
 package com.fibermc.essentialcommands;
 
-//import net.fabricmc.api.DedicatedServerModInitializer;
+import java.io.IOException;
+import java.nio.file.Path;
 
+import com.fibermc.essentialcommands.commands.RulesCommand;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.metadata.ModMetadata;
+import com.fibermc.essentialcommands.config.EssentialCommandsConfigSnapshot;
+import com.fibermc.essentialcommands.text.ECText;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.file.Path;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.ModMetadata;
+
+import dev.jpcode.eccore.util.TimeUtil;
 
 public final class EssentialCommands implements ModInitializer {
-	public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer("essential_commands").get().getMetadata();
-	public static final String MOD_ID = MOD_METADATA.getId();
-	public static Logger LOGGER = LogManager.getLogger("EssentialCommands");
-	public static final EssentialCommandsConfig CONFIG = new EssentialCommandsConfig(
-			Path.of("./config/EssentialCommands.properties"),
-			"Essential Commands Config",
-			"https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation"
-	);
-	public static void log(Level level, String message) {
-		final String logPrefix = "[EssentialCommands]: ";
-		LOGGER.log(level, logPrefix.concat(message));
-	}
+    private static final String MOD_CONTAINER_ID = "essential_commands";
+    public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer(MOD_CONTAINER_ID).map(ModContainer::getMetadata).orElse(null);
+    public static final String MOD_ID = MOD_METADATA == null ? "essentialcommands | ERR - NO MOD DATA" : MOD_METADATA.getId();
+    public static final Logger LOGGER = LogManager.getLogger("EssentialCommands");
+    public static final EssentialCommandsConfig BACKING_CONFIG = new EssentialCommandsConfig(
+        Path.of("./config/EssentialCommands.properties"),
+        "Essential Commands Config",
+        "https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation"
+    );
+    @SuppressWarnings("checkstyle:StaticVariableName")
+    public static EssentialCommandsConfigSnapshot CONFIG = EssentialCommandsConfigSnapshot.create(BACKING_CONFIG);
 
+    public static void log(Level level, String message, Object... args) {
+        final String logPrefix = "[EssentialCommands]: ";
+        LOGGER.log(level, logPrefix.concat(message), args);
+    }
 
     @Override
-	public void onInitialize/*Server*/() {
-		log(Level.INFO, "Mod Load Initiated.");
+    public void onInitialize() {
+        if (MOD_METADATA == null) {
+            log(Level.WARN, "failed to load mod metadata using mod container id '{}' ", MOD_CONTAINER_ID);
+        }
 
-		//Load Preferences
-		CONFIG.loadOrCreateProperties();
+        log(Level.INFO, "Mod Load Initiated.");
 
-		//init mod stuff
-		ManagerLocator managers = ManagerLocator.getInstance();
-		managers.init();
-		ServerLifecycleEvents.SERVER_STARTING.register(managers::onServerStart);
+        BACKING_CONFIG.registerLoadHandler((backingConfig) -> CONFIG = EssentialCommandsConfigSnapshot.create(backingConfig));
+        BACKING_CONFIG.loadOrCreateProperties();
 
-		ECPerms.init();
-		
-		//Register Mod
-		EssentialCommandRegistry.register();
+        ECPlaceholderRegistry.register();
+        ECAbilitySources.init();
 
-		if (CONFIG.CHECK_FOR_UPDATES.getValue()) {
-			Updater.checkForUpdates();
-		}
+        ManagerLocator managers = ManagerLocator.getInstance();
+        managers.init();
+        ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
+            ECText.init(server);
+            TimeUtil.init(server);
+            managers.onServerStart(server);
+            ECPerms.init(); // ECPerms must start after WorldDataManager at present (for warps).
 
-		log(Level.INFO, "Mod Load Complete.");
-	}
+            if (CONFIG.ENABLE_RULES) {
+                try {
+                    RulesCommand.reload(server);
+                } catch (IOException e) {
+                    LOGGER.error("An error occurred while loading EssentialCommands rules file.");
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        CommandRegistrationCallback.EVENT.register(EssentialCommandRegistry::register);
+
+        if (CONFIG.CHECK_FOR_UPDATES) {
+            Updater.checkForUpdates();
+        }
+
+        log(Level.INFO, "Mod Load Complete.");
+    }
 }

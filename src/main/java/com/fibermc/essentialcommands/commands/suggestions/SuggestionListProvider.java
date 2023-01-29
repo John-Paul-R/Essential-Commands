@@ -1,13 +1,13 @@
 package com.fibermc.essentialcommands.commands.suggestions;
 
+import java.util.Collection;
+
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.server.command.ServerCommandSource;
 
-import java.util.Collection;
-import java.util.List;
+import net.minecraft.server.command.ServerCommandSource;
 
 @FunctionalInterface
 public interface SuggestionListProvider<T> {
-    Collection<T> getSuggestionList(final CommandContext<ServerCommandSource> context) throws CommandSyntaxException;
+    Collection<T> getSuggestionList(CommandContext<ServerCommandSource> context) throws CommandSyntaxException;
 }

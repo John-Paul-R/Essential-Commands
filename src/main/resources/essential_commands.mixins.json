@@ -1,13 +1,16 @@
 {
   "required": true,
   "package": "com.fibermc.essentialcommands.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "PersistentStateManagerInvoker",
     "PlayerEntityMixin",
     "PlayerManagerMixin",
     "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
     "ServerScoreboardMixin",
+    "SleepManagerMixin",
+    "TeleportCommandMixin",
     "WorldSaveHandlerMixin"
   ],
   "client": [

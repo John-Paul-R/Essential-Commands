@@ -1,15 +1,5 @@
 package com.fibermc.essentialcommands;
 
-import com.fibermc.essentialcommands.types.MinecraftLocation;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.WorldSavePath;
-import net.minecraft.world.PersistentState;
-import org.apache.logging.log4j.Level;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,19 +7,44 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
+
+import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.types.WarpLocation;
+import com.fibermc.essentialcommands.types.WarpStorage;
+import org.apache.logging.log4j.Level;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.WorldSavePath;
+import net.minecraft.world.PersistentState;
+
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 
 public class WorldDataManager extends PersistentState {
-    private NamedLocationStorage warps;
+    private final WarpStorage warps;
     private MinecraftLocation spawnLocation;
     private Path saveDir;
     private File worldDataFile;
 
-    private final String SPAWN_KEY = "spawn";
-    private final String WARPS_KEY = "warps";
+    private static final String SPAWN_KEY = "spawn";
+    private static final String WARPS_KEY = "warps";
 
     public WorldDataManager() {
-        warps = new NamedLocationStorage();
+        warps = new WarpStorage();
         spawnLocation = null;
+    }
+
+    public static WorldDataManager createForServer(MinecraftServer server)
+    {
+        var worldDataManager = new WorldDataManager();
+        worldDataManager.onServerStart(server);
+        return worldDataManager;
     }
 
     public void onServerStart(MinecraftServer server) {
@@ -62,14 +77,24 @@ public class WorldDataManager extends PersistentState {
     }
 
     public void fromNbt(NbtCompound tag) {
-        MinecraftLocation tempSpawnLocation = new MinecraftLocation(tag.getCompound(SPAWN_KEY));
-        if (tempSpawnLocation.dim.getValue().getPath().isEmpty())
+        MinecraftLocation tempSpawnLocation = MinecraftLocation.fromNbt(tag.getCompound(SPAWN_KEY));
+        if (tempSpawnLocation.dim().getValue().getPath().isEmpty()) {
             this.spawnLocation = null;
-        else
+        } else {
             this.spawnLocation = tempSpawnLocation;
+        }
         NbtCompound warpsNbt = tag.getCompound(WARPS_KEY);
         warps.loadNbt(warpsNbt);
+        warpsLoadEvent.invoker().accept(warps);
     }
+
+    public final Event<Consumer<WarpStorage>> warpsLoadEvent = EventFactory.createArrayBacked(
+        Consumer.class,
+        (listeners) -> (warps) -> {
+            for (Consumer<WarpStorage> event : listeners) {
+                event.accept(warps);
+            }
+        });
 
     public void save() {
         EssentialCommands.log(Level.INFO, "Saving world_data.dat (Spawn/Warps)...");
@@ -80,11 +105,10 @@ public class WorldDataManager extends PersistentState {
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
         // Spawn to NBT
-        NbtElement spawnNbt;
-        if (spawnLocation != null)
-            spawnNbt = spawnLocation.asNbt();
-        else
-            spawnNbt = new NbtCompound();
+        NbtElement spawnNbt = spawnLocation != null
+            ? spawnLocation.asNbt()
+            : new NbtCompound();
+
         tag.put(SPAWN_KEY, spawnNbt);
 
         // Warps to NBT
@@ -96,25 +120,32 @@ public class WorldDataManager extends PersistentState {
     }
 
     // Command Actions
-    public void setWarp(String warpName, MinecraftLocation location) throws CommandSyntaxException {
-        warps.putCommand(warpName, location);
+    public void setWarp(String warpName, MinecraftLocation location, boolean requiresPermission) throws CommandSyntaxException {
+        warps.putCommand(warpName, new WarpLocation(
+            location,
+            requiresPermission ? warpName : null,
+            warpName
+        ));
         this.markDirty();
         this.save();
     }
+
     public boolean delWarp(String warpName) {
         MinecraftLocation prevValue = warps.remove(warpName);
         this.markDirty();
         this.save();
         return prevValue != null;
     }
-    public MinecraftLocation getWarp(String warpName) {
+
+    public WarpLocation getWarp(String warpName) {
         return warps.get(warpName);
     }
 
     public List<String> getWarpNames() {
         return this.warps.keySet().stream().toList();
     }
-    public Set<Entry<String, MinecraftLocation>> getWarpEntries() {
+
+    public Set<Entry<String, WarpLocation>> getWarpEntries() {
         return this.warps.entrySet();
     }
 
@@ -123,6 +154,7 @@ public class WorldDataManager extends PersistentState {
         this.markDirty();
         this.save();
     }
+
     public MinecraftLocation getSpawn() {
         return spawnLocation;
     }
