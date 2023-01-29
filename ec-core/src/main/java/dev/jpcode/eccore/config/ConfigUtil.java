@@ -1,22 +1,23 @@
 package dev.jpcode.eccore.config;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import org.apache.logging.log4j.Level;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import dev.jpcode.eccore.util.TimeUtil;
 
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import dev.jpcode.eccore.util.TimeUtil;
+import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static dev.jpcode.eccore.config.Config.LOGGER;
 import static dev.jpcode.eccore.util.TextUtil.parseText;
@@ -47,6 +48,7 @@ public final class ConfigUtil {
         return outStyle;
     }
 
+    private static JsonParser jsonParser = new JsonParser();
     @Nullable
     public static Style parseStyle(String styleStr) {
         Style outStyle = null;
@@ -58,7 +60,7 @@ public final class ConfigUtil {
         if (outStyle == null) {
             try {
                 outStyle = STYLE_JSON_DESERIALIZER.deserialize(
-                    JsonParser.parseString(styleStr),
+                    jsonParser.parse(styleStr),
                     null, null
                 );
             } catch (JsonSyntaxException e) {

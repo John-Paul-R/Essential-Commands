@@ -161,7 +161,7 @@ public class PlayerDataManager {
         var spawnLoc = worldMgr.getSpawn();
         if (CONFIG.RESPAWN_AT_EC_SPAWN == RespawnCondition.Always
             || CONFIG.RESPAWN_AT_EC_SPAWN == RespawnCondition.SameWorld
-                && oldPlayerEntity.getWorld().getRegistryKey() == spawnLoc.dim()
+                && oldPlayerEntity.getServerWorld().getRegistryKey() == spawnLoc.dim()
         ) {
             // respawn at spawn loc
             // This event handler executes just before the player is truly respawned, so we can just

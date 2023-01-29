@@ -216,7 +216,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
                 Pal.grantAbility(this.player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
             }
 
-            this.player.server.getPlayerManager().broadcast(
+            this.player.server.getPlayerManager().broadcastChatMessage(
                 ECText.getInstance().getText(
                     "player.afk.enter",
                     this.player.getDisplayName()),
@@ -233,7 +233,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
             Pal.revokeAbility(this.player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
 
-            this.player.server.getPlayerManager().broadcast(
+            this.player.server.getPlayerManager().broadcastChatMessage(
                 ECText.getInstance().getText(
                     "player.afk.exit",
                     this.player.getDisplayName()),

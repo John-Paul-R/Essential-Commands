@@ -49,7 +49,7 @@ public final class PlayerTeleporter {
         if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS
             && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
-            if (dest.dim() != player.getWorld().getRegistryKey()) {
+            if (dest.dim() != player.getServerWorld().getRegistryKey()) {
                 pData.sendError("teleport.error.interdimensional_teleport_disabled");
                 return;
             }
