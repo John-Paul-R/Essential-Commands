@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.teleportation;
 
 import com.fibermc.essentialcommands.ECPerms;
-import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.TextFormatType;
@@ -58,11 +57,7 @@ public final class PlayerTeleporter {
     }
 
     public static void teleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
-        if (ManagerLocator.playerDataEnabled()) {
-            teleport(((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData(), dest);
-        } else {
-            execTeleport(playerEntity, dest);
-        }
+        teleport(((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData(), dest);
     }
 
     private static void execTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
