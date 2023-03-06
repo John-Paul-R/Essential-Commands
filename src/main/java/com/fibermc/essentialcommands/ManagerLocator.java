@@ -6,8 +6,6 @@ import com.fibermc.essentialcommands.teleportation.TeleportManager;
 
 import net.minecraft.server.MinecraftServer;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-
 public final class ManagerLocator {
 
     private PlayerDataManager playerDataManager;
@@ -26,28 +24,9 @@ public final class ManagerLocator {
         return instance = new ManagerLocator();
     }
 
-    public static boolean playerDataEnabled() {
-        return CONFIG.ENABLE_HOME
-            || CONFIG.ENABLE_TPA
-            || CONFIG.ENABLE_BACK
-            || CONFIG.ENABLE_WARP
-            || CONFIG.ENABLE_SPAWN
-            || CONFIG.ENABLE_NICK
-            || CONFIG.ENABLE_AFK
-            ;
-    }
-
-    public static boolean teleportRequestEnabled() {
-        return (CONFIG.ENABLE_TPA);
-    }
-
     public void init() {
-        if (playerDataEnabled()) {
-            PlayerDataManager.init();
-        }
-        if (teleportRequestEnabled()) {
-            TeleportManager.init();
-        }
+        PlayerDataManager.init();
+        TeleportManager.init();
     }
 
     public void onServerStart(MinecraftServer server) {
