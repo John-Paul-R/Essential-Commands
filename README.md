@@ -29,6 +29,8 @@ All commands and sub-commands have their own permissions node in the form:
 
 `essentialcommands.<command>.<subcommand>`
 
+*Note: The config option `use_permissions_api` must be set to `true` for permissions to have an effect.*
+
 ## Commands
 
 All of these commands support automatic tab completion using Minecraft's new commands system.
