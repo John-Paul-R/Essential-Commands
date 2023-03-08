@@ -29,7 +29,7 @@ All commands and sub-commands have their own permissions node in the form:
 
 `essentialcommands.<command>.<subcommand>`
 
-*Note: The config option `use_permissions_api` must be set to `true` for permissions to have an effect.*
+*Note: The config option `use_permissions_api` must be set to `true` for permissions to have an effect.* ([Config Docs](https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation)) ([Permissions Docs](https://github.com/John-Paul-R/Essential-Commands/wiki/List-of-Commands-&-Permissions))
 
 ## Commands
 
