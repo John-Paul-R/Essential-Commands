@@ -310,6 +310,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         static final String HOMES = "homes";
         static final String NICKNAME = "nickname";
         static final String TIME_USED_RTP_EPOCH_MS = "timeUsedRtpEpochMs";
+        static final String PREVIOUS_LOCATION = "previousLocation";
     }
 
     public void fromNbt(NbtCompound tag) {
@@ -336,6 +337,10 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             this.timeUsedRtp = TimeUtil.epochTimeMsToTicks(dataTag.getLong(StorageKey.TIME_USED_RTP_EPOCH_MS));
         }
 
+        if (dataTag.contains(StorageKey.PREVIOUS_LOCATION)) {
+            this.previousLocation = MinecraftLocation.fromNbt(dataTag.getCompound(StorageKey.PREVIOUS_LOCATION));
+        }
+
         if (this.player != null) {
             updatePlayerEntity(this.player);
         }
@@ -354,11 +359,16 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
         tag.putLong(StorageKey.TIME_USED_RTP_EPOCH_MS, TimeUtil.tickTimeToEpochMs(timeUsedRtp));
 
+        if (previousLocation != null) {
+            tag.put(StorageKey.PREVIOUS_LOCATION, previousLocation.asNbt());
+        }
+
         return tag;
     }
 
     public void setPreviousLocation(MinecraftLocation location) {
         this.previousLocation = location;
+        this.markDirty();
     }
 
     public MinecraftLocation getPreviousLocation() {
