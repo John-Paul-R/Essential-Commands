@@ -61,6 +61,7 @@ public final class ECPerms {
         public static final String gametime                  = "essentialcommands.gametime";
         public static final String time_set_day              = "essentialcommands.day";
         public static final String afk                       = "essentialcommands.afk";
+        public static final String bed                       = "essentialcommands.bed";
         public static final String config_reload             = "essentialcommands.config_reload";
         public static final String rules_reload              = "essentialcommands.rules_reload";
         public static final String rules                     = "essentialcommands.rules";
