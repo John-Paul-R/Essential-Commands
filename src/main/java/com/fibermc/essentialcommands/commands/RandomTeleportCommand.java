@@ -24,6 +24,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -90,7 +91,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return 1;
     }
 
-    private static boolean isValidSpawnPosition(ServerWorld world, double x, double y, double z) {
+    private static boolean isValidSpawnPosition(ServerWorld world, int x, int y, int z) {
         // TODO This should be memoized. Cuts exec time in 1/2.
         BlockState targetBlockState = world.getBlockState(new BlockPos(x, y, z));
         BlockState footBlockState = world.getBlockState(new BlockPos(x, y - 1, z));
@@ -99,7 +100,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
         // Position relative to EC spawn locaiton.
-        MinecraftLocation center = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
+        Vec3i center = ManagerLocator.getInstance().getWorldDataManager().getSpawn().intPos();
         var ecText = ECText.access(source.getPlayerOrThrow());
         if (center == null) {
             source.sendError(TextUtil.concat(
@@ -113,7 +114,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
 
-    private static int exec(ServerPlayerEntity player, ServerWorld world, MinecraftLocation center, int timesRun) {
+    private static int exec(ServerPlayerEntity player, ServerWorld world, Vec3i center, int timesRun) {
         var ecText = ECText.access(player);
         if (timesRun > CONFIG.RTP_MAX_ATTEMPTS) {
             return -1;
@@ -130,8 +131,8 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         final double delta_x = r * Math.cos(angle);
         final double delta_z = r * Math.sin(angle);
 
-        final double new_x = center.pos().x + delta_x;
-        final double new_z = center.pos().z + delta_z;
+        final int new_x = center.getX() + (int) delta_x;
+        final int new_z = center.getZ() + (int) delta_z;
 
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
         int new_y;
@@ -141,7 +142,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         {
             Stopwatch timer = Stopwatch.createStarted();
-            new_y = getTop(chunk, (int) new_x, (int) new_z);
+            new_y = getTop(chunk, new_x, new_z);
             EssentialCommands.LOGGER.info(
                 ECText.getInstance().getText(
                     "cmd.rtp.log.location_validate_time",

@@ -12,7 +12,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
@@ -24,16 +23,16 @@ public class TopCommand implements Command<ServerCommandSource> {
         ServerCommandSource source = context.getSource();
         ServerPlayerEntity player = source.getPlayerOrThrow();
         World world = source.getWorld();
-        Vec3d playerPos = player.getPos();
+        BlockPos playerPos = player.getBlockPos();
 
         int new_y;
-        double new_x = playerPos.x;
-        double new_z = playerPos.z;
+        int new_x = playerPos.getX();
+        int new_z = playerPos.getZ();
 
         final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
 
         Chunk chunk = world.getChunk(targetXZ);
-        new_y = getTop(chunk, (int) new_x, (int) new_z);
+        new_y = getTop(chunk, new_x, new_z);
 
         // Teleport the player
         PlayerTeleporter.requestTeleport(

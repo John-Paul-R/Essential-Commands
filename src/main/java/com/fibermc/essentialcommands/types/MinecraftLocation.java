@@ -4,13 +4,14 @@ import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class MinecraftLocation {
@@ -104,6 +105,9 @@ public class MinecraftLocation {
 
     public Vec3d pos() {
         return pos;
+    }
+    public Vec3i intPos() {
+        return new Vec3i((int) pos.x, (int) pos.y, (int) pos.z);
     }
 
     public float pitch() {
