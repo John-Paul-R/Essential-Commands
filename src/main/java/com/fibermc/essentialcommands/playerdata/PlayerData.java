@@ -337,7 +337,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             this.timeUsedRtp = TimeUtil.epochTimeMsToTicks(dataTag.getLong(StorageKey.TIME_USED_RTP_EPOCH_MS));
         }
 
-        if (dataTag.contains(StorageKey.PREVIOUS_LOCATION)) {
+        if (CONFIG.PERSIST_BACK_LOCATION && dataTag.contains(StorageKey.PREVIOUS_LOCATION)) {
             this.previousLocation = MinecraftLocation.fromNbt(dataTag.getCompound(StorageKey.PREVIOUS_LOCATION));
         }
 
@@ -359,7 +359,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
         tag.putLong(StorageKey.TIME_USED_RTP_EPOCH_MS, TimeUtil.tickTimeToEpochMs(timeUsedRtp));
 
-        if (previousLocation != null) {
+        if (CONFIG.PERSIST_BACK_LOCATION && previousLocation != null) {
             tag.put(StorageKey.PREVIOUS_LOCATION, previousLocation.asNbt());
         }
 
