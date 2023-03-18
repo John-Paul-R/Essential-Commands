@@ -81,7 +81,18 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         new Thread("RTP Location Calculator Thread") {
             public void run() {
                 try {
-                    exec(context.getSource(), world);
+                    {
+                        Stopwatch timer = Stopwatch.createStarted();
+
+                        exec(context.getSource(), world);
+
+                        var totalTime = timer.stop();
+                        EssentialCommands.LOGGER.info(
+                            String.format(
+                                "Total RTP Time: %s",
+                                Text.literal(String.valueOf(totalTime))
+                            ));
+                    }
                 } catch (CommandSyntaxException e) {
                     e.printStackTrace();
                 }
@@ -139,9 +150,15 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         Chunk chunk = world.getChunk(targetXZ);
 
+        boolean isSafePosition;
+
         {
             Stopwatch timer = Stopwatch.createStarted();
+
             new_y = getTop(chunk, (int) new_x, (int) new_z);
+
+            isSafePosition = isSafePosition(chunk, new BlockPos(new_x, new_y - 2, new_z));
+
             EssentialCommands.LOGGER.info(
                 ECText.getInstance().getText(
                     "cmd.rtp.log.location_validate_time",
@@ -151,7 +168,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
         //  Addressed by adding timesRun limit.
-        if (!isSafePosition(chunk, new BlockPos(new_x, new_y - 2, new_z))) {
+        if (!isSafePosition) {
             return exec(player, world, center, timesRun + 1);
         }
 
