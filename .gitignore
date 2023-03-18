@@ -30,7 +30,7 @@ bin/
 
 # fabric
 
-run_orig/
+run_*/
 run/
 
 # env
