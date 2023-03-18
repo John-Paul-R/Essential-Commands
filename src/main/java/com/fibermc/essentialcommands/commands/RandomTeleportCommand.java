@@ -89,7 +89,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                         EssentialCommands.LOGGER.info(
                             String.format(
                                 "Total RTP Time: %s",
-                                Text.literal(String.valueOf(totalTime))
+                                totalTime
                             ));
                     }
                 } catch (CommandSyntaxException e) {
