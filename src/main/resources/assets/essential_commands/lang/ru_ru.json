@@ -59,6 +59,7 @@
   "teleport.done": "Телепортирование к ${0}.",
   "teleport.request.expired.sender": "Запрос на телепортацию к ${0} истек.",
   "teleport.request.expired.receiver": "Запрос на телепортацию от ${0} истек.",
+  "teleport.interruped.moved": "Телепортирование отменено. Причина: Вы двинулись",
 
   "generic.argument.target_player": "",
   "generic.error.unknown": "При выполнении команды произошла неизвестная ошибка.",
