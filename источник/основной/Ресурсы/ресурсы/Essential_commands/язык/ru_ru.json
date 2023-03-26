@@ -1,5 +1,5 @@
-{
-  "cmd.back.error.no_prev_location": "Предыдущая локация не обнаружено. Выполнение невозможно.",
+{{
+  "cmd.back.error.no_prev_location": "Предыдущая локация не обнаружена. Выполнение невозможно.",
   "cmd.back.location_name": "предыдущая локация",
   "cmd.enderchest.feedback": "Эндер-сундук открыт.",
   "cmd.enderchest.container_ui_name": "Эндер-сундук",
@@ -8,8 +8,7 @@
   "cmd.home.tp.error.not_found": "Не удалось найти ни одного дома с названием '${0}'.",
   "cmd.home.tp.error.shortcut_none_exist": "Домов не найдено.",
   "cmd.home.tp.error.shortcut_more_than_one": "Найдено более 1-го дома. Укажите название дома, куда Вы хотите телепортироваться.",
-  "cmd.home.location_name": "home:${0}",
-  "cmd.home.feedback.1": "Дом '",
+  "cmd.home.location_name": "дом:${0}",
   "cmd.home.delete.feedback": "Дом '${0}' был удален.",
   "cmd.home.delete.error": "Дом '${0}' не удалось удалить.",
   "cmd.home.set.feedback": "Дом '${0}' установлен.",
@@ -32,7 +31,7 @@
   "cmd.spawn.tp.error.no_spawn_set": "Точка спавна не установлена",
   "cmd.spawn.set.feedback": "Точка спавна установлена на ${0}",
   "cmd.tpaccept.feedback": "Запрос на телепортацию принят.",
-  "cmd.tpa_reply.error.shortcut_none_exist": "Нет активных запросов на тедепортацию.",
+  "cmd.tpa_reply.error.shortcut_none_exist": "Нет активных запросов на телепортацию.",
   "cmd.tpa_reply.error.shortcut_more_than_one": "Более 1 ожидающего запроса на телепортацию. Укажите имя игрока, чей запрос вы хотите принять.",
   "cmd.tpa_reply.error.no_request_from_target": "Нет ожидающего запроса на телепортацию от указанного игрока.",
   "cmd.tpask.receive": "${0} запросил телепорт к Вам.\nВведите:\n'/tpaccept <name>', чтобы принять\n'/tpdeny <name>' чтобы отклонить.",
@@ -46,13 +45,48 @@
   "cmd.warp.delete.error": "Точка варпа '${0}' не может быть удалена. (Проверьте правильность ввода)",
   "cmd.warp.set.feedback": "Точка варпа '${0}' была установлена.",
   "cmd.warp.set.error.exists": "Точка варпа '${0}' не может быть установлена. Это имя уже используется",
-  "cmd.warp.location_name": "warp:${0}",
+  "cmd.warp.location_name": "варп:${0}",
   "cmd.warp.tp.error.not_found": "Точки варпа с именем '${0}' не найдено.",
+  "cmd.warp.tp.error.permission": "Недостаточно прав для телепорта на варп '${0}'.",
   "cmd.warp.list.start": "Доступные точки варпа на сервере: ",
+  "cmd.day.error.already_daytime": "Уже день.",
+  "cmd.day.feedback": "Установлено время на день.",
+  "cmd.afk.error.in_combat": "Нельзя войти в AFK во время боя.",
+  "rules.reload.success.": "Файл правил перезагружен.",
+  "cmd.rules.reload.error.unexpected.": "При перезагрузке файла правил произошла непредвиденная ошибка. Консоль сервера может содержать дополнительную информацию.",
+  
   "cmd.workbench.feedback": "Верстак открыт.",
   "cmd.workbench.container_ui_name": "Верстак",
+  "cmd.wastebin.name": "Мусорка",
+  
   "cmd.list.feedback.empty": "Местоположения не найдены.",
-  "cmd.top.location_name": "world surface",
+  "cmd.top.location_name": "поверхность мира",
+  
+  "player.afk.enter": "${0} сейчас AFK.",
+  "player.afk.exit": "${0} больше не AFK.",
+
+  "teleport.error.interdimensional_teleport_disabled": "Телепортация отменена. Телепортация между измерениями выключена администрацией.",
+  "teleport.queued": "Телепортирование к ${0} через ${1} секунд...",
+  "teleport.done": "Телепортирование к ${0}.",
+  "teleport.interrupted.damage": "Телепортация прервана. Причина: Получение урона",
+  "teleport.interruped.moved": "Телепортация прервана. Причина: Движение",
+  "teleport.request.expired.sender": "Запрос на телепортацию к ${0} истек.",
+  "teleport.request.expired.receiver": "Запрос на телепортацию от ${0} истек.",
+  "teleport.request.canceled_by_new": "Очередь телепортации к '${0}' отменена. Причина: Новый телепорт к '${1}' начат!",
+
+  "generic.argument.target_player": "",
+  "generic.error.unknown": "При выполнении команды произошла неизвестная ошибка.",
+  "generic.enabled": "включен",
+  "generic.disabled": "выключен",
+  "generic.confirm": "Подтвердить",
+  "generic.deny": "Отменить",
+  "generic.accept": "Принять",
+
+  "essentialcommands.fullprefix": "[Essential Commands] ",
+  "essentialcommands.smallprefix": "[EC] ",
+  "cmd.config.reload": "${l:essentialcommands.fullprefix} Конфиг перезагружен."
+
+}
 
   "teleport.error.interdimensional_teleport_disabled": "Телепортация отменена. Телепортация между измерениями выключена администрацией.",
   "teleport.queued": "Телепортирование к ${0} через ${1} секунд...",
