@@ -52,8 +52,8 @@
   "cmd.day.error.already_daytime": "Já é dia.",
   "cmd.day.feedback": "Hora definida para dia.",
   "cmd.afk.error.in_combat": "Não é possível entrar em AFK durante o combate.",
-  "rules.reload.success.": "Arquivo de regras recarregado.",
-  "cmd.rules.reload.error.unexpected.": "Ocorreu um erro inesperado ao recarregar o arquivo de regras. O console do servidor pode conter mais informações.",
+  "rules.reload.success": "Arquivo de regras recarregado.",
+  "cmd.rules.reload.error.unexpected": "Ocorreu um erro inesperado ao recarregar o arquivo de regras. O console do servidor pode conter mais informações.",
 
   "cmd.workbench.feedback": "${0} aberta.",
   "cmd.workbench.container_ui_name": "EC ${0}",
@@ -84,6 +84,9 @@
 
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
-  "cmd.config.reload": "${l:essentialcommands.fullprefix} Config Recarregada."
+  "cmd.config.reload": "${l:essentialcommands.fullprefix} Config Recarregada.",
+
+  "cmd.bed.error.none_set": "Player spawnpoint not set.",
+  "cmd.bed.bed_destination_name": "bed"
 
 }
