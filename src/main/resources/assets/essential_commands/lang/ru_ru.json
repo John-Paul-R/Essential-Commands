@@ -84,5 +84,8 @@
 
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
-  "cmd.config.reload": "${l:essentialcommands.fullprefix} Конфиг перезагружен."
+  "cmd.config.reload": "${l:essentialcommands.fullprefix} Конфиг перезагружен.",
+
+  "cmd.bed.error.none_set": "Player spawnpoint not set.",
+  "cmd.bed.bed_destination_name": "bed"
 }
