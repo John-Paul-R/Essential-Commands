@@ -111,15 +111,16 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
         // Position relative to EC spawn locaiton.
-        Vec3i center = ManagerLocator.getInstance().getWorldDataManager().getSpawn().intPos();
-        var ecText = ECText.access(source.getPlayerOrThrow());
-        if (center == null) {
+        MinecraftLocation worldSpawn = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
+        if (worldSpawn == null) {
+            ECText ecText = ECText.access(source.getPlayerOrThrow());
             source.sendError(TextUtil.concat(
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
                 ecText.getText("cmd.rtp.error.no_spawn_set", TextFormatType.Error)
             ));
             return -1;
         }
+        Vec3i center = ManagerLocator.getInstance().getWorldDataManager().getSpawn().intPos();
         return exec(source.getPlayer(), world, center, 0);
     }
 
