@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -155,8 +156,8 @@ public class WorldDataManager extends PersistentState {
         this.save();
     }
 
-    public MinecraftLocation getSpawn() {
-        return spawnLocation;
+    public Optional<MinecraftLocation> getSpawn() {
+        return Optional.ofNullable(spawnLocation);
     }
 
 }

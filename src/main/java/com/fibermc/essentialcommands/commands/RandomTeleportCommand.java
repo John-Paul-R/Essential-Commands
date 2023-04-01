@@ -111,8 +111,8 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
         // Position relative to EC spawn locaiton.
-        MinecraftLocation worldSpawn = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
-        if (worldSpawn == null) {
+        var worldSpawn = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
+        if (worldSpawn.isEmpty()) {
             ECText ecText = ECText.access(source.getPlayerOrThrow());
             source.sendError(TextUtil.concat(
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
@@ -120,7 +120,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             ));
             return -1;
         }
-        Vec3i center = ManagerLocator.getInstance().getWorldDataManager().getSpawn().intPos();
+        Vec3i center = worldSpawn.get().intPos();
         return exec(source.getPlayer(), world, center, 0);
     }
 
