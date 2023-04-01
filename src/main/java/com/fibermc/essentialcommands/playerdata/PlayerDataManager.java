@@ -146,6 +146,12 @@ public class PlayerDataManager {
     }
 
     private static void onPlayerRespawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
+        var worldMgr = ManagerLocator.getInstance().getWorldDataManager();
+        var spawnLocOpt = worldMgr.getSpawn();
+        if (spawnLocOpt.isEmpty()) {
+            return;
+        }
+
         var oldPlayerAccess = ((ServerPlayerEntityAccess) oldPlayerEntity);
         var newPlayerAccess = ((ServerPlayerEntityAccess) newPlayerEntity);
 
@@ -157,8 +163,7 @@ public class PlayerDataManager {
         profile.updatePlayerEntity(newPlayerEntity);
         newPlayerAccess.ec$setProfile(profile);
 
-        var worldMgr = ManagerLocator.getInstance().getWorldDataManager();
-        var spawnLoc = worldMgr.getSpawn();
+        var spawnLoc = spawnLocOpt.get();
         if (CONFIG.RESPAWN_AT_EC_SPAWN == RespawnCondition.Always
             || CONFIG.RESPAWN_AT_EC_SPAWN == RespawnCondition.SameWorld
                 && oldPlayerEntity.getServerWorld().getRegistryKey() == spawnLoc.dim()
