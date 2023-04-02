@@ -3,9 +3,6 @@ package dev.jpcode.eccore.config.expression;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.function.Function;
-import java.util.function.Supplier;
-
-import dev.jpcode.eccore.function.Action;
 
 public class PatternMatchingExpressionReader<T>
 {
@@ -39,7 +36,7 @@ public class PatternMatchingExpressionReader<T>
         Operand3,
     }
 
-    private static class ParsingContext
+    private class ParsingContext
     {
         StringBuilder workingBuffer = new StringBuilder();
         public Mode mode = Mode.Operand1;
@@ -48,6 +45,72 @@ public class PatternMatchingExpressionReader<T>
         public ExpressionOperand operand2 = null;
         public LogicalOperator operator2 = null;
         public ExpressionOperand operand3 = null;
+
+        public void finalizeOperand3() {
+            if (this.operator2 == LogicalOperator.AND) {
+                this.operand2 = new PatternMatchingExpression<T>(
+                    this.operand2,
+                    this.operand3,
+                    this.operator2
+                );
+                this.operand3 = null;
+                this.operator2 = null;
+                this.mode = Mode.Operator2;
+            } else { // operator2 is LogicalOperator.OR
+                this.operand1 = new PatternMatchingExpression<T>(
+                    this.operand1,
+                    this.operand2,
+                    this.operator1
+                );
+                // Shift everything else left 1
+                this.operator1 = this.operator2;
+                this.operator2 = null;
+                this.operand2 = this.operand3;
+                this.operand3 = null;
+                this.mode = Mode.Operator1;
+            }
+        }
+
+        public ExpressionOperand fullFinalize() {
+            finalizeOperand3();
+
+            if (this.operand2 != null) {
+                this.operand1 = new PatternMatchingExpression<T>(
+                    this.operand1,
+                    this.operand2,
+                    this.operator1
+                );
+            }
+
+            return this.operand1;
+        }
+
+        private void tokenEnd() {
+            switch (this.mode) {
+                case Operand1 -> {
+                    this.operand1 = readValueExpression(this.workingBuffer.toString());
+                    this.mode = Mode.Operator1;
+                }
+                case Operator1 -> {
+                    this.operator1 = LogicalOperator.valueOf(this.workingBuffer.toString());
+                    this.mode = Mode.Operand2;
+                }
+                case Operand2 -> {
+                    this.operand2 = readValueExpression(this.workingBuffer.toString());
+                    this.mode = Mode.Operator2;
+                }
+                case Operator2 -> {
+                    this.operator2 = LogicalOperator.valueOf(this.workingBuffer.toString());
+                    this.mode = Mode.Operand3;
+                }
+                case Operand3 -> {
+                    this.operand3 = readValueExpression(this.workingBuffer.toString());
+                    finalizeOperand3();
+                }
+            }
+            this.workingBuffer = new StringBuilder();
+        }
+
     }
 
     public ExpressionOperand readExpression() throws IOException {
@@ -56,71 +119,6 @@ public class PatternMatchingExpressionReader<T>
 
     private ExpressionOperand parse(StringReader reader) throws IOException {
         final ParsingContext ctx = new ParsingContext();
-
-        Action finalizeOperand3 = () -> {
-            if (ctx.operator2 == LogicalOperator.AND) {
-                ctx.operand2 = new PatternMatchingExpression<T>(
-                    ctx.operand2,
-                    ctx.operand3,
-                    ctx.operator2
-                );
-                ctx.operand3 = null;
-                ctx.operator2 = null;
-                ctx.mode = Mode.Operator2;
-            } else { // operator2 is LogicalOperator.OR
-                ctx.operand1 = new PatternMatchingExpression<T>(
-                    ctx.operand1,
-                    ctx.operand2,
-                    ctx.operator1
-                );
-                // Shift everything else left 1
-                ctx.operator1 = ctx.operator2;
-                ctx.operator2 = null;
-                ctx.operand2 = ctx.operand3;
-                ctx.operand3 = null;
-                ctx.mode = Mode.Operator1;
-            }
-        };
-
-        Supplier<ExpressionOperand> fullFinalize = () -> {
-            finalizeOperand3.execute();
-
-            if (ctx.operand2 != null) {
-                ctx.operand1 = new PatternMatchingExpression<T>(
-                    ctx.operand1,
-                    ctx.operand2,
-                    ctx.operator1
-                );
-            }
-
-            return ctx.operand1;
-        };
-
-        Action tokenEnd = () -> {
-            switch (ctx.mode) {
-                case Operand1 -> {
-                    ctx.operand1 = readValueExpression(ctx.workingBuffer.toString());
-                    ctx.mode = Mode.Operator1;
-                }
-                case Operator1 -> {
-                    ctx.operator1 = LogicalOperator.valueOf(ctx.workingBuffer.toString());
-                    ctx.mode = Mode.Operand2;
-                }
-                case Operand2 -> {
-                    ctx.operand2 = readValueExpression(ctx.workingBuffer.toString());
-                    ctx.mode = Mode.Operator2;
-                }
-                case Operator2 -> {
-                    ctx.operator2 = LogicalOperator.valueOf(ctx.workingBuffer.toString());
-                    ctx.mode = Mode.Operand3;
-                }
-                case Operand3 -> {
-                    ctx.operand3 = readValueExpression(ctx.workingBuffer.toString());
-                    finalizeOperand3.execute();
-                }
-            }
-            ctx.workingBuffer = new StringBuilder();
-        };
 
         int chInt = -2;
         while (chInt != -1) {
@@ -132,28 +130,27 @@ public class PatternMatchingExpressionReader<T>
                     if (ctx.workingBuffer.isEmpty()) {
                         continue;
                     }
-                    tokenEnd.execute();
+                    ctx.tokenEnd();
                 }
                 case '(' -> { // begin group
                     var parsedGroup = parse(reader);
                     switch (ctx.mode) {
                         case Operand1 -> {ctx.operand1 = parsedGroup; ctx.mode = Mode.Operator1;}
                         case Operand2 -> {ctx.operand2 = parsedGroup; ctx.mode = Mode.Operator2;}
-                        case Operand3 -> {ctx.operand3 = parsedGroup; finalizeOperand3.execute();}
+                        case Operand3 -> {ctx.operand3 = parsedGroup; ctx.finalizeOperand3();}
                         default -> throw new RuntimeException("Invalid parsing state (Group start while not ready to parse operand (missing logical operator?)");
                     }
                 }
                 case ')' -> { // end group
-                    tokenEnd.execute();
-                    return fullFinalize.get();
+                    ctx.tokenEnd();
+                    return ctx.fullFinalize();
                 }
                 default -> ctx.workingBuffer.append(ch);
             }
         }
 
-        return fullFinalize.get();
+        return ctx.fullFinalize();
     }
-
 
     private ValueExpression<T> readValueExpression(String str) {
         return new ValueExpression<>(this.operandParser.apply(str));
