@@ -47,27 +47,34 @@ public class PatternMatchingExpressionReader<T>
         public ExpressionOperand operand3 = null;
 
         public void finalizeOperand3() {
-            if (this.operator2 == LogicalOperator.AND) {
-                this.operand2 = new PatternMatchingExpression<T>(
-                    this.operand2,
-                    this.operand3,
-                    this.operator2
-                );
-                this.operand3 = null;
-                this.operator2 = null;
-                this.mode = Mode.Operator2;
-            } else { // operator2 is LogicalOperator.OR
-                this.operand1 = new PatternMatchingExpression<T>(
-                    this.operand1,
-                    this.operand2,
-                    this.operator1
-                );
-                // Shift everything else left 1
-                this.operator1 = this.operator2;
-                this.operator2 = null;
-                this.operand2 = this.operand3;
-                this.operand3 = null;
-                this.mode = Mode.Operator1;
+            // do nothing if operator2 is null;
+            if (this.operator2 == null) {
+                return;
+            }
+            switch (this.operator2) {
+                case AND -> {
+                    this.operand2 = new PatternMatchingExpression<T>(
+                        this.operand2,
+                        this.operand3,
+                        this.operator2
+                    );
+                    this.operand3 = null;
+                    this.operator2 = null;
+                    this.mode = Mode.Operator2;
+                }
+                case OR -> {
+                    this.operand1 = new PatternMatchingExpression<T>(
+                        this.operand1,
+                        this.operand2,
+                        this.operator1
+                    );
+                    // Shift everything else left 1
+                    this.operator1 = this.operator2;
+                    this.operator2 = null;
+                    this.operand2 = this.operand3;
+                    this.operand3 = null;
+                    this.mode = Mode.Operator1;
+                }
             }
         }
 
