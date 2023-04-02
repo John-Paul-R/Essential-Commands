@@ -7,6 +7,7 @@ import com.fibermc.essentialcommands.types.RespawnCondition;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
+import dev.jpcode.eccore.config.expression.Expression;
 import dev.jpcode.eccore.util.TimeUtil;
 
 @SuppressWarnings("checkstyle:all")
@@ -66,7 +67,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final int AUTO_AFK_TICKS;
     public final boolean REGISTER_TOP_LEVEL_COMMANDS;
     public final List<String> EXCLUDED_TOP_LEVEL_COMMANDS;
-    public final RespawnCondition RESPAWN_AT_EC_SPAWN;
+    public final Expression<RespawnCondition> RESPAWN_AT_EC_SPAWN;
     public final boolean PERSIST_BACK_LOCATION;
     public final boolean RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE;
 
