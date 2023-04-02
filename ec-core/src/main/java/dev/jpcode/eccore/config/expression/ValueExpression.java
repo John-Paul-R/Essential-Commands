@@ -1,6 +1,6 @@
 package dev.jpcode.eccore.config.expression;
 
-public record ValueExpression<T>(T value) implements ExpressionOperand {
+public record ValueExpression<T>(T value) implements Expression {
 
     @Override
     public String serialize() {

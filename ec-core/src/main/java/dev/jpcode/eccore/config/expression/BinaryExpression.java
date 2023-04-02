@@ -3,13 +3,13 @@ package dev.jpcode.eccore.config.expression;
 import java.util.Arrays;
 import java.util.function.Function;
 
-public record PatternMatchingExpression<TOperand>(
-    ExpressionOperand left,
-    ExpressionOperand right,
+public record BinaryExpression<TOperand>(
+    Expression left,
+    Expression right,
     LogicalOperator op
-) implements ExpressionOperand {
+) implements Expression {
 
-    public static <TOperand2> PatternMatchingExpression<TOperand2>
+    public static <TOperand2> BinaryExpression<TOperand2>
     parse(String str, Function<String, TOperand2> operandParser) {
         var triplet = Arrays.stream(str.split(" "))
             .filter(el -> el.length() > 0)
@@ -20,7 +20,7 @@ public record PatternMatchingExpression<TOperand>(
 
         var right = operandParser.apply(triplet[2]);
 
-        return new PatternMatchingExpression<>(
+        return new BinaryExpression<>(
             new ValueExpression<>(left),
             new ValueExpression<>(right),
             op);
