@@ -30,7 +30,7 @@ public class PatternMatchingExpressionReader<T>
         }
     }
 
-    enum Mode
+    private enum Mode
     {
         Operand1,
         Operator1,
@@ -39,7 +39,7 @@ public class PatternMatchingExpressionReader<T>
         Operand3,
     }
 
-    static class ParsingContext
+    private static class ParsingContext
     {
         StringBuilder workingBuffer = new StringBuilder();
         public Mode mode = Mode.Operand1;
@@ -55,7 +55,6 @@ public class PatternMatchingExpressionReader<T>
     }
 
     private ExpressionOperand parse(StringReader reader) throws IOException {
-        int chInt = -2;
         final ParsingContext ctx = new ParsingContext();
 
         Action finalizeOperand3 = () -> {
@@ -123,6 +122,7 @@ public class PatternMatchingExpressionReader<T>
             ctx.workingBuffer = new StringBuilder();
         };
 
+        int chInt = -2;
         while (chInt != -1) {
             chInt = reader.read();
             char ch = (char)chInt;
