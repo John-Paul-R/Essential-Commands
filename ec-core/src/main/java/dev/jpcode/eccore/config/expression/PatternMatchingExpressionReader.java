@@ -51,6 +51,10 @@ public class PatternMatchingExpressionReader<T>
     }
 
     public ExpressionOperand readExpression() throws IOException {
+        return parse(this.reader);
+    }
+
+    private ExpressionOperand parse(StringReader reader) throws IOException {
         int chInt = -2;
         final ParsingContext ctx = new ParsingContext();
 
@@ -131,7 +135,7 @@ public class PatternMatchingExpressionReader<T>
                     tokenEnd.execute();
                 }
                 case '(' -> { // begin group
-                    var parsedGroup = new PatternMatchingExpressionReader<>(reader, operandParser).readExpression();
+                    var parsedGroup = parse(reader);
                     switch (ctx.mode) {
                         case Operand1 -> {ctx.operand1 = parsedGroup; ctx.mode = Mode.Operator1;}
                         case Operand2 -> {ctx.operand2 = parsedGroup; ctx.mode = Mode.Operator2;}
@@ -149,6 +153,7 @@ public class PatternMatchingExpressionReader<T>
 
         return fullFinalize.get();
     }
+
 
     private ValueExpression<T> readValueExpression(String str) {
         return new ValueExpression<>(this.operandParser.apply(str));
