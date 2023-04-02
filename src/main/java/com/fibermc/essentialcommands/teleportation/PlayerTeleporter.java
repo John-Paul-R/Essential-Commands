@@ -3,13 +3,14 @@ package com.fibermc.essentialcommands.teleportation;
 import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
-import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 
 import dev.jpcode.eccore.util.TextUtil;
+
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -26,7 +27,7 @@ public final class PlayerTeleporter {
 //            //send TP request to tpManager
 //        }
         if (playerHasTpRulesBypass(player, ECPerms.Registry.bypass_teleport_delay) || CONFIG.TELEPORT_DELAY_TICKS <= 0) {
-            teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
+            teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest(), queuedTeleport.getDestName());
         } else {
             TeleportManager.getInstance().queueTeleport(queuedTeleport);
         }
@@ -38,10 +39,10 @@ public final class PlayerTeleporter {
 
     public static void teleport(QueuedTeleport queuedTeleport) {
         queuedTeleport.complete();
-        teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest());
+        teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest(), queuedTeleport.getDestName());
     }
 
-    public static void teleport(PlayerData pData, MinecraftLocation dest) { //forceTeleport
+    public static void teleport(PlayerData pData, MinecraftLocation dest, MutableText destName) { //forceTeleport
         ServerPlayerEntity player = pData.getPlayer();
 
         // If teleporting between dimensions is disabled and player doesn't have TP rules override
@@ -54,14 +55,10 @@ public final class PlayerTeleporter {
             }
         }
 
-        execTeleport(player, dest);
+        execTeleport(player, dest, destName);
     }
 
-    public static void teleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
-        teleport(((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData(), dest);
-    }
-
-    private static void execTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest) {
+    private static void execTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
         playerEntity.teleport(
             playerEntity.getServer().getWorld(dest.dim()),
             dest.pos().x, dest.pos().y, dest.pos().z,
@@ -73,8 +70,14 @@ public final class PlayerTeleporter {
         playerAccess.ec$getPlayerData().sendMessage(
             "teleport.done",
             playerProfile.shouldPrintTeleportCoordinates()
-                ? dest.toText(playerProfile)
-                : TextUtil.literal("destination").setStyle(playerProfile.getStyle(TextFormatType.Default))
+                ? TextUtil.join(
+                    new Text[]{
+                        destName,
+                        dest.toText(playerProfile)
+                    },
+                    TextUtil.literal(" ")
+                )
+                : destName
         );
     }
 

@@ -1,14 +1,8 @@
 package com.fibermc.essentialcommands.types;
 
-import com.fibermc.essentialcommands.playerdata.PlayerProfile;
-import com.fibermc.essentialcommands.text.TextFormatType;
-
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-
-import dev.jpcode.eccore.util.TextUtil;
 
 public class NamedMinecraftLocation extends MinecraftLocation {
     private String name;
@@ -54,16 +48,5 @@ public class NamedMinecraftLocation extends MinecraftLocation {
 
     public String getName() {
         return name;
-    }
-
-    @Override
-    public Text toText(PlayerProfile playerProfile) {
-        return TextUtil.join(
-            new Text[]{
-                TextUtil.literal(name),
-                toLiteralTextSimple(),
-            },
-            TextUtil.literal(" ")
-        ).setStyle(playerProfile.getStyle(TextFormatType.Accent));
     }
 }
