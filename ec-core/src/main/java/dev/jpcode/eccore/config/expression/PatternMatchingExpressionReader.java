@@ -19,7 +19,7 @@ public class PatternMatchingExpressionReader<T>
         this.operandParser = operandParser;
     }
 
-    public static <T2> Expression parse(String str, Function<String, T2> operandParser) {
+    public static <T2> Expression<T2> parse(String str, Function<String, T2> operandParser) {
         try {
             return new PatternMatchingExpressionReader<>(str, operandParser).readExpression();
         } catch (IOException e) {
@@ -40,11 +40,11 @@ public class PatternMatchingExpressionReader<T>
     {
         StringBuilder workingBuffer = new StringBuilder();
         public Mode mode = Mode.Operand1;
-        public Expression operand1 = null;
+        public Expression<T> operand1 = null;
         public LogicalOperator operator1 = null;
-        public Expression operand2 = null;
+        public Expression<T> operand2 = null;
         public LogicalOperator operator2 = null;
-        public Expression operand3 = null;
+        public Expression<T> operand3 = null;
 
         public void finalizeOperand3() {
             // do nothing if operator2 is null;
@@ -53,17 +53,16 @@ public class PatternMatchingExpressionReader<T>
             }
             switch (this.operator2) {
                 case AND -> {
-                    this.operand2 = new BinaryExpression<T>(
+                    this.operand2 = new BinaryExpression<>(
                         this.operand2,
                         this.operand3,
                         this.operator2
                     );
                     this.operand3 = null;
                     this.operator2 = null;
-                    this.mode = Mode.Operator2;
                 }
                 case OR -> {
-                    this.operand1 = new BinaryExpression<T>(
+                    this.operand1 = new BinaryExpression<>(
                         this.operand1,
                         this.operand2,
                         this.operator1
@@ -73,16 +72,16 @@ public class PatternMatchingExpressionReader<T>
                     this.operator2 = null;
                     this.operand2 = this.operand3;
                     this.operand3 = null;
-                    this.mode = Mode.Operator1;
                 }
             }
+            this.mode = Mode.Operator2;
         }
 
-        public Expression fullFinalize() {
+        public Expression<T> fullFinalize() {
             finalizeOperand3();
 
             if (this.operand2 != null) {
-                this.operand1 = new BinaryExpression<T>(
+                this.operand1 = new BinaryExpression<>(
                     this.operand1,
                     this.operand2,
                     this.operator1
@@ -93,6 +92,9 @@ public class PatternMatchingExpressionReader<T>
         }
 
         private void tokenEnd() {
+            if (workingBuffer.isEmpty()) {
+                return;
+            }
             switch (this.mode) {
                 case Operand1 -> {
                     this.operand1 = readValueExpression(this.workingBuffer.toString());
@@ -120,25 +122,19 @@ public class PatternMatchingExpressionReader<T>
 
     }
 
-    public Expression readExpression() throws IOException {
+    public Expression<T> readExpression() throws IOException {
         return parse(this.reader);
     }
 
-    private Expression parse(StringReader reader) throws IOException {
+    private Expression<T> parse(StringReader reader) throws IOException {
         final ParsingContext ctx = new ParsingContext();
 
-        int chInt = -2;
-        while (chInt != -1) {
-            chInt = reader.read();
+        int chInt;
+        while ((chInt = reader.read()) != -1) {
             char ch = (char)chInt;
 
             switch (ch) {
-                case ' ' -> {
-                    if (ctx.workingBuffer.isEmpty()) {
-                        continue;
-                    }
-                    ctx.tokenEnd();
-                }
+                case ' ' -> ctx.tokenEnd();
                 case '(' -> { // begin group
                     var parsedGroup = parse(reader);
                     switch (ctx.mode) {
@@ -156,6 +152,7 @@ public class PatternMatchingExpressionReader<T>
             }
         }
 
+        ctx.tokenEnd();
         return ctx.fullFinalize();
     }
 

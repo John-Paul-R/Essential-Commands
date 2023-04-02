@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 public record BinaryExpression<TOperand>(
-    Expression left,
-    Expression right,
+    Expression<TOperand> left,
+    Expression<TOperand> right,
     LogicalOperator op
-) implements Expression {
+) implements Expression<TOperand> {
 
     public static <TOperand2> BinaryExpression<TOperand2>
     parse(String str, Function<String, TOperand2> operandParser) {
@@ -31,4 +31,11 @@ public record BinaryExpression<TOperand>(
         return "(%s %s %s)".formatted(left.serialize(), op, right.serialize());
     }
 
+    @Override
+    public boolean matches(ExpressionEvaluationContext<TOperand> context) {
+        return switch (op) {
+            case OR -> left.matches(context) || right.matches(context);
+            case AND -> left.matches(context) && right.matches(context);
+        };
+    }
 }

@@ -19,4 +19,34 @@ public class ParsingTests {
         assertEquals("(1 OR (2 AND (3 OR 4)))", outStr);
     }
 
+    private enum PlayerProperties
+    {
+        IsFast,
+        CanHighJump,
+        IsAncient,
+        CanFly,
+        IsInvisible,
+        IsLarge,
+    }
+
+    @Test
+    void PatternMatchingExpressionReader_matches_matchesCorrectly() {
+        String isLegendaryExpression = "CanFly AND IsInvisible OR IsLarge AND IsAncient";
+
+        var expression = PatternMatchingExpressionReader.parse(isLegendaryExpression, PlayerProperties::valueOf);
+
+        var playerPropertiesContext = CollectionExpressionEvaluationContext.from(
+            PlayerProperties.IsAncient,
+            PlayerProperties.IsLarge
+        );
+
+        var outStr = expression.serialize();
+        assertEquals("((CanFly AND IsInvisible) OR (IsLarge AND IsAncient))", outStr);
+
+        var playerIsLegandary = expression.matches(playerPropertiesContext);
+
+        assertEquals(true, playerIsLegandary);
+
+    }
+
 }
