@@ -27,6 +27,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
+import dev.jpcode.eccore.config.expression.ExpressionEvaluationContext;
+
 import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
@@ -164,10 +166,28 @@ public class PlayerDataManager {
         newPlayerAccess.ec$setProfile(profile);
 
         var spawnLoc = spawnLocOpt.get();
-        if (CONFIG.RESPAWN_AT_EC_SPAWN == RespawnCondition.Always
-            || CONFIG.RESPAWN_AT_EC_SPAWN == RespawnCondition.SameWorld
-                && oldPlayerEntity.getWorld().getRegistryKey() == spawnLoc.dim()
-        ) {
+
+        ExpressionEvaluationContext<RespawnCondition> ctx = new ExpressionEvaluationContext<>() {
+            private boolean isSameWorld() {
+                return oldPlayerEntity.getWorld().getRegistryKey() == spawnLoc.dim();
+            }
+
+            private boolean hasNoBed() {
+                var vanillaPlayerSpawnPoint = newPlayerEntity.getSpawnPointPosition();
+                return vanillaPlayerSpawnPoint == null;
+            }
+
+            @Override
+            public boolean matches(RespawnCondition condition) {
+                return switch (condition) {
+                    case Always -> true;
+                    case SameWorld -> isSameWorld();
+                    case NoBed -> hasNoBed();
+                };
+            }
+        };
+
+        if (CONFIG.RESPAWN_AT_EC_SPAWN.matches(ctx)) {
             // respawn at spawn loc
             // This event handler executes just before the player is truly respawned, so we can just
             // modify the entity's location to achieve this.

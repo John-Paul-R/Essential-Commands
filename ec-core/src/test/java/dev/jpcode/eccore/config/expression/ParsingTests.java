@@ -49,4 +49,22 @@ public class ParsingTests {
 
     }
 
+    @Test
+    void Expression_empty_doesNotMatch() {
+        var expression = Expression.<PlayerProperties>empty();
+
+        var playerPropertiesContext = CollectionExpressionEvaluationContext.from(
+            PlayerProperties.IsAncient,
+            PlayerProperties.IsLarge
+        );
+
+        var outStr = expression.serialize();
+        assertEquals("", outStr);
+
+        var playerIsLegandary = expression.matches(playerPropertiesContext);
+
+        assertEquals(false, playerIsLegandary);
+
+    }
+
 }
