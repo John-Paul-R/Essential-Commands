@@ -20,6 +20,9 @@ public class PatternMatchingExpressionReader<T>
     }
 
     public static <T2> Expression<T2> parse(String str, Function<String, T2> operandParser) {
+        if (str.isBlank()) {
+            return Expression.empty();
+        }
         try {
             return new PatternMatchingExpressionReader<>(str, operandParser).readExpression();
         } catch (IOException e) {
