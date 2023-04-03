@@ -85,7 +85,7 @@ public class EssentialsConvertor {
                             Map<String, Map<String, Object>> homesMap = (Map<String, Map<String, Object>>) data.get("homes");
                             for (Map.Entry<String, Map<String, Object>> entry : homesMap.entrySet()) {
                                 ServerWorld world = worldMap.get(COMPARISON_TABLE.get((String) entry.getValue().get("world-name")));
-                                ServerPlayerEntity player = new ServerPlayerEntity(server, world, playerProfile);
+                                ServerPlayerEntity player = new ServerPlayerEntity(server, world, playerProfile, null);
 
                                 PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
 

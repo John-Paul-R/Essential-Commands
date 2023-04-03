@@ -30,7 +30,7 @@ public abstract class PlayerManagerMixin {
             value = "INVOKE",
             // We inject right after the vanilla player join message is sent. Mostly to ensure LuckPerms permissions are
             // loaded (for role styling in EC MOTD).
-            target = "Lnet/minecraft/server/PlayerManager;sendToAll(Lnet/minecraft/network/packet/Packet;)V"
+            target = "Lnet/minecraft/server/PlayerManager;sendToAll(Lnet/minecraft/network/Packet;)V"
         )
     )
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo callbackInfo) {

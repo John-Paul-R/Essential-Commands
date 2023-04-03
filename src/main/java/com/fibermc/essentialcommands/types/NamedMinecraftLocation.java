@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands.types;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public class NamedMinecraftLocation extends MinecraftLocation {

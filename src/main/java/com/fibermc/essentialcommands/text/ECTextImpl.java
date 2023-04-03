@@ -9,7 +9,7 @@ import eu.pb4.placeholders.api.*;
 import eu.pb4.placeholders.api.node.TextNode;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.text.TextVisitFactory;
+import net.minecraft.client.font.TextVisitFactory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.*;
 

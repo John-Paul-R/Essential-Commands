@@ -104,7 +104,7 @@ public class PlayerDataManager {
                 ).filter(Objects::nonNull).collect(Collectors.toSet());
 
                 server.getPlayerManager().sendToAll(new PlayerListS2CPacket(
-                    EnumSet.of(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME),
+                    PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME,
                     allChangedNicknamePlayers
                 ));
 
