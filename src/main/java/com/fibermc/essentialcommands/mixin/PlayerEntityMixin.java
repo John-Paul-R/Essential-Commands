@@ -29,6 +29,9 @@ public abstract class PlayerEntityMixin {
         at = @At("STORE"),
         ordinal = 0)
     public MutableText injected(MutableText teamDecoratedName) {
+        if (!CONFIG.ENABLE_NICK) {
+            return teamDecoratedName;
+        }
         // Verify that this is a ServerPlayerEntity instance.
         if (!ServerPlayerEntity.class.isAssignableFrom(this.getClass())) {
             // I *think* this check is correct, but frankly am not sure.
