@@ -16,6 +16,7 @@ import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
+import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.util.IConsumer;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -32,8 +33,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
-import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import static com.fibermc.essentialcommands.EssentialCommands.*;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -68,7 +68,9 @@ public final class EssentialCommandRegistry {
         var excludedTopLevelCommands = new HashSet<>(CONFIG.EXCLUDED_TOP_LEVEL_COMMANDS);
         IConsumer<LiteralCommandNode<ServerCommandSource>> registerNode = CONFIG.REGISTER_TOP_LEVEL_COMMANDS
             ? (node) -> {
-                if (!excludedTopLevelCommands.contains(node.getLiteral())) {
+                if (excludedTopLevelCommands.contains(node.getLiteral())) {
+                    excludedTopLevelCommands.remove(node.getLiteral());
+                } else {
                     rootNode.addChild(node);
                 }
                 essentialCommandsRootNode.addChild(node);
@@ -551,6 +553,10 @@ public final class EssentialCommandRegistry {
         }
 
         rootNode.addChild(essentialCommandsRootNode);
+
+        if (!excludedTopLevelCommands.isEmpty() && CONFIG.REGISTER_TOP_LEVEL_COMMANDS) {
+            EssentialCommands.log(Level.ERROR, "The following commands were set to be excluded but don't exist: " + excludedTopLevelCommands);
+        }
     }
 
 }
