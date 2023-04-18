@@ -180,6 +180,7 @@ public class PlayerDataManager {
             @Override
             public boolean matches(RespawnCondition condition) {
                 return switch (condition) {
+                    case Never -> false;
                     case Always -> true;
                     case SameWorld -> isSameWorld();
                     case NoBed -> hasNoBed();
