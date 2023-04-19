@@ -124,6 +124,7 @@ public final class EssentialCommandRegistry {
 
             homeSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
+                .executes(new HomeSetCommand()::runDefault)
                 .then(argument("home_name", StringArgumentType.word())
                     .executes(new HomeSetCommand()));
 
