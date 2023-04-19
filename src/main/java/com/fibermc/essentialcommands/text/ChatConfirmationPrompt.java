@@ -39,7 +39,7 @@ public final class ChatConfirmationPrompt {
                                   MutableText confirmText,
                                   MutableText denyText) {
         this.player = player;
-        this.text = (MutableText) TextUtil.spaceBetween(
+        this.text = TextUtil.spaceBetween(
             new Text[]{
                 confirmText.setStyle(
                     confirmText.getStyle().withClickEvent(new ClickEvent(
@@ -53,6 +53,15 @@ public final class ChatConfirmationPrompt {
             64,
             14
         );
+    }
+
+    public ChatConfirmationPrompt(ServerPlayerEntity player,
+                                  String commandStr,
+                                  MutableText text) {
+        this.player = player;
+        this.text = Text.literal(" ".repeat(15)).append(
+            text.setStyle(text.getStyle().withClickEvent(
+                new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandStr))));
     }
 
     public void send() {
