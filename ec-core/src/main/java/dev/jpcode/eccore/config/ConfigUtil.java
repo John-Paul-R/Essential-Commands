@@ -121,8 +121,15 @@ public final class ConfigUtil {
     }
 
     public static <T> List<T> parseCsv(@NotNull String csvString, @NotNull ValueParser<T> valueParser) {
-        return Arrays.stream(csvString.split(",")).sequential().map(String::trim)
-            .map(valueParser::parseValue).collect(Collectors.toList());
+        if (csvString.isBlank()) {
+            return List.of();
+        }
+
+        return Arrays.stream(csvString.split(","))
+            .sequential()
+            .map(String::trim)
+            .map(valueParser::parseValue)
+            .collect(Collectors.toList());
     }
 
     @Contract(pure = true)
