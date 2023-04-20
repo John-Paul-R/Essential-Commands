@@ -119,9 +119,11 @@ public final class EssentialCommandRegistry {
             LiteralArgumentBuilder<ServerCommandSource> homeDeleteBuilder = CommandManager.literal("delete");
             LiteralArgumentBuilder<ServerCommandSource> homeListBuilder = CommandManager.literal("list");
             LiteralArgumentBuilder<ServerCommandSource> homeListOfflineBuilder = CommandManager.literal("list_offline");
+            LiteralArgumentBuilder<ServerCommandSource> homeOverwriteBuilder = CommandManager.literal("overwritehome");
 
             homeSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
+                .executes(new HomeSetCommand()::runDefault)
                 .then(argument("home_name", StringArgumentType.word())
                     .executes(new HomeSetCommand()));
 
@@ -163,6 +165,11 @@ public final class EssentialCommandRegistry {
                 .then(argument("target_player", StringArgumentType.word())
                     .executes(HomeTeleportOtherCommand::runListOffline));
 
+            homeOverwriteBuilder
+                .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
+                .then(argument("home_name", StringArgumentType.word())
+                .executes(new HomeOverwriteCommand()));
+
             LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder
                 .requires(ECPerms.requireAny(ECPerms.Registry.Group.home_group, 0))
                 .build();
@@ -175,6 +182,8 @@ public final class EssentialCommandRegistry {
             homeNode.addChild(homeListOfflineBuilder.build());
 
             registerNode.accept(homeNode);
+
+            essentialCommandsRootNode.addChild(homeOverwriteBuilder.build());
         }
 
         //Back
