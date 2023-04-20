@@ -2,9 +2,16 @@ package com.fibermc.essentialcommands.types;
 
 import java.util.HashMap;
 
+import com.fibermc.essentialcommands.commands.CommandUtil;
+import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.text.Text;
 
 public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation> implements NbtSerializable {
 
@@ -39,12 +46,17 @@ public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation
         }
     }
 
-    public MinecraftLocation putCommand(String name, MinecraftLocation location) {
+    public MinecraftLocation putCommand(String name, MinecraftLocation location) throws CommandSyntaxException {
         return putCommand(name, new NamedMinecraftLocation(location, name));
     }
 
-    private MinecraftLocation putCommand(String name, NamedMinecraftLocation location) {
-        return super.put(name, location);
+    private MinecraftLocation putCommand(String name, NamedMinecraftLocation location) throws CommandSyntaxException {
+        if (this.get(name) == null) {
+            return super.put(name, location);
+        } else {
+            throw CommandUtil.createSimpleException(
+                ECText.getInstance().getText("cmd.home.set.error.exists", TextFormatType.Error, Text.literal(name)));
+        }
     }
 
 }
