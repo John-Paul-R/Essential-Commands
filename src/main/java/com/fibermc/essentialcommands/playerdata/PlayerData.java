@@ -157,6 +157,10 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         }
     }
 
+    public boolean existsHome(String homeName) {
+        return homes.containsKey(homeName);
+    }
+
     public void sendCommandFeedback(Text text) {
         this.player.getCommandSource().sendFeedback(text, CONFIG.BROADCAST_TO_OPS);
     }
