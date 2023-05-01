@@ -20,7 +20,7 @@ public class HomeOverwriteCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         String homeName = StringArgumentType.getString(context, "home_name");
         ServerCommandSource source = context.getSource();
-        ServerPlayerEntity senderPlayer = source.getPlayerOrThrow();
+        ServerPlayerEntity senderPlayer = source.getPlayer();
         PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
 
         var homeNameText = ECText.access(senderPlayer).accent(homeName);

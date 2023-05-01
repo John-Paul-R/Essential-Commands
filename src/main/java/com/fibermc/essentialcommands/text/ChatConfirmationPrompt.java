@@ -59,7 +59,7 @@ public final class ChatConfirmationPrompt {
                                   String commandStr,
                                   MutableText text) {
         this.player = player;
-        this.text = Text.literal(" ".repeat(15)).append(
+        this.text = TextUtil.literal(" ".repeat(15)).append(
             text.setStyle(text.getStyle().withClickEvent(
                 new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandStr))));
     }
