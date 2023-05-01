@@ -1,5 +1,5 @@
 {
-  "cmd.back.error.no_prev_location": "이전 위치를 확인할 수 없어 'back' 명령어를 실행할 수 없습니다.",
+  "cmd.back.error.no_prev_location": "이전 위치를 확인할 수 없어 '/back' 명령어를 실행할 수 없습니다.",
   "cmd.back.location_name": "이전 위치",
   "cmd.enderchest.feedback": "엔더 상자를 열었습니다",
   "cmd.enderchest.container_ui_name": "EC 엔더 상자",
@@ -55,7 +55,7 @@
   "cmd.day.feedback": "낮으로 시간을 지정했습니다.",
   "cmd.afk.error.in_combat": "전투 중엔 잠수를 할 수 없습니다.",
   "rules.reload.success": "규칙 파일이 리로드 되었습니다.",
-  "cmd.rules.reload.error.unexpected": "규칙 파일을 로드하던 중 예기치 못한 오류가 발생했습니다. T서버 콘솔에 추가적인 정보가 있을 것입니다.",
+  "cmd.rules.reload.error.unexpected": "규칙 파일을 로드하던 중 예기치 못한 오류가 발생했습니다. 서버 콘솔에 추가적인 정보가 있을 것입니다.",
   "cmd.bed.error.none_set":  "유저 스폰포인트가 지정되지 않았습니다.",
   "cmd.bed.bed_destination_name":  "침대",
 
@@ -75,7 +75,7 @@
   "teleport.interrupted.damage": "순간이동에 실패하였습니다. 사유: 데미지 받음",
   "teleport.interruped.moved": "순간이동에 실패하였습니다. 사유: 이동",
   "teleport.request.expired.sender": "${0}에 대한 순간이동이 만료되었습니다.",
-  "teleport.request.expired.receiver":  "${0}으로부터의 순간이동이 만료되었습니다.",
+  "teleport.request.expired.receiver": "${0}으로부터의 순간이동이 만료되었습니다.",
   "teleport.request.canceled_by_new": "'${0}'으로의 순간이동 대기가 취소되었습니다. 사유: '${1}으로의 순간이동 시작!",
 
   "generic.argument.target_player": "",
