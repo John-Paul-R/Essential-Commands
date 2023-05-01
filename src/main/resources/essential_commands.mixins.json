@@ -5,7 +5,6 @@
   "mixins": [
     "PersistentStateManagerInvoker",
     "PlayerEntityMixin",
-    "PlayerListS2CPacketActionMixin",
     "PlayerManagerMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin",
