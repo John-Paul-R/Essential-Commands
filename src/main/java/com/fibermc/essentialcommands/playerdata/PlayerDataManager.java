@@ -2,7 +2,6 @@ package com.fibermc.essentialcommands.playerdata;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,7 +13,6 @@ import com.fibermc.essentialcommands.types.RespawnCondition;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.TextParserUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.damage.DamageSource;
@@ -40,7 +38,7 @@ public class PlayerDataManager {
     private final ConcurrentHashMap<UUID, PlayerData> dataMap;
     private final List<PlayerData> changedNicknames;
     private final List<String> changedTeams;
-    private final List<ServerTask> nextTickTasks;
+    private final List<Runnable> nextTickTasks;
     private static PlayerDataManager instance;
 
     public PlayerDataManager() {
@@ -83,7 +81,6 @@ public class PlayerDataManager {
     public static boolean exists() {
         return instance != null;
     }
-
     public static PlayerDataManager getInstance() {
         return instance != null ? instance : new PlayerDataManager();
     }
@@ -94,18 +91,6 @@ public class PlayerDataManager {
 
     public void markNicknameDirty(String playerName) {
         changedTeams.add(playerName);
-    }
-
-    public void queueNicknameUpdatesForAllPlayers() {
-        scheduleTask("nickname-update", server -> {
-            server.getPlayerManager().sendToAll(new PlayerListS2CPacket(
-                EnumSet.of(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME),
-                this.getAllPlayerData().stream()
-                    .filter(pd -> pd.getNickname().isPresent())
-                    .map(PlayerData::getPlayer)
-                    .toList()
-            ));
-        });
     }
 
     public void tick(MinecraftServer server) {
@@ -131,9 +116,9 @@ public class PlayerDataManager {
         }
 
         if (!nextTickTasks.isEmpty()) {
-            var tasks = nextTickTasks.listIterator();
+            Iterator<Runnable> tasks = nextTickTasks.listIterator();
             while (tasks.hasNext()) {
-                tasks.next().task().accept(server);
+                tasks.next().run();
                 tasks.remove();
             }
         }
@@ -144,19 +129,7 @@ public class PlayerDataManager {
     }
 
     public void scheduleTask(Runnable task) {
-        this.nextTickTasks.add(ServerTask.of(null, task));
-    }
-
-    public void scheduleTask(Consumer<MinecraftServer> task) {
-        this.nextTickTasks.add(ServerTask.of(null, task));
-    }
-
-    public void scheduleTask(@NotNull String id, Consumer<MinecraftServer> task) {
-        // When id provided, avoid duplicates on id
-        if (nextTickTasks.stream().anyMatch(existingTask -> id.equals(existingTask.id()))) {
-            return;
-        }
-        this.nextTickTasks.add(ServerTask.of(id, task));
+        this.nextTickTasks.add(task);
     }
 
     // EVENTS
