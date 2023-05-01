@@ -52,7 +52,6 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean OPS_BYPASS_TELEPORT_RULES;
     public final boolean NICKNAMES_IN_PLAYER_LIST;
     public final int NICKNAME_MAX_LENGTH;
-    public final boolean NICKNAME_ABOVE_HEAD;
     public final int RTP_RADIUS;
     public final int RTP_MIN_RADIUS;
     public final int RTP_COOLDOWN;
@@ -112,7 +111,6 @@ public final class EssentialCommandsConfigSnapshot {
         this.OPS_BYPASS_TELEPORT_RULES          = config.OPS_BYPASS_TELEPORT_RULES.getValue();
         this.NICKNAMES_IN_PLAYER_LIST           = config.NICKNAMES_IN_PLAYER_LIST.getValue();
         this.NICKNAME_MAX_LENGTH                = config.NICKNAME_MAX_LENGTH.getValue();
-        this.NICKNAME_ABOVE_HEAD                = config.NICKNAME_ABOVE_HEAD.getValue();
         this.RTP_RADIUS                         = config.RTP_RADIUS.getValue();
         this.RTP_MIN_RADIUS                     = config.RTP_MIN_RADIUS.getValue();
         this.RTP_COOLDOWN                       = config.RTP_COOLDOWN.getValue();
