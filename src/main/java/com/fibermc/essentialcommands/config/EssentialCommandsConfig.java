@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.List;
 
 import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,6 +68,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> OPS_BYPASS_TELEPORT_RULES =  new Option<>("ops_bypass_teleport_rules", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICKNAMES_IN_PLAYER_LIST =   new Option<>("nicknames_in_player_list", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> NICKNAME_MAX_LENGTH =    new Option<>("nickname_max_length", 32, ConfigUtil::parseInt);
+    @ConfigOption public final Option<Boolean> NICKNAME_ABOVE_HEAD =    new Option<>("nickname_above_head", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> RTP_RADIUS =             new Option<>("rtp_radius", 1000, ConfigUtil::parseInt);
     @ConfigOption public final Option<Integer> RTP_MIN_RADIUS =         new Option<>("rtp_min_radius", RTP_RADIUS.getValue(), (String s) -> parseIntOrDefault(s, RTP_RADIUS.getValue()));
     @ConfigOption public final Option<Integer> RTP_COOLDOWN =           new Option<>("rtp_cooldown", 30, ConfigUtil::parseInt);
@@ -82,7 +84,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Integer> AUTO_AFK_TICKS = new Option<>("auto_afk_time", durationToTicks(Duration.ofMinutes(15)), ConfigUtil::parseDurationToTicks, ConfigUtil::serializeTicksAsDuration);
     @ConfigOption public final Option<Boolean> REGISTER_TOP_LEVEL_COMMANDS = new Option<>("register_top_level_commands", true, Boolean::parseBoolean);
     @ConfigOption public final Option<List<String>> EXCLUDED_TOP_LEVEL_COMMANDS = new Option<>("excluded_top_level_commands", List.of(), ConfigUtil.arrayParser(Object::toString));
-    @ConfigOption public final Option<Expression<RespawnCondition>> RESPAWN_AT_EC_SPAWN = new Option<>("respawn_at_ec_spawn", Expression.empty(), (val) -> "Never".equalsIgnoreCase(val) ? Expression.empty() :PatternMatchingExpressionReader.parse(val, RespawnCondition::valueOf), Expression::serialize);
+    @ConfigOption public final Option<Expression<RespawnCondition>> RESPAWN_AT_EC_SPAWN = new Option<>("respawn_at_ec_spawn", Expression.of(RespawnCondition.Never), (str) -> str.isBlank() ? Expression.of(RespawnCondition.Never) : PatternMatchingExpressionReader.parse(str, RespawnCondition::valueOf), Expression::serialize);
     // TODO @1.0.0: Enable PERSIST_BACK_LOCATION by default
     @ConfigOption public final Option<Boolean> PERSIST_BACK_LOCATION = new Option<>("persist_back_location", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = new Option<>("recheck_player_ability_permissions_on_dimension_change", false, Boolean::parseBoolean);
@@ -92,6 +94,14 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
         HOME_LIMIT.changeEvent.register(newValue ->
                 ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue)
         );
+        // This value is only sent on server start/player connect and, so, cannot be updated for all
+        // players immediately via the config reload command without a fair bit of hackery.
+//        NICKNAME_ABOVE_HEAD.changeEvent.register(ign -> {
+//            PlayerDataManager.getInstance().queueNicknameUpdatesForAllPlayers();
+//        });
+        NICKNAMES_IN_PLAYER_LIST.changeEvent.register(ign -> {
+            PlayerDataManager.getInstance().queueNicknameUpdatesForAllPlayers();
+        });
     }
 
     public static <T> T getValueSafe(@NotNull Option<T> option, T defaultValue) {

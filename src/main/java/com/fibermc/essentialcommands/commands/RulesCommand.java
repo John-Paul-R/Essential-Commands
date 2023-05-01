@@ -46,7 +46,7 @@ public final class RulesCommand {
         EssentialCommands.LOGGER.info("Ensuring rules file exists at path: " + rulesFile.toPath());
         rulesFile.getParentFile().mkdirs();
         rulesFile.createNewFile();
-        String rulesStr = Files.readString(rulesFile.toPath());
+        String rulesStr = String.join(System.lineSeparator(), Files.readAllLines(rulesFile.toPath()));
         rulesText = TextUtil.parseText(rulesStr);
     }
 }
