@@ -110,7 +110,7 @@ Essential Commands is open-sourced software licenced under the [MIT license][lic
 
 Questions? Contact me in [my Discord server][discord].
 
-[curseforge:files]: https://www.curseforge.com/minecraft/mc-mods/essential-commands/files/all
+[curseforge:files]: https://www.curseforge.com/minecraft/mc-mods/essential-commands/files
 [modrinth:files]: https://modrinth.com/mod/essential-commands/versions
 [releases]: https://github.com/John-Paul-R/essential-commands/releases
 [license]: LICENSE
