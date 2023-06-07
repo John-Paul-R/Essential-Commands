@@ -8,12 +8,10 @@ import java.util.stream.Stream;
 
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.commands.MotdCommand;
 import com.fibermc.essentialcommands.events.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.RespawnCondition;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
-import eu.pb4.placeholders.api.TextParserUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,11 +71,7 @@ public class PlayerDataManager {
     private static void handleSendMotdForGameJoin(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
         if (CONFIG.ENABLE_MOTD) {
             var player = handler.getPlayer();
-            var message = Placeholders.parseText(
-                TextParserUtils.formatText(CONFIG.MOTD),
-                PlaceholderContext.of(player)
-            );
-            player.getCommandSource().sendFeedback(message, false);
+            MotdCommand.exec(player);
         }
     }
 

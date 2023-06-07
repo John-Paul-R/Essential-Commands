@@ -33,7 +33,8 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
-import static com.fibermc.essentialcommands.EssentialCommands.*;
+import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -479,6 +480,13 @@ public final class EssentialCommandRegistry {
                 .then(literal("reload")
                     .requires(ECPerms.require(ECPerms.Registry.rules_reload, 4))
                     .executes(RulesCommand::reloadCommand))
+                .build());
+        }
+
+        if (CONFIG.ENABLE_MOTD) {
+            registerNode.accept(CommandManager.literal("motd")
+                .requires(ECPerms.require(ECPerms.Registry.motd, 0))
+                .executes(MotdCommand::run)
                 .build());
         }
 
