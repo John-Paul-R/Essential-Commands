@@ -42,7 +42,7 @@ public class RealNameCommand implements Command<ServerCommandSource> {
             }
         }
 
-        context.getSource().sendFeedback(responseText, CONFIG.BROADCAST_TO_OPS);
+        context.getSource().sendFeedback(() -> responseText, CONFIG.BROADCAST_TO_OPS);
 
         return 0;
     }

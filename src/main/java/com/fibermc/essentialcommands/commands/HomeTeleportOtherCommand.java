@@ -99,7 +99,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
                     senderPlayerProfile
                 );
 
-                context.getSource().sendFeedback(
+                context.getSource().sendFeedback(() ->
                     suggestionText,
                     CONFIG.BROADCAST_TO_OPS
                 );

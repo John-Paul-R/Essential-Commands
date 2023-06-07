@@ -444,7 +444,7 @@ public final class EssentialCommandRegistry {
                                 context.getSource().sendError(Text.of("No player with the specified name found."));
                                 return;
                             }
-                            context.getSource().sendFeedback(
+                            context.getSource().sendFeedback(() ->
                                 Text.of(playerEntity.getPos().toString()),
                                 EssentialCommands.CONFIG.BROADCAST_TO_OPS);
                         });
@@ -500,7 +500,7 @@ public final class EssentialCommandRegistry {
                     BACKING_CONFIG.loadOrCreateProperties();
                     var player = context.getSource().getPlayer();
                     var ecText = player != null ? ECText.access(player) : ECText.getInstance();
-                    context.getSource().sendFeedback(
+                    context.getSource().sendFeedback(() -> 
                         ecText.getText("cmd.config.reload"),
                         true
                     );
@@ -512,7 +512,7 @@ public final class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.config_reload, 4))
                 .executes((context) -> {
                     BACKING_CONFIG.loadOrCreateProperties();
-                    context.getSource().sendFeedback(
+                    context.getSource().sendFeedback(() -> 
                         BACKING_CONFIG.stateAsText(),
                         false
                     );
@@ -522,9 +522,10 @@ public final class EssentialCommandRegistry {
                     .suggests(ListSuggestion.of(BACKING_CONFIG::getPublicFieldNames))
                     .executes(context -> {
                         try {
-                            context.getSource().sendFeedback(BACKING_CONFIG.getFieldValueAsText(
-                                StringArgumentType.getString(context, "config_property")
-                            ), false);
+                            Text t =  BACKING_CONFIG.getFieldValueAsText(
+                                    StringArgumentType.getString(context, "config_property"));
+                            context.getSource().sendFeedback(() -> t
+                            , false);
                         } catch (NoSuchFieldException e) {
                             e.printStackTrace();
                         }
@@ -547,7 +548,7 @@ public final class EssentialCommandRegistry {
                             mcDir.resolve("world/modplayerdata").toFile(),
                             source.getSource().getServer()
                         );
-                        source.getSource().sendFeedback(Text.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
+                        source.getSource().sendFeedback(() -> Text.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
                     } catch (NotDirectoryException | FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -562,7 +563,7 @@ public final class EssentialCommandRegistry {
                         source.getSource().getServer(),
                         mcDir.resolve("plugins/Essentials/warps").toFile()
                     );
-                    source.getSource().sendFeedback(Text.literal("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
+                    source.getSource().sendFeedback(() -> Text.literal("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
                     return 0;
                 }).build()
             );

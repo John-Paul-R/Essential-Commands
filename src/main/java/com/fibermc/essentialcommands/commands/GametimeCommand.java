@@ -26,10 +26,11 @@ public class GametimeCommand implements Command<ServerCommandSource> {
 
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        context.getSource().sendFeedback(
-            getFormattedTime(
+        Text t = getFormattedTime(
                 context.getSource().getWorld().getTimeOfDay(),
-                PlayerProfile.accessFromContextOrThrow(context)),
+                PlayerProfile.accessFromContextOrThrow(context));
+        context.getSource().sendFeedback(() -> t
+            ,
             false);
 
         return 0;

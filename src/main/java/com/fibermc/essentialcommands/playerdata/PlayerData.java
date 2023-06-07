@@ -162,7 +162,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public void sendCommandFeedback(Text text) {
-        this.player.getCommandSource().sendFeedback(text, CONFIG.BROADCAST_TO_OPS);
+        this.player.getCommandSource().sendFeedback(() -> text, CONFIG.BROADCAST_TO_OPS);
     }
 
     public void sendCommandFeedback(String messageKey, Text... args) {
