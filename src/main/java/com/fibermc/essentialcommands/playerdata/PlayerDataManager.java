@@ -50,12 +50,13 @@ public class PlayerDataManager {
     }
 
     public static void init() {
-        PlayerConnectCallback.EVENT.register(PlayerDataManager::onPlayerConnect);
-        PlayerLeaveCallback.EVENT.register(PlayerDataManager::onPlayerLeave);
-        PlayerDeathCallback.EVENT.register(PlayerDataManager::onPlayerDeath);
-        PlayerRespawnCallback.EVENT.register(PlayerDataManager::onPlayerRespawn);
+        PlayerConnectCallback.EVENT.register(PlayerDataManager::initializePlayerDataForConnect);
+        PlayerLeaveCallback.EVENT.register(PlayerDataManager::handleUnloadPlayerDataForLeave);
+        PlayerDeathCallback.EVENT.register(PlayerDataManager::handleSetPreviousLocationForDeath);
+        PlayerRespawnCallback.EVENT.register(PlayerDataManager::handlePlayerDataRespawnSync);
+        PlayerRespawnCallback.EVENT.register(PlayerDataManager::handleRespawnAtEcSpawn);
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> PlayerDataManager.getInstance().tick(server));
-        ServerPlayConnectionEvents.JOIN.register(PlayerDataManager::onPlayerConnected);
+        ServerPlayConnectionEvents.JOIN.register(PlayerDataManager::handleSendMotdForGameJoin);
     }
 
     public static final Event<PlayerDataManagerTickCallback> TICK_EVENT = EventFactory.createArrayBacked(
@@ -67,7 +68,7 @@ public class PlayerDataManager {
             }
         });
 
-    private static void onPlayerConnected(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
+    private static void handleSendMotdForGameJoin(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
         if (CONFIG.ENABLE_MOTD) {
             var player = handler.getPlayer();
             var message = PlaceholderAPI.parseText(
@@ -133,7 +134,7 @@ public class PlayerDataManager {
     }
 
     // EVENTS
-    private static void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player) {
+    private static void initializePlayerDataForConnect(ClientConnection connection, ServerPlayerEntity player) {
         var playerAccess = ((ServerPlayerEntityAccess) player);
         PlayerData playerData = getInstance().loadPlayerData(player);
         playerAccess.ec$setPlayerData(playerData);
@@ -142,18 +143,12 @@ public class PlayerDataManager {
         playerAccess.ec$getEcText();
     }
 
-    private static void onPlayerLeave(ServerPlayerEntity player) {
+    private static void handleUnloadPlayerDataForLeave(ServerPlayerEntity player) {
         // Auto-saving should be handled by WorldSaveHandlerMixin. (PlayerData saves when MC server saves players)
         getInstance().unloadPlayerData(player);
     }
 
-    private static void onPlayerRespawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
-        var worldMgr = ManagerLocator.getInstance().getWorldDataManager();
-        var spawnLocOpt = worldMgr.getSpawn();
-        if (spawnLocOpt.isEmpty()) {
-            return;
-        }
-
+    private static void handlePlayerDataRespawnSync(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
         var oldPlayerAccess = ((ServerPlayerEntityAccess) oldPlayerEntity);
         var newPlayerAccess = ((ServerPlayerEntityAccess) newPlayerEntity);
 
@@ -164,6 +159,14 @@ public class PlayerDataManager {
         PlayerProfile profile = oldPlayerAccess.ec$getProfile();
         profile.updatePlayerEntity(newPlayerEntity);
         newPlayerAccess.ec$setProfile(profile);
+    }
+
+    private static void handleRespawnAtEcSpawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
+        var worldMgr = ManagerLocator.getInstance().getWorldDataManager();
+        var spawnLocOpt = worldMgr.getSpawn();
+        if (spawnLocOpt.isEmpty()) {
+            return;
+        }
 
         var spawnLoc = spawnLocOpt.get();
 
@@ -197,7 +200,7 @@ public class PlayerDataManager {
         }
     }
 
-    private static void onPlayerDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
+    private static void handleSetPreviousLocationForDeath(ServerPlayerEntity playerEntity, DamageSource damageSource) {
         PlayerData pData = ((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData();
         if (CONFIG.ALLOW_BACK_ON_DEATH) {
             pData.setPreviousLocation(new MinecraftLocation(pData.getPlayer()));
