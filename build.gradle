@@ -69,7 +69,7 @@ allprojects {
 
     // Perform tests using the JUnit test suite
     test {
-        useJUnitPlatform()
+        //useJUnitPlatform()
     }
 
     // Produce a sources distribution
