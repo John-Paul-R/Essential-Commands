@@ -26,6 +26,6 @@ public final class MotdCommand {
             TextParserUtils.formatText(CONFIG.MOTD),
             PlaceholderContext.of(player)
         );
-        player.getCommandSource().sendFeedback(message, false);
+        player.getCommandSource().sendFeedback(() -> message, false);
     }
 }

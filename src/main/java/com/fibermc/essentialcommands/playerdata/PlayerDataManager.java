@@ -217,7 +217,7 @@ public class PlayerDataManager {
             // This event handler executes just before the player is truly respawned, so we can just
             // modify the entity's location to achieve this.
             newPlayerEntity.setPosition(spawnLoc.pos());
-            newPlayerEntity.setWorld(newPlayerEntity.getServer().getWorld(spawnLoc.dim()));
+            newPlayerEntity.setServerWorld(newPlayerEntity.getServer().getWorld(spawnLoc.dim()));
         }
     }
 

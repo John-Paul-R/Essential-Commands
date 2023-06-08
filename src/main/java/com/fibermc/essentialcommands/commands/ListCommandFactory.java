@@ -36,7 +36,7 @@ public final class ListCommandFactory {
             var styleProvider = PlayerProfile.accessFromContextOrThrow(context);
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
-            context.getSource().sendFeedback(
+            context.getSource().sendFeedback(() ->
                 getSuggestionText(responsePreText, commandExecText, suggestionsList, styleProvider),
                 CONFIG.BROADCAST_TO_OPS
             );

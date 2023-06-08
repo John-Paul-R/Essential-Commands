@@ -23,7 +23,7 @@ public final class RulesCommand {
     private static Text rulesText;
 
     public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        context.getSource().sendFeedback(rulesText, false);
+        context.getSource().sendFeedback(() -> rulesText, false);
         return 0;
     }
 

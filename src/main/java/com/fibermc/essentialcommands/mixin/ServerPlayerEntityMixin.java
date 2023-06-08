@@ -33,9 +33,6 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
 
-    @Shadow
-    public abstract ServerWorld getWorld();
-
     @Unique
     public QueuedTeleport ecQueuedTeleport;
 

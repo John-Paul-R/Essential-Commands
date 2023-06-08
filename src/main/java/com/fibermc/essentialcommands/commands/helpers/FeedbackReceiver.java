@@ -26,7 +26,7 @@ public final class FeedbackReceiver implements IFeedbackReceiver {
 
     @Override
     public void sendCommandFeedback(Text text) {
-        commandSource.sendFeedback(text, CONFIG.BROADCAST_TO_OPS);
+        commandSource.sendFeedback(() -> text, CONFIG.BROADCAST_TO_OPS);
     }
 
     @Override

@@ -17,7 +17,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -106,7 +106,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         // TODO This should be memoized. Cuts exec time in 1/2.
         BlockState targetBlockState = world.getBlockState(new BlockPos(x, y, z));
         BlockState footBlockState = world.getBlockState(new BlockPos(x, y - 1, z));
-        return targetBlockState.isAir() && footBlockState.getMaterial().isSolid();
+        return targetBlockState.isAir() && footBlockState.isSolid();
     }
 
     private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
@@ -189,8 +189,8 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             return false;
         }
 
-        var material = chunk.getBlockState(pos).getMaterial();
-        return pos.getY() < maxY.get() && !material.isLiquid() && material != Material.FIRE;
+        BlockState blockState = chunk.getBlockState(pos);
+        return pos.getY() < maxY.get() && blockState.getFluidState().isEmpty() && blockState.getBlock() != Blocks.FIRE;
     }
 
 }
