@@ -6,6 +6,7 @@ import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.events.PlayerConnectCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.events.PlayerRespawnCallback;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
 import org.spongepowered.asm.mixin.Mixin;
@@ -44,21 +45,44 @@ public abstract class PlayerManagerMixin {
         PlayerLeaveCallback.EVENT.invoker().onPlayerLeave(player);
     }
 
+    @SuppressWarnings("checkstyle:NoWhitespaceBefore")
     @Inject(method = "respawnPlayer", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/world/World;getLevelProperties()Lnet/minecraft/world/WorldProperties;"
+        // This target is near-immediately after the new ServerPlayerEntity is
+        // created. This lets us update the EC PlayerData, sooner, might be
+        // before the new ServerPlayerEntity is fully initialized.
+        target = "Lnet/minecraft/server/network/ServerPlayerEntity;copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V"
     ), locals = LocalCapture.CAPTURE_FAILHARD)
     public void onRespawnPlayer(
-        ServerPlayerEntity oldServerPlayerEntity, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir,
-        BlockPos blockPos,
-        float f,
-        boolean bl,
-        ServerWorld serverWorld,
-        Optional optional2,
-        ServerWorld serverWorld2,
-        ServerPlayerEntity serverPlayerEntity,
-        boolean bl2)
-    {
+        ServerPlayerEntity oldServerPlayerEntity, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir
+        , BlockPos blockPos
+        , float f
+        , boolean bl
+        , ServerWorld serverWorld
+        , Optional optional
+        , ServerWorld serverWorld2
+        , ServerPlayerEntity serverPlayerEntity
+    ) {
+        PlayerDataManager.handlePlayerDataRespawnSync(oldServerPlayerEntity, serverPlayerEntity);
+    }
+
+    @SuppressWarnings({"checkstyle:NoWhitespaceBefore", "checkstyle:MethodName"})
+    @Inject(method = "respawnPlayer", at = @At(
+        value = "INVOKE",
+        // This target lets us modify respawn position
+        target = "Lnet/minecraft/world/World;getLevelProperties()Lnet/minecraft/world/WorldProperties;"
+    ), locals = LocalCapture.CAPTURE_FAILHARD)
+    public void onRespawnPlayer_afterSetPosition(
+        ServerPlayerEntity oldServerPlayerEntity, boolean alive, CallbackInfoReturnable<ServerPlayerEntity> cir
+        , BlockPos blockPos
+        , float f
+        , boolean bl
+        , ServerWorld serverWorld
+        , Optional optional
+        , ServerWorld serverWorld2
+        , ServerPlayerEntity serverPlayerEntity
+    ) {
+        PlayerDataManager.handleRespawnAtEcSpawn(oldServerPlayerEntity, serverPlayerEntity);
         PlayerRespawnCallback.EVENT.invoker().onPlayerRespawn(oldServerPlayerEntity, serverPlayerEntity);
     }
 }
