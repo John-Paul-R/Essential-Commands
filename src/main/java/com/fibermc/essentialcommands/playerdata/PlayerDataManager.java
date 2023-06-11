@@ -7,7 +7,10 @@ import java.util.stream.Stream;
 
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.events.*;
+import com.fibermc.essentialcommands.events.PlayerConnectCallback;
+import com.fibermc.essentialcommands.events.PlayerDataManagerTickCallback;
+import com.fibermc.essentialcommands.events.PlayerDeathCallback;
+import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import eu.pb4.placeholders.api.PlaceholderContext;
@@ -53,8 +56,6 @@ public class PlayerDataManager {
         PlayerConnectCallback.EVENT.register(PlayerDataManager::initializePlayerDataForConnect);
         PlayerLeaveCallback.EVENT.register(PlayerDataManager::handleUnloadPlayerDataForLeave);
         PlayerDeathCallback.EVENT.register(PlayerDataManager::handleSetPreviousLocationForDeath);
-        PlayerRespawnCallback.EVENT.register(PlayerDataManager::handlePlayerDataRespawnSync);
-        PlayerRespawnCallback.EVENT.register(PlayerDataManager::handleRespawnAtEcSpawn);
         ServerTickEvents.END_SERVER_TICK.register((MinecraftServer server) -> PlayerDataManager.getInstance().tick(server));
         ServerPlayConnectionEvents.JOIN.register(PlayerDataManager::handleSendMotdForGameJoin);
     }
@@ -148,7 +149,7 @@ public class PlayerDataManager {
         getInstance().unloadPlayerData(player);
     }
 
-    private static void handlePlayerDataRespawnSync(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
+    public static void handlePlayerDataRespawnSync(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
         var oldPlayerAccess = ((ServerPlayerEntityAccess) oldPlayerEntity);
         var newPlayerAccess = ((ServerPlayerEntityAccess) newPlayerEntity);
 
@@ -161,7 +162,7 @@ public class PlayerDataManager {
         newPlayerAccess.ec$setProfile(profile);
     }
 
-    private static void handleRespawnAtEcSpawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
+    public static void handleRespawnAtEcSpawn(ServerPlayerEntity oldPlayerEntity, ServerPlayerEntity newPlayerEntity) {
         var worldMgr = ManagerLocator.getInstance().getWorldDataManager();
         var spawnLocOpt = worldMgr.getSpawn();
         if (spawnLocOpt.isEmpty()) {
