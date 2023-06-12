@@ -73,7 +73,7 @@
   "teleport.request.canceled_by_new": "傳送到 ${0} 的操作已取消。原因：新的傳送 ${1} 的操作已開始。",
 
   "generic.argument.target_player": "",
-  "generic.error.unknown": "執行指令時發生未知錯誤。执行命令时发生未知错误。",
+  "generic.error.unknown": "執行指令時發生未知錯誤。",
   "generic.enabled": "啟用",
   "generic.disabled": "停用",
   "generic.confirm": "確認",
