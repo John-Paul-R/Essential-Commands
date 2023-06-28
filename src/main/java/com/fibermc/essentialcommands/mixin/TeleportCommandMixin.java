@@ -39,7 +39,9 @@ public class TeleportCommandMixin {
             // This cast is guaranteed to work because of where we inject.
             var targetPlayer = (ServerPlayerEntity)target;
             var targetPlayerData = ((ServerPlayerEntityAccess)target).ec$getPlayerData();
-            targetPlayerData.setPreviousLocation(new MinecraftLocation(targetPlayer));
+            if (!targetPlayer.isSpectator()) {
+                targetPlayerData.setPreviousLocation(new MinecraftLocation(targetPlayer));
+            }
         }
     }
 }
