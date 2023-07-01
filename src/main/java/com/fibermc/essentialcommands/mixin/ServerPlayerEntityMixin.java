@@ -36,6 +36,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     @Shadow
     public abstract ServerWorld getWorld();
 
+    @Shadow
+    public abstract boolean isSpectator();
+
     @Unique
     public QueuedTeleport ecQueuedTeleport;
 
@@ -165,7 +168,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     // Teleport hook (for /back)
     @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDFF)V", at = @At("HEAD"))
     public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
-        this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
+        if (!isSpectator()) {
+            this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
+        }
     }
 
     @Inject(method = "enterCombat", at = @At("RETURN"))
