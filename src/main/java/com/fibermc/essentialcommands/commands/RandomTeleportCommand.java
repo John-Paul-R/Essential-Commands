@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import java.util.Optional;
 import java.util.Random;
 
 import com.fibermc.essentialcommands.EssentialCommands;
@@ -22,7 +23,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -121,17 +121,55 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             return -1;
         }
         Vec3i center = worldSpawn.get().intPos();
-        return exec(source.getPlayer(), world, center, 0);
+        return exec(source.getPlayer(), world, center);
     }
 
     private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
 
-    private static int exec(ServerPlayerEntity player, ServerWorld world, Vec3i center, int timesRun) {
+    private static int exec(ServerPlayerEntity player, ServerWorld world, Vec3i center) {
         var ecText = ECText.access(player);
-        if (timesRun > CONFIG.RTP_MAX_ATTEMPTS) {
+
+        int timesRun = 0;
+        Optional<BlockPos> pos;
+        do {
+            timesRun++;
+            pos = findRtpPosition(world, center);
+        } while (pos.isEmpty() && timesRun <= CONFIG.RTP_MAX_ATTEMPTS);
+
+        if (pos.isEmpty()) {
             return -1;
         }
+
+        // Teleport the player
+        PlayerTeleporter.requestTeleport(
+            player,
+            new MinecraftLocation(world.getRegistryKey(), pos.get(), 0, 0),
+            ecText.getText("cmd.rtp.location_name")
+        );
+
+        return 1;
+    }
+
+    private static Optional<BlockPos> findRtpPosition(ServerWorld world, Vec3i center) {
         maxY.set(world.getHeight()); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
+
+        // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
+        final BlockPos targetXZ = getRandomXZ(center);
+        final int x = targetXZ.getX();
+        final int z = targetXZ.getZ();
+        final Chunk chunk = world.getChunk(targetXZ);
+        final int y = getTop(chunk, x, z);
+
+        // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
+        //  Addressed by adding timesRun limit.
+        if (!isSafePosition(chunk, new BlockPos(x, y - 2, z))) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new BlockPos(x, y, z));
+    }
+
+    private static BlockPos getRandomXZ(Vec3i center) {
         // Calculate position on circle perimeter
         var rand = new Random();
         int r_max = CONFIG.RTP_RADIUS;
@@ -145,43 +183,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         final int new_x = center.getX() + (int) delta_x;
         final int new_z = center.getZ() + (int) delta_z;
-
-        // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
-        int new_y;
-        final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
-
-        Chunk chunk = world.getChunk(targetXZ);
-
-        boolean isSafePosition;
-
-        {
-            Stopwatch timer = Stopwatch.createStarted();
-
-            new_y = getTop(chunk, new_x, new_z);
-
-            isSafePosition = isSafePosition(chunk, new BlockPos(new_x, new_y - 2, new_z));
-
-            EssentialCommands.LOGGER.info(
-                ECText.getInstance().getText(
-                    "cmd.rtp.log.location_validate_time",
-                    Text.literal(String.valueOf(timer.stop()))
-                ).getString());
-        }
-
-        // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
-        //  Addressed by adding timesRun limit.
-        if (!isSafePosition) {
-            return exec(player, world, center, timesRun + 1);
-        }
-
-        // Teleport the player
-        PlayerTeleporter.requestTeleport(
-            player,
-            new MinecraftLocation(world.getRegistryKey(), new_x, new_y, new_z, 0, 0),
-            ecText.getText("cmd.rtp.location_name")
-        );
-
-        return 1;
+        return new BlockPos(new_x, 0, new_z);
     }
 
     private static boolean isSafePosition(Chunk chunk, BlockPos pos) {
