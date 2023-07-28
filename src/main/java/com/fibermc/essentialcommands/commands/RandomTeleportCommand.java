@@ -102,24 +102,17 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                     "Starting RTP location search for %s",
                     player.getGameProfile().getName()
                 ));
-            {
-                Stopwatch timer = Stopwatch.createStarted();
 
-                try {// this exec should be removed, and so shoudl this
-                // trycatch, prolly... I think... maybe.. depends on if the one
-                // that accepts ServerPlayerEntity _needs_ to have no feedback
-                    exec(context.getSource(), world);
-                } catch (CommandSyntaxException e) {
-                    throw new RuntimeException(e);
-                }
+            Stopwatch timer = Stopwatch.createStarted();
 
-                var totalTime = timer.stop();
-                EssentialCommands.LOGGER.info(
-                    String.format(
-                        "Total RTP Time: %s",
-                        totalTime
-                    ));
-            }
+            exec(player, world);
+
+            var totalTime = timer.stop();
+            EssentialCommands.LOGGER.info(
+                String.format(
+                    "Total RTP Time: %s",
+                    totalTime
+                ));
         });
 
         return 1;
@@ -132,25 +125,14 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return targetBlockState.isAir() && footBlockState.isSolid();
     }
 
-    private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
-        // Position relative to EC spawn locaiton.
-        var worldSpawn = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
-        if (worldSpawn.isEmpty()) {
-            ECText ecText = ECText.access(source.getPlayerOrThrow());
-            source.sendError(TextUtil.concat(
-                ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
-                ecText.getText("cmd.rtp.error.no_spawn_set", TextFormatType.Error)
-            ));
-            return -1;
-        }
-        Vec3i center = worldSpawn.get().intPos();
-        return exec(source.getPlayer(), world, center);
-    }
-
     private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
 
-    private static int exec(ServerPlayerEntity player, ServerWorld world, Vec3i center) {
-        final var ecText = ECText.access(player);
+    private static void exec(ServerPlayerEntity player, ServerWorld world) {
+        var centerOpt = getRtpCenter(player);
+        if (centerOpt.isEmpty()) {
+            return;
+        }
+        Vec3i center = centerOpt.get();
 
         final var heightFinder = HeightFindingStrategy.forWorld(world.getRegistryKey());
 
@@ -162,17 +144,30 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         } while (pos.isEmpty() && timesRun <= CONFIG.RTP_MAX_ATTEMPTS);
 
         if (pos.isEmpty()) {
-            return -1;
+            return;
         }
 
         // Teleport the player
         PlayerTeleporter.requestTeleport(
             player,
             new MinecraftLocation(world.getRegistryKey(), pos.get(), 0, 0),
-            ecText.getText("cmd.rtp.location_name")
+            ECText.access(player).getText("cmd.rtp.location_name")
         );
+    }
 
-        return 1;
+    private static Optional<Vec3i> getRtpCenter(ServerPlayerEntity player) {
+        // Position relative to EC spawn locaiton.
+        var worldSpawn = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
+        if (worldSpawn.isEmpty()) {
+            var ecText = ECText.access(player);
+            PlayerData.access(player).sendCommandError(TextUtil.concat(
+                ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
+                ecText.getText("cmd.rtp.error.no_spawn_set", TextFormatType.Error)
+            ));
+            return Optional.empty();
+        }
+
+        return Optional.of(worldSpawn.get().intPos());
     }
 
     private static Optional<BlockPos> findRtpPosition(ServerWorld world, Vec3i center, HeightFinder heightFinder) {
@@ -191,8 +186,6 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             }
             final int y = yOpt.getAsInt();
 
-            // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
-            //  Addressed by adding timesRun limit.
             if (isSafePosition(chunk, new BlockPos(x, y - 2, z))) {
                 return Optional.of(new BlockPos(x, y, z));
             }
