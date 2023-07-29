@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands.suggestions;
 
 import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.essentialcommands.types.WarpLocation;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
@@ -11,6 +12,12 @@ public final class WarpSuggestion {
 
     //Brigader Suggestions
     public static final SuggestionProvider<ServerCommandSource> STRING_SUGGESTIONS_PROVIDER
-        = ListSuggestion.of(() -> ManagerLocator.getInstance().getWorldDataManager().getWarpNames());
+        = ListSuggestion.ofContext(
+            (ctx) -> ManagerLocator.getInstance()
+                .getWorldDataManager()
+                .getAccessibleWarps(ctx.getSource().getPlayerOrThrow())
+                .map(WarpLocation::getName)
+                .toList()
+        );
 
 }

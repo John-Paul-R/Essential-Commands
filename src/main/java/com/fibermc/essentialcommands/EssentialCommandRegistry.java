@@ -14,6 +14,7 @@ import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSugges
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
 import org.apache.logging.log4j.Level;
@@ -242,7 +243,8 @@ public final class EssentialCommandRegistry {
                 .executes(ListCommandFactory.create(
                     ECText.getInstance().getString("cmd.warp.list.start"),
                     "warp tp",
-                    (context) -> ManagerLocator.getInstance().getWorldDataManager().getWarpEntries()
+                    (context) -> ManagerLocator.getInstance().getWorldDataManager().getAccessibleWarps(context.getSource().getPlayerOrThrow()).toList(),
+                    NamedMinecraftLocation::getName
                 ));
 
             LiteralCommandNode<ServerCommandSource> warpNode = warpBuilder

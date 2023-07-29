@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.WarpLocation;
@@ -21,6 +22,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.PersistentState;
 
@@ -144,6 +146,13 @@ public class WorldDataManager extends PersistentState {
 
     public List<String> getWarpNames() {
         return this.warps.keySet().stream().toList();
+    }
+
+    public Stream<WarpLocation> getAccessibleWarps(ServerPlayerEntity player) {
+        var warpsStream = this.warps.values().stream();
+        return (EssentialCommands.CONFIG.USE_PERMISSIONS_API
+            ? warpsStream.filter(loc -> loc.hasPermission(player))
+            : warpsStream);
     }
 
     public Set<Entry<String, WarpLocation>> getWarpEntries() {
