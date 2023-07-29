@@ -75,7 +75,6 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 //            ));
 //        }
 
-        //TODO Add OP/Permission bypass for RTP cooldown.
         if (CONFIG.RTP_COOLDOWN > 0 && !ECPerms.check(context.getSource(), ECPerms.Registry.bypass_randomteleport_cooldown)) {
             int curServerTickTime = context.getSource().getServer().getTicks();
             var playerData = PlayerData.access(player);
