@@ -1,11 +1,13 @@
 package com.fibermc.essentialcommands.util;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.fibermc.essentialcommands.EssentialCommands;
+import io.netty.util.CharsetUtil;
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.server.MinecraftServer;
@@ -26,4 +28,17 @@ public final class FileUtil {
         return dataDirectoryPath;
     }
 
+    static Charset[] charsetsToTry = new Charset[] {CharsetUtil.UTF_8, CharsetUtil.UTF_16};
+
+    public static String readString(Path filePath) throws IOException {
+        for (var charset : charsetsToTry) {
+            try {
+                return Files.readString(filePath, charset);
+            } catch (Exception ex) {
+                // ign
+            }
+        }
+
+        throw new IOException("Failed to read string from file: %s".formatted(filePath));
+    }
 }
