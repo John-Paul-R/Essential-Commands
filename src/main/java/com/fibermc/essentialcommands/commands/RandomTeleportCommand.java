@@ -161,7 +161,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     }
 
     private static Optional<BlockPos> findRtpPosition(ServerWorld world, Vec3i center, HeightFinder heightFinder) {
-        maxY.set(world.getHeight()); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
+        maxY.set(world.getTopY()); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
 
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
         final BlockPos targetXZ = getRandomXZ(center);

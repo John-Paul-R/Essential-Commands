@@ -76,7 +76,7 @@ public class TopCommand implements Command<ServerCommandSource> {
     }
 
     private static int calculateMaxY(Chunk chunk) {
-        final int maxY = chunk.getHeight();
+        final int maxY = chunk.getTopY();
         ChunkSection[] sections = chunk.getSectionArray();
         int maxSectionIndex = Math.min(sections.length - 1, maxY >> 4);
 
