@@ -38,6 +38,10 @@ public final class EssentialCommands implements ModInitializer {
         LOGGER.log(level, logPrefix.concat(message), args);
     }
 
+    public static void refreshConfigSnapshot() {
+        CONFIG = EssentialCommandsConfigSnapshot.create(BACKING_CONFIG);
+    }
+
     @Override
     public void onInitialize() {
         if (MOD_METADATA == null) {

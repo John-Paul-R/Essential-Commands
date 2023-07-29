@@ -67,13 +67,12 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
         ServerWorld world = context.getSource().getWorld();
         var ecText = ECText.access(player);
-        // FIXME @jp: [BEFORE MERGE] - Config option for applicable world registry keys
-//        if (world.getRegistryKey() != World.OVERWORLD) {
-//            throw new CommandException(TextUtil.concat(
-//                ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
-//                ecText.getText("cmd.rtp.error.not_overworld", TextFormatType.Error)
-//            ));
-//        }
+        if (CONFIG.RTP_ENABLED_WORLDS.contains(world.getRegistryKey())) {
+            throw new CommandException(TextUtil.concat(
+                ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
+                ecText.getText("cmd.rtp.error.not_overworld", TextFormatType.Error)
+            ));
+        }
 
         if (CONFIG.RTP_COOLDOWN > 0 && !ECPerms.check(context.getSource(), ECPerms.Registry.bypass_randomteleport_cooldown)) {
             int curServerTickTime = context.getSource().getServer().getTicks();
