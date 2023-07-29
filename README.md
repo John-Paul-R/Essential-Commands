@@ -19,7 +19,7 @@ Configurable, permissions-backed utility commands for Fabric servers.
 ## Description
 
 Essential Commands is a Minecraft (Fabric) mod that adds several simple commands to the game. \
-All commands are [configurable](https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation) and toggleable. \
+All commands are [configurable][config-docs] and toggleable. \
 The mod is purely serverside, and is not required on the client. (but it does work on singleplayer worlds).
 
 ## Permissions
@@ -66,6 +66,8 @@ See the [full List of Commands & Permissions](https://github.com/John-Paul-R/Ess
 ### Back
 
   - /back
+
+Want to teleport to where you died? Enable `allow_back_on_death` in the [config][config-docs].
 
 ### Nickname
 
@@ -115,3 +117,4 @@ Questions? Contact me in [my Discord server][discord].
 [releases]: https://github.com/John-Paul-R/essential-commands/releases
 [license]: LICENSE
 [discord]: https://discord.jpcode.dev/
+[config-docs]: https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation
