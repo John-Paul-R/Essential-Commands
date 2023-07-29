@@ -22,7 +22,7 @@
   "cmd.nickname.set.error.perms": "Player has insufficient permissions for specified nickname.",
   "cmd.nickname.set.error.length": "Length of supplied nickname (${0}) exceeded max nickname length (${1})",
   "cmd.rtp.error.pre": "Could not execute command '/rtp'. Reason: ",
-  "cmd.rtp.error.not_overworld": "Not in Overworld.",
+  "cmd.rtp.error.world_not_enabled": "RTP is not enabled in the world '${0}'",
   "cmd.rtp.error.cooldown": "Command is on cooldown. (${0} seconds remaining.)",
   "cmd.rtp.error.no_spawn_set": "Spawn not set. (RTP chooses a random location a preset distance from spawn.)",
   "cmd.rtp.location_name": "random location",

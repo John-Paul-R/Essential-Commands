@@ -29,6 +29,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
@@ -67,10 +68,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
         ServerWorld world = context.getSource().getWorld();
         var ecText = ECText.access(player);
-        if (CONFIG.RTP_ENABLED_WORLDS.contains(world.getRegistryKey())) {
+        if (!CONFIG.RTP_ENABLED_WORLDS.contains(world.getRegistryKey())) {
+            var currentWorldAsText = Text.of(world.getRegistryKey().getValue().toString());
             throw new CommandException(TextUtil.concat(
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
-                ecText.getText("cmd.rtp.error.not_overworld", TextFormatType.Error)
+                ecText.getText("cmd.rtp.error.world_not_enabled", TextFormatType.Error, currentWorldAsText)
             ));
         }
 
