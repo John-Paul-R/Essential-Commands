@@ -38,25 +38,23 @@ import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-/**
- * <p>
+/*
  * Heavily referenced from
  * https://github.com/javachaos/randomteleport/blob/master/src/main/java/net.ethermod/commands/RandomTeleportCommand.java
- * </p>
- * <p>
+ *
  * Additionally, tons of optimization tips & examples provided by @Wesley1808 on GitHub:
  * https://github.com/Wesley1808/ServerCore/issues/16
- * </p>
+ *
  */
 @SuppressWarnings("checkstyle:all")
 public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     public RandomTeleportCommand() {}
 
-    private Thread.UncaughtExceptionHandler exceptionHandler = (thread, throwable) -> {
+    private final Thread.UncaughtExceptionHandler exceptionHandler = (thread, throwable) -> {
         EssentialCommands.LOGGER.error("Exception in RTP calculator thread", throwable);
     };
-    private Executor threadExecutor = Executors.newCachedThreadPool(runnable -> {
+    private final Executor threadExecutor = Executors.newCachedThreadPool(runnable -> {
         var thread = new Thread(runnable, "RTP Location Calculator Thread");
 
         thread.setUncaughtExceptionHandler(exceptionHandler);
@@ -225,7 +223,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     public static Iterable<BlockPos.Mutable> getChunkCandidateBlocks(ChunkPos chunkPos) {
         return () -> new Iterator<>() {
             private int _idx = -1;
-            private BlockPos.Mutable _pos = new BlockPos.Mutable();
+            private final BlockPos.Mutable _pos = new BlockPos.Mutable();
 
             @Override
             public boolean hasNext() {
