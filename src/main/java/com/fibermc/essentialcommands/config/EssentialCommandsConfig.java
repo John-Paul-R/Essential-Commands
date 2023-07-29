@@ -137,7 +137,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
                     .toList();
 
                 if (invalidConfiguredWorldIds.size() > 0) {
-                    EssentialCommands.LOGGER.error("{} configured `rtp_enabled_worlds` world ids were invalid: {}", invalidConfiguredWorldIds.size(), String.join(",", invalidConfiguredWorldIds.stream().map(Identifier::toString).toList()));
+                    EssentialCommands.LOGGER.warn("{} configured `rtp_enabled_worlds` world ids were invalid: {}", invalidConfiguredWorldIds.size(), String.join(",", invalidConfiguredWorldIds.stream().map(Identifier::toString).toList()));
                 } else {
                     EssentialCommands.LOGGER.info("All configured `rtp_enabled_worlds` world ids are valid.");
                 }
