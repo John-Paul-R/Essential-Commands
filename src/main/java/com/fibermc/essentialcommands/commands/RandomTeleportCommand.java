@@ -115,7 +115,15 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return 1;
     }
 
-    private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
+    final static class ExecutionContext {
+        public final int topY;
+        public final int bottomY;
+
+        public ExecutionContext(ServerWorld world) {
+            this.topY = world.getTopY();
+            this.bottomY = world.getBottomY();
+        }
+    }
 
     private static void exec(ServerPlayerEntity player, ServerWorld world) {
         var centerOpt = getRtpCenter(player);
@@ -124,13 +132,14 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         }
         Vec3i center = centerOpt.get();
 
+        final var executionContext = new ExecutionContext(world);
         final var heightFinder = HeightFindingStrategy.forWorld(world.getRegistryKey());
 
         int timesRun = 0;
         Optional<BlockPos> pos;
         do {
             timesRun++;
-            pos = findRtpPosition(world, center, heightFinder);
+            pos = findRtpPosition(world, center, heightFinder, executionContext);
         } while (pos.isEmpty() && timesRun <= CONFIG.RTP_MAX_ATTEMPTS);
 
         if (pos.isEmpty()) {
@@ -160,9 +169,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return Optional.of(worldSpawn.get().intPos());
     }
 
-    private static Optional<BlockPos> findRtpPosition(ServerWorld world, Vec3i center, HeightFinder heightFinder) {
-        maxY.set(world.getTopY()); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
-
+    private static Optional<BlockPos> findRtpPosition(ServerWorld world, Vec3i center, HeightFinder heightFinder, ExecutionContext ctx) {
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
         final BlockPos targetXZ = getRandomXZ(center);
         final Chunk chunk = world.getChunk(targetXZ);
@@ -176,7 +183,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             }
             final int y = yOpt.getAsInt();
 
-            if (isSafePosition(chunk, new BlockPos(x, y - 2, z))) {
+            if (isSafePosition(chunk, new BlockPos(x, y - 2, z), ctx)) {
                 return Optional.of(new BlockPos(x, y, z));
             }
         }
@@ -203,13 +210,13 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return new BlockPos(new_x, 0, new_z);
     }
 
-    private static boolean isSafePosition(Chunk chunk, BlockPos pos) {
+    private static boolean isSafePosition(Chunk chunk, BlockPos pos, ExecutionContext ctx) {
         if (pos.getY() <= chunk.getBottomY()) {
             return false;
         }
 
         BlockState blockState = chunk.getBlockState(pos);
-        return pos.getY() < maxY.get() && blockState.getFluidState().isEmpty() && blockState.getBlock() != Blocks.FIRE;
+        return pos.getY() < ctx.topY && blockState.getFluidState().isEmpty() && blockState.getBlock() != Blocks.FIRE;
     }
 
     public static Iterable<BlockPos.Mutable> getChunkCandidateBlocks(ChunkPos chunkPos) {
