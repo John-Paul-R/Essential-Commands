@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.commands;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.fibermc.essentialcommands.commands.suggestions.SuggestionListProvider;
@@ -37,7 +38,25 @@ public final class ListCommandFactory {
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
             context.getSource().sendFeedback(() ->
-                getSuggestionText(responsePreText, commandExecText, suggestionsList, styleProvider),
+                getSuggestionText(responsePreText, commandExecText, suggestionsList, Entry::getKey, styleProvider),
+                CONFIG.BROADCAST_TO_OPS
+            );
+            return 0;
+        };
+    }
+
+    public static <T> Command<ServerCommandSource> create(
+        String responsePreText,
+        String commandExecText,
+        SuggestionListProvider<T> suggestionsProvider,
+        Function<T, String> nameAccessor)
+    {
+        return (CommandContext<ServerCommandSource> context) -> {
+            var styleProvider = PlayerProfile.accessFromContextOrThrow(context);
+            Collection<T> suggestionsList = suggestionsProvider.getSuggestionList(context);
+
+            context.getSource().sendFeedback(() ->
+                    getSuggestionText(responsePreText, commandExecText, suggestionsList, nameAccessor, styleProvider),
                 CONFIG.BROADCAST_TO_OPS
             );
             return 0;
@@ -47,18 +66,19 @@ public final class ListCommandFactory {
     public static <T> Text getSuggestionText(
         String responsePreText,
         String commandExecText,
-        Collection<Entry<String, T>> suggestionsList,
+        Collection<T> suggestionsList,
+        Function<T, String> nameAccessor,
         IStyleProvider styleProvider)
     {
         MutableText responseText = Text.empty()
             .append(Text.literal(responsePreText).setStyle(styleProvider.getStyle(TextFormatType.Default)));
 
         List<Text> suggestionTextList = suggestionsList.stream()
-            .map((entry) -> clickableTeleport(
-                Text.literal(entry.getKey()).setStyle(styleProvider.getStyle(TextFormatType.Accent)),
-                entry.getKey(),
-                String.format("/%s", commandExecText)
-            ))
+            .map(nameAccessor)
+            .map((name) -> clickableTeleport(
+                Text.literal(name).setStyle(styleProvider.getStyle(TextFormatType.Accent)),
+                name,
+                String.format("/%s", commandExecText)))
             .collect(Collectors.toList());
 
         if (suggestionTextList.size() > 0) {
