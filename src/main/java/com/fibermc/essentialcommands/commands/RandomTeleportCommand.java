@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.helpers.HeightFinder;
 import com.fibermc.essentialcommands.commands.helpers.HeightFindingStrategy;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
@@ -77,9 +76,8 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         //TODO Add OP/Permission bypass for RTP cooldown.
         if (CONFIG.RTP_COOLDOWN > 0) {
-            ServerCommandSource source = context.getSource();
-            int curServerTickTime = source.getServer().getTicks();
-            PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
+            int curServerTickTime = context.getSource().getServer().getTicks();
+            var playerData = PlayerData.access(player);
             var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN * 20;
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
             if (rtpCooldownRemaining > 0) {
