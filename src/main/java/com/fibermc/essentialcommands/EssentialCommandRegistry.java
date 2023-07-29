@@ -514,8 +514,8 @@ public final class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.config_reload, 4))
                 .executes((context) -> {
                     BACKING_CONFIG.loadOrCreateProperties();
-                    context.getSource().sendFeedback(() ->
-                        BACKING_CONFIG.stateAsText(),
+                    context.getSource().sendFeedback(
+                        BACKING_CONFIG::stateAsText,
                         false
                     );
                     return 1;
@@ -524,10 +524,9 @@ public final class EssentialCommandRegistry {
                     .suggests(ListSuggestion.of(BACKING_CONFIG::getPublicFieldNames))
                     .executes(context -> {
                         try {
-                            Text t =  BACKING_CONFIG.getFieldValueAsText(
-                                    StringArgumentType.getString(context, "config_property"));
-                            context.getSource().sendFeedback(() -> t
-                            , false);
+                            Text t = BACKING_CONFIG.getFieldValueAsText(
+                                StringArgumentType.getString(context, "config_property"));
+                            context.getSource().sendFeedback(() -> t, false);
                         } catch (NoSuchFieldException e) {
                             e.printStackTrace();
                         }
