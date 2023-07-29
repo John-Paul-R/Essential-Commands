@@ -1,10 +1,17 @@
 package com.fibermc.essentialcommands.commands;
 
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Random;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
+import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.commands.helpers.HeightFinder;
+import com.fibermc.essentialcommands.commands.helpers.HeightFindingStrategy;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
 import com.fibermc.essentialcommands.text.ECText;
@@ -24,47 +31,54 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-import static com.fibermc.essentialcommands.commands.TopCommand.getTop;
 
-/**
- * <p>
+/*
  * Heavily referenced from
  * https://github.com/javachaos/randomteleport/blob/master/src/main/java/net.ethermod/commands/RandomTeleportCommand.java
- * </p>
- * <p>
+ *
  * Additionally, tons of optimization tips & examples provided by @Wesley1808 on GitHub:
  * https://github.com/Wesley1808/ServerCore/issues/16
- * </p>
+ *
  */
 @SuppressWarnings("checkstyle:all")
 public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
     public RandomTeleportCommand() {}
 
+    private final Thread.UncaughtExceptionHandler exceptionHandler = (thread, throwable) -> {
+        EssentialCommands.LOGGER.error("Exception in RTP calculator thread", throwable);
+    };
+    private final Executor threadExecutor = Executors.newCachedThreadPool(runnable -> {
+        var thread = new Thread(runnable, "RTP Location Calculator Thread");
+
+        thread.setUncaughtExceptionHandler(exceptionHandler);
+
+        return thread;
+    });
+
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
         ServerWorld world = context.getSource().getWorld();
         var ecText = ECText.access(player);
-        if (!world.getRegistryKey().equals(World.OVERWORLD)) {
+        if (!CONFIG.RTP_ENABLED_WORLDS.contains(world.getRegistryKey())) {
+            var currentWorldAsText = Text.of(world.getRegistryKey().getValue().toString());
             throw new CommandException(TextUtil.concat(
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
-                ecText.getText("cmd.rtp.error.not_overworld", TextFormatType.Error)
+                ecText.getText("cmd.rtp.error.world_not_enabled", TextFormatType.Error, currentWorldAsText)
             ));
         }
 
-        //TODO Add OP/Permission bypass for RTP cooldown.
-        if (CONFIG.RTP_COOLDOWN > 0) {
-            ServerCommandSource source = context.getSource();
-            int curServerTickTime = source.getServer().getTicks();
-            PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
+        if (CONFIG.RTP_COOLDOWN > 0 && !ECPerms.check(context.getSource(), ECPerms.Registry.bypass_randomteleport_cooldown)) {
+            int curServerTickTime = context.getSource().getServer().getTicks();
+            var playerData = PlayerData.access(player);
             var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN * 20;
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
             if (rtpCooldownRemaining > 0) {
@@ -79,59 +93,107 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             playerData.setTimeUsedRtp(curServerTickTime);
         }
 
-        new Thread("RTP Location Calculator Thread") {
-            public void run() {
-                try {
-                    {
-                        Stopwatch timer = Stopwatch.createStarted();
+        threadExecutor.execute(() -> {
+            EssentialCommands.LOGGER.info(
+                String.format(
+                    "Starting RTP location search for %s",
+                    player.getGameProfile().getName()
+                ));
 
-                        exec(context.getSource(), world);
+            Stopwatch timer = Stopwatch.createStarted();
 
-                        var totalTime = timer.stop();
-                        EssentialCommands.LOGGER.info(
-                            String.format(
-                                "Total RTP Time: %s",
-                                totalTime
-                            ));
-                    }
-                } catch (CommandSyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+            exec(player, world);
+
+            var totalTime = timer.stop();
+            EssentialCommands.LOGGER.info(
+                String.format(
+                    "Total RTP Time: %s",
+                    totalTime
+                ));
+        });
+
         return 1;
     }
 
-    private static boolean isValidSpawnPosition(ServerWorld world, int x, int y, int z) {
-        // TODO This should be memoized. Cuts exec time in 1/2.
-        BlockState targetBlockState = world.getBlockState(new BlockPos(x, y, z));
-        BlockState footBlockState = world.getBlockState(new BlockPos(x, y - 1, z));
-        return targetBlockState.isAir() && footBlockState.isSolid();
+    final static class ExecutionContext {
+        public final int topY;
+        public final int bottomY;
+
+        public ExecutionContext(ServerWorld world) {
+            this.topY = world.getTopY();
+            this.bottomY = world.getBottomY();
+        }
     }
 
-    private static int exec(ServerCommandSource source, ServerWorld world) throws CommandSyntaxException {
+    private static void exec(ServerPlayerEntity player, ServerWorld world) {
+        var centerOpt = getRtpCenter(player);
+        if (centerOpt.isEmpty()) {
+            return;
+        }
+        Vec3i center = centerOpt.get();
+
+        final var executionContext = new ExecutionContext(world);
+        final var heightFinder = HeightFindingStrategy.forWorld(world.getRegistryKey());
+
+        int timesRun = 0;
+        Optional<BlockPos> pos;
+        do {
+            timesRun++;
+            pos = findRtpPosition(world, center, heightFinder, executionContext);
+        } while (pos.isEmpty() && timesRun <= CONFIG.RTP_MAX_ATTEMPTS);
+
+        if (pos.isEmpty()) {
+            return;
+        }
+
+        // Teleport the player
+        PlayerTeleporter.requestTeleport(
+            player,
+            new MinecraftLocation(world.getRegistryKey(), pos.get(), 0, 0),
+            ECText.access(player).getText("cmd.rtp.location_name")
+        );
+    }
+
+    private static Optional<Vec3i> getRtpCenter(ServerPlayerEntity player) {
         // Position relative to EC spawn locaiton.
         var worldSpawn = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
         if (worldSpawn.isEmpty()) {
-            ECText ecText = ECText.access(source.getPlayerOrThrow());
-            source.sendError(TextUtil.concat(
+            var ecText = ECText.access(player);
+            PlayerData.access(player).sendCommandError(TextUtil.concat(
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
                 ecText.getText("cmd.rtp.error.no_spawn_set", TextFormatType.Error)
             ));
-            return -1;
+            return Optional.empty();
         }
-        Vec3i center = worldSpawn.get().intPos();
-        return exec(source.getPlayer(), world, center, 0);
+
+        return Optional.of(worldSpawn.get().intPos());
     }
 
-    private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
+    private static Optional<BlockPos> findRtpPosition(ServerWorld world, Vec3i center, HeightFinder heightFinder, ExecutionContext ctx) {
+        // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
+        final BlockPos targetXZ = getRandomXZ(center);
+        final Chunk chunk = world.getChunk(targetXZ);
 
-    private static int exec(ServerPlayerEntity player, ServerWorld world, Vec3i center, int timesRun) {
-        var ecText = ECText.access(player);
-        if (timesRun > CONFIG.RTP_MAX_ATTEMPTS) {
-            return -1;
+        for (BlockPos.Mutable candidateBlock : getChunkCandidateBlocks(chunk.getPos())) {
+            final int x = candidateBlock.getX();
+            final int z = candidateBlock.getZ();
+            final OptionalInt yOpt = heightFinder.getY(chunk, x, z);
+            if (yOpt.isEmpty()) {
+                continue;
+            }
+            final int y = yOpt.getAsInt();
+
+            if (isSafePosition(chunk, new BlockPos(x, y - 2, z), ctx)) {
+                return Optional.of(new BlockPos(x, y, z));
+            }
         }
-        maxY.set(world.getHeight()); // TODO: Per-world, preset maximums (or some other mechanism of making this work in the nether)
+
+        // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
+        //  Addressed by adding timesRun limit.
+        return Optional.empty();
+    }
+
+    private static BlockPos getRandomXZ(Vec3i center) {
         // Calculate position on circle perimeter
         var rand = new Random();
         int r_max = CONFIG.RTP_RADIUS;
@@ -145,52 +207,41 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
 
         final int new_x = center.getX() + (int) delta_x;
         final int new_z = center.getZ() + (int) delta_z;
-
-        // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
-        int new_y;
-        final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
-
-        Chunk chunk = world.getChunk(targetXZ);
-
-        boolean isSafePosition;
-
-        {
-            Stopwatch timer = Stopwatch.createStarted();
-
-            new_y = getTop(chunk, new_x, new_z);
-
-            isSafePosition = isSafePosition(chunk, new BlockPos(new_x, new_y - 2, new_z));
-
-            EssentialCommands.LOGGER.info(
-                ECText.getInstance().getText(
-                    "cmd.rtp.log.location_validate_time",
-                    Text.literal(String.valueOf(timer.stop()))
-                ).getString());
-        }
-
-        // This creates an infinite recursive call in the case where all positions on RTP circle are in water.
-        //  Addressed by adding timesRun limit.
-        if (!isSafePosition) {
-            return exec(player, world, center, timesRun + 1);
-        }
-
-        // Teleport the player
-        PlayerTeleporter.requestTeleport(
-            player,
-            new MinecraftLocation(world.getRegistryKey(), new_x, new_y, new_z, 0, 0),
-            ecText.getText("cmd.rtp.location_name")
-        );
-
-        return 1;
+        return new BlockPos(new_x, 0, new_z);
     }
 
-    private static boolean isSafePosition(Chunk chunk, BlockPos pos) {
+    private static boolean isSafePosition(Chunk chunk, BlockPos pos, ExecutionContext ctx) {
         if (pos.getY() <= chunk.getBottomY()) {
             return false;
         }
 
         BlockState blockState = chunk.getBlockState(pos);
-        return pos.getY() < maxY.get() && blockState.getFluidState().isEmpty() && blockState.getBlock() != Blocks.FIRE;
+        return pos.getY() < ctx.topY && blockState.getFluidState().isEmpty() && blockState.getBlock() != Blocks.FIRE;
+    }
+
+    public static Iterable<BlockPos.Mutable> getChunkCandidateBlocks(ChunkPos chunkPos) {
+        return () -> new Iterator<>() {
+            private int _idx = -1;
+            private final BlockPos.Mutable _pos = new BlockPos.Mutable();
+
+            @Override
+            public boolean hasNext() {
+                return _idx < 4;
+            }
+
+            @Override
+            public BlockPos.Mutable next() {
+                _idx++;
+                return switch (_idx) {
+                    case 0 -> _pos.set(chunkPos.getStartX(), 0, chunkPos.getStartZ());
+                    case 1 -> _pos.set(chunkPos.getStartX(), 0, chunkPos.getEndZ());
+                    case 2 -> _pos.set(chunkPos.getEndX(), 0, chunkPos.getStartZ());
+                    case 3 -> _pos.set(chunkPos.getEndX(), 0, chunkPos.getEndZ());
+                    case 4 -> _pos.set(chunkPos.getCenterX(), 0, chunkPos.getCenterZ());
+                    default -> throw new IllegalStateException("Unexpected value: " + _idx);
+                };
+            }
+        };
     }
 
 }

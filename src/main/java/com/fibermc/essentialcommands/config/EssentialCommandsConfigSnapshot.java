@@ -1,11 +1,14 @@
 package com.fibermc.essentialcommands.config;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fibermc.essentialcommands.types.RespawnCondition;
 
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.world.World;
 
 import dev.jpcode.eccore.config.expression.Expression;
 import dev.jpcode.eccore.util.TimeUtil;
@@ -57,6 +60,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final int RTP_MIN_RADIUS;
     public final int RTP_COOLDOWN;
     public final int RTP_MAX_ATTEMPTS;
+    public final Set<RegistryKey<World>> RTP_ENABLED_WORLDS;
     public final boolean BROADCAST_TO_OPS;
     public final boolean NICK_REVEAL_ON_HOVER;
     public final boolean GRANT_LOWEST_NUMERIC_BY_DEFAULT;
@@ -117,6 +121,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.RTP_MIN_RADIUS                     = config.RTP_MIN_RADIUS.getValue();
         this.RTP_COOLDOWN                       = config.RTP_COOLDOWN.getValue();
         this.RTP_MAX_ATTEMPTS                   = config.RTP_MAX_ATTEMPTS.getValue();
+        this.RTP_ENABLED_WORLDS                 = config.getValidRtpWorldKeys();
         this.BROADCAST_TO_OPS                   = config.BROADCAST_TO_OPS.getValue();
         this.NICK_REVEAL_ON_HOVER               = config.NICK_REVEAL_ON_HOVER.getValue();
         this.GRANT_LOWEST_NUMERIC_BY_DEFAULT    = config.GRANT_LOWEST_NUMERIC_BY_DEFAULT.getValue();
