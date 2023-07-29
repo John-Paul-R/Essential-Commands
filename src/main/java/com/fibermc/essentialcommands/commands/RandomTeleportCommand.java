@@ -116,13 +116,6 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return 1;
     }
 
-    private static boolean isValidSpawnPosition(ServerWorld world, int x, int y, int z) {
-        // TODO This should be memoized. Cuts exec time in 1/2.
-        BlockState targetBlockState = world.getBlockState(new BlockPos(x, y, z));
-        BlockState footBlockState = world.getBlockState(new BlockPos(x, y - 1, z));
-        return targetBlockState.isAir() && footBlockState.isSolid();
-    }
-
     private static final ThreadLocal<Integer> maxY = new ThreadLocal<>();
 
     private static void exec(ServerPlayerEntity player, ServerWorld world) {
