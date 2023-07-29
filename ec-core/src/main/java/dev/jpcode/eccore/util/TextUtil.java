@@ -211,14 +211,15 @@ public final class TextUtil {
             try {
                 outText = parser.parseText(textStr);
             } catch (JsonParseException e) {
-                ECCore.LOGGER.log(Level.INFO, String.format("Failed to parse string '%s' as MinecraftText, trying Fabric Placeholder API...", textStr));
+                // ign
             }
 
             if (outText != null) {
-                break;
+                return outText;
             }
         }
-        return outText;
+
+        throw new RuntimeException(String.format("Failed to parse string '%s' as MinecraftText using any parsing strategy", textStr));
     }
 
     public static Collector<Text, MutableText, MutableText> collect() {

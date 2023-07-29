@@ -1,11 +1,11 @@
 package com.fibermc.essentialcommands.commands;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.util.FileUtil;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -29,6 +29,7 @@ public final class RulesCommand {
 
     public static int reloadCommand(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var playerData = PlayerData.accessFromContextOrThrow(context);
+
         try {
             reload(context.getSource().getServer());
             playerData.sendCommandFeedback("rules.reload.success");
@@ -43,10 +44,10 @@ public final class RulesCommand {
     public static void reload(MinecraftServer server) throws IOException {
         Path mcDir = server.getRunDirectory().toPath();
         var rulesFile = mcDir.resolve("config/essentialcommands/rules.txt").toFile();
-        EssentialCommands.LOGGER.info("Ensuring rules file exists at path: " + rulesFile.toPath());
         rulesFile.getParentFile().mkdirs();
-        rulesFile.createNewFile();
-        String rulesStr = String.join(System.lineSeparator(), Files.readAllLines(rulesFile.toPath()));
-        rulesText = TextUtil.parseText(rulesStr);
+        if (rulesFile.createNewFile()) {
+            EssentialCommands.LOGGER.info("Created rules file at path: " + rulesFile.toPath());
+        }
+        rulesText = TextUtil.parseText(FileUtil.readString(rulesFile.toPath()));
     }
 }
