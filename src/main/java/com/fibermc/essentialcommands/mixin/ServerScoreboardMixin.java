@@ -17,14 +17,18 @@ public class ServerScoreboardMixin {
     public void onAddPlayerToTeam(String playerName, Team team, CallbackInfoReturnable<Boolean> cir) {
         try {
             PlayerDataManager.getInstance().markNicknameDirty(playerName);
-        } catch (NullPointerException ignore) {}
+        } catch (NullPointerException ignore) {
+            // ign
+        }
     }
 
     @Inject(method = "removePlayerFromTeam", at = @At("RETURN"))
     public void onRemovePlayerFromTeam(String playerName, Team team, CallbackInfo ci) {
         try {
             PlayerDataManager.getInstance().markNicknameDirty(playerName);
-        } catch (NullPointerException ignore) {}
+        } catch (NullPointerException ignore) {
+            // ign
+        }
     }
 
     @Inject(method = "updateScoreboardTeam", at = @At("RETURN"))

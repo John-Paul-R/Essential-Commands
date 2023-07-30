@@ -113,6 +113,7 @@ public class MinecraftLocation {
     public Vec3d pos() {
         return pos;
     }
+
     public Vec3i intPos() {
         return new Vec3i((int) pos.x, (int) pos.y, (int) pos.z);
     }

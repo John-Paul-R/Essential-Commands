@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -22,11 +21,13 @@ import java.util.Objects;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class CollectionUtils {
+public final class CollectionUtils {
 // Yoinked from https://github.com/apache/commons-collections/blob/master/src/main/java/org/apache/commons/collections4/CollectionUtils.java
+    private CollectionUtils() {}
 
     /**
      * Helper class to easily access cardinality properties of two collections.
+     *
      * @param <O>  the element type
      */
     private static class CardinalityHelper<O> {
@@ -39,6 +40,7 @@ public class CollectionUtils {
 
         /**
          * Create a new CardinalityHelper for two collections.
+         *
          * @param a  the first collection
          * @param b  the second collection
          */
@@ -49,6 +51,7 @@ public class CollectionUtils {
 
         /**
          * Returns the maximum frequency of an object.
+         *
          * @param obj  the object
          * @return the maximum frequency of the object
          */
@@ -58,6 +61,7 @@ public class CollectionUtils {
 
         /**
          * Returns the minimum frequency of an object.
+         *
          * @param obj  the object
          * @return the minimum frequency of the object
          */
@@ -67,6 +71,7 @@ public class CollectionUtils {
 
         /**
          * Returns the frequency of this object in collection A.
+         *
          * @param obj  the object
          * @return the frequency of the object in collection A
          */
@@ -76,6 +81,7 @@ public class CollectionUtils {
 
         /**
          * Returns the frequency of this object in collection B.
+         *
          * @param obj  the object
          * @return the frequency of the object in collection B
          */
