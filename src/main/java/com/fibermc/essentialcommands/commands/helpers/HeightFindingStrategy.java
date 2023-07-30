@@ -17,11 +17,11 @@ public enum HeightFindingStrategy implements HeightFinder {
     BOTTOM_TO_SKY__FIRST_SAFE_AIR(HeightFindingStrategy::findYBottomUp),
     ;
 
-    private final HeightFinder _heightFinder;
+    private final HeightFinder heightFinder;
 
     HeightFindingStrategy(HeightFinder heightFinder) {
 
-        this._heightFinder = heightFinder;
+        this.heightFinder = heightFinder;
     }
 
     public static HeightFindingStrategy forWorld(RegistryKey<World> worldRegistryKey) {
@@ -38,7 +38,7 @@ public enum HeightFindingStrategy implements HeightFinder {
 
     @Override
     public OptionalInt getY(Chunk chunk, int x, int z) {
-        return _heightFinder.getY(chunk, x, z);
+        return heightFinder.getY(chunk, x, z);
     }
 
     private static OptionalInt findYBottomUp(Chunk chunk, int x, int z) {
