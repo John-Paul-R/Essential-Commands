@@ -72,7 +72,7 @@ public final class PlayerTeleporter {
                 ? TextUtil.join(
                     new Text[]{
                         destName,
-                        dest.toText(playerProfile)
+                        dest.toText(playerProfile),
                     },
                     Text.literal(" ")
                 )

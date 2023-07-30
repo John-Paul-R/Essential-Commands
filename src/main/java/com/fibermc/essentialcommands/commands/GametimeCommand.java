@@ -29,9 +29,7 @@ public class GametimeCommand implements Command<ServerCommandSource> {
         Text t = getFormattedTime(
                 context.getSource().getWorld().getTimeOfDay(),
                 PlayerProfile.accessFromContextOrThrow(context));
-        context.getSource().sendFeedback(() -> t
-            ,
-            false);
+        context.getSource().sendFeedback(() -> t, false);
 
         return 0;
     }

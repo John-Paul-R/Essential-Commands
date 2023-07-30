@@ -24,9 +24,11 @@ import net.minecraft.world.World;
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 
 @SuppressWarnings("unchecked")
-public class EssentialsConvertor {
+public final class EssentialsConvertor {
+    private EssentialsConvertor() {}
+
     private static final Yaml YAML_INSTANCE = new Yaml();
-    private static final Map<String, String> COMPARISON_TABLE = new HashMap<>(){{
+    private static final Map<String, String> COMPARISON_TABLE = new HashMap<>() {{
         put("world", "minecraft:overworld");
         put("world_nether", "minecraft:the_nether");
         put("world_the_end", "minecraft:the_end");
@@ -53,14 +55,14 @@ public class EssentialsConvertor {
 
     // TODO @jp: currently unused because EssentialsXParser.convertPlayerDataDir exists, but there
     //  are some good ideas here that might be worth carrying over
-    public static void homeConvert(MinecraftServer server){
+    public static void homeConvert(MinecraftServer server) {
         File oldUsersDataDictionary = OLD_USERDATA_PATH.toFile();
         if (!oldUsersDataDictionary.exists() || oldUsersDataDictionary.isFile()) {
             oldUsersDataDictionary.mkdirs();
         }
 
         List<File> oldUserDataFiles = getAllFile(oldUsersDataDictionary);
-        if(oldUserDataFiles.size() > 0) {
+        if (oldUserDataFiles.size() > 0) {
             LOGGER.info("Found the old home file(s), converting!");
 
             Map<String, ServerWorld> worldMap = new HashMap<>();
@@ -102,19 +104,16 @@ public class EssentialsConvertor {
                                 oldUserDataFile.renameTo(new File(oldUsersDataDictionary, oldUserDataFile.getName() + ".converted"));
                                 counter++;
                             }
-                        }
-                        else {
+                        } else {
                             oldUserDataFile.renameTo(new File(oldUsersDataDictionary, oldUserDataFile.getName() + ".converted"));
                         }
                     }
-                }
-                catch (CommandSyntaxException ce){
+                } catch (CommandSyntaxException ex) {
                     LOGGER.error("An unexpected error occurred while converting home config: {}", oldUserDataFile.getName());
-                    ce.printStackTrace();
-                }
-                catch (Exception e) {
+                    ex.printStackTrace();
+                } catch (Exception ex) {
                     LOGGER.error("An unexpected error occurred while converting home config: {}", oldUserDataFile.getName());
-                    e.printStackTrace();
+                    ex.printStackTrace();
                     return;
                 }
             }
@@ -159,8 +158,7 @@ public class EssentialsConvertor {
                             worldMap.get(COMPARISON_TABLE.get(worldName)).getRegistryKey(),
                             x, y, z, yaw, pitch));
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOGGER.error("An unexpected error occurred while converting warp config: {}", oldWarpFile.getName());
                 e.printStackTrace();
             }
@@ -171,8 +169,7 @@ public class EssentialsConvertor {
             try {
                 worldDataManager.setWarp(entry.getKey(), entry.getValue(), false);
                 successfulConversionCount++;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOGGER.error("There was an error occurred while putting warp config: {}", entry.getKey());
                 e.printStackTrace();
             }
