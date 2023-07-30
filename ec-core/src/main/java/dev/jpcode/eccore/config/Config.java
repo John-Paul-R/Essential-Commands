@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,15 +68,44 @@ public abstract class Config<T extends Config<T>> {
     }
 
     private void initProperties() {
-        Class<? extends Config> cls = this.getClass();
         // Cursed reflection reloading of all properties.
-        Arrays.stream(cls.getDeclaredFields())
+        getAllOptions()
+            .forEach(opt -> opt.loadAndSave(props));
+    }
+
+    private List<? extends Option<?>> options;
+
+    private List<? extends Option<?>> getOptions() {
+        if (this.options != null) {
+            return this.options;
+        }
+
+        Class<?> cls = this.getClass();
+        return this.options = Arrays.stream(cls.getDeclaredFields())
             .filter(field -> field.isAnnotationPresent(ConfigOption.class))
-            .forEach(field -> {
+            .map(field -> {
                 try {
-                    ((Option<?>) field.get(this)).loadAndSave(props);
+                    return ((Option<?>) field.get(this));
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            })
+            .toList();
+    }
+
+    public Stream<? extends Option<?>> getAllOptions() {
+        return Stream.concat(getOptions().stream(), getSectionOptions());
+    }
+
+    private Stream<? extends Option<?>> getSectionOptions() {
+        Class<?> cls = this.getClass();
+        return Arrays.stream(cls.getDeclaredFields())
+            .filter(field -> ConfigSectionSkeleton.class.isAssignableFrom(field.getType()))
+            .flatMap(field -> {
+                try {
+                    return ((ConfigSectionSkeleton) field.get(this)).getOptions().stream();
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 }
             });
     }

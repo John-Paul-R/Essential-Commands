@@ -100,7 +100,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
 
     @Inject(method = "getPlayerListName", at = @At("RETURN"), cancellable = true)
     public void getPlayerListName(CallbackInfoReturnable<Text> cir) {
-        if (EssentialCommandsConfig.getValueSafe(BACKING_CONFIG.NICKNAMES_IN_PLAYER_LIST, true)) {
+        if (EssentialCommandsConfig.getValueSafe(BACKING_CONFIG.NICKNAME.NICKNAMES_IN_PLAYER_LIST, true)) {
             cir.setReturnValue(((ServerPlayerEntity) (Object) this).getDisplayName());
             cir.cancel();
         }

@@ -46,7 +46,7 @@ public abstract class ECText {
     private static MinecraftServer server;
 
     static {
-        BACKING_CONFIG.LANGUAGE.changeEvent.register((langId) -> instance = create(langId));
+        BACKING_CONFIG.MISC.LANGUAGE.changeEvent.register((langId) -> instance = create(langId));
     }
 
     public static void init(MinecraftServer server) {

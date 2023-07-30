@@ -61,6 +61,10 @@ allprojects {
         modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
         include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
 
+        modApi ("me.shedaniel.cloth:cloth-config-fabric:11.1.106") {
+            exclude(group: "net.fabricmc.fabric-api")
+        }
+
         // Subprojects
         subprojects.each {
             implementation project(path: ":${it.name}", configuration: "namedElements")
@@ -105,6 +109,8 @@ allprojects {
     repositories {
         mavenCentral()
         maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
+        maven { url "https://maven.shedaniel.me/" }
+        maven { url "https://maven.terraformersmc.com/releases/" }
 //        maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
         // Add repositories to retrieve artifacts from in here.
         // You should only use this when depending on other mods because
