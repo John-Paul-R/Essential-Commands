@@ -2,6 +2,10 @@
 <!-- https://checkstyle.org -->
 <!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN" "https://checkstyle.org/dtds/configuration_1_3.dtd">
 <module name="Checker">
+  <module name="SuppressionFilter">
+    <property name="file" value="${suppressionFile}" default=".checkstyle-suppressions.xml"/>
+  </module>
+
   <!-- Checker properties                                        -->
   <!-- See https://checkstyle.org/config.html#Checker_Properties -->
   <property name="charset" value="UTF-8"/>
