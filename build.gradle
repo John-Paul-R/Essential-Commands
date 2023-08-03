@@ -56,8 +56,8 @@ allprojects {
         include "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
         modApi  "eu.pb4:placeholder-api:${project.placeholder_api_version}"
         include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
-        modImplementation 'org.yaml:snakeyaml:1.33'
-        include 'org.yaml:snakeyaml:1.33'
+        modImplementation 'org.yaml:snakeyaml:2.0'
+        include 'org.yaml:snakeyaml:2.0'
         modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
         include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
 
@@ -103,6 +103,7 @@ allprojects {
 
     // Add any additional repositories
     repositories {
+        gradlePluginPortal()
         mavenCentral()
         maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
 //        maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
@@ -184,7 +185,7 @@ import com.modrinth.minotaur.request.VersionType
 modrinth {
     token = getenv("MODRINTH") // An environment property called MODRINTH that is your token, set via Gradle CLI, GitHub Actions, Idea Run Configuration, or other
     projectId = project.modrinth_project_id
-    versionNumber = project.version // Will fail if Modrinth has this version already
+    versionNumber = (String)project.version // Will fail if Modrinth has this version already
     versionType = project.version.contains('alpha') ? VersionType.ALPHA.toString()
         : project.version.contains('beta') ? VersionType.BETA.toString()
         : VersionType.RELEASE.toString()
