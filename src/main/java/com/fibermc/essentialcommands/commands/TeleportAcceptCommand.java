@@ -1,5 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
+import java.util.Optional;
+
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.teleportation.TeleportRequest;
@@ -15,20 +17,21 @@ public class TeleportAcceptCommand extends TeleportResponseCommand {
         var targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
-        TeleportRequest teleportRequest = targetPlayerData.getSentTeleportRequest();
-        if (teleportRequest != null && teleportRequest.getTargetPlayer().equals(senderPlayer)) {
+        Optional<TeleportRequest> teleportRequest = targetPlayerData.getSentTeleportRequests()
+            .getRequestToPlayer(senderPlayerData);
+        if (teleportRequest.isPresent() && teleportRequest.get().getTargetPlayer().equals(senderPlayer)) {
 
             //inform target player that teleport has been accepted via chat
             targetPlayerData.sendMessage("cmd.tpaccept.feedback");
 
             //Conduct teleportation
-            teleportRequest.queue();
+            teleportRequest.get().queue();
 
             //Send message to command sender confirming that request has been accepted
             senderPlayerData.sendMessage("cmd.tpaccept.feedback");
 
             // Remove the tp request, as it has been completed.
-            teleportRequest.end();
+            teleportRequest.get().end();
 
             return 1;
         } else {

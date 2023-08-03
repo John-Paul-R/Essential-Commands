@@ -11,6 +11,7 @@ import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.commands.InvulnCommand;
 import com.fibermc.essentialcommands.commands.helpers.IFeedbackReceiver;
 import com.fibermc.essentialcommands.events.PlayerActCallback;
+import com.fibermc.essentialcommands.teleportation.OutgoingTeleportRequests;
 import com.fibermc.essentialcommands.teleportation.TeleportRequest;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
@@ -52,7 +53,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     private final File saveFile;
 
     // Target of tpAsk
-    private TeleportRequest outgoingTeleportRequest;
+    private final OutgoingTeleportRequests outgoingTeleportRequests = new OutgoingTeleportRequests();
 
     // players that have asked to teleport to this player
     // This list exists for autofilling the 'tpaccept' command
@@ -111,12 +112,15 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         homes = new NamedLocationStorage();
     }
 
-    public TeleportRequest getSentTeleportRequest() {
-        return outgoingTeleportRequest;
+    public OutgoingTeleportRequests getSentTeleportRequests() {
+        return outgoingTeleportRequests;
     }
 
-    public void setSentTeleportRequest(TeleportRequest request) {
-        this.outgoingTeleportRequest = request;
+    public void addSentTeleportRequest(TeleportRequest request) {
+        this.outgoingTeleportRequests.add(request);
+    }
+    public void removeSentTeleportRequest(TeleportRequest request) {
+        this.outgoingTeleportRequests.remove(request);
     }
 
     public LinkedHashMap<UUID, TeleportRequest> getIncomingTeleportRequests() {

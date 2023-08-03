@@ -29,11 +29,12 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
 
         // Don't allow spamming same target.
         {
-            var existingTeleportRequest = senderPlayerData.getSentTeleportRequest();
-            if (existingTeleportRequest != null && existingTeleportRequest.getTargetPlayer().equals(targetPlayer)) {
+            var existingTeleportRequest = senderPlayerData.getSentTeleportRequests()
+                .getRequestToPlayer(targetPlayerData);
+            if (existingTeleportRequest.isPresent()) {
                 PlayerData.access(senderPlayer).sendCommandError(
                     "cmd.tpask.error.exists",
-                    existingTeleportRequest.getTargetPlayer().getDisplayName());
+                    existingTeleportRequest.get().getTargetPlayer().getDisplayName());
                 return 0;
             }
         }
