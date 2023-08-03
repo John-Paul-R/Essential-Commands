@@ -11,9 +11,9 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class TeleportDenyCommand extends TeleportResponseCommand {
-    protected int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer) {
-        var targetPlayerData = PlayerData.access(targetPlayer);
-        var senderPlayerData = PlayerData.access(senderPlayer);
+    protected int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity respondingPlayer, ServerPlayerEntity requesterPlayer) {
+        var targetPlayerData = PlayerData.access(requesterPlayer);
+        var senderPlayerData = PlayerData.access(respondingPlayer);
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
         Optional<TeleportRequest> teleportRequest = targetPlayerData.getSentTeleportRequests()

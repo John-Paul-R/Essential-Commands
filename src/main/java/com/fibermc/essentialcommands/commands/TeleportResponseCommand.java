@@ -27,10 +27,10 @@ public abstract class TeleportResponseCommand implements Command<ServerCommandSo
     }
 
     public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var senderPlayer = context.getSource().getPlayerOrThrow();
-        var senderPlayerData = PlayerData.access(senderPlayer);
-        var ecText = ECText.access(senderPlayer);
-        LinkedHashMap<UUID, TeleportRequest> incomingTeleportRequests = senderPlayerData.getIncomingTeleportRequests();
+        var respondingPlayer = context.getSource().getPlayerOrThrow();
+        var respondingPlayerData = PlayerData.access(respondingPlayer);
+        var ecText = ECText.access(respondingPlayer);
+        LinkedHashMap<UUID, TeleportRequest> incomingTeleportRequests = respondingPlayerData.getIncomingTeleportRequests();
 
         if (incomingTeleportRequests.size() > 1) {
             throw CommandUtil.createSimpleException(
@@ -40,15 +40,15 @@ public abstract class TeleportResponseCommand implements Command<ServerCommandSo
                 ecText.getText("cmd.tpa_reply.error.shortcut_none_exist", TextFormatType.Error));
         }
 
-        ServerPlayerEntity targetPlayer = incomingTeleportRequests.values().stream().findFirst().get().getTargetPlayer();
-        if (targetPlayer == null) {
+        ServerPlayerEntity teleportRequestSender = incomingTeleportRequests.values().stream().findFirst().get().getSenderPlayer();
+        if (teleportRequestSender == null) {
             throw CommandUtil.createSimpleException(
                 ecText.getText("cmd.tpa_reply.error.no_request_from_target", TextFormatType.Error));
         }
 
-        return exec(context, senderPlayer, targetPlayer);
+        return exec(context, respondingPlayer, teleportRequestSender);
     }
 
-    abstract int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer);
+    abstract int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity respondingPlayer, ServerPlayerEntity requesterPlayer);
 
 }
