@@ -29,14 +29,14 @@ public class TeleportRequest {
         TPA_HERE
     }
 
-    private final Type requestType;
+    public final Type type;
     private final PlayerData senderPlayer;
     private final PlayerData targetPlayer;
     private boolean isEnded = false;
     private int ageTicks = 0;
 
     public TeleportRequest(ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer, Type requestType) {
-        this.requestType = requestType;
+        this.type = requestType;
         this.senderPlayer = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
         this.targetPlayer = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
     }
@@ -45,14 +45,14 @@ public class TeleportRequest {
         ServerPlayerEntity teleportee;
         ServerPlayerEntity tpDestination;
 
-        if (requestType == Type.TPA_HERE) {
+        if (type == Type.TPA_HERE) {
             tpDestination = senderPlayer.getPlayer();
             teleportee = targetPlayer.getPlayer();
-        } else if (requestType == Type.TPA_TO) {
+        } else if (type == Type.TPA_TO) {
             tpDestination = targetPlayer.getPlayer();
             teleportee = senderPlayer.getPlayer();
         } else {
-            EssentialCommands.LOGGER.warn(String.format("Invalid teleport request type %s", requestType.toString()));
+            EssentialCommands.LOGGER.warn(String.format("Invalid teleport request type %s", type.toString()));
             return;
         }
 
@@ -71,7 +71,7 @@ public class TeleportRequest {
         var targetPlayerData = this.getTargetPlayerData();
         if (targetPlayerData != null) {
             targetPlayerData.removeIncomingTeleportRequest(this.getSenderPlayer().getUuid());
-            this.getSenderPlayerData().setSentTeleportRequest(null);
+            this.getSenderPlayerData().removeSentTeleportRequest(this);
         }
         isEnded = true;
     }

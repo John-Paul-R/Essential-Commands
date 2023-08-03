@@ -127,7 +127,7 @@ public final class TeleportManager {
         var targetPlayerData = PlayerData.access(targetPlayer);
 
         var teleportRequest = new TeleportRequest(requestSender, targetPlayer, requestType);
-        senderPlayerData.setSentTeleportRequest(teleportRequest);
+        senderPlayerData.addSentTeleportRequest(teleportRequest);
         targetPlayerData.addIncomingTeleportRequest(teleportRequest);
         activeTeleportRequests.add(teleportRequest);
     }
