@@ -12,14 +12,14 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class TeleportAcceptCommand extends TeleportResponseCommand {
-    protected int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer) {
-        var senderPlayerData = PlayerData.access(senderPlayer);
-        var targetPlayerData = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
+    protected int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity respondingPlayer, ServerPlayerEntity requesterPlayer) {
+        var senderPlayerData = PlayerData.access(respondingPlayer);
+        var targetPlayerData = ((ServerPlayerEntityAccess) requesterPlayer).ec$getPlayerData();
 
         //identify if target player did indeed request to teleport. Continue if so, otherwise throw exception.
         Optional<TeleportRequest> teleportRequest = targetPlayerData.getSentTeleportRequests()
             .getRequestToPlayer(senderPlayerData);
-        if (teleportRequest.isPresent() && teleportRequest.get().getTargetPlayer().equals(senderPlayer)) {
+        if (teleportRequest.isPresent() && teleportRequest.get().getTargetPlayer().equals(respondingPlayer)) {
 
             //inform target player that teleport has been accepted via chat
             targetPlayerData.sendMessage("cmd.tpaccept.feedback");
