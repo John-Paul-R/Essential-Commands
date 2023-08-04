@@ -33,7 +33,7 @@ public class TeleportAcceptCommand extends TeleportResponseCommand {
             // Remove the tp request, as it has been completed.
             teleportRequest.get().end();
 
-            return 1;
+            return SINGLE_SUCCESS;
         } else {
             senderPlayerData.sendError("cmd.tpa_reply.error.no_request_from_target");
             return -1;

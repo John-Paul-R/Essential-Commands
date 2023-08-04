@@ -32,6 +32,6 @@ public class TeleportDenyCommand extends TeleportResponseCommand {
         // Remove the tp request, as it has been completed.
         teleportRequest.get().end();
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }

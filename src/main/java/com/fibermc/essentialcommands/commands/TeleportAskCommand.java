@@ -62,6 +62,6 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         var targetPlayerText = ECText.access(senderPlayer).accent(targetPlayer.getEntityName());
         senderPlayerData.sendCommandFeedback("cmd.tpask.send", targetPlayerText);
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }

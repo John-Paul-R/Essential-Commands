@@ -32,6 +32,6 @@ public class WarpDeleteCommand implements Command<ServerCommandSource> {
         }
 
         senderPlayerData.sendCommandFeedback("cmd.warp.delete.feedback", warpNameText);
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }

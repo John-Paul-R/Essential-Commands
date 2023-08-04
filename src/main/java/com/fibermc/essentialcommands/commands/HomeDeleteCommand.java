@@ -32,7 +32,7 @@ public class HomeDeleteCommand implements Command<ServerCommandSource> {
         //inform command sender that the home has been removed
         if (wasSuccessful) {
             senderPlayerData.sendCommandFeedback("cmd.home.delete.feedback", homeNameText);
-            return 1;
+            return SINGLE_SUCCESS;
         }
 
         senderPlayerData.sendCommandError("cmd.home.delete.error", homeNameText);

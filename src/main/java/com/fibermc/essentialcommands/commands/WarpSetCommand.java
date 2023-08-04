@@ -42,6 +42,6 @@ public class WarpSetCommand implements Command<ServerCommandSource> {
             senderPlayerData.sendCommandError("cmd.warp.set.error.exists", warpNameText);
         }
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }

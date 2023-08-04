@@ -24,7 +24,7 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
         exec(context, senderPlayer);
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 
     private void exec(

@@ -89,7 +89,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
             ecText.accent(homeName));
 
         PlayerTeleporter.requestTeleport(senderPlayerData, loc, homeNameText);
-        return 1;
+        return SINGLE_SUCCESS;
     }
 
     public static class Suggestion {
