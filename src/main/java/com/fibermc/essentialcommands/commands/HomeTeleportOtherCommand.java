@@ -76,7 +76,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
                     context.getSource().sendError(ECText.access(senderPlayerData.getPlayer()).error(e.getMessage()));
                 }
             });
-        return 1;
+        return SINGLE_SUCCESS;
 
     }
 

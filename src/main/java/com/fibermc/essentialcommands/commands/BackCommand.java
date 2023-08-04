@@ -36,6 +36,6 @@ public class BackCommand implements Command<ServerCommandSource> {
         var prevLocationName = ECText.access(player).getText("cmd.back.location_name");
         PlayerTeleporter.requestTeleport(playerData, loc, prevLocationName);
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }

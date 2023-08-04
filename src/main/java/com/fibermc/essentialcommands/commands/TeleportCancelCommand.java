@@ -40,6 +40,6 @@ public class TeleportCancelCommand implements Command<ServerCommandSource> {
                 Text.literal(", "))
         );
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }

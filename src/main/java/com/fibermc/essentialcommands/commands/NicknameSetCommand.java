@@ -32,7 +32,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
 
     public static int runStringToText(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         NicknameSetCommand.exec(context, TextUtil.parseText(StringArgumentType.getString(context, "nickname_placeholder_api")));
-        return 1;
+        return SINGLE_SUCCESS;
     }
 
     public static int exec(CommandContext<ServerCommandSource> context, Text rawNicknameText) throws CommandSyntaxException {

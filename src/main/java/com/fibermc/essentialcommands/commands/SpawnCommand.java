@@ -33,7 +33,7 @@ public class SpawnCommand implements Command<ServerCommandSource> {
         var styledLocationName = ECText.access(senderPlayer).getText("cmd.spawn.location_name");
 
         PlayerTeleporter.requestTeleport(senderPlayer, loc.get(), styledLocationName);
-        return 1;
+        return SINGLE_SUCCESS;
     }
 
 }

@@ -25,6 +25,6 @@ public class NicknameClearCommand implements Command<ServerCommandSource> {
             Text.literal(targetPlayer.getGameProfile().getName())
         );
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }

@@ -112,7 +112,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                 ));
         });
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 
     final static class ExecutionContext {

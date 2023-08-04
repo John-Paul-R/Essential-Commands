@@ -31,6 +31,6 @@ public class SpawnSetCommand implements Command<ServerCommandSource> {
             loc.toText(PlayerProfile.access(senderPlayer))
         );
 
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }
