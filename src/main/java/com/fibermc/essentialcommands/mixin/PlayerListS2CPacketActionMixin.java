@@ -30,7 +30,7 @@ public class PlayerListS2CPacketActionMixin {
         var vanillaWriter = writer;
         writer = (buf, entry) -> {
             // Need to use the backing config, since this lambda captures the field value.
-            if (BACKING_CONFIG.NICKNAME_ABOVE_HEAD.getValue()) {
+            if (BACKING_CONFIG.NICKNAME.NICKNAME_ABOVE_HEAD.getValue()) {
                 var id = entry.profileId();
                 var displayName = PlayerDataManager.getInstance().getByUuid(id).getPlayer().getDisplayName();
                 var displayNameString = displayName.asTruncatedString(16);
