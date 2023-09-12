@@ -22,7 +22,7 @@
   "cmd.nickname.set.error.perms": "Speler heeft onvoldoende rechten voor de opgegeven bijnaam.",
   "cmd.nickname.set.error.length": "De lengte van de opgegeven bijnaam (${0}) overschreed de maximale lengte van de bijnaam (${1})",
   "cmd.rtp.error.pre": "Kon command '/rtp' niet uitvoeren. Reden: ",
-  "cmd.rtp.error.not_overworld": "Niet in Overworld.",
+  "cmd.rtp.error.world_not_enabled": "RTP is niet ingeschakeld in de wereld '${0}'",
   "cmd.rtp.error.cooldown": "Er zit nog wachttijd op dit command. (${0} seconden resterend.)",
   "cmd.rtp.error.no_spawn_set": "Spawn niet ingesteld. (RTP kiest een willekeurige locatie op een bepaalde afstand van spawn.)",
   "cmd.rtp.location_name": "willekeurige locatie",
