@@ -119,6 +119,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     public void addSentTeleportRequest(TeleportRequest request) {
         this.outgoingTeleportRequests.add(request);
     }
+
     public void removeSentTeleportRequest(TeleportRequest request) {
         this.outgoingTeleportRequests.remove(request);
     }
