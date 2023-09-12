@@ -1,10 +1,11 @@
 package com.fibermc.essentialcommands.commands;
 
+import java.util.Objects;
+
 import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
-import com.fibermc.essentialcommands.text.TextFormatType;
 import io.github.ladysnake.pal.VanillaAbilities;
 
 import com.mojang.brigadier.Command;
@@ -65,14 +66,19 @@ public class FlyCommand implements Command<ServerCommandSource> {
 
         var senderPlayer = source.getPlayerOrThrow();
         var senderPlayerData = PlayerData.access(senderPlayer);
-        var ecText = ECText.access(senderPlayer);
-        var enabledText = ecText.getText(
-            shouldEnableFly ? "generic.enabled" : "generic.disabled",
-            TextFormatType.Accent);
+        var ecTextTarget = ECText.access(target);
+        String enabledString = ecTextTarget.getString(shouldEnableFly ? "generic.enabled" : "generic.disabled");
 
-        senderPlayerData.sendCommandFeedback(
+        if (!Objects.equals(senderPlayer, target)) {
+            ECText ecTextSender = ECText.access(senderPlayer);
+            senderPlayerData.sendCommandFeedback(
+                "cmd.fly.feedback",
+                ecTextSender.accent(enabledString),
+                target.getDisplayName());
+        }
+        playerData.sendCommandFeedback(
             "cmd.fly.feedback",
-            enabledText,
+            ecTextTarget.accent(enabledString),
             target.getDisplayName()
         );
     }
