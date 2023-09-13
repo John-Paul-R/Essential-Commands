@@ -364,7 +364,6 @@ public final class EssentialCommandRegistry {
 
             flySpeedBuilder
                 .requires(permissionSelf)
-                .executes(new FlySpeedCommand()::reset)
                 .then(CommandManager.literal("reset")
                     .executes(new FlySpeedCommand()::reset))
                 .then(argument("fly_speed", IntegerArgumentType.integer(0))

@@ -34,9 +34,9 @@ public class FlySpeedCommand implements Command<ServerCommandSource> {
 
     public int reset(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
-        ServerPlayerEntity player = source.getPlayer();
+        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
-        exec(source, player, 1);
+        exec(source, targetPlayer, 1);
         return 0;
     }
 
