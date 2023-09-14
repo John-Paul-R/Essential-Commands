@@ -22,6 +22,7 @@ import org.spongepowered.asm.util.IConsumer;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -345,14 +346,39 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_FLY) {
-            registerNode.accept(CommandManager.literal("fly")
-                .requires(ECPerms.require(ECPerms.Registry.fly_self, 2))
+            LiteralArgumentBuilder<ServerCommandSource> flyBuilder = CommandManager.literal("fly");
+            LiteralArgumentBuilder<ServerCommandSource> flySpeedBuilder = CommandManager.literal("speed");
+
+            Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.fly_self, 2);
+            Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.fly_others, 2);
+
+            flyBuilder
+                .requires(permissionSelf)
                 .executes(new FlyCommand())
+                .then(argument("flight_enabled", BoolArgumentType.bool())
+                    .executes(new FlyCommand()))
                 .then(CommandUtil.targetPlayerArgument()
-                    .requires(ECPerms.require(ECPerms.Registry.fly_others, 2))
+                    .requires(permissionOther)
                     .then(argument("flight_enabled", BoolArgumentType.bool())
-                        .executes(new FlyCommand())))
-                .build());
+                        .executes(new FlyCommand())));
+
+            flySpeedBuilder
+                .requires(permissionSelf)
+                .then(CommandManager.literal("reset")
+                    .executes(new FlySpeedCommand()::reset))
+                .then(argument("fly_speed", IntegerArgumentType.integer(0))
+                    .executes(new FlySpeedCommand()))
+                .then(CommandUtil.targetPlayerArgument()
+                    .requires(permissionOther)
+                    .then(CommandManager.literal("reset")
+                        .executes(new FlySpeedCommand()::reset))
+                    .then(argument("fly_speed", IntegerArgumentType.integer(0))
+                        .executes(new FlySpeedCommand())));
+
+            LiteralCommandNode<ServerCommandSource> flyNode = flyBuilder.build();
+            flyNode.addChild(flySpeedBuilder.build());
+
+            registerNode.accept(flyNode);
         }
 
         if (CONFIG.ENABLE_INVULN) {
