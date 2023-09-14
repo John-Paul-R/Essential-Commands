@@ -75,6 +75,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final Expression<RespawnCondition> RESPAWN_AT_EC_SPAWN;
     public final boolean PERSIST_BACK_LOCATION;
     public final boolean RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE;
+    public final int FLY_MAX_SPEED;
 
     private EssentialCommandsConfigSnapshot(EssentialCommandsConfig config) {
         this.FORMATTING_DEFAULT                 = config.FORMATTING_DEFAULT.getValue();
@@ -136,6 +137,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.RESPAWN_AT_EC_SPAWN                = config.RESPAWN_AT_EC_SPAWN.getValue();
         this.PERSIST_BACK_LOCATION              = config.PERSIST_BACK_LOCATION.getValue();
         this.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = config.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE.getValue();
+        this.FLY_MAX_SPEED                      = config.FLY_MAX_SPEED.getValue();
     }
 
     public static EssentialCommandsConfigSnapshot create(EssentialCommandsConfig config) {

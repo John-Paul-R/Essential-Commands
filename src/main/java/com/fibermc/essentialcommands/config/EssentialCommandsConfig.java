@@ -97,6 +97,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     // TODO @1.0.0: Enable PERSIST_BACK_LOCATION by default
     @ConfigOption public final Option<Boolean> PERSIST_BACK_LOCATION = new Option<>("persist_back_location", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = new Option<>("recheck_player_ability_permissions_on_dimension_change", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Integer> FLY_MAX_SPEED = new Option<>("fly_max_speed", 5, ConfigUtil::parseInt);
 
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);
