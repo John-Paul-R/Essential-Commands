@@ -29,7 +29,7 @@ public class FlySpeedCommand implements Command<ServerCommandSource> {
         int newSpeed = IntegerArgumentType.getInteger(context, "fly_speed");
 
         exec(source, targetPlayer, newSpeed);
-        return 0;
+        return SINGLE_SUCCESS;
     }
 
     public int reset(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -37,7 +37,7 @@ public class FlySpeedCommand implements Command<ServerCommandSource> {
         ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         exec(source, targetPlayer, 1);
-        return 0;
+        return SINGLE_SUCCESS;
     }
 
     public static void exec(ServerCommandSource source, ServerPlayerEntity target, int flySpeed) throws CommandSyntaxException {
