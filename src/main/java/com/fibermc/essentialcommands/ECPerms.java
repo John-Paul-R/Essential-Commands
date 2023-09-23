@@ -70,6 +70,18 @@ public final class ECPerms {
         public static final String bypass_randomteleport_cooldown = "essentialcommands.bypass.randomteleport_cooldown";
         public static final String rules_reload = "essentialcommands.rules_reload";
         public static final String rules = "essentialcommands.rules";
+        public static final String feed_self = "essentialcommands.feed.self";
+        public static final String feed_others = "essentialcommands.feed.others";
+        public static final String heal_self = "essentialcommands.heal.self";
+        public static final String heal_others = "essentialcommands.heal.others";
+        public static final String extinguish_self = "essentialcommands.extinguish.self";
+        public static final String extinguish_others = "essentialcommands.extinguish.others";
+        public static final String suicide = "essentialcommands.suicide";
+        public static final String time_set_night = "essentialcommands.night";
+        public static final String repair_self = "essentialcommands.repair.self";
+        public static final String repair_others = "essentialcommands.repair.others";
+        public static final String near_self = "essentialcommands.near.self";
+        public static final String near_others = "essentialcommands.near.others";
         public static final String motd = "essentialcommands.motd";
 
         public static final class Group {

@@ -2,7 +2,7 @@ package com.fibermc.essentialcommands.commands.helpers;
 
 import java.util.OptionalInt;
 
-import com.fibermc.essentialcommands.commands.TopCommand;
+import com.fibermc.essentialcommands.commands.utility.TopCommand;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.RegistryKey;

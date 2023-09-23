@@ -32,6 +32,8 @@ public final class EssentialCommands implements ModInitializer {
     );
     @SuppressWarnings("checkstyle:StaticVariableName")
     public static EssentialCommandsConfigSnapshot CONFIG = EssentialCommandsConfigSnapshot.create(BACKING_CONFIG);
+    @SuppressWarnings("checkstyle:StaticVariableName")
+    public static boolean VANISH_PRESENT;
 
     public static void log(Level level, String message, Object... args) {
         final String logPrefix = "[EssentialCommands]: ";
@@ -79,6 +81,8 @@ public final class EssentialCommands implements ModInitializer {
         if (CONFIG.CHECK_FOR_UPDATES) {
             Updater.checkForUpdates();
         }
+
+        VANISH_PRESENT = FabricLoader.getInstance().isModLoaded("melius-vanish");
 
         log(Level.INFO, "Mod Load Complete.");
     }

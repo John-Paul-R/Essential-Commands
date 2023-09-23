@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands;
+package com.fibermc.essentialcommands.commands.utility;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;

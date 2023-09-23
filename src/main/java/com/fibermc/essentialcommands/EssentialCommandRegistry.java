@@ -12,7 +12,7 @@ import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
-import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.commands.utility.*;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
@@ -483,21 +483,7 @@ public final class EssentialCommandRegistry {
         if (CONFIG.ENABLE_DAY) {
             registerNode.accept(CommandManager.literal("day")
                 .requires(ECPerms.require(ECPerms.Registry.time_set_day, 2))
-                .executes((context) -> {
-                    var source = context.getSource();
-                    var playerData = PlayerData.accessFromContextOrThrow(context);
-                    var world = source.getServer().getOverworld();
-                    if (world.isDay()) {
-                        playerData.sendCommandFeedback("cmd.day.error.already_daytime");
-                        return -1;
-                    }
-                    var time = world.getTimeOfDay();
-                    var timeToDay = 24000L - time % 24000L;
-
-                    world.setTimeOfDay(time + timeToDay);
-                    playerData.sendCommandFeedback("cmd.day.feedback");
-                    return 1;
-                })
+                .executes(new DayCommand())
                 .build());
         }
 
@@ -509,6 +495,75 @@ public final class EssentialCommandRegistry {
                     .requires(ECPerms.require(ECPerms.Registry.rules_reload, 4))
                     .executes(RulesCommand::reloadCommand))
                 .build());
+        }
+
+        if (CONFIG.ENABLE_FEED) {
+            registerNode.accept(CommandManager.literal("feed")
+                .requires(ECPerms.require(ECPerms.Registry.feed_self, 2))
+                .executes(new FeedCommand())
+                .then(CommandUtil.targetPlayerArgument()
+                    .requires(ECPerms.require(ECPerms.Registry.feed_others, 2))
+                    .executes(new FeedCommand()))
+                    .build());
+        }
+
+        if (CONFIG.ENABLE_HEAL) {
+            registerNode.accept(CommandManager.literal("heal")
+                .requires(ECPerms.require(ECPerms.Registry.heal_self, 2))
+                .executes(new HealCommand())
+                .then(CommandUtil.targetPlayerArgument()
+                    .requires(ECPerms.require(ECPerms.Registry.heal_others, 2))
+                    .executes(new HealCommand()))
+                    .build());
+        }
+
+        if (CONFIG.ENABLE_EXTINGUISH) {
+            LiteralCommandNode<ServerCommandSource> node = CommandManager.literal("extinguish")
+                .requires(ECPerms.require(ECPerms.Registry.extinguish_self, 2))
+                .executes(new ExtinguishCommand())
+                .then(CommandUtil.targetPlayerArgument()
+                    .requires(ECPerms.require(ECPerms.Registry.extinguish_others, 2))
+                    .executes(new ExtinguishCommand()))
+                    .build();
+
+            registerNode.accept(node);
+            registerNode.accept(CommandManager.literal("ext").redirect(node).build());
+        }
+
+        if (CONFIG.ENABLE_SUICIDE) {
+            registerNode.accept(CommandManager.literal("suicide")
+                .requires(ECPerms.require(ECPerms.Registry.suicide, 0))
+                .executes(new SuicideCommand())
+                .build());
+        }
+
+        if (CONFIG.ENABLE_NIGHT) {
+            registerNode.accept(CommandManager.literal("night")
+                .requires(ECPerms.require(ECPerms.Registry.time_set_night, 2))
+                .executes(new NightCommand())
+                .build());
+        }
+
+        if (CONFIG.ENABLE_REPAIR) {
+            registerNode.accept(CommandManager.literal("repair")
+                .requires(ECPerms.require(ECPerms.Registry.repair_self, 2))
+                .executes(new RepairCommand())
+                .then(CommandUtil.targetPlayerArgument()
+                    .requires(ECPerms.require(ECPerms.Registry.repair_others, 2))
+                    .executes(new RepairCommand()))
+                    .build());
+        }
+
+        if (CONFIG.ENABLE_NEAR) {
+            registerNode.accept(CommandManager.literal("near")
+                .requires(ECPerms.require(ECPerms.Registry.near_self, 2))
+                .executes(new NearCommand())
+                .then(argument("range", IntegerArgumentType.integer())
+                    .executes(NearCommand::withRange)
+                    .then(CommandUtil.targetPlayerArgument()
+                        .requires(ECPerms.require(ECPerms.Registry.near_others, 2))
+                        .executes(NearCommand::withRange)))
+                        .build());
         }
 
         if (CONFIG.ENABLE_MOTD) {
