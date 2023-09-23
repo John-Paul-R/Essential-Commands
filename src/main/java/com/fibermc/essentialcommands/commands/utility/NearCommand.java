@@ -1,8 +1,9 @@
-package com.fibermc.essentialcommands.commands;
+package com.fibermc.essentialcommands.commands.utility;
 
-import java.util.Objects;
+import java.util.List;
 
 import com.fibermc.essentialcommands.EssentialCommands;
+import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
 import me.drex.vanish.api.VanishAPI;
@@ -15,9 +16,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+
+import dev.jpcode.eccore.util.TextUtil;
 
 public class NearCommand implements Command<ServerCommandSource> {
     @Override
@@ -47,21 +49,18 @@ public class NearCommand implements Command<ServerCommandSource> {
     public static int exec(PlayerData senderPlayerData, ServerPlayerEntity targetPlayer, int range) {
         Vec3d basePos = targetPlayer.getPos();
 
-        MutableText results = Text.empty();
-        boolean matchesFound = false;
-        for (PlayerEntity player : targetPlayer.getWorld().getPlayers()) {
-            if (Objects.equals(targetPlayer.getUuid(), player.getUuid())) continue;
-            if (!basePos.isInRange(player.getPos(), range)) continue;
-            if (EssentialCommands.VANISH_PRESENT && !VanishAPI.canSeePlayer((ServerPlayerEntity) player, senderPlayerData.getPlayer())) continue;
+        List<Text> players = targetPlayer.getWorld().getPlayers().stream()
+            .filter(player ->
+                targetPlayer.getUuid() != player.getUuid()
+                && basePos.isInRange(player.getPos(), range)
+                && (!EssentialCommands.VANISH_PRESENT || VanishAPI.canSeePlayer((ServerPlayerEntity) player, senderPlayerData.getPlayer()))
+            )
+            .map(PlayerEntity::getDisplayName)
+            .toList();
 
-            if (matchesFound) results.append(", ");
-            results.append(player.getDisplayName());
-            matchesFound = true;
-        }
+        if (players.isEmpty()) senderPlayerData.sendCommandFeedback("cmd.near.feedback.empty");
+        else senderPlayerData.sendCommandFeedback("cmd.near.feedback.list", TextUtil.join(players, Text.literal(", ")));
 
-        if (!matchesFound) senderPlayerData.sendCommandFeedback("cmd.near.feedback.empty");
-        else senderPlayerData.sendCommandFeedback("cmd.near.feedback.list", results);
-
-        return 1;
+        return SINGLE_SUCCESS;
     }
 }

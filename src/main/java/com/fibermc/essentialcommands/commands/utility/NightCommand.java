@@ -20,9 +20,9 @@ public class NightCommand implements Command<ServerCommandSource> {
             return -1;
         }
         long time = world.getTimeOfDay();
-        long timeToDay = 13000L - time % 24000L;
+        long timeToNight = 13000L - time % 24000L;
 
-        world.setTimeOfDay(time + timeToDay);
+        world.setTimeOfDay(time + timeToNight);
         playerData.sendCommandFeedback("cmd.night.feedback");
         return 1;
     }
