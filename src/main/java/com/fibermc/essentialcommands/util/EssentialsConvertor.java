@@ -16,6 +16,7 @@ import org.yaml.snakeyaml.Yaml;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -87,7 +88,7 @@ public final class EssentialsConvertor {
                             Map<String, Map<String, Object>> homesMap = (Map<String, Map<String, Object>>) data.get("homes");
                             for (Map.Entry<String, Map<String, Object>> entry : homesMap.entrySet()) {
                                 ServerWorld world = worldMap.get(COMPARISON_TABLE.get((String) entry.getValue().get("world-name")));
-                                ServerPlayerEntity player = new ServerPlayerEntity(server, world, playerProfile);
+                                ServerPlayerEntity player = new ServerPlayerEntity(server, world, playerProfile, SyncedClientOptions.createDefault());
 
                                 PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
 
