@@ -62,6 +62,13 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> ENABLE_DAY =             new Option<>("enable_day", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_RULES =           new Option<>("enable_rules", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_BED =             new Option<>("enable_bed", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_FEED =            new Option<>("enable_feed", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_HEAL =            new Option<>("enable_heal", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_EXTINGUISH =      new Option<>("enable_extinguish", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_SUICIDE =         new Option<>("enable_suicide", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_NIGHT =           new Option<>("enable_night", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_REPAIR =          new Option<>("enable_repair", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_NEAR =            new Option<>("enable_near", true, Boolean::parseBoolean);
     @ConfigOption public final Option<List<Integer>> HOME_LIMIT =       new Option<>("home_limit", List.of(1, 2, 5), arrayParser(ConfigUtil::parseInt));
     @ConfigOption public final Option<Double>  TELEPORT_COOLDOWN =      new Option<>("teleport_cooldown", 1.0, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Double>  TELEPORT_DELAY =         new Option<>("teleport_delay", 0.0, ConfigUtil::parseDouble);
@@ -98,6 +105,8 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> PERSIST_BACK_LOCATION = new Option<>("persist_back_location", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = new Option<>("recheck_player_ability_permissions_on_dimension_change", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> FLY_MAX_SPEED = new Option<>("fly_max_speed", 5, ConfigUtil::parseInt);
+    @ConfigOption public final Option<Integer> NEAR_COMMAND_DEFAULT_RADIUS = new Option<>("near_command_default_radius", 200, ConfigUtil::parseInt);
+    @ConfigOption public final Option<Integer> NEAR_COMMAND_MAX_RADIUS = new Option<>("near_command_max_radius", 200, ConfigUtil::parseInt);
 
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);

@@ -41,6 +41,13 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean ENABLE_DAY;
     public final boolean ENABLE_RULES;
     public final boolean ENABLE_BED;
+    public final boolean ENABLE_FEED;
+    public final boolean ENABLE_HEAL;
+    public final boolean ENABLE_EXTINGUISH;
+    public final boolean ENABLE_SUICIDE;
+    public final boolean ENABLE_NIGHT;
+    public final boolean ENABLE_REPAIR;
+    public final boolean ENABLE_NEAR;
     public final List<Integer> HOME_LIMIT;
     public final double TELEPORT_COOLDOWN;
     public final int TELEPORT_DELAY_TICKS;
@@ -76,6 +83,8 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean PERSIST_BACK_LOCATION;
     public final boolean RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE;
     public final int FLY_MAX_SPEED;
+    public final int NEAR_COMMAND_DEFAULT_RADIUS;
+    public final int NEAR_COMMAND_MAX_RADIUS;
 
     private EssentialCommandsConfigSnapshot(EssentialCommandsConfig config) {
         this.FORMATTING_DEFAULT                 = config.FORMATTING_DEFAULT.getValue();
@@ -103,6 +112,13 @@ public final class EssentialCommandsConfigSnapshot {
         this.ENABLE_DAY                         = config.ENABLE_DAY.getValue();
         this.ENABLE_RULES                       = config.ENABLE_RULES.getValue();
         this.ENABLE_BED                         = config.ENABLE_BED.getValue();
+        this.ENABLE_FEED                        = config.ENABLE_FEED.getValue();
+        this.ENABLE_HEAL                        = config.ENABLE_HEAL.getValue();
+        this.ENABLE_EXTINGUISH                  = config.ENABLE_EXTINGUISH.getValue();
+        this.ENABLE_SUICIDE                     = config.ENABLE_SUICIDE.getValue();
+        this.ENABLE_NIGHT                       = config.ENABLE_NIGHT.getValue();
+        this.ENABLE_REPAIR                      = config.ENABLE_REPAIR.getValue();
+        this.ENABLE_NEAR                        = config.ENABLE_NEAR.getValue();
         this.HOME_LIMIT                         = config.HOME_LIMIT.getValue();
         this.TELEPORT_COOLDOWN                  = config.TELEPORT_COOLDOWN.getValue();
         this.TELEPORT_DELAY_TICKS               = (int) (config.TELEPORT_DELAY.getValue() * TimeUtil.TPS);
@@ -138,6 +154,8 @@ public final class EssentialCommandsConfigSnapshot {
         this.PERSIST_BACK_LOCATION              = config.PERSIST_BACK_LOCATION.getValue();
         this.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE = config.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE.getValue();
         this.FLY_MAX_SPEED                      = config.FLY_MAX_SPEED.getValue();
+        this.NEAR_COMMAND_DEFAULT_RADIUS        = config.NEAR_COMMAND_DEFAULT_RADIUS.getValue();
+        this.NEAR_COMMAND_MAX_RADIUS            = config.NEAR_COMMAND_MAX_RADIUS.getValue();
     }
 
     public static EssentialCommandsConfigSnapshot create(EssentialCommandsConfig config) {
