@@ -3,10 +3,10 @@ package com.fibermc.essentialcommands.commands.suggestions;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-import com.mojang.authlib.Agent;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.ProfileLookupCallback;
 
+import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -30,7 +30,8 @@ public class OfflinePlayerRepo {
         var player = new ServerPlayerEntity(
             server,
             server.getOverworld(),
-            playerProfile);
+            playerProfile,
+            SyncedClientOptions.createDefault());
 
         server.getPlayerManager().loadPlayerData(player);
 
@@ -54,7 +55,6 @@ public class OfflinePlayerRepo {
         CompletableFuture<GameProfile> out = new CompletableFuture<>();
         server.getGameProfileRepo().findProfilesByNames(
             new String[]{playerName},
-            Agent.MINECRAFT,
             new ProfileLookupCallback() {
                 @Override
                 public void onProfileLookupSucceeded(GameProfile profile) {
@@ -63,7 +63,7 @@ public class OfflinePlayerRepo {
                 }
 
                 @Override
-                public void onProfileLookupFailed(GameProfile profile, Exception exception) {
+                public void onProfileLookupFailed(String profileName, Exception exception) {
                     out.complete(null);
                 }
             });
