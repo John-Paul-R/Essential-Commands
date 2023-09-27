@@ -88,7 +88,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Integer> RTP_MIN_RADIUS =         new Option<>("rtp_min_radius", RTP_RADIUS.getValue(), (String s) -> parseIntOrDefault(s, RTP_RADIUS.getValue()));
     @ConfigOption public final Option<Integer> RTP_COOLDOWN =           new Option<>("rtp_cooldown", 30, ConfigUtil::parseInt);
     @ConfigOption public final Option<Integer> RTP_MAX_ATTEMPTS =       new Option<>("rtp_max_attempts", 15, ConfigUtil::parseInt);
-    @ConfigOption public final Option<List<String>> RTP_ENABLED_WORLDS = new Option<>("rtp_enabled_worlds", List.of(World.OVERWORLD.getValue().getPath()), arrayParser(Object::toString));
+    @ConfigOption public final Option<List<String>> RTP_ENABLED_WORLDS = new Option<>("rtp_enabled_worlds", List.of("minecraft:overworld"), arrayParser(Object::toString));
     @ConfigOption public final Option<Boolean> BROADCAST_TO_OPS =       new Option<>("broadcast_to_ops", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICK_REVEAL_ON_HOVER =   new Option<>("nick_reveal_on_hover", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> GRANT_LOWEST_NUMERIC_BY_DEFAULT = new Option<>("grant_lowest_numeric_by_default", true, Boolean::parseBoolean);

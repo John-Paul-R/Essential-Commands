@@ -55,7 +55,7 @@ public enum HeightFindingStrategy implements HeightFinder {
 
         while (mutablePos.getY() < topY) {
             bsHead3 = chunk.getBlockState(mutablePos.move(Direction.UP));
-            if (bsFeet1.isSolid() && bsBody2.isAir() && bsHead3.isAir()) { // If there is a floor block and space for player body+head
+            if (bsFeet1.getMaterial().isSolid() && bsBody2.isAir() && bsHead3.isAir()) { // If there is a floor block and space for player body+head
                 return OptionalInt.of(mutablePos.getY() - 1);
             }
 
@@ -67,7 +67,7 @@ public enum HeightFindingStrategy implements HeightFinder {
     }
 
     public static int getChunkHighestNonEmptySectionYOffsetOrTopY(Chunk chunk) {
-        int i = chunk.getHighestNonEmptySection();
+        int i = chunk.getHighestNonEmptySection().getYOffset();
         return i == chunk.getTopY() ? chunk.getBottomY() : ChunkSectionPos.getBlockCoord(chunk.sectionIndexToCoord(i));
     }
 }

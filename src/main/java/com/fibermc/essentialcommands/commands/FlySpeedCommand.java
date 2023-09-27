@@ -57,7 +57,7 @@ public class FlySpeedCommand implements Command<ServerCommandSource> {
 
         if (!Objects.equals(source.getPlayer(), target)) {
             ECText ecTextSource = ECText.access(source.getPlayer());
-            source.sendFeedback(() ->
+            source.sendFeedback(
                 ecTextSource.getText(
                     "cmd.fly.speed.feedback.update.other",
                     ecTextSource.accent(String.valueOf(oldFlySpeed)),

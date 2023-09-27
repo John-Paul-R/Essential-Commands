@@ -23,7 +23,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
@@ -216,7 +215,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         }
 
         var material = chunk.getBlockState(pos).getMaterial();
-        return pos.getY() < maxY.get() && !material.isLiquid() && material != Material.FIRE;
+        return pos.getY() < ctx.topY && !material.isLiquid() && material != Material.FIRE;
     }
 
     public static Iterable<BlockPos.Mutable> getChunkCandidateBlocks(ChunkPos chunkPos) {

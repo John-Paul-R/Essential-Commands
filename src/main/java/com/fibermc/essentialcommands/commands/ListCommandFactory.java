@@ -38,7 +38,7 @@ public final class ListCommandFactory {
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
             context.getSource().sendFeedback(
-                getSuggestionText(responsePreText, commandExecText, suggestionsList, styleProvider),
+                getSuggestionText(responsePreText, commandExecText, suggestionsList, Entry::getKey, styleProvider),
                 CONFIG.BROADCAST_TO_OPS
             );
             return 0;
