@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 import com.fibermc.essentialcommands.EssentialCommands;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.Level;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public final class PlayerDataFactory {
@@ -92,8 +94,12 @@ public final class PlayerDataFactory {
         return new PlayerData(player, null);
     }
 
+    public static Path getPlayerDataDirectoryPath(MinecraftServer server) throws IOException {
+        return FileUtil.getOrCreateWorldDirectory(server, "modplayerdata");
+    }
+
     private static File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
-        return FileUtil.getOrCreateWorldDirectory(player.getServer(), "modplayerdata")
+        return getPlayerDataDirectoryPath(player.getServer())
             .resolve(player.getUuidAsString() + ".dat")
             .toFile();
     }

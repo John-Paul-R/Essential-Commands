@@ -619,6 +619,14 @@ public final class EssentialCommandRegistry {
 
         essentialCommandsRootNode.addChild(configNode);
 
+        if (true) {
+            essentialCommandsRootNode.addChild(CommandManager.literal("deleteAllPlayerData")
+                .requires(source -> source.hasPermissionLevel(4))
+                .executes(new ClearPlayerDataCommand())
+                .build()
+            );
+        }
+
         if (CONFIG.ENABLE_ESSENTIALSX_CONVERT) {
             essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
                 .requires(source -> source.hasPermissionLevel(4))
