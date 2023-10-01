@@ -69,6 +69,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> ENABLE_NIGHT =           new Option<>("enable_night", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_REPAIR =          new Option<>("enable_repair", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_NEAR =            new Option<>("enable_near", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_DELETE_ALL_PLAYER_DATA = new Option<>("enable_delete_all_player_data", true, Boolean::parseBoolean);
     @ConfigOption public final Option<List<Integer>> HOME_LIMIT =       new Option<>("home_limit", List.of(1, 2, 5), arrayParser(ConfigUtil::parseInt));
     @ConfigOption public final Option<Double>  TELEPORT_COOLDOWN =      new Option<>("teleport_cooldown", 1.0, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Double>  TELEPORT_DELAY =         new Option<>("teleport_delay", 0.0, ConfigUtil::parseDouble);

@@ -48,6 +48,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean ENABLE_NIGHT;
     public final boolean ENABLE_REPAIR;
     public final boolean ENABLE_NEAR;
+    public final boolean ENABLE_DELETE_ALL_PLAYER_DATA;
     public final List<Integer> HOME_LIMIT;
     public final double TELEPORT_COOLDOWN;
     public final int TELEPORT_DELAY_TICKS;
@@ -119,6 +120,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.ENABLE_NIGHT                       = config.ENABLE_NIGHT.getValue();
         this.ENABLE_REPAIR                      = config.ENABLE_REPAIR.getValue();
         this.ENABLE_NEAR                        = config.ENABLE_NEAR.getValue();
+        this.ENABLE_DELETE_ALL_PLAYER_DATA      = config.ENABLE_DELETE_ALL_PLAYER_DATA.getValue();
         this.HOME_LIMIT                         = config.HOME_LIMIT.getValue();
         this.TELEPORT_COOLDOWN                  = config.TELEPORT_COOLDOWN.getValue();
         this.TELEPORT_DELAY_TICKS               = (int) (config.TELEPORT_DELAY.getValue() * TimeUtil.TPS);
