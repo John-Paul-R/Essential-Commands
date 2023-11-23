@@ -63,6 +63,9 @@ public abstract class PlayerManagerMixin {
         , ServerWorld serverWorld2
         , ServerPlayerEntity serverPlayerEntity
     ) {
+        if (ECAbilitySources.FLY_COMMAND.grants(oldServerPlayerEntity, VanillaAbilities.ALLOW_FLYING)) {
+            ECAbilitySources.FLY_COMMAND.grantTo(serverPlayerEntity, VanillaAbilities.ALLOW_FLYING);
+        }
         PlayerDataManager.handlePlayerDataRespawnSync(oldServerPlayerEntity, serverPlayerEntity);
     }
 
