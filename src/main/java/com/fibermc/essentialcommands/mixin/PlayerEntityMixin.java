@@ -26,8 +26,8 @@ public abstract class PlayerEntityMixin {
 
     @ModifyVariable(
         method = "getDisplayName",
-        at = @At("STORE"),
-        ordinal = 0)
+        at = @At("STORE"))
+    // these are just IDE errors, it works in game
     public MutableText injected(MutableText teamDecoratedName) {
         // Verify that this is a ServerPlayerEntity instance.
         if (!ServerPlayerEntity.class.isAssignableFrom(this.getClass())) {
@@ -58,7 +58,7 @@ public abstract class PlayerEntityMixin {
                 // Send nickname (styled appropriately for player team) as return value for getDisplayName().
                 ServerPlayerEntity serverPlayerEntity = playerData.getPlayer();
                 return Team.decorateName(
-                    serverPlayerEntity.getScoreboard().getPlayerTeam(serverPlayerEntity.getEntityName()),
+                    serverPlayerEntity.getScoreboardTeam(),
                     nickname
                 );
             }

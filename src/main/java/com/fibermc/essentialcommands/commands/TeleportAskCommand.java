@@ -43,7 +43,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         var targetPlayerEcText = ECText.access(targetPlayer);
         targetPlayerData.sendMessage(
             "cmd.tpask.receive",
-            targetPlayerEcText.accent(senderPlayer.getEntityName())
+            targetPlayerEcText.accent(senderPlayer.getNameForScoreboard())
         );
 
         String senderName = senderPlayer.getGameProfile().getName();
@@ -59,7 +59,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_TO);
 
         //inform command sender that request has been sent
-        var targetPlayerText = ECText.access(senderPlayer).accent(targetPlayer.getEntityName());
+        var targetPlayerText = ECText.access(senderPlayer).accent(targetPlayer.getNameForScoreboard());
         senderPlayerData.sendCommandFeedback("cmd.tpask.send", targetPlayerText);
 
         return SINGLE_SUCCESS;
