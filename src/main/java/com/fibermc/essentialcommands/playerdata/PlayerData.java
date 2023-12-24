@@ -330,11 +330,14 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         this.homes = homes;
 
         if (dataTag.contains(StorageKey.NICKNAME)) {
-            this.nickname = Text.Serializer.fromJson(dataTag.getString(StorageKey.NICKNAME));
-            try {
-                reloadFullNickname();
-            } catch (NullPointerException ignore) {
-                EssentialCommands.LOGGER.warn("Could not refresh player full nickanme, as ServerPlayerEntity was null in PlayerData.");
+            String nick = dataTag.getString(StorageKey.NICKNAME);
+            if (!Objects.equals(nick, "null")) {
+                this.nickname = Text.Serialization.fromJson(nick);
+                try {
+                    reloadFullNickname();
+                } catch (NullPointerException ignore) {
+                    EssentialCommands.LOGGER.warn("Could not refresh player full nickanme, as ServerPlayerEntity was null in PlayerData.");
+                }
             }
         }
 
@@ -360,7 +363,9 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         homes.writeNbt(homesNbt);
         tag.put(StorageKey.HOMES, homesNbt);
 
-        tag.putString(StorageKey.NICKNAME, Text.Serializer.toJson(nickname));
+        if (nickname != null) {
+            tag.putString(StorageKey.NICKNAME, Text.Serialization.toJsonString(nickname));
+        }
 
         tag.putLong(StorageKey.TIME_USED_RTP_EPOCH_MS, TimeUtil.tickTimeToEpochMs(timeUsedRtp));
 
@@ -536,7 +541,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
         if (CONFIG.NICK_REVEAL_ON_HOVER) {
             tempFullNickname.setStyle(tempFullNickname.getStyle().withHoverEvent(
-                HoverEvent.Action.SHOW_TEXT.buildHoverEvent(baseName)
+                new HoverEvent(HoverEvent.Action.SHOW_TEXT, baseName)
             ));
         }
 

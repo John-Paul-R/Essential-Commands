@@ -1,5 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
@@ -9,7 +10,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 
 public class BedCommand implements Command<ServerCommandSource> {
@@ -20,7 +20,8 @@ public class BedCommand implements Command<ServerCommandSource> {
         var spawnDim = player.getSpawnPointDimension();
 
         if (spawnPos == null) {
-            throw new CommandException(ECText.access(player).getText("cmd.bed.error.none_set", TextFormatType.Error));
+            PlayerData.access(player).sendError("cmd.bed.error.none_set");
+            return 0;
         }
         PlayerTeleporter.requestTeleport(
             player,

@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.playerdata;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.fibermc.essentialcommands.EssentialCommands;
@@ -9,6 +8,7 @@ import com.fibermc.essentialcommands.util.FileUtil;
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public final class PlayerProfileFactory {
@@ -27,7 +27,7 @@ public final class PlayerProfileFactory {
 
         if (fileExisted && playerDataFile.length() != 0) {
             try {
-                pData.fromNbt(NbtIo.readCompressed(new FileInputStream(playerDataFile)));
+                pData.fromNbt(NbtIo.readCompressed(playerDataFile.toPath(), NbtSizeTracker.ofUnlimitedBytes()));
             } catch (IOException e) {
                 EssentialCommands.log(
                     Level.WARN,

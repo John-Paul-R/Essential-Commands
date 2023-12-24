@@ -40,7 +40,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Style> FORMATTING_DEFAULT =     new Option<>("formatting_default", parseStyle("gold"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
     @ConfigOption public final Option<Style> FORMATTING_ACCENT =      new Option<>("formatting_accent", parseStyle("light_purple"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
     @ConfigOption public final Option<Style> FORMATTING_ERROR =       new Option<>("formatting_error", parseStyle("red"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
-    @ConfigOption public final Option<Text>  NICKNAME_PREFIX =        new Option<>("nickname_prefix", parseText("{\"text\":\"~\",\"color\":\"red\"}"), TextUtil::parseText, Text.Serializer::toJson);
+    @ConfigOption public final Option<Text>  NICKNAME_PREFIX =        new Option<>("nickname_prefix", parseText("{\"text\":\"~\",\"color\":\"red\"}"), TextUtil::parseText, Text.Serialization::toJsonString);
     @ConfigOption public final Option<Boolean> ENABLE_BACK =            new Option<>("enable_back", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_HOME =            new Option<>("enable_home", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_SPAWN =           new Option<>("enable_spawn", true, Boolean::parseBoolean);
@@ -95,7 +95,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> GRANT_LOWEST_NUMERIC_BY_DEFAULT = new Option<>("grant_lowest_numeric_by_default", true, Boolean::parseBoolean);
     @ConfigOption public final Option<String> LANGUAGE = new Option<>("language", "en_us", String::toString);
     @ConfigOption public final Option<String> MOTD = new Option<>("motd", "<yellow>Welcome to our server <blue>%player:displayname%</blue>!\nPlease read the rules.</yellow>", String::toString);
-    @ConfigOption public final Option<Text> AFK_PREFIX = new Option<>("afk_prefix", Text.literal("[AFK] ").formatted(Formatting.GRAY), TextUtil::parseText, Text.Serializer::toJson);
+    @ConfigOption public final Option<Text> AFK_PREFIX = new Option<>("afk_prefix", Text.literal("[AFK] ").formatted(Formatting.GRAY), TextUtil::parseText, Text.Serialization::toJsonString);
     @ConfigOption public final Option<Boolean> INVULN_WHILE_AFK = new Option<>("invuln_while_afk", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> AUTO_AFK_ENABLED = new Option<>("auto_afk_enabled", true,  Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> AUTO_AFK_TICKS = new Option<>("auto_afk_time", durationToTicks(Duration.ofMinutes(15)), ConfigUtil::parseDurationToTicks, ConfigUtil::serializeTicksAsDuration);
