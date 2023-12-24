@@ -34,4 +34,14 @@ public class TextUtilTests {
             assertEquals(inputToken.getStyle(), outToken.getStyle());
         }
     }
+
+    @Test
+    @DisplayName("from-to json is remotely sane")
+    void fromToJson_isSane()
+    {
+        var nullJsonStr = Text.Serialization.toJsonString(Text.literal(" hi there! "));
+        var parsedStyleFromNull = Text.Serialization.fromJson(nullJsonStr);
+
+        assert parsedStyleFromNull == null;
+    }
 }

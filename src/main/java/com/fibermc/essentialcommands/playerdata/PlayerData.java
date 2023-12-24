@@ -363,7 +363,9 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         homes.writeNbt(homesNbt);
         tag.put(StorageKey.HOMES, homesNbt);
 
-        tag.putString(StorageKey.NICKNAME, Text.Serialization.toJsonString(nickname));
+        if (nickname != null) {
+            tag.putString(StorageKey.NICKNAME, Text.Serialization.toJsonString(nickname));
+        }
 
         tag.putLong(StorageKey.TIME_USED_RTP_EPOCH_MS, TimeUtil.tickTimeToEpochMs(timeUsedRtp));
 
