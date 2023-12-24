@@ -25,7 +25,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.command.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -70,7 +69,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         var ecText = ECText.access(player);
         if (!CONFIG.RTP_ENABLED_WORLDS.contains(world.getRegistryKey())) {
             var currentWorldAsText = Text.of(world.getRegistryKey().getValue().toString());
-            throw new CommandException(TextUtil.concat(
+            PlayerData.access(player).sendCommandError(TextUtil.concat(
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
                 ecText.getText("cmd.rtp.error.world_not_enabled", TextFormatType.Error, currentWorldAsText)
             ));
@@ -82,12 +81,11 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN * 20;
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
             if (rtpCooldownRemaining > 0) {
-                throw new CommandException(
-                    ecText.getText(
+                    playerData.sendError(
                         "cmd.rtp.error.cooldown",
-                        TextFormatType.Error,
-                        ecText.accent(String.format("%.1f", rtpCooldownRemaining / 20D)))
-                );
+                        ecText.accent(String.format("%.1f", rtpCooldownRemaining / 20D))
+                    );
+                    return 0;
             }
             // if cooldown has expired
             playerData.setTimeUsedRtp(curServerTickTime);

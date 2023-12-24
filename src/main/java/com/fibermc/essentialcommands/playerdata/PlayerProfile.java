@@ -17,6 +17,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
@@ -36,7 +37,7 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
         this.profileOptions = new ProfileOptions();
     }
 
-    private static class ProfileOptions {
+    private static final class ProfileOptions {
         private Style formattingDefault;
         private Style formattingAccent;
         private Style formattingError;
@@ -100,13 +101,16 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
     public void fromNbt(NbtCompound tag) {
         NbtCompound dataTag = tag.getCompound("data");
         this.profileOptions = new ProfileOptions();
-        this.profileOptions.formattingDefault = Optional.of(dataTag.getString(StorageKey.FORMATTING_DEAULT))
+        this.profileOptions.formattingDefault = Optional.ofNullable(dataTag.get(StorageKey.FORMATTING_DEAULT))
+            .map(NbtElement::asString)
             .map(ConfigUtil::parseStyle)
             .orElse(null);
-        this.profileOptions.formattingAccent = Optional.of(dataTag.getString(StorageKey.FORMATTING_ACCENT))
+        this.profileOptions.formattingAccent = Optional.ofNullable(dataTag.get(StorageKey.FORMATTING_ACCENT))
+            .map(NbtElement::asString)
             .map(ConfigUtil::parseStyle)
             .orElse(null);
-        this.profileOptions.formattingError = Optional.of(dataTag.getString(StorageKey.FORMATTING_ERROR))
+        this.profileOptions.formattingError = Optional.ofNullable(dataTag.get(StorageKey.FORMATTING_ERROR))
+            .map(NbtElement::asString)
             .map(ConfigUtil::parseStyle)
             .orElse(null);
         this.profileOptions.printTeleportCoordinates = dataTag.getBoolean(StorageKey.PRINT_TELEPORT_COORDINATES);
