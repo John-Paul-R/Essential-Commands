@@ -6,30 +6,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-
-import com.mojang.serialization.Dynamic;
-
-import com.mojang.serialization.DynamicOps;
-
-import com.mojang.serialization.JsonOps;
-
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.text.TextCodecs;
-
-import net.minecraft.text.TextColor;
-import net.minecraft.util.JsonHelper;
-
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.mojang.serialization.JsonOps;
+
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.JsonHelper;
 
 import dev.jpcode.eccore.util.TimeUtil;
 
@@ -75,7 +63,7 @@ public final class ConfigUtil {
                 outStyle = Style.Codecs.CODEC.parse(
                     JsonOps.INSTANCE,
                     JsonHelper.deserialize(styleStr)
-                ).result().orElse(Style.EMPTY);
+                ).result().orElse(null);
             } catch (JsonSyntaxException e) {
                 LOGGER.log(Level.ERROR, String.format(
                     "Malformed Style JSON in config: %s", styleStr
