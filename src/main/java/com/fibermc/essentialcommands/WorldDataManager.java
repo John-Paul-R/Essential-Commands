@@ -21,7 +21,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtTagSizeTracker;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.WorldSavePath;
@@ -65,7 +65,7 @@ public class WorldDataManager extends PersistentState {
             boolean fileExisted = !worldDataFile.createNewFile();
             if (fileExisted && worldDataFile.length() > 0) {
                 // if files was not JUST created, read data from it.
-                this.fromNbt(NbtIo.readCompressed(worldDataFile.toPath(), NbtTagSizeTracker.ofUnlimitedBytes()).getCompound("data"));
+                this.fromNbt(NbtIo.readCompressed(worldDataFile.toPath(), NbtSizeTracker.ofUnlimitedBytes()).getCompound("data"));
             } else {
                 this.markDirty();
                 this.save();
