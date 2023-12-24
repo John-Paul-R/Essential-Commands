@@ -5,8 +5,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+
+import com.mojang.serialization.Dynamic;
+
+import com.mojang.serialization.DynamicOps;
+
+import com.mojang.serialization.JsonOps;
+
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.text.TextCodecs;
+
+import net.minecraft.text.TextColor;
+import net.minecraft.util.JsonHelper;
+
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +44,7 @@ public final class ConfigUtil {
     private ConfigUtil() {}
 
     // TODO do not delclair serializer objects out here. Pretty sure is bad for concurrent parsing.
-    private static final Style.Serializer STYLE_JSON_DESERIALIZER = new Style.Serializer();
+//    private static final Style.Serializer STYLE_JSON_DESERIALIZER = new Style.Serializer();
 
     public static Style parseStyleOrDefault(String styleStr, String defaultStyleStr) {
         Style outStyle = null;
@@ -57,16 +72,15 @@ public final class ConfigUtil {
 
         if (outStyle == null) {
             try {
-                outStyle = STYLE_JSON_DESERIALIZER.deserialize(
-                    JsonParser.parseString(styleStr),
-                    null, null
-                );
+                outStyle = Style.Codecs.CODEC.parse(
+                    JsonOps.INSTANCE,
+                    JsonHelper.deserialize(styleStr)
+                ).result().orElse(Style.EMPTY);
             } catch (JsonSyntaxException e) {
                 LOGGER.log(Level.ERROR, String.format(
                     "Malformed Style JSON in config: %s", styleStr
                 ));
             }
-
         }
 
         return outStyle;
@@ -152,7 +166,7 @@ public final class ConfigUtil {
     }
 
     public static String serializeStyle(Style style) {
-        return String.valueOf(STYLE_JSON_DESERIALIZER.serialize(style, null, null));
+        return Style.Codecs.CODEC.encodeStart(JsonOps.INSTANCE, style).result().orElse(JsonNull.INSTANCE).toString();
     }
 
     public static int parseDurationToTicks(String str) {
