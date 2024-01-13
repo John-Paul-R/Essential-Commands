@@ -73,6 +73,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
                 ecText.getText("cmd.rtp.error.world_not_enabled", TextFormatType.Error, currentWorldAsText)
             ));
+            return 0;
         }
 
         if (CONFIG.RTP_COOLDOWN > 0 && !ECPerms.check(context.getSource(), ECPerms.Registry.bypass_randomteleport_cooldown)) {
