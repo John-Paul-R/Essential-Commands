@@ -65,7 +65,7 @@
   "player.afk.enter": "${0} 暂时离开了。",
   "player.afk.exit": "${0} 回来了。",
 
-  "teleport.error.interdimensional_teleport_disabled": "传送失败。原因：跨纬度传送已被禁止。",
+  "teleport.error.interdimensional_teleport_disabled": "传送失败。原因：跨维度传送已被禁止。",
   "teleport.queued": "将在 ${1} 秒内传送至 ${0} ...",
   "teleport.done": "已传送至 ${0} 。",
   "teleport.interrupted.damage": "传送中断。原因：受到伤害。",
@@ -86,9 +86,9 @@
   "essentialcommands.smallprefix": "[EC] ",
   "cmd.config.reload": "${l:essentialcommands.fullprefix} 已重新加载配置。",
 
-  "rules.reload.success": "Rules file reloaded.",
-  "cmd.rules.reload.error.unexpected": "An unexpected error occurred while reloading the rules file. The server console may contain more information.",
-  "cmd.bed.error.none_set": "Player spawnpoint not set.",
-  "cmd.bed.bed_destination_name": "bed"
+  "rules.reload.success": "已重新加载规则文件",
+  "cmd.rules.reload.error.unexpected": "重新加载规则文件时出现未知错误，请检查服务器控制台。",
+  "cmd.bed.error.none_set": "玩家重生点未设置。",
+  "cmd.bed.bed_destination_name": "床"
 
 }
