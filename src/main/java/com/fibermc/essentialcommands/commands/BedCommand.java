@@ -44,10 +44,10 @@ public class BedCommand implements Command<ServerCommandSource> {
         if (block instanceof RespawnAnchorBlock
             && (Integer)blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isNether(world)) {
             Optional<Vec3d> optional = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, world, spawnPos);
-            safeSpawnPos = optional.orElseGet(() -> Vec3d.ofCenter(spawnPos));
+            safeSpawnPos = optional.orElseGet(() -> new Vec3d((double)spawnPos.getX() + 0.5, (double)spawnPos.getY() + 1, (double)spawnPos.getZ() + 0.5));
         } else if (block instanceof BedBlock && BedBlock.isBedWorking(world)) {
             Optional<Vec3d> optional =  BedBlock.findWakeUpPosition(EntityType.PLAYER, world, spawnPos, (Direction)blockState.get(BedBlock.FACING), spawnAngle);
-            safeSpawnPos = optional.orElseGet(() -> new Vec3d((double)spawnPos.getX() + 0.5, (double)spawnPos.getY() + 1, (double)spawnPos.getZ() + 0.5));
+            safeSpawnPos = optional.orElseGet(() -> new Vec3d((double)spawnPos.getX() + 0.5, (double)spawnPos.getY() + 0.5625, (double)spawnPos.getZ() + 0.5));
         } else {
             boolean bl = block.canMobSpawnInside(blockState);
             BlockState blockState2 = world.getBlockState(spawnPos.up());
