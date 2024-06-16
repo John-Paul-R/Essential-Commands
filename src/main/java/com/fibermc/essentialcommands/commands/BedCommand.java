@@ -19,14 +19,13 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class BedCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var source = context.getSource();
-        var player = source.getPlayerOrThrow();
-        var world = source.getWorld();
+        var player = context.getSource().getPlayerOrThrow();
         var spawnPos = player.getSpawnPointPosition();
         var spawnDim = player.getSpawnPointDimension();
         var spawnAngle = player.getSpawnAngle();
@@ -34,6 +33,15 @@ public class BedCommand implements Command<ServerCommandSource> {
         if (spawnPos == null) {
             PlayerData.access(player).sendError("cmd.bed.error.none_set");
             return 0;
+        }
+
+        var world = Objects.requireNonNull(player.getServer()).getWorld(spawnDim);
+
+        if (world == null) {
+            throw new IllegalStateException(String.format(
+                "could not resolve the ServerWorld corresponding to the player's spawn dimension. dimension: '%s'",
+                spawnDim.getValue())
+            );
         }
 
         //Safe Position Calculation, based on the game respawn position calculation logic,
