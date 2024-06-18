@@ -55,17 +55,24 @@ public abstract class PlayerManagerMixin {
     )
     public ServerWorld onPlayerConnect_firstConnect_spawnPositionOverride(
         ServerWorld original,
-        @Local(ordinal = 0) ServerPlayerEntity player,
+        @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity player,
         @Local(ordinal = 0) NbtCompound playerNbt
     ) {
         if (playerNbt != null) {
             // player data existed, definitely isn't first join
             return original;
         }
+
         MinecraftLocation[] location = new MinecraftLocation[1];
         PlayerDataManager.handleRespawnAtEcSpawn(null, (spawnPos) -> {
             location[0] = spawnPos;
         });
+
+        if (location[0] == null) {
+            // EC respawner doesn't want the player on EC spawn
+            return original;
+        }
+
         player.setPosition(location[0].pos());
         return original.getServer().getWorld(location[0].dim());
     }
@@ -104,7 +111,7 @@ public abstract class PlayerManagerMixin {
     ))
     public void onRespawnPlayer_forResawnLocationOverwrite(
         CallbackInfoReturnable<ServerPlayerEntity> cir
-        , @Local(ordinal = 0) ServerPlayerEntity oldServerPlayerEntity
+        , @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity oldServerPlayerEntity
         , @Local(ordinal = 0) LocalRef<BlockPos> playerSpawnpointBlockPos
         , @Local(ordinal = 0) LocalRef<Optional<Vec3d>> respawnPosition
         , @Local(ordinal = 1) LocalRef<ServerWorld> serverWorld2
@@ -124,7 +131,7 @@ public abstract class PlayerManagerMixin {
     ))
     public void onRespawnPlayer_afterSetPosition(
         CallbackInfoReturnable<ServerPlayerEntity> cir
-        , @Local(ordinal = 0) ServerPlayerEntity oldServerPlayerEntity
+        , @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity oldServerPlayerEntity
         , @Local(ordinal = 1) ServerPlayerEntity serverPlayerEntity
     ) {
         PlayerDataManager.handleRespawnAtEcSpawn(oldServerPlayerEntity, (spawnLoc) -> {
