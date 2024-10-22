@@ -25,7 +25,8 @@ public class FeedCommand implements Command<ServerCommandSource> {
 
         hungerManager.setFoodLevel(20);
         hungerManager.setSaturationLevel(5);
-        hungerManager.setExhaustion(0);
+//        hungerManager.setExhaustion(0);
+        // idk, you ca only add to it now
 
         senderPlayerData.sendCommandFeedback("cmd.feed.feedback");
 

@@ -1,5 +1,7 @@
 package com.fibermc.essentialcommands.mixin;
 
+import java.util.Set;
+
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
@@ -16,19 +18,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.PlayerManager;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProperties;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
@@ -39,6 +37,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     @Shadow
     public abstract boolean isSpectator();
 
+    @Shadow
+    public abstract boolean damage(ServerWorld world, DamageSource source, float amount);
+
     @Unique
     public QueuedTeleport ecQueuedTeleport;
 
@@ -48,7 +49,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     }
 
     @Inject(method = "damage", at = @At("RETURN"))
-    public void onDamage(DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> cir) {
+    public void onDamage(ServerWorld world, DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> cir) {
         // If damage was actually applied...
         if (cir.getReturnValue()) {
             PlayerDamageCallback.EVENT.invoker().onPlayerDamaged(
@@ -63,25 +64,17 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
 //        ((ServerPlayerEntityAccess) this).getEcPlayerData().updatePlayer(((ServerPlayerEntity) (Object) this));
     }
 
-    @Inject(method = "teleportTo(Lnet/minecraft/world/TeleportTarget;)Lnet/minecraft/entity/Entity;", at = @At(
+    @Inject(method = "teleportTo(Lnet/minecraft/world/TeleportTarget;)Lnet/minecraft/server/network/ServerPlayerEntity;", at = @At(
         value = "INVOKE",
         target = "Lnet/minecraft/server/PlayerManager;sendPlayerStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
-    ), locals = LocalCapture.CAPTURE_FAILSOFT)
-    public void onTeleportBetweenWorlds(
-        TeleportTarget teleportTarget,
-        CallbackInfoReturnable<Entity> cir,
-        ServerWorld serverWorld,
-        ServerWorld serverWorld2,
-        RegistryKey<World> registryKey,
-        WorldProperties worldProperties,
-        PlayerManager playerManager)
-    {
+    ))
+    public void onTeleportBetweenWorlds(TeleportTarget teleportTarget, CallbackInfoReturnable<Entity> cir) {
         var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
         playerData.updatePlayerEntity((ServerPlayerEntity) (Object) this);
     }
 
-    @Inject(method = "worldChanged", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    public void onWorldChanged(ServerWorld origin, CallbackInfo ci, RegistryKey<World> registryKey, RegistryKey<World> registryKey2) {
+    @Inject(method = "worldChanged", at = @At(value = "RETURN"))
+    public void onWorldChanged(ServerWorld origin, CallbackInfo ci) {
         var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
         if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
             PlayerDataManager.getInstance().scheduleTask(playerData::clearAbilitiesWithoutPermisisons);
@@ -170,8 +163,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     }
 
     // Teleport hook (for /back)
-    @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDFF)V", at = @At("HEAD"))
-    public void onTeleport(ServerWorld targetWorld, double x, double y, double z, float yaw, float pitch, CallbackInfo ci) {
+    @Inject(method = "Lnet/minecraft/server/network/ServerPlayerEntity;teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z", at = @At("HEAD"))
+    public void onTeleport(ServerWorld world, double destX, double destY, double destZ, Set<PositionFlag> flags, float yaw, float pitch, boolean resetCamera, CallbackInfoReturnable<Boolean> cir) {
         if (!isSpectator()) {
             this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
         }

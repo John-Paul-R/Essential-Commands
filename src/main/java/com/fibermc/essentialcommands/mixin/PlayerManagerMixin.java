@@ -18,10 +18,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.network.ClientConnection;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -90,13 +90,11 @@ public abstract class PlayerManagerMixin {
         // created. This lets us update the EC PlayerData, sooner, might be
         // before the new ServerPlayerEntity is fully initialized.
         target = "Lnet/minecraft/server/network/ServerPlayerEntity;copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V"
-    ), locals = LocalCapture.CAPTURE_FAILHARD)
+    ))
     public void onRespawnPlayer(
-        ServerPlayerEntity oldServerPlayerEntity, boolean alive, Entity.RemovalReason removalReason
-        , CallbackInfoReturnable<ServerPlayerEntity> cir
-        , TeleportTarget teleportTarget
-        , ServerWorld serverWorld
-        , ServerPlayerEntity serverPlayerEntity
+        ServerPlayerEntity oldServerPlayerEntity, boolean alive, Entity.RemovalReason removalReason,
+        CallbackInfoReturnable<ServerPlayerEntity> cir,
+        @Local(ordinal = 1) ServerPlayerEntity serverPlayerEntity
     ) {
         PlayerDataManager.handlePlayerDataRespawnSync(oldServerPlayerEntity, serverPlayerEntity);
     }
@@ -122,7 +120,7 @@ public abstract class PlayerManagerMixin {
                 Vec3d.ZERO,
                 0,
                 0,
-                false,
+                PositionFlag.ROT,
                 TeleportTarget.NO_OP
             ));
         });

@@ -119,7 +119,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         public final int bottomY;
 
         public ExecutionContext(ServerWorld world) {
-            this.topY = world.getTopY();
+            this.topY = world.getTopYInclusive();
             this.bottomY = world.getBottomY();
         }
     }

@@ -5,6 +5,7 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -65,7 +66,8 @@ public final class PlayerTeleporter {
         playerEntity.teleport(
             targetWorld,
             dest.pos().x, dest.pos().y, dest.pos().z,
-            dest.headYaw(), dest.pitch()
+            PositionFlag.ROT, dest.headYaw(), dest.pitch(),
+            false
         );
 
         var playerAccess = ((ServerPlayerEntityAccess) playerEntity);

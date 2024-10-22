@@ -114,9 +114,9 @@ public final class EssentialsXParser {
             // bukkit/spigot/paper UID. Instead, we should be reading those mods' config files to
             // find the correct directory. Rn this will essentially (heh) always be wrong.
             var persistentStateManager = ((PersistentStateManagerInvoker) world.getPersistentStateManager());
-            File uidFile = persistentStateManager.invokeGetFile("uid");
+            File uidFile = persistentStateManager.invokeGetFile("uid").toFile();
             if (!uidFile.exists()) {
-                uidFile = persistentStateManager.invokeGetFile("../uid");
+                uidFile = persistentStateManager.invokeGetFile("../uid").toFile();
             }
 
             try {

@@ -21,7 +21,7 @@ public class SuicideCommand implements Command<ServerCommandSource> {
             return 0;
         }
 
-        player.kill();
+        player.kill(player.server.getWorld(player.getWorld().getRegistryKey()));
 
         return SINGLE_SUCCESS;
     }

@@ -3,6 +3,7 @@ package com.fibermc.essentialcommands.mixin;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -15,11 +16,13 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin {
 
+    @Unique
     private PlayerData getPlayerData() {
         var player = ((ServerPlayNetworkHandler) (Object) this).player;
         return ((ServerPlayerEntityAccess) player).ec$getPlayerData();
     }
 
+    @Unique
     private void invokeActEvent(Packet<ServerPlayPacketListener> packet) {
         getPlayerData().playerActEvent.invoker().onPlayerAct(packet);
     }
