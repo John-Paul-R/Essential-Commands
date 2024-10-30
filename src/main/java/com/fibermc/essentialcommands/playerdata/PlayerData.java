@@ -404,10 +404,9 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
     @Override
     public void updatePlayerEntity(ServerPlayerEntity serverPlayerEntity) {
+        boolean couldFly = VanillaAbilities.ALLOW_FLYING.getTracker(this.player).isGrantedBy(ECAbilitySources.FLY_COMMAND);
         this.player = serverPlayerEntity;
-
-        // This is to fix a bug with ability to fly being lost upon being teleported to a new dim via /execute...tp.
-        PlayerDataManager.getInstance().scheduleTask(this::updateFlight);
+        setFlight(couldFly);
     }
 
     private void updateFlight() {
@@ -428,7 +427,9 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         } else {
             Pal.revokeAbility(this.player, VanillaAbilities.ALLOW_FLYING, ECAbilitySources.FLY_COMMAND);
         }
-        this.player.sendAbilitiesUpdate();
+
+        // This is to fix a bug with ability to fly being lost upon being teleported to a new dim via /execute...tp.
+        PlayerDataManager.getInstance().scheduleTask(this::updateFlight);
     }
 
     public void clearAbilitiesWithoutPermisisons() {
