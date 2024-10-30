@@ -120,7 +120,6 @@ public abstract class PlayerManagerMixin {
                 Vec3d.ZERO,
                 0,
                 0,
-                PositionFlag.ROT,
                 TeleportTarget.NO_OP
             ));
         });

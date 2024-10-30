@@ -12,6 +12,8 @@ import net.minecraft.text.Text;
 
 import dev.jpcode.eccore.util.TextUtil;
 
+import java.util.Set;
+
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public final class PlayerTeleporter {
@@ -66,7 +68,7 @@ public final class PlayerTeleporter {
         playerEntity.teleport(
             targetWorld,
             dest.pos().x, dest.pos().y, dest.pos().z,
-            PositionFlag.ROT, dest.headYaw(), dest.pitch(),
+            Set.of(), dest.headYaw(), dest.pitch(),
             false
         );
 
