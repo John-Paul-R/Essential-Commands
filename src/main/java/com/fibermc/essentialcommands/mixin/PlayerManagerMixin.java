@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -105,7 +104,7 @@ public abstract class PlayerManagerMixin {
         // This target lets us modify respawn position and dimension (player maybe not _fully_ initialized, still)
         target = "Lnet/minecraft/server/network/ServerPlayerEntity;<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/world/ServerWorld;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/network/packet/c2s/common/SyncedClientOptions;)V"
     ))
-    public void onRespawnPlayer_forResawnLocationOverwrite(
+    public void onRespawnPlayer_forRespawnLocationOverwrite(
         CallbackInfoReturnable<ServerPlayerEntity> cir
         , @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity oldServerPlayerEntity
         , @Local(ordinal = 0) LocalRef<TeleportTarget> teleportTargetLocalRef

@@ -37,9 +37,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     @Shadow
     public abstract boolean isSpectator();
 
-    @Shadow
-    public abstract boolean damage(ServerWorld world, DamageSource source, float amount);
-
     @Unique
     public QueuedTeleport ecQueuedTeleport;
 
@@ -69,13 +66,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
         target = "Lnet/minecraft/server/PlayerManager;sendPlayerStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
     ))
     public void onTeleportBetweenWorlds(TeleportTarget teleportTarget, CallbackInfoReturnable<Entity> cir) {
-        var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
+        var playerData = this.ec$getPlayerData();
         playerData.updatePlayerEntity((ServerPlayerEntity) (Object) this);
     }
 
     @Inject(method = "worldChanged", at = @At(value = "RETURN"))
     public void onWorldChanged(ServerWorld origin, CallbackInfo ci) {
-        var playerData = ((ServerPlayerEntityAccess) this).ec$getPlayerData();
+        var playerData = this.ec$getPlayerData();
         if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
             PlayerDataManager.getInstance().scheduleTask(playerData::clearAbilitiesWithoutPermisisons);
         }
@@ -163,7 +160,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     }
 
     // Teleport hook (for /back)
-    @Inject(method = "Lnet/minecraft/server/network/ServerPlayerEntity;teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z", at = @At("HEAD"))
+    @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z", at = @At("HEAD"))
     public void onTeleport(ServerWorld world, double destX, double destY, double destZ, Set<PositionFlag> flags, float yaw, float pitch, boolean resetCamera, CallbackInfoReturnable<Boolean> cir) {
         if (!isSpectator()) {
             this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
