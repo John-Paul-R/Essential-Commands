@@ -5,14 +5,20 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
-import net.minecraft.network.packet.s2c.play.PositionFlag;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
 import dev.jpcode.eccore.util.TextUtil;
 
-import java.util.Set;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+
+
+import java.util.*;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -61,10 +67,20 @@ public final class PlayerTeleporter {
     }
 
     private static void execTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
-        var targetWorld = playerEntity.getServer().getWorld(dest.dim());
+        var playerServer = playerEntity.getServer();
+        var targetWorld = playerServer.getWorld(dest.dim());
+
         if (targetWorld == null) {
             throw new NullPointerException(String.format("Could not find teleport target world, '%s'", dest.dim()));
         }
+
+        BlockPos playerPos = playerEntity.getBlockPos();
+        Vec3d targetVec = new Vec3d(dest.pos().x, dest.pos().y, dest.pos().z);
+
+        // HashMap to track recently teleported followers (to disable damage)
+        final HashMap<UUID, Date> teleportedfollowers = new HashMap<>();
+
+        // **Teleport Player**
         playerEntity.teleport(
             targetWorld,
             dest.pos().x, dest.pos().y, dest.pos().z,
@@ -72,21 +88,43 @@ public final class PlayerTeleporter {
             false
         );
 
+        // **Check if pet teleportation is enabled**
+        if (CONFIG.TELEPORT_FOLLOWERS) {
+            double radius = CONFIG.TELEPORT_FOLLOWERS_RADIUS;
+
+            // sanity check
+            if (radius < 0) {
+                radius = 0;
+            }
+
+            // Find tamed animals around the player and not sitting
+            List<TameableEntity> pets = playerEntity.getWorld()
+                .getEntitiesByClass(TameableEntity.class, new Box(playerPos).expand(radius), pet ->
+                    pet.isTamed() && pet.getOwnerUuid() != null && pet.getOwnerUuid().equals(playerEntity.getUuid()) && !pet.isSitting()
+                );
+
+            // Teleport each pet
+            for (TameableEntity pet : pets) {
+                if (pet != null) {
+                    pet.teleport(targetVec.x, targetVec.y, targetVec.z, false);
+                    teleportedfollowers.put(pet.getUuid(), new Date()); // Track teleported pets
+                }
+            }
+        }
+
         var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
         var playerProfile = playerAccess.ec$getProfile();
         playerAccess.ec$getPlayerData().sendMessage(
             "teleport.done",
             playerProfile.shouldPrintTeleportCoordinates().orElse(CONFIG.PRINT_TELEPORT_COORDINATES)
                 ? TextUtil.join(
-                    new Text[]{
-                        destName,
-                        dest.toText(playerProfile),
-                    },
-                    Text.literal(" ")
-                )
+                new Text[]{destName, dest.toText(playerProfile)},
+                Text.literal(" ")
+            )
                 : destName
         );
     }
+
 
     static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
         return (
