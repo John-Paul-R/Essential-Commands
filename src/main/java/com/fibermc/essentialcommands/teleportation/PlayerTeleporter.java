@@ -5,6 +5,7 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -21,6 +22,7 @@ import net.minecraft.util.math.Vec3d;
 import java.util.*;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import static net.minecraft.entity.SpawnReason.COMMAND;
 
 public final class PlayerTeleporter {
     private PlayerTeleporter() {}
@@ -77,9 +79,6 @@ public final class PlayerTeleporter {
         BlockPos playerPos = playerEntity.getBlockPos();
         Vec3d targetVec = new Vec3d(dest.pos().x, dest.pos().y, dest.pos().z);
 
-        // HashMap to track recently teleported followers (to disable damage)
-        final HashMap<UUID, Date> teleportedfollowers = new HashMap<>();
-
         // **Teleport Player**
         playerEntity.teleport(
             targetWorld,
@@ -90,25 +89,39 @@ public final class PlayerTeleporter {
 
         // **Check if pet teleportation is enabled**
         if (CONFIG.TELEPORT_FOLLOWERS) {
-            double radius = CONFIG.TELEPORT_FOLLOWERS_RADIUS;
+            double radius = Math.max(CONFIG.TELEPORT_FOLLOWERS_RADIUS, 0); // Ensure radius is not negative
+            ServerWorld playerWorld = (ServerWorld) playerEntity.getWorld();
 
-            // sanity check
-            if (radius < 0) {
-                radius = 0;
-            }
+            // Get all tamed pets within radius
+            List<TameableEntity> pets = playerWorld.getEntitiesByClass(TameableEntity.class, new Box(playerPos).expand(radius), pet ->
+                pet.isTamed() && pet.getOwnerUuid() != null && pet.getOwnerUuid().equals(playerEntity.getUuid()) && !pet.isSitting()
+            );
 
-            // Find tamed animals around the player and not sitting
-            List<TameableEntity> pets = playerEntity.getWorld()
-                .getEntitiesByClass(TameableEntity.class, new Box(playerPos).expand(radius), pet ->
-                    pet.isTamed() && pet.getOwnerUuid() != null && pet.getOwnerUuid().equals(playerEntity.getUuid()) && !pet.isSitting()
-                );
-
-            // Teleport each pet
+            // **Teleport each pet**
             for (TameableEntity pet : pets) {
-                if (pet != null) {
-                    pet.teleport(targetVec.x, targetVec.y, targetVec.z, false);
-                    teleportedfollowers.put(pet.getUuid(), new Date()); // Track teleported pets
+                if (pet == null) continue;
+
+                if (pet.getWorld() != targetWorld) {
+                    // **Manually re-create entity in the new world**
+                    Entity newPet = pet.getType().create(targetWorld, COMMAND);
+                    if (newPet instanceof TameableEntity newTamedPet) {
+                        newTamedPet.copyPositionAndRotation(pet); // Copy position
+                        newTamedPet.setTamed(true, false);
+                        newTamedPet.setOwner(playerEntity); // Ensure ownership persists
+
+                        // Remove the old pet & add the new one
+                        pet.discard();
+                        targetWorld.spawnEntity(newTamedPet);
+                        pet = newTamedPet;
+                    } else {
+                        continue; // Skip if recreation fails
+                    }
                 }
+
+                // **Ensure chunk is loaded before teleporting pet**
+                ((ServerWorld) targetWorld).getChunk((int) targetVec.x >> 4, (int) targetVec.z >> 4);
+
+                pet.teleport(targetVec.x, targetVec.y, targetVec.z, false);
             }
         }
 
