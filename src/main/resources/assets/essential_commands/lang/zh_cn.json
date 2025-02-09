@@ -4,6 +4,10 @@
   "cmd.enderchest.feedback": "已打开末影箱",
   "cmd.enderchest.container_ui_name": "EC 末影箱",
   "cmd.fly.feedback": "为 ${1} ${0}了飞行。",
+  "cmd.fly.speed.feedback.update": "已将你的飞行速度从 ${0} 更新到 ${1}",
+  "cmd.fly.speed.feedback.update.other": "已将 ${2} 的飞行速度从 ${0} 更新到 ${1}",
+  "cmd.fly.speed.error.limit": "飞行速度不能超过 ${0}",
+  
   "cmd.invuln.feedback": "为 ${1} ${0}了无敌。",
   "cmd.home.tp.error.not_found": "找不到名为 \"${0}\" 的家。",
   "cmd.home.tp.error.shortcut_none_exist": "找不到指定的家。",
@@ -52,9 +56,28 @@
   "cmd.warp.tp.error.permission": "没有足够的权限来传送到 \"${0}\" 。",
   "cmd.warp.list.start": "服务器当前可用的传送点：",
   "cmd.day.error.already_daytime": "当前已是白天。",
-  "cmd.day.feedback": "将时间设为白天。",
+  "cmd.day.feedback": "已将时间设为白天。",
   "cmd.afk.error.in_combat": "无法在战斗中将状态设置为离开。",
+  "rules.reload.success": "已更新规则文件。",
+  "cmd.rules.reload.error.unexpected": "重载规则文件时出现未知错误，服务器控制台可能记录了更多信息。",
+  "cmd.bed.error.none_set":  "玩家未设置出生点。",
+  "cmd.bed.bed_destination_name":  "床",
+  "cmd.feed.error.full": "玩家的饱食度已满。",
+  "cmd.feed.feedback": "已恢复玩家的饱食度。",
+  "cmd.heal.error.full": "玩家的生命值已满。",
+  "cmd.heal.feedback": "已恢复玩家的生命值。",
+  "cmd.extinguish.error.not_on_fire": "玩家未着火",
+  "cmd.extinguish.feedback": "玩家着的火已熄灭",
+  "cmd.suicide.error.already_dead": "你已经死了，你怎么发的命令？",
+  "cmd.night.error.already_nighttime": "当前已是晚上。",
+  "cmd.night.feedback": "已将时间设为晚上。",
+  "cmd.repair.error.not_damaged": "物品未损毁。",
+  "cmd.repair.feedback": "物品已修复。",
+  "cmd.near.error.range_too_high": "范围不能超过 ${0}",
+  "cmd.near.feedback.empty": "未找到玩家。",
+  "cmd.near.feedback.list": "附近的玩家：${0}",
 
+  
   "cmd.workbench.feedback": "已打开 ${0} 。",
   "cmd.workbench.container_ui_name": "EC ${0}",
   "cmd.wastebin.name": "垃圾箱",
@@ -69,7 +92,7 @@
   "teleport.queued": "将在 ${1} 秒内传送至 ${0} ...",
   "teleport.done": "已传送至 ${0} 。",
   "teleport.interrupted.damage": "传送中断。原因：受到伤害。",
-  "teleport.interruped.moved": "传送中断。原因：移动。",
+  "teleport.interrupted.moved": "传送中断。原因：移动。",
   "teleport.request.expired.sender": "发送至 ${0} 的传送请求已过期。",
   "teleport.request.expired.receiver":  "来自 ${0} 的传送请求已过期。",
   "teleport.request.canceled_by_new": "传送至 ${0} 的操作已取消。原因：新的传送至 ${1} 的操作已开始。",
@@ -84,11 +107,7 @@
 
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
-  "cmd.config.reload": "${l:essentialcommands.fullprefix} 已重新加载配置。",
+  "cmd.config.reload": "${l:essentialcommands.fullprefix} 已重新加载配置。"
 
-  "rules.reload.success": "已重新加载规则文件",
-  "cmd.rules.reload.error.unexpected": "重新加载规则文件时出现未知错误，请检查服务器控制台。",
-  "cmd.bed.error.none_set": "玩家重生点未设置。",
-  "cmd.bed.bed_destination_name": "床"
 
 }
