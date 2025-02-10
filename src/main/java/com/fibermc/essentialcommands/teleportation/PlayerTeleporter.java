@@ -6,7 +6,10 @@ import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
@@ -18,13 +21,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.util.*;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-import static net.minecraft.entity.SpawnReason.COMMAND;
 
 public final class PlayerTeleporter {
+    private static final Logger LOGGER = LogManager.getLogger("PlayerTeleporter");
     private PlayerTeleporter() {}
 
     public static void requestTeleport(PlayerData pData, MinecraftLocation dest, MutableText destName) {
@@ -68,6 +74,13 @@ public final class PlayerTeleporter {
         execTeleport(player, dest, destName);
     }
 
+    /**
+     * Executes the teleportation of a player and their tamed pets to a specified destination.
+     *
+     * @param playerEntity the player entity to be teleported
+     * @param dest the destination location for the teleportation
+     * @param destName the name of the destination to be displayed in messages
+     */
     private static void execTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
         var playerServer = playerEntity.getServer();
         var targetWorld = playerServer.getWorld(dest.dim());
@@ -79,52 +92,99 @@ public final class PlayerTeleporter {
         BlockPos playerPos = playerEntity.getBlockPos();
         Vec3d targetVec = new Vec3d(dest.pos().x, dest.pos().y, dest.pos().z);
 
-        // **Teleport Player**
-        playerEntity.teleport(
-            targetWorld,
-            dest.pos().x, dest.pos().y, dest.pos().z,
-            Set.of(), dest.headYaw(), dest.pitch(),
-            false
-        );
+        List<TameableEntity> pets = detectTamedPets(playerEntity, playerPos);
 
-        // **Check if pet teleportation is enabled**
-        if (CONFIG.TELEPORT_FOLLOWERS) {
-            double radius = Math.max(CONFIG.TELEPORT_FOLLOWERS_RADIUS, 0); // Ensure radius is not negative
-            ServerWorld playerWorld = (ServerWorld) playerEntity.getWorld();
+        playerEntity.teleport(targetWorld, targetVec.x, targetVec.y, targetVec.z, Set.of(), dest.headYaw(), dest.pitch(), false);
 
-            // Get all tamed pets within radius
-            List<TameableEntity> pets = playerWorld.getEntitiesByClass(TameableEntity.class, new Box(playerPos).expand(radius), pet ->
-                pet.isTamed() && pet.getOwnerUuid() != null && pet.getOwnerUuid().equals(playerEntity.getUuid()) && !pet.isSitting()
-            );
+        teleportTamedEntities(pets, targetWorld, targetVec, playerEntity);
 
-            // **Teleport each pet**
-            for (TameableEntity pet : pets) {
-                if (pet == null) continue;
+        sendTeleportMessage(playerEntity, destName, dest);
+    }
 
-                if (pet.getWorld() != targetWorld) {
-                    // **Manually re-create entity in the new world**
-                    Entity newPet = pet.getType().create(targetWorld, COMMAND);
-                    if (newPet instanceof TameableEntity newTamedPet) {
-                        newTamedPet.copyPositionAndRotation(pet); // Copy position
-                        newTamedPet.setTamed(true, false);
-                        newTamedPet.setOwner(playerEntity); // Ensure ownership persists
+    /**
+     * Detects tamed pets within a specified radius around the player's position.
+     *
+     * @param playerEntity the player entity whose pets are being detected
+     * @param playerPos the position of the player
+     * @return a list of tamed pets that belong to the player and are not sitting
+     */
+    private static List<TameableEntity> detectTamedPets(ServerPlayerEntity playerEntity, BlockPos playerPos) {
+        double radius = Math.max(CONFIG.TELEPORT_FOLLOWERS_RADIUS, 0);
+        ServerWorld playerWorld = (ServerWorld) playerEntity.getWorld();
 
-                        // Remove the old pet & add the new one
-                        pet.discard();
-                        targetWorld.spawnEntity(newTamedPet);
-                        pet = newTamedPet;
-                    } else {
-                        continue; // Skip if recreation fails
-                    }
+        return playerWorld.getEntitiesByClass(TameableEntity.class, new Box(playerPos).expand(radius), pet -> {
+            boolean isTamed = pet.isTamed();
+            UUID ownerUuid = pet.getOwnerUuid();
+            boolean isSameOwner = ownerUuid != null && ownerUuid.equals(playerEntity.getUuid());
+            boolean isSitting = pet.isSitting();
+
+            LOGGER.info("Checking pet {} ({}) - Tamed: {}, Owner Matches: {}, Sitting: {}",
+                pet.getType().getTranslationKey(), pet.getUuid(), isTamed, isSameOwner, isSitting);
+
+            return isTamed && isSameOwner && !isSitting;
+        });
+    }
+
+    /**
+     * Teleports a list of tamed entities to a specified position in a target world.
+     *
+     * @param pets the list of tamed entities to be teleported
+     * @param targetWorld the world where the entities will be teleported
+     * @param targetVec the position where the entities will be teleported
+     * @param playerEntity the player entity who owns the tamed entities
+     */
+    private static void teleportTamedEntities(List<TameableEntity> pets, ServerWorld targetWorld, Vec3d targetVec, ServerPlayerEntity playerEntity) {
+        for (TameableEntity pet : pets) {
+            if (pet.getWorld() != targetWorld) {
+                if (!transferEntityToWorld(pet, targetWorld, targetVec, playerEntity)) {
+                    LOGGER.warn("Failed to transfer pet {} ({}) to {}", pet.getType().getTranslationKey(), pet.getUuid(), targetWorld.getRegistryKey().getValue());
                 }
-
-                // **Ensure chunk is loaded before teleporting pet**
-                ((ServerWorld) targetWorld).getChunk((int) targetVec.x >> 4, (int) targetVec.z >> 4);
-
-                pet.teleport(targetVec.x, targetVec.y, targetVec.z, false);
+            } else {
+                targetWorld.getChunk((int) targetVec.x >> 4, (int) targetVec.z >> 4);
+                pet.teleport(targetVec.x, targetVec.y + 0.5, targetVec.z, false);
             }
         }
+    }
 
+    /**
+     * Transfers a tamed entity to a specified target world and position.
+     *
+     * @param pet the tamed entity to be transferred
+     * @param targetWorld the world where the entity will be transferred
+     * @param targetVec the position where the entity will be transferred
+     * @param playerEntity the player entity who owns the tamed entity
+     * @return true if the entity was successfully transferred, false otherwise
+     */
+    private static boolean transferEntityToWorld(TameableEntity pet, ServerWorld targetWorld, Vec3d targetVec, ServerPlayerEntity playerEntity) {
+        NbtCompound entityData = new NbtCompound();
+        pet.saveSelfNbt(entityData); // Store full entity data
+
+        Entity newPet = EntityType.loadEntityWithPassengers(entityData, targetWorld, SpawnReason.COMMAND, (e) -> {
+            e.setPos(targetVec.x, targetVec.y, targetVec.z);
+            return e;
+        });
+
+        if (newPet instanceof TameableEntity newTamedPet) {
+            newTamedPet.setTamed(true, true);
+            newTamedPet.setOwner(playerEntity);
+            targetWorld.spawnEntity(newTamedPet);
+
+            pet.discard();
+            return true;
+        } else {
+            LOGGER.error("Failed to create entity from NBT for pet ({})!", pet.getUuid());
+            return false;
+        }
+    }
+
+    /**
+     * Sends a teleportation message to the player.
+     *
+     * @param playerEntity the player entity to whom the message will be sent
+     * @param destName the name of the destination to be displayed in the message
+     * @param dest the destination location for the teleportation
+     */
+    private static void sendTeleportMessage(ServerPlayerEntity playerEntity, MutableText destName, MinecraftLocation dest) {
         var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
         var playerProfile = playerAccess.ec$getProfile();
         playerAccess.ec$getPlayerData().sendMessage(
@@ -144,6 +204,5 @@ public final class PlayerTeleporter {
             (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
                 || ECPerms.check(player.getCommandSource(), permission, 5)
         );
-
     }
 }
