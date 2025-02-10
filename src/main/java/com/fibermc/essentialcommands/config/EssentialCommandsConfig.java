@@ -83,7 +83,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Double>  TELEPORT_INTERRUPT_ON_MOVE_AMOUNT = new Option<>("teleport_interrupt_on_move_max_blocks", 3D, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Boolean> ALLOW_TELEPORT_BETWEEN_DIMENSIONS = new Option<>("allow_teleport_between_dimensions", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ALLOW_TELEPORT_WITH_FOLLOWERS = new Option<>("allow_teleport_with_followers", true, Boolean::parseBoolean);
-    @ConfigOption public final Option<Double>  TELEPORT_WITH_FOLLOWERS_RADIUS = new Option<>("teleport_with_followers_radius", 50D, ConfigUtil::parseDouble);
+    @ConfigOption public final Option<Double>  TELEPORT_WITH_FOLLOWERS_RADIUS = new Option<>("teleport_with_followers_radius", 100D, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Boolean> OPS_BYPASS_TELEPORT_RULES =  new Option<>("ops_bypass_teleport_rules", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICKNAMES_IN_PLAYER_LIST =   new Option<>("nicknames_in_player_list", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> NICKNAME_MAX_LENGTH =    new Option<>("nickname_max_length", 32, ConfigUtil::parseInt);
