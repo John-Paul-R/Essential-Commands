@@ -92,11 +92,12 @@ public final class PlayerTeleporter {
         BlockPos playerPos = playerEntity.getBlockPos();
         Vec3d targetVec = new Vec3d(dest.pos().x, dest.pos().y, dest.pos().z);
 
-        List<TameableEntity> pets = detectTamedPets(playerEntity, playerPos);
-
         playerEntity.teleport(targetWorld, targetVec.x, targetVec.y, targetVec.z, Set.of(), dest.headYaw(), dest.pitch(), false);
 
-        teleportTamedEntities(pets, targetWorld, targetVec, playerEntity);
+        if (CONFIG.TELEPORT_FOLLOWERS) {
+            List<TameableEntity> pets = detectTamedPets(playerEntity, playerPos);
+            teleportTamedEntities(pets, targetWorld, targetVec, playerEntity);
+        }
 
         sendTeleportMessage(playerEntity, destName, dest);
     }
@@ -117,9 +118,6 @@ public final class PlayerTeleporter {
             UUID ownerUuid = pet.getOwnerUuid();
             boolean isSameOwner = ownerUuid != null && ownerUuid.equals(playerEntity.getUuid());
             boolean isSitting = pet.isSitting();
-
-            LOGGER.info("Checking pet {} ({}) - Tamed: {}, Owner Matches: {}, Sitting: {}",
-                pet.getType().getTranslationKey(), pet.getUuid(), isTamed, isSameOwner, isSitting);
 
             return isTamed && isSameOwner && !isSitting;
         });
@@ -169,9 +167,16 @@ public final class PlayerTeleporter {
             newTamedPet.setOwner(playerEntity);
             targetWorld.spawnEntity(newTamedPet);
 
+            // sanity check to make sure the entity has spawned
+            if (newTamedPet.isRemoved()) {
+                LOGGER.error("Failed to spawn pet {} ({}) in {}", newTamedPet.getType().getTranslationKey(), newTamedPet.getUuid(), targetWorld.getRegistryKey().getValue());
+                return false;
+            }
+
             pet.discard();
             return true;
         } else {
+            // Failed to create entity from NBT
             LOGGER.error("Failed to create entity from NBT for pet ({})!", pet.getUuid());
             return false;
         }

@@ -135,7 +135,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.TELEPORT_INTERRUPT_ON_MOVE         = config.TELEPORT_INTERRUPT_ON_MOVE.getValue();
         this.TELEPORT_INTERRUPT_ON_MOVE_AMOUNT  = config.TELEPORT_INTERRUPT_ON_MOVE_AMOUNT.getValue();
         this.ALLOW_TELEPORT_BETWEEN_DIMENSIONS  = config.ALLOW_TELEPORT_BETWEEN_DIMENSIONS.getValue();
-        this.TELEPORT_FOLLOWERS                 = config.ALLOW_TELEPORT_WITH_FOLLOWERS.getValue();
+        this.TELEPORT_FOLLOWERS                 = config.TELEPORT_WITH_FOLLOWERS.getValue();
         this.TELEPORT_FOLLOWERS_RADIUS          = config.TELEPORT_WITH_FOLLOWERS_RADIUS.getValue();
         this.OPS_BYPASS_TELEPORT_RULES          = config.OPS_BYPASS_TELEPORT_RULES.getValue();
         this.NICKNAMES_IN_PLAYER_LIST           = config.NICKNAMES_IN_PLAYER_LIST.getValue();
