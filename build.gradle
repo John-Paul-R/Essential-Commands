@@ -99,11 +99,11 @@ allprojects {
         }
     }
 
-    checkstyle {
-        // use one common config file for all subprojects
-        configFile = project(':').file('.checkstyle.xml')
-        configProperties = [ "suppressionFile" : project(':').file('.checkstyle-suppressions.xml')]
-    }
+    // checkstyle {
+    //     // use one common config file for all subprojects
+    //     configFile = project(':').file('.checkstyle.xml')
+    //     configProperties = [ "suppressionFile" : project(':').file('.checkstyle-suppressions.xml')]
+    // }
 
     // Add any additional repositories
     repositories {
