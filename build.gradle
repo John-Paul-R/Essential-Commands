@@ -18,6 +18,10 @@ String getenv(String key) {
     return env.getOrDefault(key, "NOT FOUND")
 }
 
+tasks.named('remapJar').configure {
+    dependsOn(tasks.named('compileTestGroovy'))
+}
+
 allprojects {
     apply plugin: 'fabric-loom'
     apply plugin: 'idea'
