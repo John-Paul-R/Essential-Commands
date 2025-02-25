@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.playerdata;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import com.fibermc.essentialcommands.ECAbilitySources;
@@ -29,6 +30,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -515,7 +517,13 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public void save(RegistryWrapper.WrapperLookup wrapperLookup) {
-        super.save(saveFile, wrapperLookup);
+        NbtCompound data = this.toNbt(wrapperLookup);
+
+        try {
+            NbtIo.writeCompressed(data, this.saveFile.toPath());
+        } catch (IOException e) {
+            EssentialCommands.LOGGER.error("Could not save data {}", this, e);
+        }
     }
 
     public void setTimeUsedRtp(int i) {

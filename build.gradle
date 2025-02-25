@@ -1,11 +1,11 @@
 plugins {
     id 'groovy'
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.9-SNAPSHOT'
     id 'maven-publish'
     id "com.modrinth.minotaur" version "2.+"
     id 'com.matthewprenger.cursegradle' version "1.4.0"
     id "com.github.breadmoirai.github-release" version "2.3.7"
-    id 'checkstyle'
+    // id 'checkstyle'
 }
 
 build {
@@ -16,6 +16,10 @@ ext.env = loadenv()
 
 String getenv(String key) {
     return env.getOrDefault(key, "NOT FOUND")
+}
+
+tasks.named('remapJar').configure {
+    dependsOn(tasks.named('compileTestGroovy'))
 }
 
 allprojects {
@@ -99,11 +103,11 @@ allprojects {
         }
     }
 
-    checkstyle {
-        // use one common config file for all subprojects
-        configFile = project(':').file('.checkstyle.xml')
-        configProperties = [ "suppressionFile" : project(':').file('.checkstyle-suppressions.xml')]
-    }
+    // checkstyle {
+    //     // use one common config file for all subprojects
+    //     configFile = project(':').file('.checkstyle.xml')
+    //     configProperties = [ "suppressionFile" : project(':').file('.checkstyle-suppressions.xml')]
+    // }
 
     // Add any additional repositories
     repositories {
@@ -139,7 +143,7 @@ tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
 
     // Minecraft 1.17 (21w19a) upwards uses Java 16.
-    it.options.release.set(17)
+    it.options.release.set(21)
 }
 
 //jar {

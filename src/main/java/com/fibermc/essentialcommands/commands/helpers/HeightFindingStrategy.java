@@ -68,6 +68,6 @@ public enum HeightFindingStrategy implements HeightFinder {
 
     public static int getChunkHighestNonEmptySectionYOffsetOrTopY(Chunk chunk) {
         int i = chunk.getHighestNonEmptySection();
-        return i == chunk.getTopY() ? chunk.getBottomY() : ChunkSectionPos.getBlockCoord(chunk.sectionIndexToCoord(i));
+        return i == chunk.getTopYInclusive() ? chunk.getBottomY() : ChunkSectionPos.getBlockCoord(chunk.sectionIndexToCoord(i));
     }
 }

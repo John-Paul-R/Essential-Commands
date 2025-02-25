@@ -1,6 +1,6 @@
 package com.fibermc.essentialcommands.mixin;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -11,6 +11,6 @@ import net.minecraft.world.PersistentStateManager;
 public interface PersistentStateManagerInvoker {
 
     @Invoker("getFile")
-    File invokeGetFile(String id);
+    Path invokeGetFile(String id);
 
 }

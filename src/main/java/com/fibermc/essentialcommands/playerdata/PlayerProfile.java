@@ -1,10 +1,12 @@
 package com.fibermc.essentialcommands.playerdata;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.fibermc.essentialcommands.types.ProfileOption;
@@ -18,6 +20,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -139,7 +142,13 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
     }
 
     public void save(RegistryWrapper.WrapperLookup wrapperLookup) {
-        super.save(saveFile, wrapperLookup);
+        NbtCompound data = this.toNbt(wrapperLookup);
+
+        try {
+            NbtIo.writeCompressed(data, this.saveFile.toPath());
+        } catch (IOException e) {
+            EssentialCommands.LOGGER.error("Could not save data {}", this, e);
+        }
     }
 
     @Override

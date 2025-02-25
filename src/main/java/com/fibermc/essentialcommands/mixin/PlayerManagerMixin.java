@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.network.ClientConnection;
@@ -90,13 +89,11 @@ public abstract class PlayerManagerMixin {
         // created. This lets us update the EC PlayerData, sooner, might be
         // before the new ServerPlayerEntity is fully initialized.
         target = "Lnet/minecraft/server/network/ServerPlayerEntity;copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V"
-    ), locals = LocalCapture.CAPTURE_FAILHARD)
+    ))
     public void onRespawnPlayer(
-        ServerPlayerEntity oldServerPlayerEntity, boolean alive, Entity.RemovalReason removalReason
-        , CallbackInfoReturnable<ServerPlayerEntity> cir
-        , TeleportTarget teleportTarget
-        , ServerWorld serverWorld
-        , ServerPlayerEntity serverPlayerEntity
+        ServerPlayerEntity oldServerPlayerEntity, boolean alive, Entity.RemovalReason removalReason,
+        CallbackInfoReturnable<ServerPlayerEntity> cir,
+        @Local(ordinal = 1) ServerPlayerEntity serverPlayerEntity
     ) {
         PlayerDataManager.handlePlayerDataRespawnSync(oldServerPlayerEntity, serverPlayerEntity);
     }
@@ -107,7 +104,7 @@ public abstract class PlayerManagerMixin {
         // This target lets us modify respawn position and dimension (player maybe not _fully_ initialized, still)
         target = "Lnet/minecraft/server/network/ServerPlayerEntity;<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/world/ServerWorld;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/network/packet/c2s/common/SyncedClientOptions;)V"
     ))
-    public void onRespawnPlayer_forResawnLocationOverwrite(
+    public void onRespawnPlayer_forRespawnLocationOverwrite(
         CallbackInfoReturnable<ServerPlayerEntity> cir
         , @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity oldServerPlayerEntity
         , @Local(ordinal = 0) LocalRef<TeleportTarget> teleportTargetLocalRef
@@ -122,7 +119,6 @@ public abstract class PlayerManagerMixin {
                 Vec3d.ZERO,
                 0,
                 0,
-                false,
                 TeleportTarget.NO_OP
             ));
         });

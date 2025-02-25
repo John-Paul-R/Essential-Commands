@@ -23,7 +23,7 @@ import net.minecraft.server.world.ServerWorld;
 public class TeleportCommandMixin {
 
     @Inject(method = "teleport",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FF)Z")
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z")
     )
     private static void execute(
         ServerCommandSource source,
@@ -35,9 +35,8 @@ public class TeleportCommandMixin {
         @Coerce Object facingLocation,
         CallbackInfo ci
     ) throws CommandSyntaxException {
-        if (target instanceof ServerPlayerEntity) {
+        if (target instanceof ServerPlayerEntity targetPlayer) {
             // This cast is guaranteed to work because of where we inject.
-            var targetPlayer = (ServerPlayerEntity)target;
             var targetPlayerData = ((ServerPlayerEntityAccess)target).ec$getPlayerData();
             if (!targetPlayer.isSpectator()) {
                 targetPlayerData.setPreviousLocation(new MinecraftLocation(targetPlayer));
