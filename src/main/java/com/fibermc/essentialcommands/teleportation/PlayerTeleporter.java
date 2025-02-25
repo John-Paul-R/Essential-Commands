@@ -5,7 +5,10 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
@@ -67,6 +70,11 @@ public final class PlayerTeleporter {
             dest.pos().x, dest.pos().y, dest.pos().z,
             dest.headYaw(), dest.pitch()
         );
+
+        //Added by EBLCraft
+        playerEntity.playSoundToPlayer(SoundEvents.ENTITY_ENDER_PEARL_THROW, SoundCategory.MASTER, 1, 1.1f);
+        playerEntity.getWorld().addParticle(ParticleTypes.FLAME, true, playerEntity.getX(), playerEntity.getY() + 0.2, playerEntity.getZ(), 0.5, 0.5, 0.5);
+        //End of EBLCraft
 
         var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
         var playerProfile = playerAccess.ec$getProfile();
