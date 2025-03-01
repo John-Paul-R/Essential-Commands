@@ -186,7 +186,7 @@ public class PlayerDataManager {
      * @param oldPlayerEntity null if first spawn
      */
     public static void handleRespawnAtEcSpawn(
-        ServerPlayerEntity oldPlayerEntity,
+        @Nullable ServerPlayerEntity oldPlayerEntity,
         Consumer<MinecraftLocation> onOverwriteSpawn
     ) {
         var worldMgr = ManagerLocator.getInstance().getWorldDataManager();
@@ -199,12 +199,11 @@ public class PlayerDataManager {
 
         ExpressionEvaluationContext<RespawnCondition> ctx = new ExpressionEvaluationContext<>() {
             private boolean isSameWorld() {
-                return oldPlayerEntity.getWorld().getRegistryKey() == spawnLoc.dim();
+                return oldPlayerEntity == null || oldPlayerEntity.getWorld().getRegistryKey() == spawnLoc.dim();
             }
 
             private boolean hasNoBed() {
-                var vanillaPlayerSpawnPoint = oldPlayerEntity.getSpawnPointPosition();
-                return vanillaPlayerSpawnPoint == null;
+                return oldPlayerEntity == null || oldPlayerEntity.getSpawnPointPosition() == null;
             }
 
             @Override
