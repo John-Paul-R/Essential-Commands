@@ -35,7 +35,7 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
 
     @Shadow
-    public abstract boolean isSpectator();
+    public abstract GameMode getGameMode();
 
     @Unique
     public QueuedTeleport ecQueuedTeleport;
@@ -162,7 +162,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
     // Teleport hook (for /back)
     @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z", at = @At("HEAD"))
     public void onTeleport(ServerWorld world, double destX, double destY, double destZ, Set<PositionFlag> flags, float yaw, float pitch, boolean resetCamera, CallbackInfoReturnable<Boolean> cir) {
-        if (!isSpectator()) {
+        if (getGameMode() != GameMode.SPECTATOR) {
             this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
         }
     }
