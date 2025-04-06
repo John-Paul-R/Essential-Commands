@@ -62,8 +62,8 @@ public class MinecraftLocation {
             tag.getDouble("y").orElseThrow(),
             tag.getDouble("z").orElseThrow()
         );
-        this.headYaw = tag.getFloat("headYaw").orElseThrow();
-        this.pitch = tag.getFloat("pitch").orElseThrow();
+        this.headYaw = tag.getFloat("headYaw").orElse(0f);
+        this.pitch = tag.getFloat("pitch").orElse(0f);
     }
 
     public static MinecraftLocation fromNbt(NbtCompound tag) {
@@ -82,8 +82,8 @@ public class MinecraftLocation {
             tag.getDouble("y").orElseThrow(),
             tag.getDouble("z").orElseThrow()
         );
-        this.headYaw = tag.getFloat("headYaw").orElseThrow();
-        this.pitch = tag.getFloat("pitch").orElseThrow();
+        this.headYaw = tag.getFloat("headYaw").orElse(0f);
+        this.pitch = tag.getFloat("pitch").orElse(0f);
     }
 
     public NbtCompound asNbt() {
