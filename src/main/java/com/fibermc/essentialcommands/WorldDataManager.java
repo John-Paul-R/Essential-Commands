@@ -113,7 +113,6 @@ public class WorldDataManager extends PersistentState {
         EssentialCommands.log(Level.INFO, "world_data.dat saved.");
     }
 
-    @Override
     public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup wrapperLookup) {
         // Spawn to NBT
         NbtElement spawnNbt = spawnLocation != null

@@ -1,6 +1,10 @@
 package com.fibermc.essentialcommands.playerdata;
 
-import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
@@ -11,17 +15,9 @@ import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.RespawnCondition;
-import dev.jpcode.eccore.config.expression.ExpressionEvaluationContext;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
@@ -29,8 +25,16 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+
+import dev.jpcode.eccore.config.expression.ExpressionEvaluationContext;
+
+import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public class PlayerDataManager {
 
@@ -269,7 +273,9 @@ public class PlayerDataManager {
                 private boolean hasNoBed() {
                     return (
                         oldPlayerEntity == null ||
-                        oldPlayerEntity.getSpawnPointPosition() == null
+                        // This is not perfect, but 'respawn' is horribly
+                        // complex to navigate now
+                        oldPlayerEntity.getRespawn() == null
                     );
                 }
 

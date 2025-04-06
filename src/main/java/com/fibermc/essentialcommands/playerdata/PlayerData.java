@@ -20,23 +20,19 @@ import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import com.fibermc.essentialcommands.util.NicknameTextUtil;
-
-import com.mojang.serialization.Codec;
-
 import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
-
-import net.minecraft.nbt.NbtOps;
-
 import org.jetbrains.annotations.NotNull;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
 
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -372,7 +368,6 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
     }
 
-    @Override
     public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup wrapperLookup) {
         tag.put(StorageKey.PLAYER_UUID, Codec.STRING, pUuid.toString());
 

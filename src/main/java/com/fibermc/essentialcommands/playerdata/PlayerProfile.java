@@ -124,7 +124,6 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
             : Optional.empty();
     }
 
-    @Override
     public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup wrapperLookup) {
         this.profileOptions.formattingDefault
             .ifPresent(style -> tag.putString(StorageKey.FORMATTING_DEAULT, ConfigUtil.serializeStyle(style)));
