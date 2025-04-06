@@ -56,7 +56,7 @@ public final class PlayerDataFactory {
     public static PlayerData create(NamedLocationStorage homes, File saveFile) {
         String fileName = saveFile.getName();
         UUID playerUuid = UUID.fromString(fileName.substring(0, fileName.indexOf(".dat")));
-        PlayerData pData = new PlayerData(playerUuid, saveFile);
+        PlayerData pData = new PlayerData(saveFile);
         if (Files.exists(saveFile.toPath()) && saveFile.length() != 0) {
             try {
                 NbtCompound nbtCompound3 = NbtIo.readCompressed(saveFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
