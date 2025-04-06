@@ -1,9 +1,15 @@
 package com.fibermc.essentialcommands.teleportation;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -14,18 +20,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-
-import dev.jpcode.eccore.util.TextUtil;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-
-import java.util.*;
+import dev.jpcode.eccore.util.TextUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -115,7 +114,12 @@ public final class PlayerTeleporter {
 
         return playerWorld.getEntitiesByClass(TameableEntity.class, new Box(playerPos).expand(radius), pet -> {
             boolean isTamed = pet.isTamed();
-            UUID ownerUuid = Objects.requireNonNull(pet.getOwner()).getUuid();
+            var petOwner = pet.getOwner();
+            if (petOwner == null) {
+                LOGGER.warn("failed to find owner for pet with id '{}', name '{}'", pet.getUuid(), pet.getDisplayName().getString());
+                return false;
+            }
+            UUID ownerUuid = petOwner.getUuid();
             boolean isSameOwner = ownerUuid != null && ownerUuid.equals(playerEntity.getUuid());
             boolean isSitting = pet.isSitting();
 
