@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.types;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import com.fibermc.essentialcommands.ECPerms;
 
@@ -28,7 +27,7 @@ public class WarpLocation extends NamedMinecraftLocation {
     }
 
     public static WarpLocation fromNbt(NbtCompound tag, String name) {
-        String permissionString1 = String.valueOf(tag.getString("permissionString"));
+        String permissionString1 = tag.getString("permissionString").orElseThrow();
         if (Objects.equals(permissionString1, "")) {
             permissionString1 = null;
         }
