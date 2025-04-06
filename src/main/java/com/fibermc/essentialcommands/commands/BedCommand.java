@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands.commands;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import com.fibermc.essentialcommands.playerdata.PlayerData;
@@ -20,6 +19,7 @@ import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
@@ -51,22 +51,13 @@ public class BedCommand implements Command<ServerCommandSource> {
      * block)
      */
     private static Optional<MinecraftLocation> getSafeSpawnPos(ServerPlayerEntity player) {
-        var spawnPos = player.getSpawnPointPosition();
-        if (spawnPos == null) {
+        var respawn = player.getRespawn();
+        if (respawn == null) {
             return Optional.empty();
         }
 
-        var spawnDim = player.getSpawnPointDimension();
-        var spawnAngle = player.getSpawnAngle();
-
-        var world = Objects.requireNonNull(player.getServer()).getWorld(spawnDim);
-
-        if (world == null) {
-            throw new IllegalStateException(String.format(
-                "could not resolve the ServerWorld corresponding to the player's spawn dimension. dimension: '%s'",
-                spawnDim.getValue())
-            );
-        }
+        ServerWorld world = player.server.getWorld(respawn.dimension());
+        var spawnPos = respawn.pos();
 
         // Safe Position Calculation, based on the game respawn position calculation logic,
         // which was basically rewritten because the game code caused the state of the RespawnAnchorBlock to be refreshed.
@@ -79,7 +70,7 @@ public class BedCommand implements Command<ServerCommandSource> {
             Optional<Vec3d> optional = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, world, spawnPos);
             safeSpawnPos = optional.orElseGet(() -> new Vec3d((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 1, (double) spawnPos.getZ() + 0.5));
         } else if (block instanceof BedBlock && BedBlock.isBedWorking(world)) {
-            Optional<Vec3d> optional =  BedBlock.findWakeUpPosition(EntityType.PLAYER, world, spawnPos, (Direction)blockState.get(BedBlock.FACING), spawnAngle);
+            Optional<Vec3d> optional = BedBlock.findWakeUpPosition(EntityType.PLAYER, world, spawnPos, (Direction)blockState.get(BedBlock.FACING), respawn.angle());
             safeSpawnPos = optional.orElseGet(() -> new Vec3d((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 0.5625, (double) spawnPos.getZ() + 0.5));
         } else {
             boolean bl = block.canMobSpawnInside(blockState);
@@ -92,6 +83,6 @@ public class BedCommand implements Command<ServerCommandSource> {
             }
         }
 
-        return Optional.of(new MinecraftLocation(spawnDim, safeSpawnPos.getX(), safeSpawnPos.getY(), safeSpawnPos.getZ()));
+        return Optional.of(new MinecraftLocation(respawn.dimension(), safeSpawnPos.getX(), safeSpawnPos.getY(), safeSpawnPos.getZ()));
     }
 }
