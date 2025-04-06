@@ -19,7 +19,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.command.ServerCommandSource;
@@ -107,21 +106,16 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
         NbtCompound dataTag = tag.getCompoundOrEmpty("data");
         this.profileOptions = new ProfileOptions();
 
-        this.profileOptions.formattingDefault = Optional.ofNullable(dataTag.get(StorageKey.FORMATTING_DEAULT))
-            .flatMap(NbtElement::asString)
+        this.profileOptions.formattingDefault = dataTag.getString(StorageKey.FORMATTING_DEAULT)
             .flatMap(s -> Optional.ofNullable(ConfigUtil.parseStyle(s)));
 
-        this.profileOptions.formattingAccent = Optional.ofNullable(dataTag.get(StorageKey.FORMATTING_ACCENT))
-            .flatMap(NbtElement::asString)
+        this.profileOptions.formattingAccent = dataTag.getString(StorageKey.FORMATTING_ACCENT)
             .flatMap(s -> Optional.ofNullable(ConfigUtil.parseStyle(s)));
 
-        this.profileOptions.formattingError = Optional.ofNullable(dataTag.get(StorageKey.FORMATTING_ERROR))
-            .flatMap(NbtElement::asString)
+        this.profileOptions.formattingError = dataTag.getString(StorageKey.FORMATTING_ERROR)
             .flatMap(s -> Optional.ofNullable(ConfigUtil.parseStyle(s)));
 
-        this.profileOptions.printTeleportCoordinates = dataTag.contains(StorageKey.PRINT_TELEPORT_COORDINATES)
-            ? Optional.of(dataTag.getBoolean(StorageKey.PRINT_TELEPORT_COORDINATES).orElseThrow())
-            : Optional.empty();
+        this.profileOptions.printTeleportCoordinates = dataTag.getBoolean(StorageKey.PRINT_TELEPORT_COORDINATES);
     }
 
     public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup wrapperLookup) {
