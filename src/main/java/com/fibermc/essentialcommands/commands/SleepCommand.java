@@ -32,10 +32,6 @@ public class SleepCommand implements Command<ServerCommandSource> {
             return 0;
         }
 
-        if (CONFIG.SLEEP_INVULN) {
-            // todo: set invuln ability
-        }
-
         player.sleep(pos);
         playerData.setIsSleepingFromCommand(true);
 

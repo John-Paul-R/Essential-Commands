@@ -94,6 +94,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             updateLastActionTick();
             setAfk(false);
         });
+        // this should never stick around between respawns
+        Pal.revokeAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.SLEEP_INVULN);
     }
 
     /**
@@ -318,6 +320,9 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
     public void setIsSleepingFromCommand(boolean sleepingFromCommand) {
         this.isSleepingFromCommand = sleepingFromCommand;
+        if (CONFIG.SLEEP_INVULN && sleepingFromCommand) {
+            Pal.grantAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.SLEEP_INVULN);
+        }
     }
 
     private static final class StorageKey {
