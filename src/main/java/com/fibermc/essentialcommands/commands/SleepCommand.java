@@ -1,6 +1,5 @@
 package com.fibermc.essentialcommands.commands;
 
-import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.util.PlayerUtilities;
 
@@ -9,6 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -17,7 +17,6 @@ public class SleepCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         var source = context.getSource();
         var player = source.getPlayerOrThrow();
-        var playerAccess = (ServerPlayerEntityAccess)player;
         var playerData = PlayerData.access(player);
         var pos = player.getBlockPos();
 
@@ -27,8 +26,7 @@ public class SleepCommand implements Command<ServerCommandSource> {
         }
 
         if (!CONFIG.SLEEP_NEAR_MONSTERS && PlayerUtilities.isNearAngryMonsters(player)) {
-            // todo: use mc text?
-            PlayerData.access(player).sendError("cmd.sleep.error.near_monsters");
+            PlayerData.access(player).sendCommandError(Text.translatable("block.minecraft.bed.not_safe"));
             return 0;
         }
 
