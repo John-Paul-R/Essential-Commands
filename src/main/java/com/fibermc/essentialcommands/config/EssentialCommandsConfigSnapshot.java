@@ -48,6 +48,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean ENABLE_NIGHT;
     public final boolean ENABLE_REPAIR;
     public final boolean ENABLE_NEAR;
+    public final boolean ENABLE_SLEEP;
     public final boolean ENABLE_DELETE_ALL_PLAYER_DATA;
     public final List<Integer> HOME_LIMIT;
     public final double TELEPORT_COOLDOWN;
@@ -80,6 +81,8 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean INVULN_WHILE_AFK;
     public final boolean AUTO_AFK_ENABLED;
     public final int AUTO_AFK_TICKS;
+    public final boolean SLEEP_NEAR_MONSTERS;
+    public final boolean SLEEP_INVULN;
     public final boolean REGISTER_TOP_LEVEL_COMMANDS;
     public final List<String> EXCLUDED_TOP_LEVEL_COMMANDS;
     public final Expression<RespawnCondition> RESPAWN_AT_EC_SPAWN;
@@ -123,6 +126,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.ENABLE_NIGHT                       = config.ENABLE_NIGHT.getValue();
         this.ENABLE_REPAIR                      = config.ENABLE_REPAIR.getValue();
         this.ENABLE_NEAR                        = config.ENABLE_NEAR.getValue();
+        this.ENABLE_SLEEP                       = config.ENABLE_SLEEP.getValue();
         this.ENABLE_DELETE_ALL_PLAYER_DATA      = config.ENABLE_DELETE_ALL_PLAYER_DATA.getValue();
         this.HOME_LIMIT                         = config.HOME_LIMIT.getValue();
         this.TELEPORT_COOLDOWN                  = config.TELEPORT_COOLDOWN.getValue();
@@ -155,6 +159,8 @@ public final class EssentialCommandsConfigSnapshot {
         this.INVULN_WHILE_AFK                   = config.INVULN_WHILE_AFK.getValue();
         this.AUTO_AFK_ENABLED                   = config.AUTO_AFK_ENABLED.getValue();
         this.AUTO_AFK_TICKS                     = config.AUTO_AFK_TICKS.getValue();
+        this.SLEEP_NEAR_MONSTERS                = config.SLEEP_NEAR_MONSTERS.getValue();
+        this.SLEEP_INVULN                       = config.SLEEP_INVULN.getValue();
         this.REGISTER_TOP_LEVEL_COMMANDS        = config.REGISTER_TOP_LEVEL_COMMANDS.getValue();
         this.EXCLUDED_TOP_LEVEL_COMMANDS        = config.EXCLUDED_TOP_LEVEL_COMMANDS.getValue();
         this.RESPAWN_AT_EC_SPAWN                = config.RESPAWN_AT_EC_SPAWN.getValue();

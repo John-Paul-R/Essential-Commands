@@ -70,6 +70,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> ENABLE_NIGHT =           new Option<>("enable_night", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_REPAIR =          new Option<>("enable_repair", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_NEAR =            new Option<>("enable_near", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_SLEEP =           new Option<>("enable_sleep", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_DELETE_ALL_PLAYER_DATA = new Option<>("enable_delete_all_player_data", true, Boolean::parseBoolean);
     @ConfigOption public final Option<List<Integer>> HOME_LIMIT =       new Option<>("home_limit", List.of(1, 2, 5), arrayParser(ConfigUtil::parseInt));
     @ConfigOption public final Option<Double>  TELEPORT_COOLDOWN =      new Option<>("teleport_cooldown", 1.0, ConfigUtil::parseDouble);
@@ -102,6 +103,8 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> INVULN_WHILE_AFK = new Option<>("invuln_while_afk", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> AUTO_AFK_ENABLED = new Option<>("auto_afk_enabled", true,  Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> AUTO_AFK_TICKS = new Option<>("auto_afk_time", durationToTicks(Duration.ofMinutes(15)), ConfigUtil::parseDurationToTicks, ConfigUtil::serializeTicksAsDuration);
+    @ConfigOption public final Option<Boolean> SLEEP_NEAR_MONSTERS = new Option<>("sleep_near_monsters", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> SLEEP_INVULN = new Option<>("sleep_invuln", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> REGISTER_TOP_LEVEL_COMMANDS = new Option<>("register_top_level_commands", true, Boolean::parseBoolean);
     @ConfigOption public final Option<List<String>> EXCLUDED_TOP_LEVEL_COMMANDS = new Option<>("excluded_top_level_commands", List.of(), ConfigUtil.arrayParser(Object::toString));
     @ConfigOption public final Option<Expression<RespawnCondition>> RESPAWN_AT_EC_SPAWN = new Option<>("respawn_at_ec_spawn", Expression.of(RespawnCondition.Never), (str) -> str.isBlank() ? Expression.of(RespawnCondition.Never) : PatternMatchingExpressionReader.parse(str, RespawnCondition::valueOf), Expression::serialize);

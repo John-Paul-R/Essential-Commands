@@ -459,6 +459,13 @@ public final class EssentialCommandRegistry {
                 .build());
         }
 
+        if (CONFIG.ENABLE_SLEEP) {
+            registerNode.accept(CommandManager.literal("sleep")
+                .requires(ECPerms.require(ECPerms.Registry.sleep, 0))
+                .executes(new SleepCommand())
+                .build());
+        }
+
         registerNode.accept(CommandManager.literal("lastPos")
             .requires(ECPerms.require("essentialcommands.admin.lastpos", 2))
                 .then(argument("target_player", StringArgumentType.word())

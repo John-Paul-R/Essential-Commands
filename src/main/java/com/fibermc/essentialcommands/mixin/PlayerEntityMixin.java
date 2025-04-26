@@ -18,7 +18,7 @@ import net.minecraft.text.Text;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 @Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin {
+public abstract class PlayerEntityMixin extends LivingEntityMixin {
     @Inject(method = "getDisplayName", at = @At("RETURN"))
     public void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
 

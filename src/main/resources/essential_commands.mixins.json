@@ -3,6 +3,7 @@
   "package": "com.fibermc.essentialcommands.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "LivingEntityMixin",
     "PersistentStateManagerInvoker",
     "PlayerEntityMixin",
     "PlayerListS2CPacketActionMixin",

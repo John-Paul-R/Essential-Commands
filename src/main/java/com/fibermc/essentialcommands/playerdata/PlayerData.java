@@ -80,6 +80,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     private int lastActionTick;
     private int lastMovedTick;
     private boolean hasMovedThisTick;
+    private boolean isSleepingFromCommand;
 
     public PlayerData(ServerPlayerEntity player, File saveFile) {
         this.player = player;
@@ -309,6 +310,14 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
     public void updateLastActionTick() {
         this.lastActionTick = player.server.getTicks();
+    }
+
+    public boolean isSleepingFromCommand() {
+        return isSleepingFromCommand;
+    }
+
+    public void setIsSleepingFromCommand(boolean sleepingFromCommand) {
+        this.isSleepingFromCommand = sleepingFromCommand;
     }
 
     private static final class StorageKey {
