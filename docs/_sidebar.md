@@ -1,4 +1,5 @@
 - [Welcome](Welcome)
+- [Feature Guide](Feature-Guide)
 - [Config Documentation](Config-Documentation)
 - [List of Commands & Permissions](List-of-Commands-&-Permissions)
 - [Home Limits](Home-Limit)
