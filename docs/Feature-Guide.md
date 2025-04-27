@@ -40,7 +40,8 @@ Essential Commands provides a request-based teleportation system that allows any
 - `teleport_request_duration` - How long teleport requests remain valid (seconds) - Default: `60`
 
 ### Player Homes (`/home`)
-The home system allows players to save and teleport to personal locations.
+
+A `home` is a location that player has saved and given a name with `/home set <home_name>`, and can be returned to with `/home tp <home_name>`. Only the player that created the home can see or teleport to it.
 
 | Feature | Commands | Permissions |
 |---------|----------|------------|
