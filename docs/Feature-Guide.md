@@ -16,11 +16,14 @@ Essential Commands provides a request-based teleportation system that respects p
 | Cancel teleport request | `/tpcancel <player>` | Same as original teleport |
 
 **Related Config Options:**
-- `teleport_delay` - Wait time before teleportation occurs (seconds)
-- `teleport_interrupt_on_damaged` - Whether taking damage cancels teleportation
-- `teleport_interrupt_on_move` - Whether movement cancels teleportation
-- `allow_teleport_between_dimensions` - Allow teleporting across dimensions
-- `teleport_request_duration` - How long teleport requests remain valid (seconds)
+- `teleport_delay` - Wait time before teleportation occurs (seconds) - Default: `0.0`
+- `teleport_interrupt_on_damaged` - Whether taking damage cancels teleportation - Default: `true`
+- `teleport_interrupt_on_move` - Whether movement cancels teleportation - Default: `false`
+- `teleport_interrupt_on_move_max_blocks` - Maximum blocks movement allowed before teleport is canceled - Default: `3.0`
+- `allow_teleport_between_dimensions` - Allow teleporting across dimensions - Default: `true`
+- `teleport_request_duration` - How long teleport requests remain valid (seconds) - Default: `60`
+- `teleport_with_followers` - Whether followers teleport with the player - Default: `false`
+- `teleport_with_followers_radius` - Maximum radius to look for followers - Default: `100.0`
 
 **Bypass Permissions:**
 - `essentialcommands.bypass.teleport_delay` - Ignore teleport delay
@@ -33,30 +36,30 @@ The home system allows players to save and teleport to personal locations.
 
 | Feature | Commands | Permissions |
 |---------|----------|------------|
-| Set a home | `/home set <name>` | `essentialcommands.home.set` |
-| Overwrite existing home | `/home overwritehome <name>` | `essentialcommands.home.set` |
-| Teleport to home | `/home tp <name>` | `essentialcommands.home.tp` |
+| Set a home | `/home set <n>` | `essentialcommands.home.set` |
+| Overwrite existing home | `/home overwritehome <n>` | `essentialcommands.home.set` |
+| Teleport to home | `/home tp <n>` | `essentialcommands.home.tp` |
 | List homes | `/home list` | `essentialcommands.home.tp` |
-| Delete home | `/home delete <name>` | `essentialcommands.home.delete` |
-| Teleport to another player's home | `/home tp_other <player> <name>` | `essentialcommands.home_tp_others` |
+| Delete home | `/home delete <n>` | `essentialcommands.home.delete` |
+| Teleport to another player's home | `/home tp_other <player> <n>` | `essentialcommands.home_tp_others` |
 | List offline player's homes | `/home list_offline <player>` | `essentialcommands.home_tp_others` |
 
 **Related Config Options:**
-- `home_limit` - Maximum number of homes a player can have (see [Home Limit](Home-Limit) for details)
-- `grant_lowest_numeric_by_default` - Give non-permission players access to the minimum home limit
+- `home_limit` - Maximum number of homes a player can have (see [Home Limit](Home-Limit) for details) - Default: `[1, 2, 5]`
+- `grant_lowest_numeric_by_default` - Give non-permission players access to the minimum home limit - Default: `true`
 
 ### Warps
 Warps are server-wide teleport locations accessible to all players with permissions.
 
 | Feature | Commands | Permissions |
 |---------|----------|------------|
-| Create a warp | `/warp set <name>` | `essentialcommands.warp.set` |
-| Teleport to warp | `/warp tp <name>` | `essentialcommands.warp.tp` or<br>`essentialcommands.warp.tp_named.<warp_name>` |
+| Create a warp | `/warp set <n>` | `essentialcommands.warp.set` |
+| Teleport to warp | `/warp tp <n>` | `essentialcommands.warp.tp` or<br>`essentialcommands.warp.tp_named.<warp_name>` |
 | List available warps | `/warp list` | `essentialcommands.warp.tp` |
-| Delete a warp | `/warp delete <name>` | `essentialcommands.warp.delete` |
+| Delete a warp | `/warp delete <n>` | `essentialcommands.warp.delete` |
 
 **Related Config Options:**
-- `enable_warp` - Enables/disables warp functionality
+- `enable_warp` - Enables/disables warp functionality - Default: `true`
 
 ### Spawn Management
 Server-wide spawn point management.
@@ -67,8 +70,8 @@ Server-wide spawn point management.
 | Set server spawn | `/spawn set` | `essentialcommands.spawn.set` |
 
 **Related Config Options:**
-- `enable_spawn` - Enables/disables spawn commands
-- `respawn_at_ec_spawn` - Controls when players respawn at the EC spawn point. Accepts these values as an [Expression](Config-Documentation.md#expression):
+- `enable_spawn` - Enables/disables spawn commands - Default: `true`
+- `respawn_at_ec_spawn` - Controls when players respawn at the EC spawn point. Accepts these values as an [Expression](Config-Documentation.md#expression) - Default: `Never`
   - `Never` - Players never respawn at EC spawn (default)
   - `Always` - Players always respawn at EC spawn
   - `NoBed` - Players respawn at EC spawn only when they don't have a bed
@@ -88,15 +91,18 @@ Additional teleportation options.
 | Teleport to highest block | `/top` | `essentialcommands.top` |
 
 **Related Config Options:**
-- `enable_back` - Enables/disables back command
-- `allow_back_on_death` - Whether `/back` works after death
-- `persist_back_location` - Whether back location persists across server restarts
-- `enable_rtp` - Enables/disables random teleport
-- `rtp_radius` - Maximum distance for random teleport
-- `rtp_min_radius` - Minimum distance for random teleport
-- `rtp_cooldown` - Cooldown between random teleports
-- `rtp_max_attempts` - Maximum tries to find valid location
-- `rtp_enabled_worlds` - Worlds where RTP is enabled
+- `enable_back` - Enables/disables back command - Default: `true`
+- `allow_back_on_death` - Whether `/back` works after death - Default: `false`
+- `persist_back_location` - Whether back location persists across server restarts - Default: `false`
+- `enable_rtp` - Enables/disables random teleport - Default: `true`
+- `rtp_radius` - Maximum distance for random teleport - Default: `1000`
+- `rtp_min_radius` - Minimum distance for random teleport - Default: Same as `rtp_radius` (`1000`)
+- `rtp_cooldown` - Cooldown between random teleports (seconds) - Default: `30`
+- `rtp_max_attempts` - Maximum tries to find valid location - Default: `15`
+- `rtp_enabled_worlds` - Worlds where RTP is enabled - Default: `overworld`
+- `enable_top` - Enables/disables top command - Default: `true`
+- `enable_bed` - Enables/disables bed command - Default: `false`
+- `print_teleport_coordinates` - Whether to show teleport coordinates - Default: `true`
 
 ## Player Abilities & Status
 
@@ -113,7 +119,8 @@ Control player flight abilities.
 | Reset others' flight speed | `/fly speed <player> reset` | `essentialcommands.fly.others` |
 
 **Related Config Options:**
-- `enable_fly` - Enables/disables flight commands
+- `enable_fly` - Enables/disables flight commands - Default: `true`
+- `fly_max_speed` - Maximum allowed flight speed - Default: `5`
 
 ### Invulnerability
 Make players immune to damage.
@@ -124,7 +131,7 @@ Make players immune to damage.
 | Toggle invulnerability for others | `/invuln <player>` | `essentialcommands.invuln.others` |
 
 **Related Config Options:**
-- `enable_invuln` - Enables/disables invulnerability commands
+- `enable_invuln` - Enables/disables invulnerability commands - Default: `true`
 
 ### AFK (Away From Keyboard)
 Mark players as AFK with optional automatic detection.
@@ -134,12 +141,11 @@ Mark players as AFK with optional automatic detection.
 | Toggle AFK status | `/afk` | `essentialcommands.afk` |
 
 **Related Config Options:**
-- `enable_afk` - Enables/disables AFK functionality
-- `auto_afk_enabled` - Enables automatic AFK detection
-- `auto_afk_time` - Time before player is marked AFK automatically
-- `afk_prefix` - Text prefix shown for AFK players
-- `invuln_while_afk` - Whether AFK players are invulnerable
-- `afk_prefix` - Prefix shown for AFK players
+- `enable_afk` - Enables/disables AFK functionality - Default: `true`
+- `auto_afk_enabled` - Enables automatic AFK detection - Default: `true`
+- `auto_afk_time` - Time before player is marked AFK automatically - Default: `PT15M` (15 minutes)
+- `afk_prefix` - Text prefix shown for AFK players - Default: `[AFK]` (gray)
+- `invuln_while_afk` - Whether AFK players are invulnerable - Default: `false`
 
 ### Nicknames
 Customize player display names.
@@ -159,12 +165,12 @@ Customize player display names.
 - `essentialcommands.nickname.style.click` - Use click actions on nicknames
 
 **Related Config Options:**
-- `enable_nick` - Enables/disables nickname functionality
-- `nickname_prefix` - Prefix shown before nicknames
-- `nickname_max_length` - Maximum nickname length
-- `nick_reveal_on_hover` - Show real name on nickname hover
-- `nickname_above_head` - Show nickname above player's head
-- `nicknames_in_player_list` - Show nicknames in tab list
+- `enable_nick` - Enables/disables nickname functionality - Default: `true`
+- `nickname_prefix` - Prefix shown before nicknames - Default: `~` (red)
+- `nickname_max_length` - Maximum nickname length - Default: `32`
+- `nick_reveal_on_hover` - Show real name on nickname hover - Default: `true`
+- `nickname_above_head` - Show nickname above player's head - Default: `false`
+- `nicknames_in_player_list` - Show nicknames in tab list - Default: `true`
 
 ## Utility Commands
 
@@ -182,6 +188,13 @@ Commands to help with player survival needs.
 | Repair held item | `/repair` | `essentialcommands.repair` |
 | End your life | `/suicide` | `essentialcommands.suicide` |
 
+**Related Config Options:**
+- `enable_feed` - Enables/disables feed command - Default: `true`
+- `enable_heal` - Enables/disables heal command - Default: `true`
+- `enable_extinguish` - Enables/disables extinguish command - Default: `true`
+- `enable_repair` - Enables/disables repair command - Default: `true`
+- `enable_suicide` - Enables/disables suicide command - Default: `true`
+
 ### World Commands
 Commands to interact with the world.
 
@@ -193,7 +206,12 @@ Commands to interact with the world.
 | Find nearby players | `/near` | `essentialcommands.near` |
 
 **Related Config Options:**
-- `enable_gametime` - Enables/disables gametime command
+- `enable_gametime` - Enables/disables gametime command - Default: `true`
+- `enable_day` - Enables/disables day command - Default: `true`
+- `enable_night` - Enables/disables night command - Default: `true`
+- `enable_near` - Enables/disables near command - Default: `true`
+- `near_command_default_radius` - Default search radius for near command - Default: `200`
+- `near_command_max_radius` - Maximum search radius for near command - Default: `200`
 
 ### Workbenches
 Access crafting and other stations anywhere.
@@ -208,10 +226,10 @@ Access crafting and other stations anywhere.
 | Waste disposal | `/wastebin` | `essentialcommands.wastebin` |
 
 **Related Config Options:**
-- `enable_workbench` - Enables/disables workbench commands
-- `enable_anvil` - Enables/disables anvil command
-- `enable_enderchest` - Enables/disables enderchest command
-- `enable_wastebin` - Enables/disables wastebin command
+- `enable_workbench` - Enables/disables workbench commands - Default: `true`
+- `enable_anvil` - Enables/disables anvil command - Default: `false`
+- `enable_enderchest` - Enables/disables enderchest command - Default: `true`
+- `enable_wastebin` - Enables/disables wastebin command - Default: `true`
 
 ### Player Trading
 Direct trading between players.
@@ -230,6 +248,9 @@ Display and manage server rules.
 | View rules | `/rules` | `essentialcommands.rules` |
 | Reload rules file | `/rules reload` | `essentialcommands.rules_reload` |
 
+**Related Config Options:**
+- `enable_rules` - Enables/disables rules command - Default: `true`
+
 ### MOTD (Message of the Day)
 Server welcome message.
 
@@ -238,8 +259,8 @@ Server welcome message.
 | View MOTD | `/motd` | - |
 
 **Related Config Options:**
-- `enable_motd` - Enables/disables MOTD command
-- `motd` - The message shown to players
+- `enable_motd` - Enables/disables MOTD command - Default: `false`
+- `motd` - The message shown to players - Default: `<yellow>Welcome to our server <blue>%player:displayname%</blue>!\nPlease read the rules.</yellow>`
 
 ## Sleep Command
 
@@ -248,9 +269,9 @@ Server welcome message.
 | Bedless sleeping | `/sleep` | `essentialcommands.sleep` |
 
 **Related Config Options:**
-- `enable_sleep` - Enables/disables sleep command
-- `sleep_invuln` - Whether players are invulnerable while sleeping
-- `sleep_near_monsters` - Whether players can sleep with monsters nearby
+- `enable_sleep` - Enables/disables sleep command - Default: `false`
+- `sleep_invuln` - Whether players are invulnerable while sleeping - Default: `false`
+- `sleep_near_monsters` - Whether players can sleep with monsters nearby - Default: `false`
 
 ## Player Profiles
 Players can customize their personal Essential Commands experience through profiles.
@@ -279,6 +300,9 @@ This command is extremely powerful and should be restricted to server administra
 |---------|----------|------------|
 | Erase all player data | `/clearplayerdata` | OP level 4 only |
 
+**Related Config Options:**
+- `enable_delete_all_player_data` - Enables/disables clear player data command - Default: `true`
+
 **Warning:** This command will remove all homes, nicknames, and other player-specific data from Essential Commands. This action cannot be undone.
 
 ### Config Management
@@ -293,10 +317,11 @@ By default, Essential Commands grants all players access to some reasonable comm
 
 For more control, Essential Commands also supports the Fabric permissions API, which allows choosing exactly which features each player (or group of players) have access to, via a permissions mod like [LuckPerms][luck-perms] and [PlayerRoles][player-roles]. To use the permissions system, enable it in the config by settings `use_permissions_api` to `true`.
 
-| Config Option | Description |
-|---------------|-------------|
-| `use_permissions_api` | Enable permissions-based access control |
-| `ops_bypass_teleport_rules` | Whether server operators bypass teleport restrictions |
+| Config Option | Description | Default |
+|---------------|-------------|---------|
+| `use_permissions_api` | Enable permissions-based access control | `false` |
+| `ops_bypass_teleport_rules` | Whether server operators bypass teleport restrictions | `true` |
+| `recheck_player_ability_permissions_on_dimension_change` | Re-verify player ability permissions when changing dimensions | `false` |
 
 When permissions are enabled:
 - Each command has its own permission node
@@ -307,11 +332,21 @@ For more detailed information on specific commands and permissions, see [List of
 
 ## Visual Customization
 
-| Config Option | Description |
-|---------------|-------------|
-| `formatting_default` | Default text formatting |
-| `formatting_accent` | Accent text formatting |
-| `formatting_error` | Error text formatting |
+| Config Option | Description | Default |
+|---------------|-------------|---------|
+| `formatting_default` | Default text formatting | `gold` |
+| `formatting_accent` | Accent text formatting | `light_purple` |
+| `formatting_error` | Error text formatting | `red` |
+
+## Miscellaneous Options
+
+| Config Option | Description | Default |
+|---------------|-------------|---------|
+| `check_for_updates` | Whether to check for mod updates | `true` |
+| `broadcast_to_ops` | Whether to broadcast certain actions to operators | `false` |
+| `register_top_level_commands` | Register commands at top level (e.g., `/home` vs. `/ec home`) | `true` |
+| `excluded_top_level_commands` | List of commands to exclude from top-level registration | `[]` |
+| `language` | Default language for mod messages | `en_us` |
 
 [luck-perms]: https://luckperms.net/wiki/Usage
 [player-roles]: https://github.com/NucleoidMC/player-roles
