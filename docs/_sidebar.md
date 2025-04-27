@@ -5,4 +5,5 @@
 - [Home Limits](Home-Limit)
 - [Player Profiles](Player-Profiles)
 - [Recommended Companion Mods](Recommended-Companion-Mods)
+- [Language](Language)
 - [File Locations](File-locations)
