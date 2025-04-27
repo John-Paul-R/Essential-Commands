@@ -4,8 +4,29 @@ This guide provides a comprehensive overview of Essential Commands features, org
 
 ## Teleportation Features
 
-### Player-to-Player Teleportation
-Essential Commands provides a request-based teleportation system that respects player consent.
+Essential Commands offers a few different commands that perform teleports. The following config options apply to all of them:
+
+- `teleport_delay` - Wait time before teleportation occurs (seconds) - Default: `0.0`
+- `teleport_interrupt_on_damaged` - Whether taking damage cancels teleportation - Default: `true`
+- `teleport_interrupt_on_move` - Whether movement cancels teleportation - Default: `false`
+- `teleport_interrupt_on_move_max_blocks` - Maximum blocks movement allowed before teleport is canceled - Default: `3.0`
+- `allow_teleport_between_dimensions` - Allow teleporting across dimensions - Default: `true`
+- `teleport_with_followers` - Whether followers teleport with the player - Default: `false`
+- `teleport_with_followers_radius` - Maximum radius to look for followers - Default: `100.0`
+
+Some of the restrictions imposed by some of the above options can be bypassed by select players when using a permissions mod, with the following permissions:
+
+- `essentialcommands.bypass.teleport_delay` - Ignore teleport delay
+- `essentialcommands.bypass.allow_teleport_between_dimensions` - Ignore dimension restrictions
+- `essentialcommands.bypass.teleport_interrupt_on_damaged` - Ignore damage interruption
+- `essentialcommands.bypass.teleport_interrupt_on_move` - Ignore movement interruption
+
+Alternatively, if not using a permissions mod, ops can be allowed to bypass _all_ teleport rules with the following config option:
+
+- `ops_bypass_teleport_rules` - Whether server operators bypass teleport restrictions - Default: `true`
+
+### Player-to-Player Teleportation (`/tpa`)
+Essential Commands provides a request-based teleportation system that allows any player to teleport to any other player, (or have someone else teleport to them), as long as the other player say 'yes' to the request.
 
 | Feature | Commands | Permissions |
 |---------|----------|------------|
@@ -16,22 +37,9 @@ Essential Commands provides a request-based teleportation system that respects p
 | Cancel teleport request | `/tpcancel <player>` | Same as original teleport |
 
 **Related Config Options:**
-- `teleport_delay` - Wait time before teleportation occurs (seconds) - Default: `0.0`
-- `teleport_interrupt_on_damaged` - Whether taking damage cancels teleportation - Default: `true`
-- `teleport_interrupt_on_move` - Whether movement cancels teleportation - Default: `false`
-- `teleport_interrupt_on_move_max_blocks` - Maximum blocks movement allowed before teleport is canceled - Default: `3.0`
-- `allow_teleport_between_dimensions` - Allow teleporting across dimensions - Default: `true`
 - `teleport_request_duration` - How long teleport requests remain valid (seconds) - Default: `60`
-- `teleport_with_followers` - Whether followers teleport with the player - Default: `false`
-- `teleport_with_followers_radius` - Maximum radius to look for followers - Default: `100.0`
 
-**Bypass Permissions:**
-- `essentialcommands.bypass.teleport_delay` - Ignore teleport delay
-- `essentialcommands.bypass.allow_teleport_between_dimensions` - Ignore dimension restrictions
-- `essentialcommands.bypass.teleport_interrupt_on_damaged` - Ignore damage interruption
-- `essentialcommands.bypass.teleport_interrupt_on_move` - Ignore movement interruption
-
-### Home System
+### Player Homes (`/home`)
 The home system allows players to save and teleport to personal locations.
 
 | Feature | Commands | Permissions |
@@ -48,7 +56,7 @@ The home system allows players to save and teleport to personal locations.
 - `home_limit` - Maximum number of homes a player can have (see [Home Limit](Home-Limit) for details) - Default: `[1, 2, 5]`
 - `grant_lowest_numeric_by_default` - Give non-permission players access to the minimum home limit - Default: `true`
 
-### Warps
+### Server Warps (`/warp`)
 Warps are server-wide teleport locations accessible to all players with permissions.
 
 | Feature | Commands | Permissions |
@@ -61,7 +69,7 @@ Warps are server-wide teleport locations accessible to all players with permissi
 **Related Config Options:**
 - `enable_warp` - Enables/disables warp functionality - Default: `true`
 
-### Spawn Management
+### Server Spawn
 Server-wide spawn point management.
 
 | Feature | Commands | Permissions |
@@ -87,12 +95,12 @@ Additional teleportation options.
 |---------|----------|------------|
 | Return to previous location | `/back` | `essentialcommands.back` |
 | Teleport to random location | `/rtp` or `/randomteleport` | `essentialcommands.randomteleport` |
-| Teleport to your bed | `/bed` | `essentialcommands.bed` |
+| Teleport to your bed or spawnpoint | `/bed` | `essentialcommands.bed` |
 | Teleport to highest block | `/top` | `essentialcommands.top` |
 
 **Related Config Options:**
 - `enable_back` - Enables/disables back command - Default: `true`
-- `allow_back_on_death` - Whether `/back` works after death - Default: `false`
+- `allow_back_on_death` - Whether `/back` allows players to jump back to their death location - Default: `false`
 - `persist_back_location` - Whether back location persists across server restarts - Default: `false`
 - `enable_rtp` - Enables/disables random teleport - Default: `true`
 - `rtp_radius` - Maximum distance for random teleport - Default: `1000`
@@ -104,7 +112,7 @@ Additional teleportation options.
 - `enable_bed` - Enables/disables bed command - Default: `false`
 - `print_teleport_coordinates` - Whether to show teleport coordinates - Default: `true`
 
-## Player Abilities & Status
+## Player Abilities, Status, and Display
 
 ### Flight
 Control player flight abilities.
@@ -315,7 +323,6 @@ For more control, Essential Commands also supports the Fabric permissions API, w
 | Config Option | Description | Default |
 |---------------|-------------|---------|
 | `use_permissions_api` | Enable permissions-based access control | `false` |
-| `ops_bypass_teleport_rules` | Whether server operators bypass teleport restrictions | `true` |
 | `recheck_player_ability_permissions_on_dimension_change` | Re-verify player ability permissions when changing dimensions | `false` |
 
 When permissions are enabled:
