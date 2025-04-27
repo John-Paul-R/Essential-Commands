@@ -245,7 +245,7 @@ Access crafting and other stations anywhere.
 | Stonecutter | `/stonecutter` | `essentialcommands.workbench` |
 | Anvil | `/anvil` | `essentialcommands.anvil` |
 | Enderchest | `/enderchest` | `essentialcommands.enderchest` |
-| Waste disposal | `/wastebin` | `essentialcommands.wastebin` |
+| A 'chest' that deletes items | `/wastebin` | `essentialcommands.wastebin` |
 
 **Related Config Options:**
 - `enable_workbench` - Enables/disables workbench commands - Default: `true`
