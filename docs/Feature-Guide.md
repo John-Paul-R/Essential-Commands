@@ -174,7 +174,7 @@ Customize player display names.
 
 ## Utility Commands
 
-### Player Needs
+### Player-Focused
 Commands to help with player survival needs.
 
 | Feature | Commands | Permissions |
@@ -186,7 +186,7 @@ Commands to help with player survival needs.
 | Extinguish fire on self | `/extinguish` | `essentialcommands.extinguish.self` |
 | Extinguish fire on others | `/extinguish <player>` | `essentialcommands.extinguish.others` |
 | Repair held item | `/repair` | `essentialcommands.repair` |
-| End your life | `/suicide` | `essentialcommands.suicide` |
+| Die | `/suicide` | `essentialcommands.suicide` |
 
 **Related Config Options:**
 - `enable_feed` - Enables/disables feed command - Default: `true`
@@ -194,6 +194,19 @@ Commands to help with player survival needs.
 - `enable_extinguish` - Enables/disables extinguish command - Default: `true`
 - `enable_repair` - Enables/disables repair command - Default: `true`
 - `enable_suicide` - Enables/disables suicide command - Default: `true`
+
+## Sleep Command
+
+Sleep anywhere, without a bed!
+
+| Feature | Commands | Permissions |
+|---------|----------|------------|
+| Bedless sleeping | `/sleep` | `essentialcommands.sleep` |
+
+**Related Config Options:**
+- `enable_sleep` - Enables/disables sleep command - Default: `false`
+- `sleep_invuln` - Whether players are invulnerable while sleeping - Default: `false`
+- `sleep_near_monsters` - Whether players can sleep with monsters nearby - Default: `false`
 
 ### World Commands
 Commands to interact with the world.
@@ -231,13 +244,6 @@ Access crafting and other stations anywhere.
 - `enable_enderchest` - Enables/disables enderchest command - Default: `true`
 - `enable_wastebin` - Enables/disables wastebin command - Default: `true`
 
-### Player Trading
-Direct trading between players.
-
-| Feature | Commands | Permissions |
-|---------|----------|------------|
-| Trade with player | `/trade <player>` | `essentialcommands.trade` |
-
 ## Server Information
 
 ### Rules Management
@@ -261,17 +267,6 @@ Server welcome message.
 **Related Config Options:**
 - `enable_motd` - Enables/disables MOTD command - Default: `false`
 - `motd` - The message shown to players - Default: `<yellow>Welcome to our server <blue>%player:displayname%</blue>!\nPlease read the rules.</yellow>`
-
-## Sleep Command
-
-| Feature | Commands | Permissions |
-|---------|----------|------------|
-| Bedless sleeping | `/sleep` | `essentialcommands.sleep` |
-
-**Related Config Options:**
-- `enable_sleep` - Enables/disables sleep command - Default: `false`
-- `sleep_invuln` - Whether players are invulnerable while sleeping - Default: `false`
-- `sleep_near_monsters` - Whether players can sleep with monsters nearby - Default: `false`
 
 ## Player Profiles
 Players can customize their personal Essential Commands experience through profiles.
@@ -347,6 +342,8 @@ For more detailed information on specific commands and permissions, see [List of
 | `register_top_level_commands` | Register commands at top level (e.g., `/home` vs. `/ec home`) | `true` |
 | `excluded_top_level_commands` | List of commands to exclude from top-level registration | `[]` |
 | `language` | Default language for mod messages | `en_us` |
+
+[Read more about languages and translations](Language).
 
 [luck-perms]: https://luckperms.net/wiki/Usage
 [player-roles]: https://github.com/NucleoidMC/player-roles
