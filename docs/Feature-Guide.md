@@ -68,7 +68,14 @@ Server-wide spawn point management.
 
 **Related Config Options:**
 - `enable_spawn` - Enables/disables spawn commands
-- `respawn_at_ec_spawn` - Controls when players respawn at the EC spawn point
+- `respawn_at_ec_spawn` - Controls when players respawn at the EC spawn point. Accepts these values as an [Expression](Config-Documentation.md#expression):
+  - `Never` - Players never respawn at EC spawn (default)
+  - `Always` - Players always respawn at EC spawn
+  - `NoBed` - Players respawn at EC spawn only when they don't have a bed
+  - `SameWorld` - Players respawn at EC spawn if they're in the same world as the spawn
+  - `FirstJoin` - Players respawn at EC spawn only on their first join
+  
+  You can combine these using logical operators, for example: `NoBed OR SameWorld` will use the EC spawn if either condition is true.
 
 ### Other Teleportation
 Additional teleportation options.
