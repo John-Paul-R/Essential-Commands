@@ -183,14 +183,10 @@ Commands to interact with the world.
 | Get current game time | `/gametime` | `essentialcommands.gametime` |
 | Skip to day | `/day` | `essentialcommands.day` |
 | Skip to night | `/night` | `essentialcommands.night` |
-| Bedless sleeping | `/sleep` | `essentialcommands.sleep` |
 | Find nearby players | `/near` | `essentialcommands.near` |
 
 **Related Config Options:**
 - `enable_gametime` - Enables/disables gametime command
-- `enable_sleep` - Enables/disables sleep command
-- `sleep_invuln` - Whether players are invulnerable while sleeping
-- `sleep_near_monsters` - Whether players can sleep with monsters nearby
 
 ### Workbenches
 Access crafting and other stations anywhere.
@@ -217,7 +213,7 @@ Direct trading between players.
 |---------|----------|------------|
 | Trade with player | `/trade <player>` | `essentialcommands.trade` |
 
-## Other
+## Server Information
 
 ### Rules Management
 Display and manage server rules.
@@ -238,7 +234,18 @@ Server welcome message.
 - `enable_motd` - Enables/disables MOTD command
 - `motd` - The message shown to players
 
-### Player Profiles
+## Sleep Command
+
+| Feature | Commands | Permissions |
+|---------|----------|------------|
+| Bedless sleeping | `/sleep` | `essentialcommands.sleep` |
+
+**Related Config Options:**
+- `enable_sleep` - Enables/disables sleep command
+- `sleep_invuln` - Whether players are invulnerable while sleeping
+- `sleep_near_monsters` - Whether players can sleep with monsters nearby
+
+## Player Profiles
 Players can customize their personal Essential Commands experience through profiles.
 
 | Feature | Commands | Example |
@@ -249,6 +256,8 @@ Players can customize their personal Essential Commands experience through profi
 
 **Note:** Changes to profiles only affect the player who makes them and persist across server restarts.
 
+## Admin Commands
+
 ### Last Position
 This admin command allows tracking a player's most recent position, even if they're offline.
 
@@ -256,7 +265,7 @@ This admin command allows tracking a player's most recent position, even if they
 |---------|----------|------------|
 | Get player's last position | `/lastpos <player>` | `essentialcommands.admin.lasPos` |
 
-### Clear Player Data (Admin Only)
+### Clear Player Data
 This command is extremely powerful and should be restricted to server administrators only. It completely erases all data about all players stored by Essential Commands.
 
 | Feature | Commands | Permissions |
