@@ -4,6 +4,9 @@
   "cmd.enderchest.feedback": "已打开末影箱",
   "cmd.enderchest.container_ui_name": "EC 末影箱",
   "cmd.fly.feedback": "为 ${1} ${0}了飞行。",
+  "cmd.fly.speed.feedback.update": "你的飞行速度已从${0}更新至${1}。",
+  "cmd.fly.speed.feedback.update.other": "玩家${2}的飞行速度已从${0}更新至${1}。",
+  "cmd.fly.speed.error.limit": "飞行速度限制为${0}。",
   "cmd.invuln.feedback": "为 ${1} ${0}了无敌。",
   "cmd.home.tp.error.not_found": "找不到名为 \"${0}\" 的家。",
   "cmd.home.tp.error.shortcut_none_exist": "找不到指定的家。",
@@ -22,7 +25,7 @@
   "cmd.nickname.set.error.perms": "你没有设置昵称的权限。",
   "cmd.nickname.set.error.length": "欲设置的昵称长度(%s)超过了允许的最大长度(%s)。",
   "cmd.rtp.error.pre": "无法执行 \"/rtp\" 命令。原因：",
-  "cmd.rtp.error.not_overworld": "不在主世界。",
+  "cmd.rtp.error.world_not_enabled": "随机传送在世界'${0}'中未启用。",
   "cmd.rtp.error.cooldown": "命令仍在冷却中(还剩 ${0} 秒)。",
   "cmd.rtp.error.no_spawn_set": "未设置出生点。(此命令选择一个与出生点指定距离的位置进行传送，这意味着你需要先设置出生点。)",
   "cmd.rtp.location_name": "随机位置",
@@ -54,6 +57,24 @@
   "cmd.day.error.already_daytime": "当前已是白天。",
   "cmd.day.feedback": "将时间设为白天。",
   "cmd.afk.error.in_combat": "无法在战斗中将状态设置为离开。",
+  "rules.reload.success": "已重新加载规则文件",
+  "cmd.rules.reload.error.unexpected": "重新加载规则文件时出现未知错误，请检查服务器控制台。",
+  "cmd.bed.error.none_set": "玩家重生点未设置。",
+  "cmd.bed.bed_destination_name": "床",
+  "cmd.feed.error.full": "玩家并不饥饿。",
+  "cmd.feed.feedback": "玩家饥饿值已补充。",
+  "cmd.heal.error.full": "玩家未受伤。",
+  "cmd.heal.feedback": "玩家生命值已恢复。",
+  "cmd.extinguish.error.not_on_fire": "玩家未着火。",
+  "cmd.extinguish.feedback": "玩家已熄灭。",
+  "cmd.suicide.error.already_dead": "你已死亡，为何还能发送命令？",
+  "cmd.night.error.already_nighttime": "当前已是夜晚。",
+  "cmd.night.feedback": "将时间设为夜晚。",
+  "cmd.repair.error.not_damaged": "物品未损坏。",
+  "cmd.repair.feedback": "物品已修复。",
+  "cmd.near.error.range_too_high": "范围限制为${0}。",
+  "cmd.near.feedback.empty": "未发现附近有玩家。",
+  "cmd.near.feedback.list": "附近发现的玩家如下：${0}。",
 
   "cmd.workbench.feedback": "已打开 ${0} 。",
   "cmd.workbench.container_ui_name": "EC ${0}",
@@ -84,11 +105,6 @@
 
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
-  "cmd.config.reload": "${l:essentialcommands.fullprefix} 已重新加载配置。",
-
-  "rules.reload.success": "已重新加载规则文件",
-  "cmd.rules.reload.error.unexpected": "重新加载规则文件时出现未知错误，请检查服务器控制台。",
-  "cmd.bed.error.none_set": "玩家重生点未设置。",
-  "cmd.bed.bed_destination_name": "床"
+  "cmd.config.reload": "${l:essentialcommands.fullprefix} 已重新加载配置。"
 
 }
