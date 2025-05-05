@@ -83,6 +83,8 @@
   "cmd.list.feedback.empty": "No locations found.",
   "cmd.top.location_name": "world surface",
 
+  "cmd.strike.feedback": "Summoned a new Lightning Bolt on ${0}.",
+
   "player.afk.enter": "${0} is now AFK.",
   "player.afk.exit": "${0} is no longer AFK.",
 

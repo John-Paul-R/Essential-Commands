@@ -84,6 +84,7 @@ public final class ECPerms {
         public static final String near_self = "essentialcommands.near.self";
         public static final String near_others = "essentialcommands.near.others";
         public static final String motd = "essentialcommands.motd";
+        public static final String strike = "essentialcommands.strike";
 
         public static final class Group {
             public static final String[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};

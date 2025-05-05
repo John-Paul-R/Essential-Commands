@@ -92,6 +92,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final int NEAR_COMMAND_DEFAULT_RADIUS;
     public final int NEAR_COMMAND_MAX_RADIUS;
     public final boolean PRINT_TELEPORT_COORDINATES;
+    public final boolean ENABLE_STRIKE;
 
     private EssentialCommandsConfigSnapshot(EssentialCommandsConfig config) {
         this.FORMATTING_DEFAULT                 = config.FORMATTING_DEFAULT.getValue();
@@ -170,6 +171,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.NEAR_COMMAND_DEFAULT_RADIUS        = config.NEAR_COMMAND_DEFAULT_RADIUS.getValue();
         this.NEAR_COMMAND_MAX_RADIUS            = config.NEAR_COMMAND_MAX_RADIUS.getValue();
         this.PRINT_TELEPORT_COORDINATES         = config.PRINT_TELEPORT_COORDINATES.getValue();
+        this.ENABLE_STRIKE                       = config.ENABLE_STRIKE.getValue();
     }
 
     public static EssentialCommandsConfigSnapshot create(EssentialCommandsConfig config) {

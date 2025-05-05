@@ -580,6 +580,16 @@ public final class EssentialCommandRegistry {
                 .build());
         }
 
+        if (CONFIG.ENABLE_STRIKE) {
+            registerNode.accept(CommandManager.literal("strike")
+                .requires(ECPerms.require(ECPerms.Registry.strike, 2))
+                .executes(new StrikeCommand())
+                .then(CommandUtil.targetPlayerArgument()
+                    .executes(new StrikeCommand())
+                )
+                .build());
+        }
+
         var profileNode = ProfileCommand.buildNode();
         essentialCommandsRootNode.addChild(profileNode);
 
