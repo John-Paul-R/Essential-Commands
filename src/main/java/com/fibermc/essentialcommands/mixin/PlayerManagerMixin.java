@@ -74,6 +74,7 @@ public abstract class PlayerManagerMixin {
         }
 
         player.setPosition(location[0].pos());
+        player.setAngles(location[0].headYaw(), location[0].pitch());
         return original.getServer().getWorld(location[0].dim());
     }
 
@@ -117,8 +118,8 @@ public abstract class PlayerManagerMixin {
                 targetWorld,
                 spawnLoc.pos(),
                 Vec3d.ZERO,
-                0,
-                0,
+                spawnLoc.headYaw(),
+                spawnLoc.pitch(),
                 TeleportTarget.NO_OP
             ));
         });
