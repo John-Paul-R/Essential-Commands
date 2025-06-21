@@ -1,9 +1,13 @@
 package com.fibermc.essentialcommands.types;
 
+import com.fibermc.essentialcommands.codec.Codecs;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
+import com.mojang.serialization.Codec;
+
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,6 +19,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class MinecraftLocation {
+    public static final Codec<MinecraftLocation> CODEC = Codecs.MINECRAFT_LOCATION;
 
     private Vec3d pos;
     private float pitch;
@@ -45,6 +50,13 @@ public class MinecraftLocation {
         this.pitch = pitch;
     }
 
+    public MinecraftLocation(RegistryKey<World> dim, Vec3d pos, float headYaw, float pitch) {
+        this.dim = dim;
+        this.pos = pos;
+        this.headYaw = headYaw;
+        this.pitch = pitch;
+    }
+
     public MinecraftLocation(ServerPlayerEntity player) {
         this.dim = player.getWorld().getRegistryKey();
         this.pos = Vec3d.ZERO.add(player.getPos());
@@ -66,37 +78,33 @@ public class MinecraftLocation {
         this.pitch = tag.getFloat("pitch").orElse(0f);
     }
 
-    public static MinecraftLocation fromNbt(NbtCompound tag) {
-        var loc = new MinecraftLocation();
-        loc.loadNbt(tag);
-        return loc;
-    }
-
-    protected void loadNbt(NbtCompound tag) {
-        this.dim = RegistryKey.of(
-            RegistryKeys.WORLD,
-            Identifier.tryParse(tag.getString("WorldRegistryKey").orElseThrow())
-        );
-        this.pos = new Vec3d(
-            tag.getDouble("x").orElseThrow(),
-            tag.getDouble("y").orElseThrow(),
-            tag.getDouble("z").orElseThrow()
-        );
-        this.headYaw = tag.getFloat("headYaw").orElse(0f);
-        this.pitch = tag.getFloat("pitch").orElse(0f);
-    }
-
     public NbtCompound asNbt() {
         return this.writeNbt(new NbtCompound());
     }
 
+    public static MinecraftLocation fromNbt(NbtCompound tag) {
+        var result = CODEC.parse(NbtOps.INSTANCE, tag);
+
+        if (result.isSuccess()) {
+            return result.getOrThrow();
+        } else {
+            throw new RuntimeException("Failed to parse MinecraftLocation from NBT: " + result.error());
+        }
+    }
+
     public NbtCompound writeNbt(NbtCompound tag) {
-        tag.putString("WorldRegistryKey", dim().getValue().toString());
-        tag.putDouble("x", pos().x);
-        tag.putDouble("y", pos().y);
-        tag.putDouble("z", pos().z);
-        tag.putFloat("headYaw", headYaw());
-        tag.putFloat("pitch", pitch());
+        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
+
+        if (result.isSuccess()) {
+            var encoded = result.getOrThrow();
+            if (encoded instanceof NbtCompound compound) {
+                compound.getKeys().forEach(key -> {
+                    tag.put(key, compound.get(key));
+                });
+            }
+        } else {
+            throw new RuntimeException("Failed to encode MinecraftLocation to NBT: " + result.error());
+        }
 
         return tag;
     }
@@ -124,6 +132,18 @@ public class MinecraftLocation {
 
     public float headYaw() {
         return headYaw;
+    }
+
+    public double x() {
+        return pos.x;
+    }
+
+    public double y() {
+        return pos.y;
+    }
+
+    public double z() {
+        return pos.z;
     }
 
     public RegistryKey<World> dim() {

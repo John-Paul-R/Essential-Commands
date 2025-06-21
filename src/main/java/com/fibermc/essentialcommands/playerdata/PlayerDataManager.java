@@ -157,7 +157,7 @@ public class PlayerDataManager {
                     );
 
                 changedNicknames.forEach(playerData ->
-                    playerData.save(server.getRegistryManager())
+                    playerData.save()
                 );
 
                 this.changedNicknames.clear();

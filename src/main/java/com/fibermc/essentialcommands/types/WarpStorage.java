@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.types;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.text.ECText;
@@ -38,11 +39,27 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
             for (NbtElement t : homesNbtList) {
                 NbtCompound homeTag = (NbtCompound) t;
                 String name = homeTag.getString("homeName").orElseThrow();
-                super.put(name, WarpLocation.fromNbt(homeTag, name));
+                var location = MinecraftLocation.fromNbt(homeTag);
+                super.put(
+                    name,
+                    new WarpLocation(
+                        location,
+                        homeTag.getString("permissionString")
+                            .flatMap(str -> str.isBlank() ? Optional.empty() : Optional.of(str))
+                            .orElse(null),
+                        name
+                    )
+                );
             }
         } else {
             NbtCompound nbtCompound = (NbtCompound) nbt;
-            nbtCompound.getKeys().forEach((key) -> super.put(key, WarpLocation.fromNbt(nbtCompound.getCompoundOrEmpty(key), key)));
+            nbtCompound.getKeys().forEach((key) -> {
+                var location = WarpLocation.fromNbt(nbtCompound.getCompound(key).orElseThrow());
+                if (!key.equals(location.getName())) {
+                    throw new RuntimeException("Warp key '%s' did not match home name '%s'".formatted(key, location.getName()));
+                }
+                super.put(key, location);
+            });
         }
 
     }

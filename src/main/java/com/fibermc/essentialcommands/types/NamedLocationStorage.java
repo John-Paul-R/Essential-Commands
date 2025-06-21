@@ -2,18 +2,22 @@ package com.fibermc.essentialcommands.types;
 
 import java.util.HashMap;
 
+import com.fibermc.essentialcommands.codec.Codecs;
 import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.text.Text;
 
 public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation> implements NbtSerializable {
+    public static final Codec<NamedLocationStorage> CODEC = Codecs.NAMED_LOCATION_STORAGE;
 
     public NamedLocationStorage() {}
 
@@ -22,28 +26,60 @@ public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation
         loadNbt(nbt);
     }
 
-    @Override
+    public static NamedLocationStorage fromNbt(NbtCompound nbt) {
+        // Try codec first
+        var result = CODEC.parse(NbtOps.INSTANCE, nbt);
+        if (result.isSuccess()) {
+            return result.getOrThrow();
+        }
+
+        // Fallback to legacy parsing
+        NamedLocationStorage storage = new NamedLocationStorage();
+        storage.loadNbt(nbt);
+        return storage;
+    }
+
     public NbtCompound writeNbt(NbtCompound nbt) {
-        this.forEach((key, value) -> nbt.put(key, value.asNbt()));
-        return nbt;
+        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
+
+        if (result.isSuccess()) {
+            var encoded = result.getOrThrow();
+            if (encoded instanceof NbtCompound compound) {
+                compound.getKeys().forEach(key -> {
+                    nbt.put(key, compound.get(key));
+                });
+            }
+            return nbt;
+        }
+
+        throw new RuntimeException("Failed to encode NamedLocationStorage to NBT: " + result.error());
     }
 
     /**
-     * @param nbt NbtCompound or NbtList. (Latter is deprecated)
+     * Legacy NBT loading method - supports both old list format and compound format
+     * @param nbt NbtCompound or NbtList. (NbtList is deprecated)
      */
-    public void loadNbt(NbtElement nbt) {
+    private void loadNbt(NbtElement nbt) {
         if (nbt.getType() == 9) {
-            // Legacy format
+            // Legacy format - NbtList
             NbtList homesNbtList = (NbtList) nbt;
             for (NbtElement t : homesNbtList) {
                 NbtCompound homeTag = (NbtCompound) t;
                 homeTag.getString("homeName").ifPresent((homeName) -> {
-                    super.put(homeName, NamedMinecraftLocation.fromNbt(homeTag, homeName));
+                    var location = MinecraftLocation.fromNbt(homeTag);
+                    super.put(homeName, new NamedMinecraftLocation(location, homeName));
                 });
             }
         } else {
+            // Legacy compound format
             NbtCompound nbtCompound = (NbtCompound) nbt;
-            nbtCompound.getKeys().forEach((key) -> super.put(key, NamedMinecraftLocation.fromNbt(nbtCompound.getCompoundOrEmpty(key), key)));
+            nbtCompound.getKeys().forEach((key) -> {
+                var location = NamedMinecraftLocation.fromNbt(nbtCompound.getCompound(key).orElseThrow());
+                if (!key.equals(location.getName())) {
+                    throw new RuntimeException("Home key '%s' did not match home name '%s'".formatted(key, location.getName()));
+                }
+                super.put(key, location);
+            });
         }
     }
 

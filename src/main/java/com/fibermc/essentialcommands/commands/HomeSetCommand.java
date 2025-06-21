@@ -51,7 +51,7 @@ public class HomeSetCommand implements Command<ServerCommandSource> {
             Text homeNameText = ECText.access(senderPlayer).accent(homeName);
             playerData.addHome(homeName, new MinecraftLocation(senderPlayer));
 
-            playerData.save(context.getSource().getServer().getRegistryManager());
+            playerData.save();
             //inform command sender that the home has been set
             playerData.sendCommandFeedback("cmd.home.set.feedback", homeNameText);
         }

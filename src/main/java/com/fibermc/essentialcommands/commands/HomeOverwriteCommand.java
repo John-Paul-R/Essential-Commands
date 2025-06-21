@@ -27,7 +27,7 @@ public class HomeOverwriteCommand implements Command<ServerCommandSource> {
         playerData.removeHome(homeName);
         playerData.addHome(homeName, new MinecraftLocation(senderPlayer));
 
-        playerData.save(context.getSource().getServer().getRegistryManager());
+        playerData.save();
         //inform command sender that the home has been set
         playerData.sendCommandFeedback("cmd.overwritehome.feedback", homeNameText);
 

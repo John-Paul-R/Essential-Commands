@@ -101,7 +101,7 @@ public final class EssentialsConvertor {
                                 String homeName = entry.getKey();
 
                                 playerData.addHome(homeName, new MinecraftLocation(world.getRegistryKey(), x, y, z, yaw, pitch));
-                                playerData.save(player.getServer().getRegistryManager());
+                                playerData.save();
 
                                 oldUserDataFile.renameTo(new File(oldUsersDataDictionary, oldUserDataFile.getName() + ".converted"));
                                 counter++;

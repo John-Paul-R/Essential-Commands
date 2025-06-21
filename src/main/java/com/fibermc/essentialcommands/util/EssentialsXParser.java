@@ -16,7 +16,6 @@ import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
@@ -183,7 +182,7 @@ public final class EssentialsXParser {
                 LOGGER.info("Creating temporary playerdata for '{}', with {} homes.", file, homes.size());
 
                 PlayerData playerData = PlayerDataFactory.create(homes, targetFile);
-                playerData.save(DynamicRegistryManager.EMPTY);
+                playerData.save();
                 filesSucceeded++;
             } catch (Exception ex) {
                 LOGGER.error("An unexpected error occurred while parsing player data file '{}'", targetFile.getPath(), ex);

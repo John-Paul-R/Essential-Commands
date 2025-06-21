@@ -3,12 +3,18 @@ package com.fibermc.essentialcommands.types;
 import java.util.Optional;
 
 import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.codec.Codecs;
+
+import com.mojang.serialization.Codec;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.World;
 
 public class WarpLocation extends NamedMinecraftLocation {
-
+    public static final Codec<WarpLocation> CODEC = Codecs.WARP_LOCATION;
     private String permissionString;
 
     private WarpLocation() {}
@@ -26,16 +32,28 @@ public class WarpLocation extends NamedMinecraftLocation {
         this.permissionString = permissionString;
     }
 
-    public static WarpLocation fromNbt(NbtCompound tag, String name) {
-        // `data` was the main obj key in old mc PersistentState schema
-        tag = tag.getCompound("data").orElse(tag);
+    public WarpLocation(
+        RegistryKey<World> dim,
+        double x,
+        double y,
+        double z,
+        float headYaw,
+        float pitch,
+        Optional<String> name,
+        Optional<String> permissionString
+    ) {
+        super(dim, x, y, z, headYaw, pitch, name);
+        this.permissionString = permissionString.orElse(null);
+    }
 
-        var loc = new WarpLocation();
-        loc.loadNbt(tag, name);
-        loc.permissionString = tag.getString("permissionString")
-            .flatMap(str -> str.isBlank() ? Optional.empty() : Optional.of(str))
-            .orElse(null);
-        return loc;
+    public static WarpLocation fromNbt(NbtCompound tag) {
+        var result = CODEC.parse(NbtOps.INSTANCE, tag);
+
+        if (result.isSuccess()) {
+            return result.getOrThrow();
+        }
+
+        throw new RuntimeException("Failed to parse WarpLocation from NBT: " + result.error());
     }
 
     @Override
@@ -45,10 +63,19 @@ public class WarpLocation extends NamedMinecraftLocation {
 
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
-        super.writeNbt(tag);
-        if (permissionString != null) {
-            tag.putString("permissionString", permissionString);
+        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
+
+        if (result.isSuccess()) {
+            var encoded = result.getOrThrow();
+            if (encoded instanceof NbtCompound compound) {
+                compound.getKeys().forEach(key -> {
+                    tag.put(key, compound.get(key));
+                });
+            }
+        } else {
+            throw new RuntimeException("Failed to encode WarpLocation to NBT: " + result.error());
         }
+
         return tag;
     }
 

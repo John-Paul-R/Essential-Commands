@@ -8,6 +8,7 @@ import com.fibermc.essentialcommands.ECAbilitySources;
 import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.codec.Codecs;
 import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.commands.InvulnCommand;
 import com.fibermc.essentialcommands.commands.helpers.IFeedbackReceiver;
@@ -27,17 +28,19 @@ import org.jetbrains.annotations.NotNull;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.PersistentState;
 
@@ -54,7 +57,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     // ServerPlayerEntity
     private ServerPlayerEntity player;
     private UUID pUuid;
-    private final File saveFile;
+    private File saveFile;
 
     // Target of tpAsk
     private final OutgoingTeleportRequests outgoingTeleportRequests = new OutgoingTeleportRequests();
@@ -84,19 +87,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     private boolean isSleepingFromCommand;
 
     public PlayerData(ServerPlayerEntity player, File saveFile) {
-        this.player = player;
-        this.lastTickPos = player.getPos();
-        this.lastActionTick = player.getServer().getTicks();
-        this.pUuid = player.getUuid();
-        this.saveFile = saveFile;
         incomingTeleportRequests = new LinkedHashMap<>();
-        homes = new NamedLocationStorage();
-        playerActEvent.register((packet) -> {
-            updateLastActionTick();
-            setAfk(false);
-        });
-        // this should never stick around between respawns
-        Pal.revokeAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.SLEEP_INVULN);
+        initializeRuntimeState(player, saveFile);
     }
 
     /**
@@ -115,6 +107,59 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         this.saveFile = saveFile;
         incomingTeleportRequests = new LinkedHashMap<>();
         homes = new NamedLocationStorage();
+    }
+
+    // ONLY TO BE USED WITH CODECS
+    private PlayerData() {
+        this.saveFile = null; // must be set by factory
+        this.incomingTeleportRequests = new LinkedHashMap<>();
+    }
+
+    public static PlayerData createWithData(
+        NamedLocationStorage homes,
+        Optional<MinecraftLocation> previousLocation,
+        Optional<Text> nickname,
+        long timeUsedRtpEpochMs,
+        int tpCooldown
+    ) {
+        // This creates a PlayerData with serializable state only
+        // Runtime state will be initialized by your factory methods
+        PlayerData pd = new PlayerData();
+        pd.homes = homes;
+        pd.previousLocation = previousLocation.orElse(null);
+        pd.nickname = nickname.orElse(null);
+        pd.timeUsedRtp = TimeUtil.epochTimeMsToTicks(timeUsedRtpEpochMs);
+        pd.tpCooldown = tpCooldown;
+        return pd;
+    }
+
+    // Initialize runtime state after deserialization
+    public void initializeRuntimeState(ServerPlayerEntity player, File saveFile) {
+        this.player = player;
+        this.saveFile = saveFile;
+        this.lastTickPos = player.getPos();
+        this.lastActionTick = player.getServer().getTicks();
+        this.pUuid = player.getUuid();
+
+        // Re-register events
+        playerActEvent.register((packet) -> {
+            updateLastActionTick();
+            setAfk(false);
+        });
+
+        // Recalculate derived state
+        if (this.nickname != null) {
+            try {
+                reloadFullNickname();
+            } catch (NullPointerException ignore) {
+                EssentialCommands.LOGGER.warn("Could not refresh player full nickname, as ServerPlayerEntity was null in PlayerData.");
+            }
+        }
+
+        // Revoke any abilities that shouldn't persist
+        Pal.revokeAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.SLEEP_INVULN);
+
+        updatePlayerEntity(player);
     }
 
     public OutgoingTeleportRequests getSentTeleportRequests() {
@@ -338,27 +383,50 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         static final String PREVIOUS_LOCATION = "previousLocation";
     }
 
-    public void fromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup wrapperLookup) {
-        // `data` was the main obj key in old mc PersistentState schema
+    public void fromNbt(NbtCompound tag) {
+        // Handle legacy "data" wrapper if present
         NbtCompound dataTag = tag.getCompound("data").orElse(tag);
 
-        NamedLocationStorage homes = new NamedLocationStorage();
-        NbtElement homesTag = dataTag.get(StorageKey.HOMES);
-        if (homesTag != null) {
-            homes.loadNbt(homesTag);
+        var result = CODEC.parse(NbtOps.INSTANCE, dataTag);
+
+        if (result.isSuccess()) {
+            PlayerData loaded = result.getOrThrow();
+
+            // Copy serializable state to this instance
+            this.homes = loaded.homes;
+            this.previousLocation = loaded.previousLocation;
+            this.nickname = loaded.nickname;
+            this.timeUsedRtp = loaded.timeUsedRtp;
+            this.tpCooldown = loaded.tpCooldown;
+
+            // Recalculate derived state if player is available
+            if (this.nickname != null && this.player != null) {
+                try {
+                    reloadFullNickname();
+                } catch (NullPointerException ignore) {
+                    EssentialCommands.LOGGER.warn("Could not refresh player full nickname, as ServerPlayerEntity was null in PlayerData.");
+                }
+            }
+        } else {
+            // Fallback to legacy parsing for backward compatibility
+            EssentialCommands.LOGGER.warn("Failed to parse PlayerData with codec, falling back to legacy parsing: {}", result.error());
+            legacyFromNbt(dataTag);
         }
-        this.homes = homes;
+
+        if (this.player != null) {
+            updatePlayerEntity(this.player);
+        }
+    }
+
+    // Keep legacy parsing as fallback
+    private void legacyFromNbt(NbtCompound dataTag) {
+        this.homes = dataTag.get(StorageKey.HOMES, NamedLocationStorage.CODEC).orElseGet(NamedLocationStorage::new);
 
         dataTag.getString(StorageKey.NICKNAME).ifPresent((nick) -> {
             if ("null".equals(nick)) {
                 return;
             }
             this.nickname = TextUtil.parseText(nick);
-            try {
-                reloadFullNickname();
-            } catch (NullPointerException ignore) {
-                EssentialCommands.LOGGER.warn("Could not refresh player full nickanme, as ServerPlayerEntity was null in PlayerData.");
-            }
         });
 
         dataTag.getLong(StorageKey.TIME_USED_RTP_EPOCH_MS).ifPresent((time) -> {
@@ -370,29 +438,18 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
                 this.previousLocation = MinecraftLocation.fromNbt(nbt);
             });
         }
-
-        if (this.player != null) {
-            updatePlayerEntity(this.player);
-        }
-
     }
 
-    public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup wrapperLookup) {
-        NbtCompound homesNbt = new NbtCompound();
-        homes.writeNbt(homesNbt);
-        tag.put(StorageKey.HOMES, homesNbt);
+    public NbtCompound toNbt() {
+        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
 
-        if (nickname != null) {
-            tag.putString(StorageKey.NICKNAME, TextUtil.toJsonString(nickname));
+        if (result.isSuccess()) {
+            return result.getOrThrow()
+                .asCompound()
+                .orElseThrow();
         }
 
-        tag.putLong(StorageKey.TIME_USED_RTP_EPOCH_MS, TimeUtil.tickTimeToEpochMs(timeUsedRtp));
-
-        if (CONFIG.PERSIST_BACK_LOCATION && previousLocation != null) {
-            tag.put(StorageKey.PREVIOUS_LOCATION, previousLocation.asNbt());
-        }
-
-        return tag;
+        throw new RuntimeException("Failed to encode PlayerData with codec: " + result.error());
     }
 
     public void setPreviousLocation(MinecraftLocation location) {
@@ -532,8 +589,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         return resultCode;
     }
 
-    public void save(RegistryWrapper.WrapperLookup wrapperLookup) {
-        NbtCompound data = this.writeNbt(new NbtCompound(), wrapperLookup);
+    public void save() {
+        NbtCompound data = this.toNbt();
 
         try {
             NbtIo.writeCompressed(data, this.saveFile.toPath());
@@ -583,4 +640,34 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     {
         return access(context.getSource().getPlayerOrThrow());
     }
+
+    public static final Codec<PlayerData> CODEC = RecordCodecBuilder.create(instance ->
+        instance.group(
+            // Homes storage
+            NamedLocationStorage.CODEC
+                .optionalFieldOf("homes", new NamedLocationStorage())
+                .forGetter(pd -> pd.homes),
+
+            // Previous location for /back
+            Codecs.MINECRAFT_LOCATION
+                .optionalFieldOf("previousLocation")
+                .forGetter(pd -> Optional.ofNullable(pd.previousLocation)),
+
+            // Nickname
+            TextCodecs.CODEC
+                .optionalFieldOf("nickname")
+                .forGetter(pd -> Optional.ofNullable(pd.nickname)),
+
+            // RTP time (stored as epoch ms for format compatibility)
+            Codec.LONG
+                .optionalFieldOf("timeUsedRtpEpochMs", 0L)
+                .forGetter(pd -> TimeUtil.tickTimeToEpochMs(pd.timeUsedRtp)),
+
+            // TP cooldown
+            Codec.INT
+                .optionalFieldOf("tpCooldown", 0)
+                .forGetter(pd -> pd.tpCooldown)
+
+        ).apply(instance, PlayerData::createWithData)
+    );
 }
