@@ -10,13 +10,10 @@ import java.util.stream.Collector;
 import com.google.gson.JsonParser;
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.parsers.TagParser;
-import org.apache.logging.log4j.Level;
 
 import com.mojang.serialization.JsonOps;
 
 import net.minecraft.text.*;
-
-import dev.jpcode.eccore.ECCore;
 
 public final class TextUtil {
     private TextUtil() {}
@@ -198,21 +195,7 @@ public final class TextUtil {
 
     static {
         registerTextParser(str -> TextCodecs.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(str)).getOrThrow());
-        int javaVersion = Util.getJavaVersion();
-        if (javaVersion >= 16) {
-            ECCore.LOGGER.log(Level.INFO, String.format(
-                "Detected Java version %d. Enabling Java %d features.",
-                javaVersion,
-                16
-            ));
-            registerTextParser(str -> TagParser.DEFAULT.parseText(str, ParserContext.of()));
-        } else {
-            ECCore.LOGGER.log(Level.WARN, String.format(
-                "Detected Java version %d. Some features require Java %d. Some text formatting features will be disabled.",
-                javaVersion,
-                16
-            ));
-        }
+        registerTextParser(str -> TagParser.DEFAULT.parseText(str, ParserContext.of()));
     }
 
     public static Text parseText(String textStr) {
