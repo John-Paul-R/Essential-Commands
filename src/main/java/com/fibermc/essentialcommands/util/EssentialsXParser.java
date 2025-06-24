@@ -98,7 +98,7 @@ public final class EssentialsXParser {
                     (Double) locData.get("z"),
                     ((Double) locData.get("yaw")).floatValue(),
                     ((Double) locData.get("pitch")).floatValue(),
-                    name
+                    Optional.of(name)
                 ));
         });
 

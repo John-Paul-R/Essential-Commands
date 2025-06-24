@@ -40,16 +40,10 @@ public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation
     }
 
     public NbtCompound writeNbt(NbtCompound nbt) {
-        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
+        var result = CODEC.encode(this, NbtOps.INSTANCE, nbt);
 
         if (result.isSuccess()) {
-            var encoded = result.getOrThrow();
-            if (encoded instanceof NbtCompound compound) {
-                compound.getKeys().forEach(key -> {
-                    nbt.put(key, compound.get(key));
-                });
-            }
-            return nbt;
+            return result.getOrThrow().asCompound().orElseThrow();
         }
 
         throw new RuntimeException("Failed to encode NamedLocationStorage to NBT: " + result.error());

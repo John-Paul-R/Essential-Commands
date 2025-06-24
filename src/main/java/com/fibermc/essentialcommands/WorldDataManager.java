@@ -21,8 +21,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtSizeTracker;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.WorldSavePath;
@@ -32,17 +30,12 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 
 public class WorldDataManager extends PersistentState {
-    private final WarpStorage warps;
-    private MinecraftLocation spawnLocation;
     private Path saveDir;
     private File worldDataFile;
-
-    private static final String SPAWN_KEY = "spawn";
-    private static final String WARPS_KEY = "warps";
+    private WorldData data;
 
     public WorldDataManager() {
-        warps = new WarpStorage();
-        spawnLocation = null;
+        this.data = new WorldData();
     }
 
     public static WorldDataManager createForServer(MinecraftServer server)
@@ -68,10 +61,11 @@ public class WorldDataManager extends PersistentState {
                 // if files was not JUST created, read data from it.
                 var tag = NbtIo.readCompressed(worldDataFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
                 // `data` was the main obj key in old mc PersistentState schema
-                this.fromNbt(tag.getCompound("data").orElse(tag));
+                this.data = WorldData.fromNbt(tag.getCompound("data").orElse(tag));
+                warpsLoadEvent.invoker().accept(this.data.warps());
             } else {
                 this.markDirty();
-                this.save(server.getRegistryManager());
+                this.save();
             }
         } catch (IOException e) {
             EssentialCommands.log(Level.ERROR, String.format("An unexpected error occoured while loading the Essential Commands World Data file (Path: '%s')", worldDataFile.getPath()));
@@ -83,18 +77,6 @@ public class WorldDataManager extends PersistentState {
         return worldDataFile;
     }
 
-    public void fromNbt(NbtCompound tag) {
-        this.spawnLocation = tag.getCompound(SPAWN_KEY)
-            .flatMap(spawnTag -> spawnTag.isEmpty() ? Optional.empty() : Optional.of(spawnTag))
-            .map(MinecraftLocation::fromNbt)
-            .orElse(null);
-
-        tag.getCompound(WARPS_KEY)
-            .ifPresent(warps::loadNbt);
-
-        warpsLoadEvent.invoker().accept(warps);
-    }
-
     public final Event<Consumer<WarpStorage>> warpsLoadEvent = EventFactory.createArrayBacked(
         Consumer.class,
         (listeners) -> (warps) -> {
@@ -103,9 +85,9 @@ public class WorldDataManager extends PersistentState {
             }
         });
 
-    public void save(RegistryWrapper.WrapperLookup wrapperLookup) {
+    public void save() {
         EssentialCommands.log(Level.INFO, "Saving world_data.dat (Spawn/Warps)...");
-        NbtCompound data = this.writeNbt(new NbtCompound(), wrapperLookup);
+        NbtCompound data = this.data.toNbt();
         try {
             NbtIo.writeCompressed(data, this.worldDataFile.toPath());
         } catch (IOException e) {
@@ -114,65 +96,51 @@ public class WorldDataManager extends PersistentState {
         EssentialCommands.log(Level.INFO, "world_data.dat saved.");
     }
 
-    public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup wrapperLookup) {
-        // Spawn to NBT
-        if (spawnLocation != null) {
-            tag.put(SPAWN_KEY, spawnLocation.asNbt());
-        }
-
-        // Warps to NBT
-        NbtCompound warpsNbt = new NbtCompound();
-        warps.writeNbt(warpsNbt);
-        tag.put(WARPS_KEY, warpsNbt);
-
-        return tag;
-    }
-
     // Command Actions
     public void setWarp(String warpName, MinecraftLocation location, boolean requiresPermission) throws CommandSyntaxException {
-        warps.putCommand(warpName, new WarpLocation(
+        this.data.warps().putCommand(warpName, new WarpLocation(
             location,
             requiresPermission ? warpName : null,
             warpName
         ));
         this.markDirty();
-        this.save(DynamicRegistryManager.EMPTY);
+        this.save();
     }
 
     public boolean delWarp(String warpName) {
-        MinecraftLocation prevValue = warps.remove(warpName);
+        MinecraftLocation prevValue = this.data.warps().remove(warpName);
         this.markDirty();
-        this.save(DynamicRegistryManager.EMPTY);
+        this.save();
         return prevValue != null;
     }
 
     public WarpLocation getWarp(String warpName) {
-        return warps.get(warpName);
+        return this.data.warps().get(warpName);
     }
 
     public List<String> getWarpNames() {
-        return this.warps.keySet().stream().toList();
+        return this.data.warps().keySet().stream().toList();
     }
 
     public Stream<WarpLocation> getAccessibleWarps(ServerPlayerEntity player) {
-        var warpsStream = this.warps.values().stream();
+        var warpsStream = this.data.warps().values().stream();
         return (EssentialCommands.CONFIG.USE_PERMISSIONS_API
             ? warpsStream.filter(loc -> loc.hasPermission(player))
             : warpsStream);
     }
 
     public Set<Entry<String, WarpLocation>> getWarpEntries() {
-        return this.warps.entrySet();
+        return this.data.warps().entrySet();
     }
 
     public void setSpawn(MinecraftLocation location) {
-        spawnLocation = location;
+        this.data.setSpawn(location);
         this.markDirty();
-        this.save(DynamicRegistryManager.EMPTY);
+        this.save();
     }
 
     public Optional<MinecraftLocation> getSpawn() {
-        return Optional.ofNullable(spawnLocation);
+        return Optional.ofNullable(this.data.getSpawn());
     }
 
 }

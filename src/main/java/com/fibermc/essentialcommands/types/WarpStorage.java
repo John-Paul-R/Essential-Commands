@@ -3,18 +3,22 @@ package com.fibermc.essentialcommands.types;
 import java.util.HashMap;
 import java.util.Optional;
 
+import com.fibermc.essentialcommands.codec.Codecs;
 import com.fibermc.essentialcommands.commands.CommandUtil;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Codec;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.text.Text;
 
 public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSerializable {
+    public static Codec<WarpStorage> CODEC = Codecs.WARP_STORAGE;
 
     public WarpStorage() {}
 
@@ -23,16 +27,33 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
         loadNbt(nbt);
     }
 
-    @Override
+    public static WarpStorage fromNbt(NbtCompound nbt) {
+        // Try codec first
+        var result = CODEC.parse(NbtOps.INSTANCE, nbt);
+        if (result.isSuccess()) {
+            return result.getOrThrow();
+        }
+
+        // Fallback to legacy parsing
+        WarpStorage storage = new WarpStorage();
+        storage.loadNbt(nbt);
+        return storage;
+    }
+
     public NbtCompound writeNbt(NbtCompound nbt) {
-        this.forEach((key, value) -> nbt.put(key, value.asNbt()));
-        return nbt;
+        var result = CODEC.encode(this, NbtOps.INSTANCE, nbt);
+
+        if (result.isSuccess()) {
+            return result.getOrThrow().asCompound().orElseThrow();
+        }
+
+        throw new RuntimeException("Failed to encode WarpStorage to NBT: " + result.error());
     }
 
     /**
      * @param nbt NbtCompound or NbtList. (Latter is deprecated)
      */
-    public void loadNbt(NbtElement nbt) {
+    private void loadNbt(NbtElement nbt) {
         if (nbt.getType() == 9) {
             // Legacy format
             NbtList homesNbtList = (NbtList) nbt;

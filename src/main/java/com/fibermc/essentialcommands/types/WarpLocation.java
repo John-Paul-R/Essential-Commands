@@ -56,6 +56,11 @@ public class WarpLocation extends NamedMinecraftLocation {
         throw new RuntimeException("Failed to parse WarpLocation from NBT: " + result.error());
     }
 
+    public static WarpLocation setName(WarpLocation value, String key) {
+        value.name = key;
+        return value;
+    }
+
     @Override
     public NbtCompound asNbt() {
         return this.writeNbt(new NbtCompound());

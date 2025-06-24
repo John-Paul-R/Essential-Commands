@@ -409,7 +409,10 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             }
         } else {
             // Fallback to legacy parsing for backward compatibility
-            EssentialCommands.LOGGER.warn("Failed to parse PlayerData with codec, falling back to legacy parsing: {}", result.error());
+            EssentialCommands.LOGGER.warn(
+                "Failed to parse PlayerData with codec, falling back to legacy parsing: {}",
+                result.error()
+            );
             legacyFromNbt(dataTag);
         }
 
@@ -551,10 +554,10 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         if (nickname == null) {
             this.nickname = null;
             resultCode = 1;
-            EssentialCommands.LOGGER.info(String.format(
-                "Cleared %s's nickname",
+            EssentialCommands.LOGGER.info(
+                "Cleared {}'s nickname",
                 this.player.getGameProfile().getName()
-            ));
+            );
         } else {
             // Ensure nickname does not exceed max length
             if (nickname.getString().length() > CONFIG.NICKNAME_MAX_LENGTH) {
@@ -563,18 +566,18 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             // Ensure player has permissions required to set the specified nickname
             boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, this.player.getCommandSource());
             if (!hasRequiredPerms) {
-                EssentialCommands.LOGGER.info(String.format(
-                    "%s attempted to set nickname to '%s', with insufficient permissions to do so.",
+                EssentialCommands.LOGGER.info(
+                    "{} attempted to set nickname to '{}', with insufficient permissions to do so.",
                     this.player.getGameProfile().getName(),
                     nickname
-                ));
+                );
                 return -1;
             } else {
-                EssentialCommands.LOGGER.info(String.format(
-                    "Set %s's nickname to '%s'.",
+                EssentialCommands.LOGGER.info(
+                    "Set {}'s nickname to '{}'.",
                     this.player.getGameProfile().getName(),
                     nickname
-                ));
+                );
             }
 
             // Set nickname

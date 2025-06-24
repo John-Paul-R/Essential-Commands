@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 public class NamedMinecraftLocation extends MinecraftLocation {
     public static final Codec<NamedMinecraftLocation> CODEC = Codecs.NAMED_MINECRAFT_LOCATION;
 
-    private String name;
+    protected String name;
 
     protected NamedMinecraftLocation() {}
 
@@ -42,7 +42,7 @@ public class NamedMinecraftLocation extends MinecraftLocation {
         Optional<String> name
     ) {
         super(dim, x, y, z, headYaw, pitch);
-        this.name = name;
+        this.name = name.orElse(null);
     }
 
     public NamedMinecraftLocation(

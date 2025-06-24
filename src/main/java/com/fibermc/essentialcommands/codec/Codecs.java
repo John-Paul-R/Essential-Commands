@@ -1,0 +1,119 @@
+package com.fibermc.essentialcommands.codec;
+
+import java.util.HashMap;
+import java.util.Optional;
+
+import com.fibermc.essentialcommands.WorldData;
+import com.fibermc.essentialcommands.types.*;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+
+public final class Codecs {
+    private Codecs() {}
+
+    // Codec for RegistryKey<World>
+    public static final Codec<RegistryKey<World>> WORLD_KEY =
+        Identifier.CODEC.xmap(
+            id -> RegistryKey.of(RegistryKeys.WORLD, id),
+            RegistryKey::getValue
+        );
+
+    // Codec for Vec3d
+    public static final Codec<Vec3d> VEC3D = RecordCodecBuilder.create(instance ->
+        instance.group(
+            Codec.DOUBLE.fieldOf("x").forGetter(Vec3d::getX),
+            Codec.DOUBLE.fieldOf("y").forGetter(Vec3d::getY),
+            Codec.DOUBLE.fieldOf("z").forGetter(Vec3d::getZ)
+        ).apply(instance, Vec3d::new)
+    );
+
+    // Main MinecraftLocation codec
+    public static final Codec<MinecraftLocation> MINECRAFT_LOCATION = RecordCodecBuilder.create(instance ->
+        instance.group(
+            WORLD_KEY.fieldOf("WorldRegistryKey").forGetter(MinecraftLocation::dim),
+            Codec.DOUBLE.fieldOf("x").forGetter(MinecraftLocation::x),
+            Codec.DOUBLE.fieldOf("y").forGetter(MinecraftLocation::y),
+            Codec.DOUBLE.fieldOf("z").forGetter(MinecraftLocation::z),
+            Codec.FLOAT.optionalFieldOf("headYaw", 0.0f).forGetter(MinecraftLocation::headYaw),
+            Codec.FLOAT.optionalFieldOf("pitch", 0.0f).forGetter(MinecraftLocation::pitch)
+        ).apply(instance, MinecraftLocation::new)
+    );
+
+    public static final Codec<NamedMinecraftLocation> NAMED_MINECRAFT_LOCATION = RecordCodecBuilder.create(instance ->
+        instance.group(
+            // Inherit all fields from NamedMinecraftLocation
+            WORLD_KEY.fieldOf("WorldRegistryKey").forGetter(NamedMinecraftLocation::dim),
+            Codec.DOUBLE.fieldOf("x").forGetter(MinecraftLocation::x),
+            Codec.DOUBLE.fieldOf("y").forGetter(MinecraftLocation::y),
+            Codec.DOUBLE.fieldOf("z").forGetter(MinecraftLocation::z),
+            Codec.FLOAT.optionalFieldOf("headYaw", 0.0f).forGetter(NamedMinecraftLocation::headYaw),
+            Codec.FLOAT.optionalFieldOf("pitch", 0.0f).forGetter(NamedMinecraftLocation::pitch),
+            // loaded from the map
+            Codec.STRING.optionalFieldOf("name").forGetter(home -> Optional.of(home.getName()))
+
+        ).apply(instance, NamedMinecraftLocation::new)
+    );
+
+    public static final Codec<WarpLocation> WARP_LOCATION = RecordCodecBuilder.create(instance ->
+        instance.group(
+            // Inherit all fields from NamedMinecraftLocation
+            WORLD_KEY.fieldOf("WorldRegistryKey").forGetter(WarpLocation::dim),
+            Codec.DOUBLE.fieldOf("x").forGetter(MinecraftLocation::x),
+            Codec.DOUBLE.fieldOf("y").forGetter(MinecraftLocation::y),
+            Codec.DOUBLE.fieldOf("z").forGetter(MinecraftLocation::z),
+            Codec.FLOAT.optionalFieldOf("headYaw", 0.0f).forGetter(WarpLocation::headYaw),
+            Codec.FLOAT.optionalFieldOf("pitch", 0.0f).forGetter(WarpLocation::pitch),
+            // loaded from the map
+            Codec.STRING.optionalFieldOf("name").forGetter(warp -> Optional.of(warp.getName())),
+
+            Codec.STRING.optionalFieldOf("permissionString").forGetter(warp -> Optional.ofNullable(warp.getPermissionString()))
+
+        ).apply(instance, WarpLocation::new)
+    );
+
+    public static final Codec<NamedLocationStorage> NAMED_LOCATION_STORAGE =
+        Codec.unboundedMap(Codec.STRING, MINECRAFT_LOCATION)
+            .xmap(
+                // Convert Map to NamedLocationStorage
+                map -> {
+                    NamedLocationStorage storage = new NamedLocationStorage();
+                    map.forEach(
+                        (key, value) -> storage.put(key, new NamedMinecraftLocation(value, key))
+                    );
+                    return storage;
+                },
+                // Convert NamedLocationStorage to Map for serialization
+                HashMap::new
+            );
+
+    public static final Codec<WarpStorage> WARP_STORAGE =
+        Codec.unboundedMap(Codec.STRING, WARP_LOCATION)
+            .xmap(
+                // Convert Map to WarpStorage
+                map -> {
+                    WarpStorage storage = new WarpStorage();
+                    map.forEach(
+                        (key, value) -> storage.put(key, WarpLocation.setName(value, key))
+                    );
+                    return storage;
+                },
+                // Convert WarpStorage to Map for serialization
+                HashMap::new
+            );
+
+    private static final String SPAWN_KEY = "spawn";
+    private static final String WARPS_KEY = "warps";
+    public static final Codec<WorldData> WORLD_DATA = RecordCodecBuilder.create(instance ->
+        instance.group(
+            Codecs.MINECRAFT_LOCATION.fieldOf(SPAWN_KEY).forGetter(WorldData::getSpawn),
+            Codecs.WARP_STORAGE.fieldOf(WARPS_KEY).forGetter(WorldData::warps)
+        ).apply(instance, WorldData::new)
+    );
+}
