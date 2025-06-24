@@ -83,30 +83,15 @@ public class MinecraftLocation {
     }
 
     public static MinecraftLocation fromNbt(NbtCompound tag) {
-        var result = CODEC.parse(NbtOps.INSTANCE, tag);
-
-        if (result.isSuccess()) {
-            return result.getOrThrow();
-        } else {
-            throw new RuntimeException("Failed to parse MinecraftLocation from NBT: " + result.error());
-        }
+        return CODEC.parse(NbtOps.INSTANCE, tag)
+            .getOrThrow();
     }
 
     public NbtCompound writeNbt(NbtCompound tag) {
-        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
-
-        if (result.isSuccess()) {
-            var encoded = result.getOrThrow();
-            if (encoded instanceof NbtCompound compound) {
-                compound.getKeys().forEach(key -> {
-                    tag.put(key, compound.get(key));
-                });
-            }
-        } else {
-            throw new RuntimeException("Failed to encode MinecraftLocation to NBT: " + result.error());
-        }
-
-        return tag;
+        return CODEC.encodeStart(NbtOps.INSTANCE, this)
+            .getOrThrow()
+            .asCompound()
+            .orElseThrow();
     }
 
     protected MutableText toLiteralTextSimple() {

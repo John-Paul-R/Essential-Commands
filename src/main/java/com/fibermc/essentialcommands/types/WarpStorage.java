@@ -41,13 +41,10 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
     }
 
     public NbtCompound writeNbt(NbtCompound nbt) {
-        var result = CODEC.encode(this, NbtOps.INSTANCE, nbt);
-
-        if (result.isSuccess()) {
-            return result.getOrThrow().asCompound().orElseThrow();
-        }
-
-        throw new RuntimeException("Failed to encode WarpStorage to NBT: " + result.error());
+        return CODEC.encode(this, NbtOps.INSTANCE, nbt)
+            .getOrThrow()
+            .asCompound()
+            .orElseThrow();
     }
 
     /**

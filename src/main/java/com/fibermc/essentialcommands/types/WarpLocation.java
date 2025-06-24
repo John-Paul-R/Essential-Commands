@@ -68,20 +68,10 @@ public class WarpLocation extends NamedMinecraftLocation {
 
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
-        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
-
-        if (result.isSuccess()) {
-            var encoded = result.getOrThrow();
-            if (encoded instanceof NbtCompound compound) {
-                compound.getKeys().forEach(key -> {
-                    tag.put(key, compound.get(key));
-                });
-            }
-        } else {
-            throw new RuntimeException("Failed to encode WarpLocation to NBT: " + result.error());
-        }
-
-        return tag;
+        return CODEC.encodeStart(NbtOps.INSTANCE, this)
+            .getOrThrow()
+            .asCompound()
+            .orElseThrow();
     }
 
     public String getPermissionString() {
