@@ -108,12 +108,5 @@ public final class Codecs {
                 HashMap::new
             );
 
-    private static final String SPAWN_KEY = "spawn";
-    private static final String WARPS_KEY = "warps";
-    public static final Codec<WorldData> WORLD_DATA = RecordCodecBuilder.create(instance ->
-        instance.group(
-            Codecs.MINECRAFT_LOCATION.fieldOf(SPAWN_KEY).forGetter(WorldData::getSpawn),
-            Codecs.WARP_STORAGE.fieldOf(WARPS_KEY).forGetter(WorldData::warps)
-        ).apply(instance, WorldData::new)
-    );
+    public static final Codec<WorldData> WORLD_DATA = WorldData.CODEC;
 }

@@ -7,22 +7,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 
 public class WorldData {
-    private static final Codec<WorldData> CODEC = Codecs.WORLD_DATA;
-
     private @Nullable MinecraftLocation spawnLocation;
     private final @NotNull WarpStorage warps;
 
-    public WorldData() {
+    WorldData() {
         this.spawnLocation = null;
         this.warps = new WarpStorage();
     }
 
-    public WorldData(@Nullable MinecraftLocation spawnLocation, @NotNull WarpStorage warps) {
+    WorldData(@Nullable MinecraftLocation spawnLocation, @NotNull WarpStorage warps) {
         this.spawnLocation = spawnLocation;
         this.warps = warps;
     }
@@ -46,4 +45,11 @@ public class WorldData {
     public NbtCompound toNbt() {
         return CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow().asCompound().orElseThrow();
     }
+
+    public static final Codec<WorldData> CODEC = RecordCodecBuilder.create(instance ->
+        instance.group(
+            Codecs.MINECRAFT_LOCATION.fieldOf("spawn").forGetter(WorldData::getSpawn),
+            Codecs.WARP_STORAGE.fieldOf("warps").forGetter(WorldData::warps)
+        ).apply(instance, WorldData::new)
+    );
 }
