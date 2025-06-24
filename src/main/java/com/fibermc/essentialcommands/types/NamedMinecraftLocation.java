@@ -57,29 +57,16 @@ public class NamedMinecraftLocation extends MinecraftLocation {
     }
 
     public static NamedMinecraftLocation fromNbt(NbtCompound tag) {
-        var result = CODEC.parse(NbtOps.INSTANCE, tag);
-
-        if (result.isSuccess()) {
-            return result.getOrThrow();
-        }
-
-        throw new RuntimeException("Failed to parse NamedMinecraftLocation from NBT: " + result.error());
+        return CODEC.parse(NbtOps.INSTANCE, tag)
+            .getOrThrow();
     }
 
     public NbtCompound writeNbt(NbtCompound tag) {
-        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
+        return CODEC.encodeStart(NbtOps.INSTANCE, this)
+            .getOrThrow()
+            .asCompound()
+            .orElseThrow();
 
-        if (result.isSuccess()) {
-            var encoded = result.getOrThrow();
-            if (encoded instanceof NbtCompound compound) {
-                compound.getKeys().forEach(key -> {
-                    tag.put(key, compound.get(key));
-                });
-            }
-            return tag;
-        }
-
-        throw new RuntimeException("Failed to encode NamedMinecraftLocation to NBT: " + result.error());
     }
 
     public String getName() {
