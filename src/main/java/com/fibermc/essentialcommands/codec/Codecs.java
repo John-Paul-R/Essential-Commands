@@ -11,30 +11,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public final class Codecs {
     private Codecs() {}
 
-    // Codec for RegistryKey<World>
-    public static final Codec<RegistryKey<World>> WORLD_KEY =
-        Identifier.CODEC.xmap(
-            id -> RegistryKey.of(RegistryKeys.WORLD, id),
-            RegistryKey::getValue
-        );
+    public static final Codec<RegistryKey<World>> WORLD_KEY = RegistryKey.createCodec(RegistryKeys.WORLD);
 
-    // Codec for Vec3d
-    public static final Codec<Vec3d> VEC3D = RecordCodecBuilder.create(instance ->
-        instance.group(
-            Codec.DOUBLE.fieldOf("x").forGetter(Vec3d::getX),
-            Codec.DOUBLE.fieldOf("y").forGetter(Vec3d::getY),
-            Codec.DOUBLE.fieldOf("z").forGetter(Vec3d::getZ)
-        ).apply(instance, Vec3d::new)
-    );
-
-    // Main MinecraftLocation codec
     public static final Codec<MinecraftLocation> MINECRAFT_LOCATION = RecordCodecBuilder.create(instance ->
         instance.group(
             WORLD_KEY.fieldOf("WorldRegistryKey").forGetter(MinecraftLocation::dim),
