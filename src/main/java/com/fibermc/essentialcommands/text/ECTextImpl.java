@@ -1,18 +1,19 @@
 package com.fibermc.essentialcommands.text;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import com.fibermc.essentialcommands.types.ECPlaceholderApiCompat;
 import com.fibermc.essentialcommands.types.IStyleProvider;
-import eu.pb4.placeholders.api.*;
-import eu.pb4.placeholders.api.node.TextNode;
+import eu.pb4.placeholders.api.ParserContext;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.parsers.NodeParser;
+import eu.pb4.placeholders.api.parsers.TagLikeParser;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.*;
-
-import dev.jpcode.eccore.util.TextUtil;
 
 public class ECTextImpl extends ECText {
     private final ParserContext parserContext;
@@ -67,50 +68,41 @@ public class ECTextImpl extends ECText {
         return getTextInternal(key, textFormatType, styleProvider, args);
     }
 
-    private Placeholders.PlaceholderGetter placeholderGetterForContext(
+    private NodeParser parserForContext(
         TextFormatType textFormatType,
         @Nullable IStyleProvider styleProvider,
         List<MutableText> args)
     {
-        return new Placeholders.PlaceholderGetter() {
-            @Override
-            public boolean isContextOptional() {
-                // In some situations (Notably, unit tests), the MinecraftServer from which to init
-                // the PlaceholderContext will be unavailable, so we set the context to Optional.
-                // (At time of writing, none of EC's PlaceholderGetter tech depends on the server
-                // context)
-                return true;
-            }
-
-            @Override
-            public PlaceholderHandler getPlaceholder(String placeholderId) {
-                return (ctx, abc) -> {
+        return TagLikeParser.of(
+            TagLikeParser.PLACEHOLDER_USER,
+            TagLikeParser.Provider.placeholderText(placeholderId -> {
+                if (placeholderId.startsWith("l:")) {
+                    // handling the ${l:lang.key.here} case for interpolating value from elsewhere in language files
                     var idxAndFormattingCode = placeholderId.split(":");
-                    if (idxAndFormattingCode.length < 1) {
-                        throw new IllegalArgumentException("lang string placeholder did not contain an index");
+                    if (idxAndFormattingCode.length < 2) {
+                        throw new IllegalArgumentException(
+                            "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
+                                + placeholderId);
+                    }
+                    if (idxAndFormattingCode.length > 3) {
+                        throw new IllegalArgumentException("lang string placeholder had an unexpected second ':'. Received: " + placeholderId);
                     }
 
-                    var firstToken = idxAndFormattingCode[0];
-                    var text = switch (firstToken) {
-                        case "l" -> {
-                            if (idxAndFormattingCode.length < 2) {
-                                throw new IllegalArgumentException(
-                                    "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
-                                        + placeholderId);
-                            }
-                            yield getTextInternal(idxAndFormattingCode[1], textFormatType, styleProvider);
-                        }
+                    return getTextInternal(idxAndFormattingCode[1], textFormatType, styleProvider);
+                }
 
-                        default -> args.get(Integer.parseInt(idxAndFormattingCode[0]));
-                    };
-                    return PlaceholderResult.value(text);
-                };
-            }
-        };
-    }
+                if (placeholderId.matches("\\d+")) {
+                    // handling the ${1} case for argument interpolation
+                    int targetIndex = Integer.parseInt(placeholderId);
+                    if (targetIndex > args.size()) {
+                        throw new IllegalArgumentException("Invalid 'Argument' placeholder: targeted argument with (0-based) index '" + targetIndex + "' but only " + args.size() + " were present");
+                    }
+                    return args.get(targetIndex);
+                }
 
-    private static int hashText(Text text) {
-        return Objects.hash(text.getContent(), text.getStyle());
+                return null;
+            })
+        );
     }
 
     public MutableText getTextInternal(
@@ -120,33 +112,19 @@ public class ECTextImpl extends ECText {
         Text... args)
     {
         var argsList = Arrays.stream(args).map(Text::copy).toList();
-        var argsHashes = argsList.stream()
-            .map(ECTextImpl::hashText)
-            .collect(Collectors.toCollection(HashSet::new));
 
-        var placeholderGetter = placeholderGetterForContext(textFormatType, styleProvider, argsList);
-        var nodes = Placeholders.parseNodes(
-            TextNode.convert(Text.literal(getString(key))),
-            Placeholders.PREDEFINED_PLACEHOLDER_PATTERN,
-            placeholderGetter);
-        var retVal = ECPlaceholderApiCompat.toText(nodes, parserContext);
-
-        var retValSiblings = retVal.getSiblings();
+        var parser = parserForContext(textFormatType, styleProvider, argsList);
+        var parsedText = parser.parseText(
+            getString(key),
+            this.parserContext
+        );
 
         var specifiedStyle = styleProvider == null
             ? textFormatType.getStyle()
             : styleProvider.getStyle(textFormatType);
-
-        if (retValSiblings.size() == 0) {
-            return retVal.copy().setStyle(specifiedStyle);
-        }
-
-        return retValSiblings
-            .stream()
-            .map(text -> argsHashes.contains(hashText(text))
-                ? text
-                : text.copy().setStyle(specifiedStyle))
-            .collect(TextUtil.collect());
+        var ret = Text.empty();
+        parsedText.getWithStyle(specifiedStyle).forEach(ret::append);
+        return ret;
     }
 
     public boolean hasTranslation(String key) {
