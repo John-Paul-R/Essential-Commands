@@ -44,6 +44,8 @@ public class WorldData {
     }
 
     public static WorldData fromNbt(NbtCompound nbt) {
+        // Handle legacy "data" wrapper if present
+        nbt = nbt.getCompound("data").orElse(nbt);
         nbt = WorldDataDataFixer.createDataFixer().build().fixer().update(
             WorldDataDataFixer.TYPE,
             new Dynamic<NbtElement>(NbtOps.INSTANCE, nbt),
