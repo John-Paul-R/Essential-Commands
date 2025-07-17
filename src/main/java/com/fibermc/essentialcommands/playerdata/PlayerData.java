@@ -134,10 +134,14 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         return pd;
     }
 
+    public void initializeSaveFileField(File saveFile)
+    {
+        this.saveFile = saveFile;
+    }
     // Initialize runtime state after deserialization
     public void initializeRuntimeState(ServerPlayerEntity player, File saveFile) {
+        initializeSaveFileField(saveFile);
         this.player = player;
-        this.saveFile = saveFile;
         this.lastTickPos = player.getPos();
         this.lastActionTick = player.getServer().getTicks();
         this.pUuid = player.getUuid();
@@ -376,86 +380,6 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         }
     }
 
-    private static final class StorageKey {
-        static final String PLAYER_UUID = "playerUuid";
-        static final String HOMES = "homes";
-        static final String NICKNAME = "nickname";
-        static final String TIME_USED_RTP_EPOCH_MS = "timeUsedRtpEpochMs";
-        static final String PREVIOUS_LOCATION = "previousLocation";
-    }
-
-    public void fromNbt(NbtCompound tag) {
-        // Handle legacy "data" wrapper if present
-        NbtCompound dataTag = tag.getCompound("data").orElse(tag);
-
-        var result = CODEC.parse(NbtOps.INSTANCE, dataTag);
-
-        if (result.isSuccess()) {
-            PlayerData loaded = result.getOrThrow();
-
-            // Copy serializable state to this instance
-            this.homes = loaded.homes;
-            this.previousLocation = loaded.previousLocation;
-            this.nickname = loaded.nickname;
-            this.timeUsedRtp = loaded.timeUsedRtp;
-            this.tpCooldown = loaded.tpCooldown;
-
-            // Recalculate derived state if player is available
-            if (this.nickname != null && this.player != null) {
-                try {
-                    reloadFullNickname();
-                } catch (NullPointerException ignore) {
-                    EssentialCommands.LOGGER.warn("Could not refresh player full nickname, as ServerPlayerEntity was null in PlayerData.");
-                }
-            }
-        } else {
-            // Fallback to legacy parsing for backward compatibility
-            EssentialCommands.LOGGER.warn(
-                "Failed to parse PlayerData with codec, falling back to legacy parsing: {}",
-                result.error()
-            );
-            legacyFromNbt(dataTag);
-        }
-
-        if (this.player != null) {
-            updatePlayerEntity(this.player);
-        }
-    }
-
-    // Keep legacy parsing as fallback
-    private void legacyFromNbt(NbtCompound dataTag) {
-        this.homes = dataTag.get(StorageKey.HOMES, NamedLocationStorage.CODEC).orElseGet(NamedLocationStorage::new);
-
-        dataTag.getString(StorageKey.NICKNAME).ifPresent((nick) -> {
-            if ("null".equals(nick)) {
-                return;
-            }
-            this.nickname = TextUtil.parseText(nick);
-        });
-
-        dataTag.getLong(StorageKey.TIME_USED_RTP_EPOCH_MS).ifPresent((time) -> {
-            this.timeUsedRtp = TimeUtil.epochTimeMsToTicks(time);
-        });
-
-        if (CONFIG.PERSIST_BACK_LOCATION) {
-            dataTag.getCompound(StorageKey.PREVIOUS_LOCATION).ifPresent((nbt) -> {
-                this.previousLocation = MinecraftLocation.fromNbt(nbt);
-            });
-        }
-    }
-
-    public NbtCompound toNbt() {
-        var result = CODEC.encodeStart(NbtOps.INSTANCE, this);
-
-        if (result.isSuccess()) {
-            return result.getOrThrow()
-                .asCompound()
-                .orElseThrow();
-        }
-
-        throw new RuntimeException("Failed to encode PlayerData with codec: " + result.error());
-    }
-
     public void setPreviousLocation(MinecraftLocation location) {
         this.previousLocation = location;
         this.markDirty();
@@ -594,7 +518,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public void save() {
-        NbtCompound data = this.toNbt();
+        NbtCompound data = CODEC.encodeStart(NbtOps.INSTANCE, this)
+            .getOrThrow().asCompound().orElseThrow();
 
         try {
             NbtIo.writeCompressed(data, this.saveFile.toPath());
