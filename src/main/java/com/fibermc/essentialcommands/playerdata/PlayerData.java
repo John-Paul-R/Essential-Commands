@@ -165,6 +165,10 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         // Revoke any abilities that shouldn't persist
         Pal.revokeAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.SLEEP_INVULN);
 
+        if (!CONFIG.PERSIST_BACK_LOCATION) {
+            this.previousLocation = null;
+        }
+
         updatePlayerEntity(player);
     }
 
