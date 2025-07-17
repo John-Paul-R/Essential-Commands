@@ -32,11 +32,16 @@ public final class PlayerDataFactory {
 
         if (fileExisted && playerDataFile.length() != 0) {
             try {
+                var tag = NbtIo.readCompressed(playerDataFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
+                // Handle legacy "data" wrapper if present
+                NbtCompound dataTag = tag.getCompound("data").orElse(tag);
+
                 var playerData = PlayerData.CODEC.parse(
                     NbtOps.INSTANCE,
-                    NbtIo.readCompressed(playerDataFile.toPath(), NbtSizeTracker.ofUnlimitedBytes())
+                    dataTag
                 ).getOrThrow();
                 playerData.initializeRuntimeState(player, playerDataFile);
+
                 return playerData;
             } catch (IOException e) {
                 EssentialCommands.log(
@@ -60,14 +65,21 @@ public final class PlayerDataFactory {
     public static PlayerData create(NamedLocationStorage homes, File saveFile) {
         String fileName = saveFile.getName();
         UUID playerUuid = UUID.fromString(fileName.substring(0, fileName.indexOf(".dat")));
-        PlayerData pData = new PlayerData(saveFile);
+        PlayerData playerData = null;
         if (Files.exists(saveFile.toPath()) && saveFile.length() != 0) {
             try {
-                NbtCompound nbtCompound3 = NbtIo.readCompressed(saveFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
-                pData.fromNbt(nbtCompound3);
+                NbtCompound tag = NbtIo.readCompressed(saveFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
+                // Handle legacy "data" wrapper if present
+                NbtCompound dataTag = tag.getCompound("data").orElse(tag);
+
+                playerData = PlayerData.CODEC.parse(
+                    NbtOps.INSTANCE,
+                    dataTag
+                ).getOrThrow();
+                playerData.initializeSaveFileField(saveFile);
                 // If a EC data already existed, the homes we just initialized the pData with (from paramater) just got overwritten.
                 // Now, add them back if their keys do not already exist in the set we just loaded from EC save file.
-                pData.homes.putAll(homes);
+                playerData.homes.putAll(homes);
                 //Testing:
 
             } catch (IOException e) {
@@ -84,8 +96,12 @@ public final class PlayerDataFactory {
             }
         }
 
-        pData.markDirty();
-        return pData;
+        if (playerData == null) {
+            playerData = new PlayerData(saveFile);
+        }
+
+        playerData.markDirty();
+        return playerData;
     }
 
     public static PlayerData create(ServerPlayerEntity player) {
