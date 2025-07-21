@@ -19,7 +19,7 @@ public final class MotdCommand {
 
     private static final NodeParser NODE_PARSER = ParserBuilder.of()
         .globalPlaceholders()
-        .add(TagParser.QUICK_TEXT_WITH_STF_SAFE)
+        .add(TagParser.QUICK_TEXT_WITH_STF)
         .build();
 
     public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
