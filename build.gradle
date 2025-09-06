@@ -363,23 +363,23 @@ static def getTimestamp() {
     return new Date().format('yyyyMMddHHmmss')
 }
 
-String cachedChangelog = null
+ext.cachedChangelog = null
 
 String readChangelogFromFile() {
-    if (cachedChangelog != null) {
-        return cachedChangelog
+    if (ext.has('cachedChangelog')) {
+        return ext.cachedChangelog
     }
 
     String changelogFilePath = './changelog.md'
     var file = new File(changelogFilePath)
     if (!file.exists()) {
         logger.warn("'%s' not found.", changelogFilePath)
-        cachedChangelog = "changelog file not found"
-        return cachedChangelog
+        ext.cachedChangelog = "changelog file not found"
+        return ext.cachedChangelog
     }
 
-    cachedChangelog = file.getText('UTF-8')
-    return cachedChangelog
+    ext.cachedChangelog = file.getText('UTF-8')
+    return ext.cachedChangelog
 }
 
 String readLatestChangelogSection() {
