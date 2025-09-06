@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 
 import com.mojang.serialization.JsonOps;
 
+import net.minecraft.Bootstrap;
+import net.minecraft.SharedConstants;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
@@ -14,6 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("TextUtil")
 public class TextUtilTests {
+    static {
+        SharedConstants.createGameVersion();
+        Bootstrap.initialize();
+        Registries.bootstrap();
+    }
+
     @Test
     @DisplayName("flattenRoot output is shaped correctly")
     void flattenRoot_flattensCorrectly()
@@ -42,10 +51,12 @@ public class TextUtilTests {
     @DisplayName("from-to json is remotely sane")
     void fromToJson_isSane()
     {
-        var nullJsonStr = TextCodecs.CODEC.encodeStart(JsonOps.INSTANCE, Text.literal(" hi there! "))
+        var originalText = Text.literal(" hi there! ");
+        var textAsJson = TextCodecs.CODEC.encodeStart(JsonOps.INSTANCE, originalText)
             .getOrThrow();
-        var parsedStyleFromNull = TextCodecs.CODEC.parse(JsonOps.INSTANCE, nullJsonStr)
+        var parsedText = TextCodecs.CODEC.parse(JsonOps.INSTANCE, textAsJson)
             .getOrThrow();
-        assert parsedStyleFromNull == null;
+        assertEquals(originalText.getContent(), parsedText.getContent());
+        assertEquals(originalText.getStyle(), parsedText.getStyle()); // I think both null?
     }
 }

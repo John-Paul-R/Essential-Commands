@@ -3,7 +3,7 @@ plugins {
     id 'fabric-loom' version "${loom_version}"
     id 'maven-publish'
     id "com.modrinth.minotaur" version "2.+"
-    id 'com.matthewprenger.cursegradle' version "1.4.0"
+    id 'io.github.themrmilchmann.curseforge-publish' version "0.8.0"
     id "com.github.breadmoirai.github-release" version "2.3.7"
     // id 'checkstyle'
 }
@@ -33,9 +33,7 @@ allprojects {
         : "${project.mod_version}-mc${project.minecraft_version}"
 
     version = full_version
-    archivesBaseName = "${project.mod_id}"
-
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+    base.archivesName = "${project.mod_id}"
 
     // Declare dependencies
     dependencies {
@@ -49,12 +47,16 @@ allprojects {
 //        modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
         modImplementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
 
-        include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.5")))
+        // included in fabriclocader 1.15+, kept here for compat on older loaders, I think
+        include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}")))
 
         // Code Quality
         compileOnly "org.jetbrains:annotations:${project.jetbrains_annotations_version}"
-        testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_jupiter_version}"
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_jupiter_version}"
+        testImplementation platform("org.junit:junit-bom:${project.junit_bom_version}")
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+
 
         // JIJ Dependencies
         modApi  "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
@@ -78,7 +80,7 @@ allprojects {
 
     // Perform tests using the JUnit test suite
     test {
-        //useJUnitPlatform()
+        useJUnitPlatform()
     }
 
     // Produce a sources distribution
@@ -142,8 +144,7 @@ tasks.withType(JavaCompile).configureEach {
     // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
     // If Javadoc is generated, this must be specified in that task too.
     it.options.encoding = "UTF-8"
-
-    // Minecraft 1.17 (21w19a) upwards uses Java 16.
+    // java version
     it.options.release.set(21)
 }
 
@@ -226,45 +227,87 @@ task publishModrinth(type: TaskModrinthUpload) { // Make sure it runs after buil
     }
 }
 
-//curseforge475964 // Begin the cursegradle task. Replacing ID with the id you set on the cursegradle config.
+// Replace your existing curseforge configuration with this:
 curseforge {
-    apiKey = getenv("CURSEFORGE")
+    apiToken = getenv("CURSEFORGE")
 
-    // Declare all projects
-    //noinspection GroovyAssignabilityCheck
-    project {
-        // Set the project id
-        id = project.cf_project_id
-        // Set the release type
-        releaseType = project.version.contains('alpha') ? 'alpha'
-            : project.version.contains('beta') ? 'beta'
-            : 'release'
-        // Set the release notes
-        changelog = "For a list of changes, please refer to https://github.com/${project.github_repo}/releases/tag/${project.version}"
-        // Add all supported game versions
-        project.cf_game_versions.split(',').each { addGameVersion it }
-        // Add the main artifact
-        mainArtifact(remapJar) { displayName = "${project.version}" }
+    publications {
+        register("main") {
+            projectId = project.cf_project_id
 
-        // Add any additional artifacts
-        subprojects.each {
-            addArtifact it.remapJar
-//            addArtifact it.sourcesJar
-//            addArtifact it.jar
-        }
-        // Add any dependencies
-        relations {
-            if (project.cf_relations_required) project.cf_relations_required.split(',').each { requiredDependency it }
-            if (project.cf_relations_optional) project.cf_relations_optional.split(',').each { optionalDependency it }
-            if (project.cf_relations_embedded) project.cf_relations_embedded.split(',').each { embeddedLibrary it }
-            if (project.cf_relations_tools) project.cf_relations_tools.split(',').each { tool it }
-            if (project.cf_relations_incompatible) project.cf_relations_incompatible.split(',').each { incompatible it }
+            // Convert game versions from comma-separated string to GameVersion objects
+            project.cf_game_versions.split(',').each { version ->
+                gameVersions.add(new io.github.themrmilchmann.gradle.publish.curseforge.GameVersion("minecraft-java-edition", version.trim()))
+            }
+
+            artifacts.register("main") {
+                displayName = "${project.version}"
+
+                // Convert release type to enum
+                releaseType = project.version.contains('alpha') ? ReleaseType.ALPHA
+                    : project.version.contains('beta') ? ReleaseType.BETA
+                    : ReleaseType.RELEASE
+
+                // Set up changelog (pointing to GitHub releases instead of inline text)
+                changelog {
+                    format = ChangelogFormat.TEXT
+                    content = "For a list of changes, please refer to https://github.com/${project.github_repo}/releases/tag/${project.version}"
+                }
+
+                from(remapJar)
+
+                // Convert relations configuration
+                relations {
+                    if (project.cf_relations_required) {
+                        project.cf_relations_required.split(',').each { dep ->
+                            requiredDependency(dep.trim())
+                        }
+                    }
+                    if (project.cf_relations_optional) {
+                        project.cf_relations_optional.split(',').each { dep ->
+                            optionalDependency(dep.trim())
+                        }
+                    }
+                    if (project.cf_relations_embedded) {
+                        project.cf_relations_embedded.split(',').each { dep ->
+                            embeddedLibrary(dep.trim())
+                        }
+                    }
+                    if (project.cf_relations_tools) {
+                        project.cf_relations_tools.split(',').each { dep ->
+                            tool(dep.trim())
+                        }
+                    }
+                    if (project.cf_relations_incompatible) {
+                        project.cf_relations_incompatible.split(',').each { dep ->
+                            incompatible(dep.trim())
+                        }
+                    }
+                }
+            }
+
+            // Add additional artifacts from subprojects
+            subprojects.eachWithIndex { subproject, index ->
+                artifacts.register("subproject${index}") {
+                    from(subproject.remapJar)
+                    displayName = "${subproject.name} - ${project.version}"
+                    releaseType = project.version.contains('alpha') ? ReleaseType.ALPHA
+                        : project.version.contains('beta') ? ReleaseType.BETA
+                        : ReleaseType.RELEASE
+                }
+            }
         }
     }
+}
 
-    // Configure other options
-    options {
-        forgeGradleIntegration = false
+task publishCurseForge {
+    description 'Uploads to CurseForge'
+    group 'upload'
+
+    dependsOn 'publishMainToCurseForge'
+
+    onlyIf {
+        env.containsKey("CURSEFORGE")
     }
 }
 
@@ -287,7 +330,7 @@ githubRelease {
     body = readChangelogFromFile() // by default this is empty
     draft = false // by default this is false
     prerelease = false // by default this is false
-    releaseAssets libsDirectory
+    releaseAssets base.libsDirectory
         .getAsFileTree()
         .matching((PatternFilterable pattern) -> pattern.include("**/*${project.version}.jar"))
     //jar.outputs.getFiles().asPath//

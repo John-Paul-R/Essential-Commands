@@ -4,8 +4,9 @@ plugins {
 
 // Declare dependencies
 dependencies {
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_jupiter_version}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_jupiter_version}"
+    testImplementation platform("org.junit:junit-bom:${project.junit_bom_version}")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 publishing {
