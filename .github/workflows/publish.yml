@@ -1,0 +1,100 @@
+
+# This workflow publishes releases to GitHub Packages, Modrinth, CurseForge, and GitHub Releases
+
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (without v prefix)'
+        required: true
+        type: string
+
+env:
+  JAVA_VERSION: 21
+  JAVA_DISTRIBUTION: adopt
+
+jobs:
+  publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    environment: publish
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: ✨ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛂 Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: 🏗 Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+
+      - name: 📷 Begin Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 🔨 Build artifacts and Run Tests
+        env:
+          IS_PIPELINE: true
+        run: gradle clean build
+
+      - name: 📦 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: '**/build/libs/'
+
+      - name: 📝 Upload test reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: '**/build/reports/'
+
+      - name: 📤 Publish to GitHub Packages
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IS_PIPELINE: true
+        run: gradle publish
+
+      - name: 📤 Publish to Modrinth
+        env:
+          MODRINTH: ${{ secrets.MODRINTH }}
+          IS_PIPELINE: true
+        run: gradle publishModrinth
+
+      - name: 📤 Publish to CurseForge
+        env:
+          CURSEFORGE: ${{ secrets.CURSEFORGE }}
+          IS_PIPELINE: true
+        run: gradle publishCurseForge
+
+      - name: 📤 Create GitHub Release
+        env:
+          GITHUB: ${{ secrets.GITHUB_TOKEN }}
+          IS_PIPELINE: true
+        run: gradle publishGithubRelease
+
+      - name: 🧨 Cleanup Gradle cache
+        run: |
+          rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          rm -f ~/.gradle/caches/modules-2/gc.properties

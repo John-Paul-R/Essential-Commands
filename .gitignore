@@ -39,6 +39,7 @@ run.*/
 
 *.orig
 changelog*.md
+!changelog.md
 cfmd.py
 *cf.md
 showcase.md
