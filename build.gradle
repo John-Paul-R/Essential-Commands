@@ -38,20 +38,12 @@ allprojects {
     version = full_version
     base.archivesName = "${project.mod_id}"
 
-    // Declare dependencies
+    // Common dependencies for all projects
     dependencies {
         // Fabric
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
         mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
         modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-        // Mods
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-//        modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
-        modImplementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
-
-        // included in fabriclocader 1.15+, kept here for compat on older loaders, I think
-        include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}")))
 
         // Code Quality
         compileOnly "org.jetbrains:annotations:${project.jetbrains_annotations_version}"
@@ -60,21 +52,6 @@ allprojects {
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
         testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 
-
-        // JIJ Dependencies
-        modApi  "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
-        include "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
-        modApi  "eu.pb4:placeholder-api:${project.placeholder_api_version}"
-        include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
-        modImplementation 'org.yaml:snakeyaml:2.5.0'
-        include 'org.yaml:snakeyaml:2.5.0'
-        modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
-        include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
-
-        // mod compatibility
-        modCompileOnly  "maven.modrinth:vanish:${project.vanish_version}"
-
-        // Subprojects
         subprojects.each {
             implementation project(path: ":${it.name}", configuration: "namedElements")
             include project("${it.name}:") // nest within distribution
@@ -138,6 +115,33 @@ allprojects {
             }
         }
         maven { url "https://api.modrinth.com/maven" } // for vanish
+    }
+}
+
+// Root project specific dependencies
+dependencies {
+    // Root-only dependencies (not needed by ec-core)
+    modImplementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+
+    // included in fabriclocader 1.15+, kept here for compat on older loaders, I think
+    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}")))
+
+    // JIJ Dependencies (include for packaging)
+    modApi  "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+    include "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+    include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+    modImplementation "org.yaml:snakeyaml:${project.snakeyaml_version}"
+    include "org.yaml:snakeyaml:${project.snakeyaml_version}"
+    modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
+    include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
+
+    // mod compatibility
+    modCompileOnly  "maven.modrinth:vanish:${project.vanish_version}"
+
+    // Subprojects
+    subprojects.each {
+        implementation project(path: ":${it.name}", configuration: "namedElements")
+        include project("${it.name}:") // nest within distribution
     }
 }
 
