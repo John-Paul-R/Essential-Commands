@@ -66,18 +66,33 @@ jobs:
           VERSION_SUFFIX: ${{ steps.version_suffix.version_suffix }}
         run: gradle clean build
 
+      - name: 🎯 Prepare mod-only artifact dir
+        run: |
+          mkdir -p upload-staging
+          find build/libs -name "*.jar" \
+            ! -name "*-sources.jar" \
+            ! -name "*-javadoc.jar" \
+            ! -name "*-test*.jar" \
+            -exec cp {} upload-staging/ \;
+
+      - name: 📦 Upload mod-only artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod_artifact
+          path: upload-staging/
+
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: artifacts
-          path: '**/build/libs/'
+          path: 'build/libs/'
 
       - name: 📝 Upload reports
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: reports
-          path: '**/build/reports/'
+          path: 'build/reports/'
 
       - name: 🧨 Cleanup Gradle cache
         run: |

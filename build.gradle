@@ -258,7 +258,7 @@ curseforge {
                     : ReleaseType.RELEASE
 
                 // Set up changelog (pointing to GitHub releases instead of inline text)
-                changelog {IS_PIPELINE
+                changelog {
                     format = ChangelogFormat.TEXT
                     content = "For a list of changes, please refer to https://github.com/${project.github_repo}/releases/tag/${project.version}"
                 }
