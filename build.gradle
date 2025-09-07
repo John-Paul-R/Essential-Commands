@@ -155,7 +155,7 @@ publishing {
         }
         maven {
             name 'GitHub'
-            url "https://maven.pkg.github.com/${project.gh_owner}/project.gh_repo"
+            url "https://maven.pkg.github.com/${project.gh_owner}/${project.gh_repo}"
             credentials {
                 username = getenv('GITHUB_ACTOR')
                 password = getenv('GITHUB_TOKEN')
