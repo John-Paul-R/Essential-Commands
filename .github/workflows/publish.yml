@@ -127,13 +127,13 @@ jobs:
         env:
           CURSEFORGE: ${{ secrets.CURSEFORGE }}
           IS_PIPELINE: true
-        run: gradle publishCurseForge
+        run: gradle publishCurseforge
 
       - name: 📤 Create GitHub Release
         env:
           GITHUB: ${{ secrets.GITHUB_TOKEN }}
           IS_PIPELINE: true
-        run: gradle publishGithubRelease
+        run: gradle publishGithub
 
       - name: 🧨 Cleanup Gradle cache
         run: |
