@@ -17,6 +17,7 @@ import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.types.RtpCenter;
 import com.google.common.base.Stopwatch;
 
 import com.mojang.brigadier.Command;
@@ -93,22 +94,14 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         }
 
         threadExecutor.execute(() -> {
-            EssentialCommands.LOGGER.info(
-                String.format(
-                    "Starting RTP location search for %s",
-                    player.getGameProfile().getName()
-                ));
+            EssentialCommands.LOGGER.info("Starting RTP location search for {}", player.getGameProfile().getName());
 
             Stopwatch timer = Stopwatch.createStarted();
 
             exec(player, world);
 
             var totalTime = timer.stop();
-            EssentialCommands.LOGGER.info(
-                String.format(
-                    "Total RTP Time: %s",
-                    totalTime
-                ));
+            EssentialCommands.LOGGER.info("Total RTP Time: {}", totalTime);
         });
 
         return SINGLE_SUCCESS;
@@ -154,18 +147,29 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     }
 
     private static Optional<Vec3i> getRtpCenter(ServerPlayerEntity player) {
-        // Position relative to EC spawn locaiton.
-        var worldSpawn = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
-        if (worldSpawn.isEmpty()) {
-            var ecText = ECText.access(player);
-            PlayerData.access(player).sendCommandError(TextUtil.concat(
-                ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
-                ecText.getText("cmd.rtp.error.no_spawn_set", TextFormatType.Error)
-            ));
-            return Optional.empty();
+        var configuredRtpCenter = CONFIG.RTP_CENTER.getPosition();
+        if (configuredRtpCenter.isPresent()) {
+            var pair = configuredRtpCenter.get();
+            return Optional.of(new Vec3i(pair.x(), 0, pair.z()));
         }
 
-        return Optional.of(worldSpawn.get().intPos());
+        if (CONFIG.RTP_CENTER instanceof RtpCenter.Spawn) {
+            // Position relative to EC spawn locaiton.
+            var worldSpawn = ManagerLocator.getInstance().getWorldDataManager().getSpawn();
+            if (worldSpawn.isEmpty()) {
+                var ecText = ECText.access(player);
+                PlayerData.access(player).sendCommandError(TextUtil.concat(
+                    ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
+                    ecText.getText("cmd.rtp.error.no_spawn_set", TextFormatType.Error)
+                ));
+                return Optional.empty();
+            }
+
+            return Optional.of(worldSpawn.get().intPos());
+        }
+
+        EssentialCommands.LOGGER.warn("Received no-value (not even default) for RTP_CENTER. (should be 'SPAWN'?)");
+        return Optional.empty();
     }
 
     private static Optional<BlockPos> findRtpPosition(ServerWorld world, Vec3i center, HeightFinder heightFinder, ExecutionContext ctx) {
