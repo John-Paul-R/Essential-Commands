@@ -10,7 +10,7 @@ The config file can be found at `config/EssentialCommands.properties`
 *Note: Enabling/Disabling commands requires a server restart. `/essentialcommands config reload` is not sufficient.*
 
 | Config Var                                             | Default Value              | Acceptable Values           |
-| ------------------------------------------------------ | -------------------------- | --------------------------- |
+|--------------------------------------------------------|----------------------------|-----------------------------|
 | ~~teleport_cooldown~~                                  | 1.0                        | double (seconds)            |
 | afk_prefix                                             | "[AFK] " (gray)            | MinecraftText               |
 | allow_back_on_death                                    | false                      | boolean                     |
@@ -56,6 +56,7 @@ The config file can be found at `config/EssentialCommands.properties`
 | recheck_player_ability_permissions_on_dimension_change | false                      | boolean                     |
 | register_top_level_commands                            | true                       | boolean                     |
 | respawn_at_ec_spawn                                    | Never                      | RespawnCondition Expression |
+| rtp_center                                             | Spawn                      | RtpCenter (`Spawn`, `5,10`) |
 | rtp_cooldown                                           | 30                         | integer                     |
 | rtp_enabled_worlds                                     | overworld                  | world name (ex `the_nether`)|
 | rtp_max_attempts                                       | 15                         | integer                     |

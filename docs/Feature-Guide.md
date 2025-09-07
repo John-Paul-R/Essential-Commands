@@ -114,6 +114,8 @@ Teleport to a random location in the world.
 
 **Related Config Options:**
 - `enable_rtp` - Enables/disables random teleport - Default: `true`
+- `rtp_radius` - Where to center the region of available locations - Default: `Spawn`
+  - Also accepts comma-separated coordinates in `x,z` format, e.g. `500,1000`
 - `rtp_radius` - Maximum distance for random teleport - Default: `1000`
 - `rtp_min_radius` - Minimum distance for random teleport - Default: Same as `rtp_radius` (`1000`)
 - `rtp_cooldown` - Cooldown between random teleports (seconds) - Default: `30`
