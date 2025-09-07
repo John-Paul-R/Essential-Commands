@@ -80,12 +80,16 @@ jobs:
         with:
           name: mod_artifact
           path: upload-staging/
+          # jars are already compressed
+          compression-level: 0
 
       - name: 📦 Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: 'build/libs/'
+          # jars are already compressed
+          compression-level: 0
 
       - name: 📝 Upload reports
         if: ${{ always() }}

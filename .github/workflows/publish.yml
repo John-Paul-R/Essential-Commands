@@ -78,11 +78,30 @@ jobs:
           IS_PIPELINE: true
         run: gradle clean build
 
-      - name: 📦 Upload build artifacts
+      - name: 🎯 Prepare mod-only artifact dir
+        run: |
+          mkdir -p upload-staging
+          find build/libs -name "*.jar" \
+            ! -name "*-sources.jar" \
+            ! -name "*-javadoc.jar" \
+            ! -name "*-test*.jar" \
+            -exec cp {} upload-staging/ \;
+
+      - name: 📦 Upload mod-only artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: '**/build/libs/'
+          name: mod_artifact
+          path: upload-staging/
+          # jars are already compressed
+          compression-level: 0
+
+      - name: 📦 Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: 'build/libs/'
+          # jars are already compressed
+          compression-level: 0
 
       - name: 📝 Upload test reports
         if: ${{ always() }}
