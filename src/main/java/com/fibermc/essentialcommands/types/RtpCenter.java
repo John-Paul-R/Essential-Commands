@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.types;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public sealed interface RtpCenter permits RtpCenter.Spawn, RtpCenter.Coordinates {
 
@@ -24,7 +25,7 @@ public sealed interface RtpCenter permits RtpCenter.Spawn, RtpCenter.Coordinates
 
         @Override
         public String serialize() {
-            return "SPAWN";
+            return "Spawn";
         }
     }
 
@@ -36,8 +37,13 @@ public sealed interface RtpCenter permits RtpCenter.Spawn, RtpCenter.Coordinates
 
         @Override
         public String serialize() {
-            return "COORDINATES:" + position.x() + "," + position.z();
+            return "Coordinates(" + position.x() + "," + position.z() + ")";
         }
+
+        private static final Pattern REGEX = Pattern.compile(
+            "(?:COORDINATES)?\\(?\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)?",
+            Pattern.CASE_INSENSITIVE
+        );
     }
 
     static RtpCenter parse(String serialized) {
@@ -47,27 +53,25 @@ public sealed interface RtpCenter permits RtpCenter.Spawn, RtpCenter.Coordinates
 
         String trimmed = serialized.trim();
 
-        if ("SPAWN".equals(trimmed)) {
+        if ("SPAWN".equalsIgnoreCase(trimmed)) {
             return new Spawn();
         }
 
-        if (trimmed.startsWith("COORDINATES:")) {
-            String coords = trimmed.substring("COORDINATES:".length());
-            String[] parts = coords.split(",");
+        var matcher = Coordinates.REGEX.matcher(trimmed);
 
-            if (parts.length != 2) {
-                throw new IllegalArgumentException("Invalid coordinates format: " + coords);
-            }
+        if (matcher.matches()) {
+            var xStr = matcher.group(1);
+            var zStr = matcher.group(2);
 
             try {
-                int x = Integer.parseInt(parts[0].trim());
-                int y = Integer.parseInt(parts[1].trim());
+                int x = Integer.parseInt(xStr);
+                int y = Integer.parseInt(zStr);
                 return new Coordinates(new Vec2i(x, y));
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid coordinate numbers: " + coords, e);
+                throw new IllegalArgumentException("Invalid coordinate numbers: ", e);
             }
         }
 
-        throw new IllegalArgumentException("Unknown RtpCenter format: " + serialized);
+        throw new IllegalArgumentException("Unknown rtp_center format: " + serialized);
     }
 }

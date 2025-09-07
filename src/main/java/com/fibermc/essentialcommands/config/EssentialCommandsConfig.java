@@ -89,7 +89,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> NICKNAMES_IN_PLAYER_LIST =   new Option<>("nicknames_in_player_list", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> NICKNAME_MAX_LENGTH =    new Option<>("nickname_max_length", 32, ConfigUtil::parseInt);
     @ConfigOption public final Option<Boolean> NICKNAME_ABOVE_HEAD =    new Option<>("nickname_above_head", false, Boolean::parseBoolean);
-    @ConfigOption public final Option<RtpCenter> RTP_CENTER =           new Option<>("rtp_center", RtpCenter.spawn(), RtpCenter::parse);
+    @ConfigOption public final Option<RtpCenter> RTP_CENTER =           new Option<>("rtp_center", RtpCenter.spawn(), RtpCenter::parse, RtpCenter::serialize);
     @ConfigOption public final Option<Integer> RTP_RADIUS =             new Option<>("rtp_radius", 1000, ConfigUtil::parseInt);
     @ConfigOption public final Option<Integer> RTP_MIN_RADIUS =         new Option<>("rtp_min_radius", RTP_RADIUS.getValue(), (String s) -> parseIntOrDefault(s, RTP_RADIUS.getValue()));
     @ConfigOption public final Option<Integer> RTP_COOLDOWN =           new Option<>("rtp_cooldown", 30, ConfigUtil::parseInt);
