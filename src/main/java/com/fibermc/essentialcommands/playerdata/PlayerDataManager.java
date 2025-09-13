@@ -68,6 +68,9 @@ public class PlayerDataManager {
         ServerPlayConnectionEvents.JOIN.register(
             PlayerDataManager::handleSendMotdForGameJoin
         );
+        ServerPlayConnectionEvents.JOIN.register(
+            PlayerDataManager::handleUpdatePlayerCache
+        );
     }
 
     public static final Event<PlayerDataManagerTickCallback> TICK_EVENT =
@@ -90,6 +93,23 @@ public class PlayerDataManager {
         if (CONFIG.ENABLE_MOTD) {
             var player = handler.getPlayer();
             MotdCommand.exec(player);
+        }
+    }
+
+    private static void handleUpdatePlayerCache(
+        ServerPlayNetworkHandler handler,
+        PacketSender sender,
+        MinecraftServer server
+    ) {
+        try {
+            var player = handler.getPlayer();
+            var playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
+            var database = ManagerLocator.getInstance().getJoinpointDatabase();
+
+            String nickname = playerData.getNickname().map(text -> text.getString()).orElse(null);
+            database.updatePlayerCache(player.getUuid(), player.getName().getString(), nickname);
+        } catch (Exception e) {
+            // Log but don't crash on cache update failure - joinpoint database might not be initialized yet
         }
     }
 

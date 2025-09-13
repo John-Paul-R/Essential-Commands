@@ -11,6 +11,7 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
+import com.fibermc.essentialcommands.types.JoinpointLimit;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import com.fibermc.essentialcommands.types.RtpCenter;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +48,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> ENABLE_SPAWN =           new Option<>("enable_spawn", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_TPA =             new Option<>("enable_tpa", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_WARP =            new Option<>("enable_warp", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_JOINPOINT =       new Option<>("enable_joinpoint", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_NICK =            new Option<>("enable_nick", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_RTP =             new Option<>("enable_rtp", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_FLY =             new Option<>("enable_fly", true, Boolean::parseBoolean);
@@ -73,6 +75,8 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> ENABLE_SLEEP =           new Option<>("enable_sleep", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_DELETE_ALL_PLAYER_DATA = new Option<>("enable_delete_all_player_data", true, Boolean::parseBoolean);
     @ConfigOption public final Option<List<Integer>> HOME_LIMIT =       new Option<>("home_limit", List.of(1, 2, 5), arrayParser(ConfigUtil::parseInt));
+    @ConfigOption public final Option<JoinpointLimit> JOINPOINT_LIMIT = new Option<>("joinpoint_limit", JoinpointLimit.any(3, 5, 10), JoinpointLimit::parse, JoinpointLimit::serialize);
+    @ConfigOption public final Option<Integer> JOINPOINT_MAX_SHARED =   new Option<>("joinpoint_max_shared", 10, ConfigUtil::parseInt);
     @ConfigOption public final Option<Double>  TELEPORT_COOLDOWN =      new Option<>("teleport_cooldown", 1.0, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Double>  TELEPORT_DELAY =         new Option<>("teleport_delay", 0.0, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Boolean> ALLOW_BACK_ON_DEATH =    new Option<>("allow_back_on_death", false, Boolean::parseBoolean);

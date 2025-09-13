@@ -26,6 +26,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean ENABLE_SPAWN;
     public final boolean ENABLE_TPA;
     public final boolean ENABLE_WARP;
+    public final boolean ENABLE_JOINPOINT;
     public final boolean ENABLE_NICK;
     public final boolean ENABLE_RTP;
     public final boolean ENABLE_FLY;
@@ -105,6 +106,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.ENABLE_SPAWN                       = config.ENABLE_SPAWN.getValue();
         this.ENABLE_TPA                         = config.ENABLE_TPA.getValue();
         this.ENABLE_WARP                        = config.ENABLE_WARP.getValue();
+        this.ENABLE_JOINPOINT                   = config.ENABLE_JOINPOINT.getValue();
         this.ENABLE_NICK                        = config.ENABLE_NICK.getValue();
         this.ENABLE_RTP                         = config.ENABLE_RTP.getValue();
         this.ENABLE_FLY                         = config.ENABLE_FLY.getValue();

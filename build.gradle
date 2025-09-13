@@ -123,6 +123,10 @@ dependencies {
     include "org.yaml:snakeyaml:${project.snakeyaml_version}"
     modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
     include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
+    
+    // SQLite for joinpoints storage
+    implementation "org.xerial:sqlite-jdbc:3.47.1.0"
+    include "org.xerial:sqlite-jdbc:3.47.1.0"
 
     // mod compatibility
     modCompileOnly  "maven.modrinth:vanish:${project.vanish_version}"

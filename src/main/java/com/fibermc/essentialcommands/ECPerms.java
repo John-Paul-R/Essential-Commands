@@ -33,6 +33,11 @@ public final class ECPerms {
         public static final String warp_delete = "essentialcommands.warp.delete";
         public static final String warp_tp_named = "essentialcommands.warp.tp_named";
         public static final String warp_tp_others = "essentialcommands.warp_tp_others";
+        public static final String joinpoint_set = "essentialcommands.joinpoint.set";
+        public static final String joinpoint_tp = "essentialcommands.joinpoint.tp";
+        public static final String joinpoint_delete = "essentialcommands.joinpoint.delete";
+        public static final String joinpoint_global = "essentialcommands.joinpoint.global";
+        public static final String joinpoint_share = "essentialcommands.joinpoint.share";
         public static final String back = "essentialcommands.back";
         public static final String spawn_tp = "essentialcommands.spawn.tp";
         public static final String spawn_set = "essentialcommands.spawn.set";
@@ -88,6 +93,7 @@ public final class ECPerms {
             public static final String[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};
             public static final String[] home_group = {home_set, home_tp, home_delete};
             public static final String[] warp_group = {warp_set, warp_tp, warp_delete};
+            public static final String[] joinpoint_group = {joinpoint_set, joinpoint_tp, joinpoint_delete};
             public static final String[] spawn_group = {spawn_tp, spawn_set};
             public static final String[] nickname_group = {nickname_self, nickname_others, nickname_reveal};
             public static final String[] fly_group = {fly_self, fly_others};
