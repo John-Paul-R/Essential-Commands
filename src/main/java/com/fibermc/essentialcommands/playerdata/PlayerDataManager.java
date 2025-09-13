@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.MotdCommand;
@@ -107,9 +108,15 @@ public class PlayerDataManager {
             var database = ManagerLocator.getInstance().getJoinpointDatabase();
 
             String nickname = playerData.getNickname().map(text -> text.getString()).orElse(null);
-            database.updatePlayerCache(player.getUuid(), player.getName().getString(), nickname);
+            database
+                .updatePlayerCacheAsync(player.getUuid(), player.getName().getString(), nickname)
+                .exceptionally(err -> {
+                    EssentialCommands.LOGGER.error(err);
+                    return null;
+                });
         } catch (Exception e) {
             // Log but don't crash on cache update failure - joinpoint database might not be initialized yet
+            EssentialCommands.LOGGER.error(e);
         }
     }
 

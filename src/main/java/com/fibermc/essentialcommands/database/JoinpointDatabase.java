@@ -3,11 +3,13 @@ package com.fibermc.essentialcommands.database;
 import java.io.File;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.types.JoinpointLocation;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -97,7 +99,7 @@ public class JoinpointDatabase {
         }
     }
 
-    public void createJoinpoint(String name, UUID ownerUuid, JoinpointLocation location) throws SQLException {
+    private void createJoinpoint(String name, UUID ownerUuid, JoinpointLocation location) throws SQLException {
         String sql = """
             INSERT INTO joinpoints (name, owner_uuid, world_key, x, y, z, head_yaw, pitch, is_global)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -116,7 +118,6 @@ public class JoinpointDatabase {
 
             stmt.executeUpdate();
 
-            // Get the generated ID and add shared users if any
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     long joinpointId = generatedKeys.getLong(1);
@@ -126,8 +127,7 @@ public class JoinpointDatabase {
         }
     }
 
-    public void updateJoinpoint(String name, UUID ownerUuid, JoinpointLocation location) throws SQLException {
-        // First update the main joinpoint record
+    private void updateJoinpoint(String name, UUID ownerUuid, JoinpointLocation location) throws SQLException {
         String updateSql = """
             UPDATE joinpoints
             SET world_key = ?, x = ?, y = ?, z = ?, head_yaw = ?, pitch = ?, is_global = ?
@@ -152,15 +152,12 @@ public class JoinpointDatabase {
             }
         }
 
-        // Get the joinpoint ID for updating shared users
         joinpointId = getJoinpointId(name, ownerUuid);
-
-        // Clear existing shared users and add new ones
         clearSharedUsers(joinpointId);
         addSharedUsers(joinpointId, location.getSharedWith());
     }
 
-    public boolean deleteJoinpoint(String name, UUID ownerUuid) throws SQLException {
+    private boolean deleteJoinpoint(String name, UUID ownerUuid) throws SQLException {
         String sql = "DELETE FROM joinpoints WHERE name = ? AND owner_uuid = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -172,7 +169,7 @@ public class JoinpointDatabase {
         }
     }
 
-    public JoinpointLocation getJoinpoint(String name, UUID ownerUuid) throws SQLException {
+    private JoinpointLocation getJoinpoint(String name, UUID ownerUuid) throws SQLException {
         String sql = """
             SELECT j.*, GROUP_CONCAT(s.shared_with_uuid) as shared_uuids
             FROM joinpoints j
@@ -195,15 +192,23 @@ public class JoinpointDatabase {
         return null;
     }
 
-    public List<JoinpointLocation> getAccessibleJoinpoints(ServerPlayerEntity player) throws SQLException {
+    private List<JoinpointLocation> getAccessibleJoinpoints(ServerPlayerEntity player) throws SQLException {
+        return getAccessibleOwnedJoinpoints(player, player.getUuid());
+    }
+
+    private List<JoinpointLocation> getAccessibleOwnedJoinpoints(ServerPlayerEntity player, UUID ownedById) throws SQLException {
         UUID playerUuid = player.getUuid();
         String sql = """
             SELECT DISTINCT j.*, GROUP_CONCAT(s.shared_with_uuid) as shared_uuids
             FROM joinpoints j
             LEFT JOIN joinpoint_shared_with s ON j.id = s.joinpoint_id
-            WHERE j.is_global = TRUE
-               OR j.owner_uuid = ?
-               OR j.id IN (SELECT joinpoint_id FROM joinpoint_shared_with WHERE shared_with_uuid = ?)
+            WHERE (
+                    j.is_global = TRUE
+                    OR j.owner_uuid = ?
+                    OR j.id IN (SELECT joinpoint_id FROM joinpoint_shared_with WHERE shared_with_uuid = ?)
+               ) AND (
+                   j.owner_uuid = ?
+               )
             GROUP BY j.id
             ORDER BY j.name
             """;
@@ -212,6 +217,7 @@ public class JoinpointDatabase {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, playerUuid.toString());
             stmt.setString(2, playerUuid.toString());
+            stmt.setString(3, ownedById.toString());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -223,7 +229,7 @@ public class JoinpointDatabase {
         return joinpoints;
     }
 
-    public List<JoinpointLocation> getOwnedJoinpoints(UUID ownerUuid) throws SQLException {
+    private List<JoinpointLocation> getOwnedJoinpoints(UUID ownerUuid) throws SQLException {
         String sql = """
             SELECT j.*, GROUP_CONCAT(s.shared_with_uuid) as shared_uuids
             FROM joinpoints j
@@ -247,6 +253,264 @@ public class JoinpointDatabase {
         return joinpoints;
     }
 
+    private boolean joinpointExists(String name, UUID ownerUuid) throws SQLException {
+        String sql = "SELECT 1 FROM joinpoints WHERE name = ? AND owner_uuid = ? LIMIT 1";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, ownerUuid.toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    private void updatePlayerCache(UUID uuid, String name, String nickname) throws SQLException {
+        String sql = """
+            INSERT OR REPLACE INTO player_cache (uuid, name, nickname, last_seen)
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, uuid.toString());
+            stmt.setString(2, name);
+            stmt.setString(3, nickname);
+            stmt.executeUpdate();
+        }
+    }
+
+    private String getCachedPlayerName(UUID uuid) throws SQLException {
+        String sql = "SELECT name FROM player_cache WHERE uuid = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, uuid.toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("name");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private UUID getOwnerPlayerIdByName(String playerName, UUID requesterUuid) throws SQLException {
+        String sql = """
+            SELECT DISTINCT p.uuid
+            FROM player_cache p
+            INNER JOIN joinpoints joinp ON joinp.owner_uuid = p.uuid
+            LEFT JOIN joinpoint_shared_with jsw ON jsw.joinpoint_id = joinp.id
+            WHERE p.name = ?
+                AND (
+                    joinp.is_global
+                    OR jsw.shared_with_uuid = ?
+                )
+            """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, playerName);
+            stmt.setString(2, requesterUuid.toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return UUID.fromString(rs.getString("uuid"));
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String getCachedPlayerNickname(UUID uuid) throws SQLException {
+        String sql = "SELECT nickname FROM player_cache WHERE uuid = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, uuid.toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("nickname");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private List<JoinpointLocation> getAccessibleJoinpointsWithNames(ServerPlayerEntity player) throws SQLException {
+        UUID playerUuid = player.getUuid();
+        String sql = """
+            SELECT DISTINCT j.*,
+                   GROUP_CONCAT(s.shared_with_uuid) as shared_uuids,
+                   pc_owner.name as owner_name,
+                   pc_owner.nickname as owner_nickname
+            FROM joinpoints j
+            LEFT JOIN joinpoint_shared_with s ON j.id = s.joinpoint_id
+            LEFT JOIN player_cache pc_owner ON j.owner_uuid = pc_owner.uuid
+            WHERE j.is_global = TRUE
+               OR j.owner_uuid = ?
+               OR j.id IN (SELECT joinpoint_id FROM joinpoint_shared_with WHERE shared_with_uuid = ?)
+            GROUP BY j.id
+            ORDER BY j.name
+            """;
+
+        List<JoinpointLocation> joinpoints = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, playerUuid.toString());
+            stmt.setString(2, playerUuid.toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    JoinpointLocation joinpoint = createJoinpointLocationFromResultSet(rs);
+
+                    String ownerName = rs.getString("owner_name");
+                    String ownerNickname = rs.getString("owner_nickname");
+
+                    if (ownerName != null) {
+                        joinpoint = new JoinpointLocationWithOwnerName(joinpoint, ownerName, ownerNickname);
+                    }
+
+                    joinpoints.add(joinpoint);
+                }
+            }
+        }
+
+        return joinpoints;
+    }
+
+    private List<String> getAccessibleJoinpointsOwnerNames(ServerPlayerEntity player) throws SQLException {
+        UUID playerUuid = player.getUuid();
+        String sql = """
+            SELECT DISTINCT
+                pc_owner.name as owner_name
+            FROM joinpoints j
+            LEFT JOIN joinpoint_shared_with s ON j.id = s.joinpoint_id
+            LEFT JOIN player_cache pc_owner ON j.owner_uuid = pc_owner.uuid
+            WHERE j.is_global = TRUE
+               OR j.owner_uuid = ?
+               OR j.id IN (SELECT joinpoint_id FROM joinpoint_shared_with WHERE shared_with_uuid = ?)
+            GROUP BY j.id
+            ORDER BY j.name
+            """;
+
+        List<String> ownerNames = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, playerUuid.toString());
+            stmt.setString(2, playerUuid.toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ownerNames.add(rs.getString("owner_name"));
+                }
+            }
+        }
+
+        return ownerNames;
+    }
+
+    private Map<UUID, String> getCachedNamesForUuids(Set<UUID> uuids) throws SQLException {
+        if (uuids.isEmpty()) return new HashMap<>();
+
+        Map<UUID, String> nameMap = new HashMap<>();
+        StringBuilder sql = new StringBuilder("SELECT uuid, name FROM player_cache WHERE uuid IN (");
+
+        for (int i = 0; i < uuids.size(); i++) {
+            if (i > 0) sql.append(",");
+            sql.append("?");
+        }
+        sql.append(")");
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+            int index = 1;
+            for (UUID uuid : uuids) {
+                stmt.setString(index++, uuid.toString());
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    UUID uuid = UUID.fromString(rs.getString("uuid"));
+                    String name = rs.getString("name");
+                    nameMap.put(uuid, name);
+                }
+            }
+        }
+
+        return nameMap;
+    }
+
+    // ASYNC VARIANTS
+    public CompletableFuture<Void> createJoinpointAsync(String name, UUID ownerUuid, JoinpointLocation location) {
+        return DatabaseHelper.async(() -> {
+            createJoinpoint(name, ownerUuid, location);
+            return null;
+        });
+    }
+
+    public CompletableFuture<Void> updateJoinpointAsync(String name, UUID ownerUuid, JoinpointLocation location) {
+        return DatabaseHelper.async(() -> {
+            updateJoinpoint(name, ownerUuid, location);
+            return null;
+        });
+    }
+
+    public CompletableFuture<Boolean> deleteJoinpointAsync(String name, UUID ownerUuid) {
+        return DatabaseHelper.async(() -> deleteJoinpoint(name, ownerUuid), false);
+    }
+
+    public CompletableFuture<JoinpointLocation> getJoinpointAsync(@NotNull String name, @NotNull UUID ownerUuid) {
+        return DatabaseHelper.async(() -> getJoinpoint(name, ownerUuid));
+    }
+
+    public CompletableFuture<List<JoinpointLocation>> getAccessibleJoinpointsAsync(ServerPlayerEntity player) {
+        return DatabaseHelper.async(() -> getAccessibleJoinpoints(player), new ArrayList<>());
+    }
+
+    public CompletableFuture<List<JoinpointLocation>> getAccessibleOwnedJoinpointsAsync(ServerPlayerEntity player, UUID ownedById) {
+        return DatabaseHelper.async(() -> getAccessibleOwnedJoinpoints(player, ownedById), new ArrayList<>());
+    }
+
+    public CompletableFuture<List<JoinpointLocation>> getOwnedJoinpointsAsync(UUID ownerUuid) {
+        return DatabaseHelper.async(() -> getOwnedJoinpoints(ownerUuid), new ArrayList<>());
+    }
+
+    public CompletableFuture<Boolean> joinpointExistsAsync(String name, UUID ownerUuid) {
+        return DatabaseHelper.async(() -> joinpointExists(name, ownerUuid), false);
+    }
+
+    public CompletableFuture<Void> updatePlayerCacheAsync(UUID uuid, String name, String nickname) {
+        return DatabaseHelper.async(() -> {
+            updatePlayerCache(uuid, name, nickname);
+            return null;
+        });
+    }
+
+    public CompletableFuture<String> getCachedPlayerNameAsync(UUID uuid) {
+        return DatabaseHelper.async(() -> getCachedPlayerName(uuid));
+    }
+
+    public CompletableFuture<UUID> getOwnerPlayerIdByNameAsync(String playerName, UUID requesterId) {
+        return DatabaseHelper.async(() -> getOwnerPlayerIdByName(playerName, requesterId));
+    }
+
+    public CompletableFuture<String> getCachedPlayerNicknameAsync(UUID uuid) {
+        return DatabaseHelper.async(() -> getCachedPlayerNickname(uuid));
+    }
+
+    public CompletableFuture<List<JoinpointLocation>> getAccessibleJoinpointsWithNamesAsync(ServerPlayerEntity player) {
+        return DatabaseHelper.async(() -> getAccessibleJoinpointsWithNames(player), new ArrayList<>());
+    }
+
+    public CompletableFuture<List<String>> getAccessibleJoinpointsOwnerNamesAsync(ServerPlayerEntity player) {
+        return DatabaseHelper.async(() -> getAccessibleJoinpointsOwnerNames(player), new ArrayList<>());
+    }
+
+    public CompletableFuture<Map<UUID, String>> getCachedNamesForUuidsAsync(Set<UUID> uuids) {
+        return DatabaseHelper.async(() -> getCachedNamesForUuids(uuids), new HashMap<>());
+    }
+
+    // HELPER METHODS (existing)
     private JoinpointLocation createJoinpointLocationFromResultSet(ResultSet rs) throws SQLException {
         String name = rs.getString("name");
         UUID ownerUuid = UUID.fromString(rs.getString("owner_uuid"));
@@ -258,7 +522,6 @@ public class JoinpointDatabase {
         float pitch = rs.getFloat("pitch");
         boolean isGlobal = rs.getBoolean("is_global");
 
-        // Parse shared UUIDs
         Set<UUID> sharedWith = new HashSet<>();
         String sharedUuidsStr = rs.getString("shared_uuids");
         if (sharedUuidsStr != null && !sharedUuidsStr.trim().isEmpty()) {
@@ -273,10 +536,7 @@ public class JoinpointDatabase {
             }
         }
 
-        // Create world registry key
         RegistryKey<World> worldKey = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(worldKeyStr));
-
-        // Create MinecraftLocation
         MinecraftLocation mcLocation = new MinecraftLocation(worldKey, x, y, z, headYaw, pitch);
 
         return new JoinpointLocation(mcLocation, name, ownerUuid, isGlobal, sharedWith);
@@ -333,140 +593,6 @@ public class JoinpointDatabase {
         }
     }
 
-    public boolean joinpointExists(String name, UUID ownerUuid) throws SQLException {
-        String sql = "SELECT 1 FROM joinpoints WHERE name = ? AND owner_uuid = ? LIMIT 1";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            stmt.setString(2, ownerUuid.toString());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next();
-            }
-        }
-    }
-
-    // Player cache management
-    public void updatePlayerCache(UUID uuid, String name, String nickname) throws SQLException {
-        String sql = """
-            INSERT OR REPLACE INTO player_cache (uuid, name, nickname, last_seen)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-            """;
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, uuid.toString());
-            stmt.setString(2, name);
-            stmt.setString(3, nickname);
-            stmt.executeUpdate();
-        }
-    }
-
-    public String getCachedPlayerName(UUID uuid) throws SQLException {
-        String sql = "SELECT name FROM player_cache WHERE uuid = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, uuid.toString());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("name");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public String getCachedPlayerNickname(UUID uuid) throws SQLException {
-        String sql = "SELECT nickname FROM player_cache WHERE uuid = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, uuid.toString());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("nickname");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public List<JoinpointLocation> getAccessibleJoinpointsWithNames(ServerPlayerEntity player) throws SQLException {
-        UUID playerUuid = player.getUuid();
-        String sql = """
-            SELECT DISTINCT j.*,
-                   GROUP_CONCAT(s.shared_with_uuid) as shared_uuids,
-                   pc_owner.name as owner_name,
-                   pc_owner.nickname as owner_nickname
-            FROM joinpoints j
-            LEFT JOIN joinpoint_shared_with s ON j.id = s.joinpoint_id
-            LEFT JOIN player_cache pc_owner ON j.owner_uuid = pc_owner.uuid
-            WHERE j.is_global = TRUE
-               OR j.owner_uuid = ?
-               OR j.id IN (SELECT joinpoint_id FROM joinpoint_shared_with WHERE shared_with_uuid = ?)
-            GROUP BY j.id
-            ORDER BY j.name
-            """;
-
-        List<JoinpointLocation> joinpoints = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, playerUuid.toString());
-            stmt.setString(2, playerUuid.toString());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    JoinpointLocation joinpoint = createJoinpointLocationFromResultSet(rs);
-
-                    // Set cached names for display
-                    String ownerName = rs.getString("owner_name");
-                    String ownerNickname = rs.getString("owner_nickname");
-
-                    // Store the owner display name in a way the list command can access
-                    if (ownerName != null) {
-                        joinpoint = new JoinpointLocationWithOwnerName(joinpoint, ownerName, ownerNickname);
-                    }
-
-                    joinpoints.add(joinpoint);
-                }
-            }
-        }
-
-        return joinpoints;
-    }
-
-    public Map<UUID, String> getCachedNamesForUuids(Set<UUID> uuids) throws SQLException {
-        if (uuids.isEmpty()) return new HashMap<>();
-
-        Map<UUID, String> nameMap = new HashMap<>();
-        StringBuilder sql = new StringBuilder("SELECT uuid, name FROM player_cache WHERE uuid IN (");
-
-        for (int i = 0; i < uuids.size(); i++) {
-            if (i > 0) sql.append(",");
-            sql.append("?");
-        }
-        sql.append(")");
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
-            int index = 1;
-            for (UUID uuid : uuids) {
-                stmt.setString(index++, uuid.toString());
-            }
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    UUID uuid = UUID.fromString(rs.getString("uuid"));
-                    String name = rs.getString("name");
-                    nameMap.put(uuid, name);
-                }
-            }
-        }
-
-        return nameMap;
-    }
-
-    // Extended JoinpointLocation that carries owner name for display
     public static class JoinpointLocationWithOwnerName extends JoinpointLocation {
         private final String ownerName;
         private final String ownerNickname;

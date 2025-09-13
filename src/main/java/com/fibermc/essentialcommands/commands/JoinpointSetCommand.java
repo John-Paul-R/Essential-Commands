@@ -1,16 +1,23 @@
 package com.fibermc.essentialcommands.commands;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ChatConfirmationPrompt;
 import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.JoinpointLocation;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
@@ -23,6 +30,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 public class JoinpointSetCommand implements Command<ServerCommandSource> {
 
@@ -42,32 +50,110 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         return exec(context, joinpointName);
     }
 
+    abstract class JoinpointSetException extends RuntimeException {
+        private final String joinpointName;
+
+        public JoinpointSetException(String joinpointName) {
+            this.joinpointName = joinpointName;
+        }
+
+        public String getJoinpointName() {
+            return joinpointName;
+        }
+    }
+
+    final class JoinpointDeleteNotFoundException extends JoinpointSetException {
+        public JoinpointDeleteNotFoundException(String joinpointName) {
+            super(joinpointName);
+        }
+    }
+
+    private <T> CompletableFuture<T> async(Supplier<T> supplier, Consumer<Function<ECText, Text>> sendError)
+    {
+        return CompletableFuture
+            .supplyAsync(supplier, Executors.newVirtualThreadPerTaskExecutor())
+            .exceptionallyAsync(threadException -> {
+                if (!(threadException instanceof CompletionException)) {
+                    EssentialCommands.LOGGER.error(threadException);
+                    sendError.accept(ecText -> ecText.getText(
+                        "cmd.joinpoint.error.unknown",
+                        TextFormatType.Error,
+                        Text.literal(threadException.getMessage())
+                    ));
+                }
+                Function<ECText, Text> errorFunction = switch (threadException.getCause()) {
+                    case JoinpointDeleteNotFoundException e -> ecText -> ecText.getText(
+                        "cmd.joinpoint.delete.error",
+                        TextFormatType.Error,
+                        ecText.accent(e.getJoinpointName())
+                    );
+                    default -> {
+                        EssentialCommands.LOGGER.error("Unknown error in a Joinpoint set command", threadException);
+                        yield ecText -> ecText.getText(
+                            "cmd.joinpoint.error.unknown",
+                            TextFormatType.Error,
+                            Text.literal(threadException.getCause().getMessage())
+                        );
+                    }
+                };
+                sendError.accept(errorFunction);
+                return null;
+            }, Util.getMainWorkerExecutor());
+    }
+
+    private Consumer<Function<ECText, Text>> sendErrorToPlayer(ServerPlayerEntity senderPlayer) {
+        var ecText = ECText.access(senderPlayer);
+
+        return (messageFn) -> {
+            var message = messageFn.apply(ecText);
+            PlayerData.access(senderPlayer)
+                .sendCommandError(message);
+        };
+    }
+
     private int exec(CommandContext<ServerCommandSource> context, String joinpointName) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         ServerPlayerEntity senderPlayer = source.getPlayerOrThrow();
-        PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
 
-        JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
-
-        try {
-            switch (action) {
-                case SET -> handleSet(context, joinpointName, senderPlayer, playerData, database);
-                case OVERWRITE -> handleOverwrite(context, joinpointName, senderPlayer, playerData, database);
-                case DELETE -> handleDelete(context, joinpointName, senderPlayer, playerData, database);
+        // Extract global flag outside async (only relevant for SET and OVERWRITE)
+        Boolean isGlobal = null;
+        if (action == Action.SET || action == Action.OVERWRITE) {
+            try {
+                isGlobal = BoolArgumentType.getBool(context, "global");
+            } catch (IllegalArgumentException ignored) {
+                // Optional parameter not provided - will be false
+                isGlobal = false;
             }
-        } catch (SQLException e) {
-            playerData.sendCommandError("cmd.joinpoint.error.database", Text.literal(e.getMessage()));
-            return 0;
         }
+
+        // Capture for lambda
+        final Boolean finalIsGlobal = isGlobal;
+
+        async(() -> {
+            PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
+            JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+
+            return switch (action) {
+                case SET -> handleSetAsync(finalIsGlobal, joinpointName, senderPlayer, playerData, database);
+                case OVERWRITE -> handleOverwriteAsync(finalIsGlobal, joinpointName, senderPlayer, playerData, database);
+                case DELETE -> handleDeleteAsync(joinpointName, senderPlayer, playerData, database);
+            };
+        }, sendErrorToPlayer(senderPlayer));
 
         return SINGLE_SUCCESS;
     }
 
-    private void handleSet(CommandContext<ServerCommandSource> context, String joinpointName,
-                          ServerPlayerEntity senderPlayer, PlayerData playerData, JoinpointDatabase database)
-                          throws CommandSyntaxException, SQLException {
+    private Void handleSetAsync(
+        boolean isGlobal,
+        String joinpointName,
+        ServerPlayerEntity senderPlayer,
+        PlayerData playerData,
+        JoinpointDatabase database
+    )
+    {
+        boolean exists = database.joinpointExistsAsync(joinpointName, senderPlayer.getUuid()).join();
 
-        if (database.joinpointExists(joinpointName, senderPlayer.getUuid())) {
+        if (exists) {
             // Ask the player whether they want to override the joinpoint
             ECText playerEcText = ECText.access(senderPlayer);
             playerData.sendMessage(
@@ -82,81 +168,75 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
             ).send();
         } else {
             // Create new joinpoint
-            boolean isGlobal = false;
             Set<UUID> sharedWith = new HashSet<>();
-
-            // Check if global flag is provided
-            try {
-                isGlobal = BoolArgumentType.getBool(context, "global");
-            } catch (IllegalArgumentException ignored) {
-                // Optional parameter not provided
-            }
-
-            // Note: Sharing is now handled by /joinpoint share command
 
             MinecraftLocation location = new MinecraftLocation(senderPlayer);
             JoinpointLocation joinpoint = new JoinpointLocation(
                 location, joinpointName, senderPlayer.getUuid(), isGlobal, sharedWith
             );
 
-            database.createJoinpoint(joinpointName, senderPlayer.getUuid(), joinpoint);
+            database.createJoinpointAsync(joinpointName, senderPlayer.getUuid(), joinpoint).join();
 
             Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
-            String messageKey = isGlobal ? "cmd.joinpoint.set.feedback.global" :
-                               !sharedWith.isEmpty() ? "cmd.joinpoint.set.feedback.shared" :
-                               "cmd.joinpoint.set.feedback";
+            String messageKey = isGlobal ? "cmd.joinpoint.set.feedback.global"
+                : !sharedWith.isEmpty() ? "cmd.joinpoint.set.feedback.shared"
+                : "cmd.joinpoint.set.feedback";
 
             playerData.sendCommandFeedback(messageKey, joinpointNameText);
         }
+
+        return null;
     }
 
-    private void handleOverwrite(CommandContext<ServerCommandSource> context, String joinpointName,
-                               ServerPlayerEntity senderPlayer, PlayerData playerData, JoinpointDatabase database)
-        throws SQLException
+    private Void handleOverwriteAsync(
+        boolean isGlobal,
+        String joinpointName,
+        ServerPlayerEntity senderPlayer,
+        PlayerData playerData,
+        JoinpointDatabase database
+    )
     {
-
-        boolean isGlobal = false;
         Set<UUID> sharedWith = new HashSet<>();
-
-        // Check if global flag is provided
-        try {
-            isGlobal = BoolArgumentType.getBool(context, "global");
-        } catch (IllegalArgumentException ignored) {
-            // Optional parameter not provided
-        }
-
-        // Note: Sharing is now handled by /joinpoint share command
 
         MinecraftLocation location = new MinecraftLocation(senderPlayer);
         JoinpointLocation joinpoint = new JoinpointLocation(
             location, joinpointName, senderPlayer.getUuid(), isGlobal, sharedWith
         );
 
-        if (database.joinpointExists(joinpointName, senderPlayer.getUuid())) {
-            database.updateJoinpoint(joinpointName, senderPlayer.getUuid(), joinpoint);
+        boolean exists = database.joinpointExistsAsync(joinpointName, senderPlayer.getUuid()).join();
+
+        if (exists) {
+            database.updateJoinpointAsync(joinpointName, senderPlayer.getUuid(), joinpoint).join();
         } else {
-            database.createJoinpoint(joinpointName, senderPlayer.getUuid(), joinpoint);
+            database.createJoinpointAsync(joinpointName, senderPlayer.getUuid(), joinpoint).join();
         }
 
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
         String messageKey = isGlobal ? "cmd.joinpoint.overwrite.feedback.global" :
-                           !sharedWith.isEmpty() ? "cmd.joinpoint.overwrite.feedback.shared" :
-                           "cmd.joinpoint.overwrite.feedback";
+            !sharedWith.isEmpty() ? "cmd.joinpoint.overwrite.feedback.shared" :
+                "cmd.joinpoint.overwrite.feedback";
 
         playerData.sendCommandFeedback(messageKey, joinpointNameText);
+
+        return null;
     }
 
-    private void handleDelete(CommandContext<ServerCommandSource> context, String joinpointName,
-                            ServerPlayerEntity senderPlayer, PlayerData playerData, JoinpointDatabase database)
-                            throws SQLException {
-
-        boolean wasSuccessful = database.deleteJoinpoint(joinpointName, senderPlayer.getUuid());
+    private Void handleDeleteAsync(
+        String joinpointName,
+        ServerPlayerEntity senderPlayer,
+        PlayerData playerData,
+        JoinpointDatabase database
+    )
+    {
+        boolean wasSuccessful = database.deleteJoinpointAsync(joinpointName, senderPlayer.getUuid()).join();
 
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
         if (wasSuccessful) {
             playerData.sendCommandFeedback("cmd.joinpoint.delete.feedback", joinpointNameText);
         } else {
-            playerData.sendCommandError("cmd.joinpoint.delete.error", joinpointNameText);
+            throw new JoinpointDeleteNotFoundException(joinpointName);
         }
+
+        return null;
     }
 }

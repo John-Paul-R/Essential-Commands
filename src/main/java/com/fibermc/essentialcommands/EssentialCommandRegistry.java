@@ -191,8 +191,7 @@ public final class EssentialCommandRegistry {
             essentialCommandsRootNode.addChild(homeOverwriteBuilder.build());
         }
 
-        //Joinpoint
-        if (true) { // TODO: Re-enable with CONFIG.ENABLE_JOINPOINT when config is regenerated
+        if (CONFIG.ENABLE_JOINPOINT) {
             LiteralArgumentBuilder<ServerCommandSource> joinpointBuilder = CommandManager.literal("joinpoint");
             LiteralArgumentBuilder<ServerCommandSource> joinpointSetBuilder = CommandManager.literal("set");
             LiteralArgumentBuilder<ServerCommandSource> joinpointTpBuilder = CommandManager.literal("tp");
@@ -210,13 +209,16 @@ public final class EssentialCommandRegistry {
 
             joinpointTpBuilder
                 .requires(ECPerms.require(ECPerms.Registry.joinpoint_tp, 0))
-                .then(argument("joinpoint_name", StringArgumentType.word())
-                    .suggests(JoinpointTpCommand.Suggestion.ACCESSIBLE_JOINPOINTS)
-                    .executes(new JoinpointTpCommand()::runOwnJoinpoint))
-                .then(argument("owner_player", StringArgumentType.word())
+                .then(argument(JoinpointTpCommand.OWNER_PLAYER_ARG, StringArgumentType.word())
+                    .suggests(JoinpointTpCommand.Suggestion.OWNERS_OF_ACCESSIBLE_JOINPOINTS)
                     .then(argument("joinpoint_name", StringArgumentType.word())
-                        .suggests(JoinpointTpCommand.Suggestion.OWNER_JOINPOINTS)
+                        .suggests(JoinpointTpCommand.Suggestion.ACCESSIBLE_TARGET_PLAYER_JOINPOINTS)
                         .executes(new JoinpointTpCommand())));
+
+            // this is interfering with the more-important playername suggestions
+//                .then(argument("joinpoint_name", StringArgumentType.word())
+//                .suggests(JoinpointTpCommand.Suggestion.ACCESSIBLE_JOINPOINTS)
+//                .executes(new JoinpointTpCommand()::runOwnJoinpoint))
 
             joinpointDeleteBuilder
                 .requires(ECPerms.require(ECPerms.Registry.joinpoint_delete, 0))
@@ -227,6 +229,7 @@ public final class EssentialCommandRegistry {
             joinpointOverwriteBuilder
                 .requires(ECPerms.require(ECPerms.Registry.joinpoint_set, 0))
                 .then(argument("joinpoint_name", StringArgumentType.word())
+                    .suggests(JoinpointTpCommand.Suggestion.OWNED_JOINPOINTS)
                     .executes(new JoinpointSetCommand(JoinpointSetCommand.Action.OVERWRITE))
                     .then(argument("global", BoolArgumentType.bool())
                         .executes(new JoinpointSetCommand(JoinpointSetCommand.Action.OVERWRITE))));

@@ -1,10 +1,17 @@
 package com.fibermc.essentialcommands.commands;
 
-import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.database.JoinpointDatabase;
@@ -14,84 +21,185 @@ import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.JoinpointLocation;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 
 public class JoinpointShareCommand implements Command<ServerCommandSource> {
-    
+
     private final Action action;
-    
+
     public enum Action {
         ADD, REMOVE, LIST, CLEAR
     }
-    
+
     public JoinpointShareCommand(Action action) {
         this.action = action;
     }
-    
+
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         String joinpointName = StringArgumentType.getString(context, "joinpoint_name");
         return exec(context, joinpointName);
     }
-    
+
+    abstract class JoinpointShareException extends RuntimeException {
+        private final String joinpointName;
+
+        public JoinpointShareException(String joinpointName) {
+            this.joinpointName = joinpointName;
+        }
+
+        public String getJoinpointName() {
+            return joinpointName;
+        }
+    }
+
+    final class JoinpointNotFoundException extends JoinpointShareException {
+        public JoinpointNotFoundException(String joinpointName) {
+            super(joinpointName);
+        }
+    }
+
+    final class JoinpointAlreadyGlobalException extends JoinpointShareException {
+        public JoinpointAlreadyGlobalException(String joinpointName) {
+            super(joinpointName);
+        }
+    }
+
+    final class NoNewPlayersException extends JoinpointShareException {
+        public NoNewPlayersException(String joinpointName) {
+            super(joinpointName);
+        }
+    }
+
+    final class PlayersNotSharedException extends JoinpointShareException {
+        public PlayersNotSharedException(String joinpointName) {
+            super(joinpointName);
+        }
+    }
+
+    final class CannotClearGlobalException extends JoinpointShareException {
+        public CannotClearGlobalException(String joinpointName) {
+            super(joinpointName);
+        }
+    }
+
+    private <T> CompletableFuture<T> async(Supplier<T> supplier, Consumer<Function<ECText, Text>> sendError)
+    {
+        return CompletableFuture
+            .supplyAsync(supplier, Executors.newVirtualThreadPerTaskExecutor())
+            .exceptionallyAsync(threadException -> {
+                if (!(threadException instanceof CompletionException)) {
+                    EssentialCommands.LOGGER.error(threadException);
+                    sendError.accept(ecText -> ecText.getText(
+                        "cmd.joinpoint.error.unknown",
+                        TextFormatType.Error,
+                        Text.literal(threadException.getMessage())
+                    ));
+                }
+                Function<ECText, Text> errorFunction = switch (threadException.getCause()) {
+                    case JoinpointNotFoundException e -> ecText -> ecText.getText(
+                        "cmd.joinpoint.share.error.not_found",
+                        TextFormatType.Error,
+                        Text.literal(e.getJoinpointName())
+                    );
+                    case JoinpointAlreadyGlobalException e -> ecText -> ecText.getText(
+                        "cmd.joinpoint.share.error.already_global",
+                        TextFormatType.Error,
+                        ecText.accent(e.getJoinpointName())
+                    );
+                    case NoNewPlayersException e -> ecText -> ecText.getText(
+                        "cmd.joinpoint.share.error.no_new_players",
+                        TextFormatType.Error
+                    );
+                    case PlayersNotSharedException e -> ecText -> ecText.getText(
+                        "cmd.joinpoint.share.error.players_not_shared",
+                        TextFormatType.Error
+                    );
+                    case CannotClearGlobalException e -> ecText -> ecText.getText(
+                        "cmd.joinpoint.share.error.cannot_clear_global",
+                        TextFormatType.Error,
+                        ecText.accent(e.getJoinpointName())
+                    );
+                    default -> {
+                        EssentialCommands.LOGGER.error("Unknown error in a Joinpoint share command", threadException);
+                        yield ecText -> ecText.getText(
+                            "cmd.joinpoint.error.unknown",
+                            TextFormatType.Error,
+                            Text.literal(threadException.getCause().getMessage())
+                        );
+                    }
+                };
+                sendError.accept(errorFunction);
+                return null;
+            }, Util.getMainWorkerExecutor());
+    }
+
+    private Consumer<Function<ECText, Text>> sendErrorToPlayer(ServerPlayerEntity senderPlayer) {
+        var ecText = ECText.access(senderPlayer);
+
+        return (messageFn) -> {
+            var message = messageFn.apply(ecText);
+            PlayerData.access(senderPlayer)
+                .sendCommandError(message);
+        };
+    }
+
     private int exec(CommandContext<ServerCommandSource> context, String joinpointName) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         ServerPlayerEntity senderPlayer = source.getPlayerOrThrow();
-        PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
-        
-        JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
-        
-        try {
-            switch (action) {
-                case ADD -> handleAdd(context, joinpointName, senderPlayer, playerData, database);
-                case REMOVE -> handleRemove(context, joinpointName, senderPlayer, playerData, database);
-                case LIST -> handleList(context, joinpointName, senderPlayer, playerData, database);
-                case CLEAR -> handleClear(context, joinpointName, senderPlayer, playerData, database);
-            }
-        } catch (SQLException e) {
-            playerData.sendCommandError("cmd.joinpoint.error.database", Text.literal(e.getMessage()));
-            return 0;
+
+        // Extract target players outside async for ADD/REMOVE actions
+        Collection<ServerPlayerEntity> targetPlayers = null;
+        if (action == Action.ADD || action == Action.REMOVE) {
+            targetPlayers = EntityArgumentType.getPlayers(context, "target_players");
         }
-        
+
+        // Capture targetPlayers for lambda
+        final Collection<ServerPlayerEntity> finalTargetPlayers = targetPlayers;
+
+        async(() -> {
+            PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
+            JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+
+            return switch (action) {
+                case ADD -> handleAddAsync(finalTargetPlayers, joinpointName, senderPlayer, playerData, database);
+                case REMOVE -> handleRemoveAsync(finalTargetPlayers, joinpointName, senderPlayer, playerData, database);
+                case LIST -> handleListAsync(joinpointName, senderPlayer, playerData, database);
+                case CLEAR -> handleClearAsync(joinpointName, senderPlayer, playerData, database);
+            };
+        }, sendErrorToPlayer(senderPlayer));
+
         return SINGLE_SUCCESS;
     }
-    
-    private void handleAdd(CommandContext<ServerCommandSource> context, String joinpointName,
-                          ServerPlayerEntity senderPlayer, PlayerData playerData, JoinpointDatabase database)
-                          throws CommandSyntaxException, SQLException {
-        
-        // Get the joinpoint
-        JoinpointLocation joinpoint = database.getJoinpoint(joinpointName, senderPlayer.getUuid());
+
+    private Void handleAddAsync(
+        Collection<ServerPlayerEntity> targetPlayers,
+        String joinpointName,
+        ServerPlayerEntity senderPlayer,
+        PlayerData playerData,
+        JoinpointDatabase database
+    )
+    {
+        JoinpointLocation joinpoint = database.getJoinpointAsync(joinpointName, senderPlayer.getUuid()).join();
         if (joinpoint == null) {
-            Message msg = ECText.access(senderPlayer).getText(
-                "cmd.joinpoint.share.error.not_found",
-                TextFormatType.Error,
-                Text.literal(joinpointName)
-            );
-            throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
+            throw new JoinpointNotFoundException(joinpointName);
         }
-        
-        // Check if it's already global
+
         if (joinpoint.isGlobal()) {
-            playerData.sendCommandError("cmd.joinpoint.share.error.already_global", 
-                ECText.access(senderPlayer).accent(joinpointName));
-            return;
+            throw new JoinpointAlreadyGlobalException(joinpointName);
         }
-        
-        // Get the players to share with
-        var targetPlayers = EntityArgumentType.getPlayers(context, "target_players");
+
         Set<UUID> newSharedWith = new HashSet<>(joinpoint.getSharedWith());
         Set<String> addedPlayerNames = new HashSet<>();
-        
+
         for (var targetPlayer : targetPlayers) {
             if (!targetPlayer.getUuid().equals(senderPlayer.getUuid())) {
                 if (newSharedWith.add(targetPlayer.getUuid())) {
@@ -99,141 +207,121 @@ public class JoinpointShareCommand implements Command<ServerCommandSource> {
                 }
             }
         }
-        
+
         if (addedPlayerNames.isEmpty()) {
-            playerData.sendCommandError("cmd.joinpoint.share.error.no_new_players");
-            return;
+            throw new NoNewPlayersException(joinpointName);
         }
-        
-        // Create updated joinpoint
+
         JoinpointLocation updatedJoinpoint = new JoinpointLocation(
             joinpoint, joinpoint.getName(), joinpoint.getOwner(), false, newSharedWith
         );
-        
-        database.updateJoinpoint(joinpointName, senderPlayer.getUuid(), updatedJoinpoint);
-        
+
+        database.updateJoinpointAsync(joinpointName, senderPlayer.getUuid(), updatedJoinpoint).join();
+
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
         Text playersText = Text.literal(String.join(", ", addedPlayerNames));
         playerData.sendCommandFeedback("cmd.joinpoint.share.add.feedback", joinpointNameText, playersText);
+
+        return null;
     }
-    
-    private void handleRemove(CommandContext<ServerCommandSource> context, String joinpointName,
-                             ServerPlayerEntity senderPlayer, PlayerData playerData, JoinpointDatabase database)
-                             throws CommandSyntaxException, SQLException {
-        
-        // Get the joinpoint
-        JoinpointLocation joinpoint = database.getJoinpoint(joinpointName, senderPlayer.getUuid());
+
+    private Void handleRemoveAsync(
+        Collection<ServerPlayerEntity> targetPlayers,
+        String joinpointName,
+        ServerPlayerEntity senderPlayer,
+        PlayerData playerData,
+        JoinpointDatabase database
+    )
+    {
+        JoinpointLocation joinpoint = database.getJoinpointAsync(joinpointName, senderPlayer.getUuid()).join();
         if (joinpoint == null) {
-            Message msg = ECText.access(senderPlayer).getText(
-                "cmd.joinpoint.share.error.not_found",
-                TextFormatType.Error,
-                Text.literal(joinpointName)
-            );
-            throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
+            throw new JoinpointNotFoundException(joinpointName);
         }
-        
-        // Get the players to remove sharing from
-        var targetPlayers = EntityArgumentType.getPlayers(context, "target_players");
+
         Set<UUID> newSharedWith = new HashSet<>(joinpoint.getSharedWith());
         Set<String> removedPlayerNames = new HashSet<>();
-        
+
         for (var targetPlayer : targetPlayers) {
             if (newSharedWith.remove(targetPlayer.getUuid())) {
                 removedPlayerNames.add(targetPlayer.getName().getString());
             }
         }
-        
+
         if (removedPlayerNames.isEmpty()) {
-            playerData.sendCommandError("cmd.joinpoint.share.error.players_not_shared");
-            return;
+            throw new PlayersNotSharedException(joinpointName);
         }
-        
-        // Create updated joinpoint
+
         JoinpointLocation updatedJoinpoint = new JoinpointLocation(
             joinpoint, joinpoint.getName(), joinpoint.getOwner(), joinpoint.isGlobal(), newSharedWith
         );
-        
-        database.updateJoinpoint(joinpointName, senderPlayer.getUuid(), updatedJoinpoint);
-        
+
+        database.updateJoinpointAsync(joinpointName, senderPlayer.getUuid(), updatedJoinpoint).join();
+
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
         Text playersText = Text.literal(String.join(", ", removedPlayerNames));
         playerData.sendCommandFeedback("cmd.joinpoint.share.remove.feedback", joinpointNameText, playersText);
+
+        return null;
     }
-    
-    private void handleList(CommandContext<ServerCommandSource> context, String joinpointName,
-                           ServerPlayerEntity senderPlayer, PlayerData playerData, JoinpointDatabase database)
-                           throws CommandSyntaxException, SQLException {
-        
-        // Get the joinpoint
-        JoinpointLocation joinpoint = database.getJoinpoint(joinpointName, senderPlayer.getUuid());
+
+    private Void handleListAsync(
+        String joinpointName,
+        ServerPlayerEntity senderPlayer,
+        PlayerData playerData,
+        JoinpointDatabase database
+    )
+    {
+        JoinpointLocation joinpoint = database.getJoinpointAsync(joinpointName, senderPlayer.getUuid()).join();
         if (joinpoint == null) {
-            Message msg = ECText.access(senderPlayer).getText(
-                "cmd.joinpoint.share.error.not_found",
-                TextFormatType.Error,
-                Text.literal(joinpointName)
-            );
-            throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
+            throw new JoinpointNotFoundException(joinpointName);
         }
-        
+
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
-        
+
         if (joinpoint.isGlobal()) {
             playerData.sendCommandFeedback("cmd.joinpoint.share.list.global", joinpointNameText);
-            return;
+            return null;
         }
-        
+
         if (joinpoint.getSharedWith().isEmpty()) {
             playerData.sendCommandFeedback("cmd.joinpoint.share.list.private", joinpointNameText);
-            return;
+            return null;
         }
-        
-        // Get player names using cached names for performance
+
         Set<String> sharedPlayerNames = new HashSet<>();
-        var cachedNames = database.getCachedNamesForUuids(joinpoint.getSharedWith());
-        
-        for (UUID uuid : joinpoint.getSharedWith()) {
-            String name = cachedNames.get(uuid);
-            if (name != null) {
-                sharedPlayerNames.add(name);
-            } else {
-                sharedPlayerNames.add(uuid.toString().substring(0, 8) + "..."); // Fallback to truncated UUID
-            }
-        }
-        
+        JoinpointListCommand.getSharedWithNames(database, joinpoint, sharedPlayerNames);
+
         Text playersText = Text.literal(String.join(", ", sharedPlayerNames));
         playerData.sendCommandFeedback("cmd.joinpoint.share.list.shared", joinpointNameText, playersText);
+
+        return null;
     }
-    
-    private void handleClear(CommandContext<ServerCommandSource> context, String joinpointName,
-                            ServerPlayerEntity senderPlayer, PlayerData playerData, JoinpointDatabase database)
-                            throws CommandSyntaxException, SQLException {
-        
-        // Get the joinpoint
-        JoinpointLocation joinpoint = database.getJoinpoint(joinpointName, senderPlayer.getUuid());
+
+    private Void handleClearAsync(
+        String joinpointName,
+        ServerPlayerEntity senderPlayer,
+        PlayerData playerData,
+        JoinpointDatabase database
+    )
+    {
+        JoinpointLocation joinpoint = database.getJoinpointAsync(joinpointName, senderPlayer.getUuid()).join();
         if (joinpoint == null) {
-            Message msg = ECText.access(senderPlayer).getText(
-                "cmd.joinpoint.share.error.not_found",
-                TextFormatType.Error,
-                Text.literal(joinpointName)
-            );
-            throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
+            throw new JoinpointNotFoundException(joinpointName);
         }
-        
-        // Check if it's global (can't clear global status this way)
+
         if (joinpoint.isGlobal()) {
-            playerData.sendCommandError("cmd.joinpoint.share.error.cannot_clear_global", 
-                ECText.access(senderPlayer).accent(joinpointName));
-            return;
+            throw new CannotClearGlobalException(joinpointName);
         }
-        
-        // Clear all sharing
+
         JoinpointLocation updatedJoinpoint = new JoinpointLocation(
             joinpoint, joinpoint.getName(), joinpoint.getOwner(), false, new HashSet<>()
         );
-        
-        database.updateJoinpoint(joinpointName, senderPlayer.getUuid(), updatedJoinpoint);
-        
+
+        database.updateJoinpointAsync(joinpointName, senderPlayer.getUuid(), updatedJoinpoint).join();
+
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
         playerData.sendCommandFeedback("cmd.joinpoint.share.clear.feedback", joinpointNameText);
+
+        return null;
     }
 }

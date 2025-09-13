@@ -1,13 +1,20 @@
 package com.fibermc.essentialcommands.commands;
 
-import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.JoinpointLocation;
 
 import com.mojang.brigadier.Command;
@@ -23,6 +30,7 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 
 public class JoinpointListCommand implements Command<ServerCommandSource> {
 
@@ -52,15 +60,53 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         return exec(senderPlayer, FilterType.ALL);
     }
 
+    private <T> CompletableFuture<T> async(Supplier<T> supplier, Consumer<Function<ECText, Text>> sendError)
+    {
+        return CompletableFuture
+            .supplyAsync(supplier, Executors.newVirtualThreadPerTaskExecutor())
+            .exceptionallyAsync(threadException -> {
+                if (!(threadException instanceof CompletionException)) {
+                    EssentialCommands.LOGGER.error(threadException);
+                    sendError.accept(ecText -> ecText.getText(
+                        "cmd.joinpoint.error.unknown",
+                        TextFormatType.Error,
+                        Text.literal(threadException.getMessage())
+                    ));
+                }
+                Function<ECText, Text> errorFunction = switch (threadException.getCause()) {
+                    default -> {
+                        EssentialCommands.LOGGER.error("Unknown error in a Joinpoint list command", threadException);
+                        yield ecText -> ecText.getText(
+                            "cmd.joinpoint.error.unknown",
+                            TextFormatType.Error,
+                            Text.literal(threadException.getCause().getMessage())
+                        );
+                    }
+                };
+                sendError.accept(errorFunction);
+                return null;
+            }, Util.getMainWorkerExecutor());
+    }
+
+    private Consumer<Function<ECText, Text>> sendErrorToPlayer(ServerPlayerEntity senderPlayer) {
+        var ecText = ECText.access(senderPlayer);
+
+        return (messageFn) -> {
+            var message = messageFn.apply(ecText);
+            PlayerData.access(senderPlayer)
+                .sendCommandError(message);
+        };
+    }
+
     private int exec(ServerPlayerEntity senderPlayer, FilterType filter) throws CommandSyntaxException {
-        PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
-        JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+        async(() -> {
+            PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
+            JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
 
-        try {
-            List<JoinpointLocation> joinpoints = database.getAccessibleJoinpointsWithNames(senderPlayer);
-            List<JoinpointLocation> ownedJoinpoints = database.getOwnedJoinpoints(senderPlayer.getUuid());
+            List<JoinpointLocation> joinpoints = database.getAccessibleJoinpointsWithNamesAsync(senderPlayer).join();
+            List<JoinpointLocation> ownedJoinpoints = database.getOwnedJoinpointsAsync(senderPlayer.getUuid()).join();
 
-            List<JoinpointEntry> filteredJoinpoints = filterJoinpoints(joinpoints, ownedJoinpoints, senderPlayer.getUuid(), filter, database);
+            List<JoinpointEntry> filteredJoinpoints = filterJoinpointsAsync(joinpoints, ownedJoinpoints, senderPlayer.getUuid(), filter, database);
 
             if (filteredJoinpoints.isEmpty()) {
                 String messageKey = switch (filter) {
@@ -70,7 +116,7 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                     case ALL -> "cmd.joinpoint.list.empty.all";
                 };
                 playerData.sendMessage(messageKey);
-                return 0;
+                return null;
             }
 
             // Send header message
@@ -126,19 +172,17 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                 }
             }
 
-        } catch (SQLException e) {
-            playerData.sendCommandError("cmd.joinpoint.error.database", Text.literal(e.getMessage()));
-            return 0;
-        }
+            return null;
+        }, sendErrorToPlayer(senderPlayer));
 
         return SINGLE_SUCCESS;
     }
 
-    private List<JoinpointEntry> filterJoinpoints(List<JoinpointLocation> accessibleJoinpoints,
-                                                  List<JoinpointLocation> ownedJoinpoints,
-                                                  UUID playerUuid,
-                                                  FilterType filter,
-                                                  JoinpointDatabase database) throws SQLException {
+    private List<JoinpointEntry> filterJoinpointsAsync(List<JoinpointLocation> accessibleJoinpoints,
+                                                       List<JoinpointLocation> ownedJoinpoints,
+                                                       UUID playerUuid,
+                                                       FilterType filter,
+                                                       JoinpointDatabase database) {
         List<JoinpointEntry> result = new ArrayList<>();
 
         for (JoinpointLocation joinpoint : accessibleJoinpoints) {
@@ -167,15 +211,7 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
             // Get shared player names for owned joinpoints using cached names
             Set<String> sharedWithNames = new HashSet<>();
             if (isOwned && !joinpoint.getSharedWith().isEmpty()) {
-                var cachedNames = database.getCachedNamesForUuids(joinpoint.getSharedWith());
-                for (UUID uuid : joinpoint.getSharedWith()) {
-                    String name = cachedNames.get(uuid);
-                    if (name != null) {
-                        sharedWithNames.add(name);
-                    } else {
-                        sharedWithNames.add(uuid.toString().substring(0, 8) + "...");
-                    }
-                }
+                getSharedWithNames(database, joinpoint, sharedWithNames);
             }
 
             result.add(new JoinpointEntry(joinpoint, isOwned, ownerName, sharedWithNames));
@@ -185,6 +221,18 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         result.sort((a, b) -> a.joinpoint.getName().compareToIgnoreCase(b.joinpoint.getName()));
 
         return result;
+    }
+
+    static void getSharedWithNames(JoinpointDatabase database, JoinpointLocation joinpoint, Set<String> sharedWithNames) {
+        var cachedNames = database.getCachedNamesForUuidsAsync(joinpoint.getSharedWith()).join();
+        for (UUID uuid : joinpoint.getSharedWith()) {
+            String name = cachedNames.get(uuid);
+            if (name != null) {
+                sharedWithNames.add(name);
+            } else {
+                sharedWithNames.add(uuid.toString().substring(0, 8) + "...");
+            }
+        }
     }
 
     private static class JoinpointEntry {
