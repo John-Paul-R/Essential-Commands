@@ -235,7 +235,7 @@ public final class EssentialCommandRegistry {
                         .executes(new JoinpointSetCommand(JoinpointSetCommand.Action.OVERWRITE))));
 
             joinpointShareBuilder
-                .requires(ECPerms.require(ECPerms.Registry.joinpoint_share, 0))
+                .requires(ECPerms.require(ECPerms.Registry.joinpoint_set, 0))
                 .then(argument("joinpoint_name", StringArgumentType.word())
                     .suggests(JoinpointTpCommand.Suggestion.OWNED_JOINPOINTS)
                     .then(CommandManager.literal("add")

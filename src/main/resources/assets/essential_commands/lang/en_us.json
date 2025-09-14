@@ -46,7 +46,7 @@
   "cmd.joinpoint.list.empty.global": "No global joinpoints are available.",
   "cmd.joinpoint.error.database": "Database error: ${0}",
   "cmd.joinpoint.error.unknown": "Joinpoint action failed - an unknown error occurred: ${0}",
-  "cmd.joinpoint.share.error.not_found": "Joinpoint '${0}' not found.",
+  "cmd.joinpoint.error.not_found": "Joinpoint '${0}' not found.",
   "cmd.joinpoint.share.error.already_global": "Joinpoint '${0}' is already global and accessible to all players.",
   "cmd.joinpoint.share.error.no_new_players": "No new players to share with.",
   "cmd.joinpoint.share.error.players_not_shared": "None of the specified players have access to this joinpoint.",

@@ -106,7 +106,7 @@ public class JoinpointShareCommand implements Command<ServerCommandSource> {
                 }
                 Function<ECText, Text> errorFunction = switch (threadException.getCause()) {
                     case JoinpointNotFoundException e -> ecText -> ecText.getText(
-                        "cmd.joinpoint.share.error.not_found",
+                        "cmd.joinpoint.error.not_found",
                         TextFormatType.Error,
                         Text.literal(e.getJoinpointName())
                     );

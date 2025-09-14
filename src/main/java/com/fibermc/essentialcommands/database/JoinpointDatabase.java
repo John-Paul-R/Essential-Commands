@@ -456,7 +456,7 @@ public class JoinpointDatabase {
     }
 
     public CompletableFuture<Boolean> deleteJoinpointAsync(String name, UUID ownerUuid) {
-        return DatabaseHelper.async(() -> deleteJoinpoint(name, ownerUuid), false);
+        return DatabaseHelper.async(() -> deleteJoinpoint(name, ownerUuid));
     }
 
     public CompletableFuture<JoinpointLocation> getJoinpointAsync(@NotNull String name, @NotNull UUID ownerUuid) {
@@ -464,19 +464,19 @@ public class JoinpointDatabase {
     }
 
     public CompletableFuture<List<JoinpointLocation>> getAccessibleJoinpointsAsync(ServerPlayerEntity player) {
-        return DatabaseHelper.async(() -> getAccessibleJoinpoints(player), new ArrayList<>());
+        return DatabaseHelper.async(() -> getAccessibleJoinpoints(player));
     }
 
     public CompletableFuture<List<JoinpointLocation>> getAccessibleOwnedJoinpointsAsync(ServerPlayerEntity player, UUID ownedById) {
-        return DatabaseHelper.async(() -> getAccessibleOwnedJoinpoints(player, ownedById), new ArrayList<>());
+        return DatabaseHelper.async(() -> getAccessibleOwnedJoinpoints(player, ownedById));
     }
 
     public CompletableFuture<List<JoinpointLocation>> getOwnedJoinpointsAsync(UUID ownerUuid) {
-        return DatabaseHelper.async(() -> getOwnedJoinpoints(ownerUuid), new ArrayList<>());
+        return DatabaseHelper.async(() -> getOwnedJoinpoints(ownerUuid));
     }
 
     public CompletableFuture<Boolean> joinpointExistsAsync(String name, UUID ownerUuid) {
-        return DatabaseHelper.async(() -> joinpointExists(name, ownerUuid), false);
+        return DatabaseHelper.async(() -> joinpointExists(name, ownerUuid));
     }
 
     public CompletableFuture<Void> updatePlayerCacheAsync(UUID uuid, String name, String nickname) {
@@ -499,18 +499,18 @@ public class JoinpointDatabase {
     }
 
     public CompletableFuture<List<JoinpointLocation>> getAccessibleJoinpointsWithNamesAsync(ServerPlayerEntity player) {
-        return DatabaseHelper.async(() -> getAccessibleJoinpointsWithNames(player), new ArrayList<>());
+        return DatabaseHelper.async(() -> getAccessibleJoinpointsWithNames(player));
     }
 
     public CompletableFuture<List<String>> getAccessibleJoinpointsOwnerNamesAsync(ServerPlayerEntity player) {
-        return DatabaseHelper.async(() -> getAccessibleJoinpointsOwnerNames(player), new ArrayList<>());
+        return DatabaseHelper.async(() -> getAccessibleJoinpointsOwnerNames(player));
     }
 
     public CompletableFuture<Map<UUID, String>> getCachedNamesForUuidsAsync(Set<UUID> uuids) {
-        return DatabaseHelper.async(() -> getCachedNamesForUuids(uuids), new HashMap<>());
+        return DatabaseHelper.async(() -> getCachedNamesForUuids(uuids));
     }
 
-    // HELPER METHODS (existing)
+    // HELPERS
     private JoinpointLocation createJoinpointLocationFromResultSet(ResultSet rs) throws SQLException {
         String name = rs.getString("name");
         UUID ownerUuid = UUID.fromString(rs.getString("owner_uuid"));

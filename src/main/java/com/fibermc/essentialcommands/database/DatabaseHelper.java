@@ -4,41 +4,22 @@ import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import com.fibermc.essentialcommands.EssentialCommands;
+
 import net.minecraft.util.Util;
 
-public class DatabaseHelper {
-    private static final Executor EXECUTOR = Util.getIoWorkerExecutor(); //Executors.newVirtualThreadPerTaskExecutor();
+public final class DatabaseHelper {
+    private DatabaseHelper() {}
 
-    // Simple version - wraps SQLException in RuntimeException
+    private static final Executor EXECUTOR = Util.getIoWorkerExecutor(); // Executors.newVirtualThreadPerTaskExecutor();
+
     public static <T> CompletableFuture<T> async(SqlSupplier<T> supplier) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return supplier.get();
             } catch (SQLException e) {
+                EssentialCommands.LOGGER.error("Database error", e);
                 throw new RuntimeException("Database error", e);
-            }
-        }, EXECUTOR);
-    }
-
-    // Version with custom exception handling
-    public static <T> CompletableFuture<T> async(SqlSupplier<T> supplier, T defaultValue) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return supplier.get();
-            } catch (SQLException e) {
-                // Log error here if needed
-                return defaultValue;
-            }
-        }, EXECUTOR);
-    }
-
-    // Version that completes exceptionally on SQL errors
-    public static <T> CompletableFuture<T> asyncWithSqlException(SqlSupplier<T> supplier) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return supplier.get();
-            } catch (SQLException e) {
-                throw new RuntimeException(e); // Will cause CompletableFuture to complete exceptionally
             }
         }, EXECUTOR);
     }

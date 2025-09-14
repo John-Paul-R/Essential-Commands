@@ -72,6 +72,12 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         }
     }
 
+    final class JoinpointDeleteGenericException extends JoinpointSetException {
+        public JoinpointDeleteGenericException(String joinpointName) {
+            super(joinpointName);
+        }
+    }
+
     final class JoinpointMaxPointsExceededException extends JoinpointSetException {
         private final int max;
         private final int current;
@@ -107,6 +113,11 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
                 Function<ECText, Text> errorFunction = switch (threadException.getCause()) {
                     case JoinpointDeleteNotFoundException e -> ecText -> ecText.getText(
                         "cmd.joinpoint.delete.error",
+                        TextFormatType.Error,
+                        ecText.accent(e.getJoinpointName())
+                    );
+                    case JoinpointDeleteGenericException e -> ecText -> ecText.getText(
+                        "cmd.joinpoint.error.not_found",
                         TextFormatType.Error,
                         ecText.accent(e.getJoinpointName())
                     );
@@ -271,13 +282,17 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         JoinpointDatabase database
     )
     {
+        if (!database.joinpointExistsAsync(joinpointName, senderPlayer.getUuid()).join()) {
+            throw new JoinpointDeleteNotFoundException(joinpointName);
+        }
+
         boolean wasSuccessful = database.deleteJoinpointAsync(joinpointName, senderPlayer.getUuid()).join();
 
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
         if (wasSuccessful) {
             playerData.sendCommandFeedback("cmd.joinpoint.delete.feedback", joinpointNameText);
         } else {
-            throw new JoinpointDeleteNotFoundException(joinpointName);
+            throw new JoinpointDeleteGenericException(joinpointName);
         }
 
         return null;

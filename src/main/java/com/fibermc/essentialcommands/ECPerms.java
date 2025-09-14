@@ -39,8 +39,6 @@ public final class ECPerms {
         public static final String joinpoint_set = "essentialcommands.joinpoint.set";
         public static final String joinpoint_tp = "essentialcommands.joinpoint.tp";
         public static final String joinpoint_delete = "essentialcommands.joinpoint.delete";
-        public static final String joinpoint_global = "essentialcommands.joinpoint.global";
-        public static final String joinpoint_share = "essentialcommands.joinpoint.share";
         public static final String back = "essentialcommands.back";
         public static final String spawn_tp = "essentialcommands.spawn.tp";
         public static final String spawn_set = "essentialcommands.spawn.set";
