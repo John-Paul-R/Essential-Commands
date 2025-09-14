@@ -6,15 +6,21 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import com.fibermc.essentialcommands.EssentialCommands;
+import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 import com.fibermc.essentialcommands.types.JoinpointLocation;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 
+import com.mojang.serialization.JsonOps;
+
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
 import net.minecraft.world.World;
 
 public class JoinpointDatabase {
@@ -339,12 +345,13 @@ public class JoinpointDatabase {
         return null;
     }
 
-    private List<JoinpointLocation> getAccessibleJoinpointsWithNames(ServerPlayerEntity player) throws SQLException {
+    private List<JoinpointLocationWithOwnerName> getAccessibleJoinpointsWithNames(ServerPlayerEntity player) throws SQLException {
         UUID playerUuid = player.getUuid();
         String sql = """
             SELECT DISTINCT j.*,
                    GROUP_CONCAT(s.shared_with_uuid) as shared_uuids,
                    pc_owner.name as owner_name,
+                   pc_owner.uuid as owner_uuid,
                    pc_owner.nickname as owner_nickname
             FROM joinpoints j
             LEFT JOIN joinpoint_shared_with s ON j.id = s.joinpoint_id
@@ -356,7 +363,8 @@ public class JoinpointDatabase {
             ORDER BY j.name
             """;
 
-        List<JoinpointLocation> joinpoints = new ArrayList<>();
+        List<JoinpointLocationWithOwnerName> joinpoints = new ArrayList<>();
+        Map<UUID, Text> nicknameCache = new HashMap<>();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, playerUuid.toString());
             stmt.setString(2, playerUuid.toString());
@@ -366,13 +374,22 @@ public class JoinpointDatabase {
                     JoinpointLocation joinpoint = createJoinpointLocationFromResultSet(rs);
 
                     String ownerName = rs.getString("owner_name");
+                    var ownerId = UUID.fromString(rs.getString("owner_uuid"));
                     String ownerNickname = rs.getString("owner_nickname");
 
-                    if (ownerName != null) {
-                        joinpoint = new JoinpointLocationWithOwnerName(joinpoint, ownerName, ownerNickname);
+                    Text nickname;
+                    if (nicknameCache.containsKey(ownerId)) {
+                        nickname = nicknameCache.get(ownerId);
+                    } else {
+                        nickname = ownerNickname == null
+                            ? null
+                            : TextCodecs.CODEC.parse(JsonOps.INSTANCE, JsonHelper.deserialize(ownerNickname))
+                                .mapError(e -> null)
+                                .getOrThrow();
+                        nicknameCache.put(ownerId, nickname);
                     }
 
-                    joinpoints.add(joinpoint);
+                    joinpoints.add(new JoinpointLocationWithOwnerName(joinpoint, ownerName, ownerId, nickname));
                 }
             }
         }
@@ -498,7 +515,7 @@ public class JoinpointDatabase {
         return DatabaseHelper.async(() -> getCachedPlayerNickname(uuid));
     }
 
-    public CompletableFuture<List<JoinpointLocation>> getAccessibleJoinpointsWithNamesAsync(ServerPlayerEntity player) {
+    public CompletableFuture<List<JoinpointLocationWithOwnerName>> getAccessibleJoinpointsWithNamesAsync(ServerPlayerEntity player) {
         return DatabaseHelper.async(() -> getAccessibleJoinpointsWithNames(player));
     }
 
@@ -595,11 +612,18 @@ public class JoinpointDatabase {
 
     public static class JoinpointLocationWithOwnerName extends JoinpointLocation {
         private final String ownerName;
-        private final String ownerNickname;
+        private final UUID ownerUuid;
+        private final Text ownerNickname;
 
-        public JoinpointLocationWithOwnerName(JoinpointLocation original, String ownerName, String ownerNickname) {
+        public JoinpointLocationWithOwnerName(
+            JoinpointLocation original,
+            String ownerName,
+            UUID ownerUuid,
+            Text ownerNickname
+        ) {
             super(original, original.getName(), original.getOwner(), original.isGlobal(), original.getSharedWith());
             this.ownerName = ownerName;
+            this.ownerUuid = ownerUuid;
             this.ownerNickname = ownerNickname;
         }
 
@@ -607,12 +631,16 @@ public class JoinpointDatabase {
             return ownerName;
         }
 
-        public String getOwnerNickname() {
-            return ownerNickname;
+        public Text getOwnerNickname() {
+            return PlayerDataManager.getInstance().getByUuid(this.ownerUuid).getFullNickname();
         }
 
-        public String getDisplayName() {
-            return ownerNickname != null ? ownerNickname : ownerName;
+        public Text getDisplayName() {
+            var onlinePlayerData = PlayerDataManager.getInstance().getByUuid(this.ownerUuid);
+            if (onlinePlayerData != null) {
+                return onlinePlayerData.getPlayer().getDisplayName();
+            }
+            return this.ownerNickname;
         }
     }
 }

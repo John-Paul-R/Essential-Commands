@@ -65,13 +65,14 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
 
     private int exec(ServerPlayerEntity senderPlayer, FilterType filter) {
         Async.runCommand(() -> {
+            var senderPlayerId = senderPlayer.getUuid();
             PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
             JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
 
-            List<JoinpointLocation> joinpoints = database.getAccessibleJoinpointsWithNamesAsync(senderPlayer).join();
-            List<JoinpointLocation> ownedJoinpoints = database.getOwnedJoinpointsAsync(senderPlayer.getUuid()).join();
+            var joinpoints = database.getAccessibleJoinpointsWithNamesAsync(senderPlayer).join();
+//            List<JoinpointLocation> ownedJoinpoints = database.getOwnedJoinpointsAsync(senderPlayer.getUuid()).join();
 
-            List<JoinpointEntry> filteredJoinpoints = filterJoinpointsAsync(joinpoints, ownedJoinpoints, senderPlayer.getUuid(), filter, database);
+            List<JoinpointEntry> filteredJoinpoints = filterJoinpointsAsync(joinpoints, senderPlayer.getUuid(), filter, database);
 
             if (filteredJoinpoints.isEmpty()) {
                 String messageKey = switch (filter) {
@@ -102,9 +103,12 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                 MutableText nameText = ecText.accent(entry.joinpoint.getName())
                     .styled(style -> style
                         .withClickEvent(new ClickEvent.SuggestCommand(
-                            entry.isOwned
-                                ? "/joinpoint tp " + entry.joinpoint.getName()
-                                : "/joinpoint tp " + entry.ownerName + " " + entry.joinpoint.getName()
+                            // right now I've removed this quick tp due to it getting prioritized over the other one
+                            // in command suggestions :/
+//                            entry.isOwned
+//                                ? "/joinpoint tp " + entry.joinpoint.getName()
+//                                :
+                                "/joinpoint tp " + entry.ownerName + " " + entry.joinpoint.getName()
                         ))
                         .withHoverEvent(new HoverEvent.ShowText(
                             Text.literal("Click to suggest teleport command")
@@ -117,9 +121,15 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                     message.append(" ").append(Text.literal("[Global]").formatted(Formatting.GREEN));
                 } else if (!entry.isOwned) {
                     message.append(" ").append(Text.literal("[Shared]").formatted(Formatting.YELLOW));
-                    message.append(" ").append(Text.literal("by " + entry.ownerName).formatted(Formatting.GRAY));
+                    message.append(" ").append(Text.literal("by " + entry.ownerDisplayName).formatted(Formatting.GRAY));
                 } else if (!entry.sharedWith.isEmpty()) {
                     message.append(" ").append(Text.literal("[Private+]").formatted(Formatting.BLUE));
+                }
+
+                if (entry.joinpoint.getOwner() == senderPlayerId) {
+                    message.append(" ").append(Text.literal("(You)"));
+                } else {
+                    message.append(" ").append(entry.ownerDisplayName);
                 }
 
                 senderPlayer.sendMessage(message);
@@ -143,14 +153,13 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         return SINGLE_SUCCESS;
     }
 
-    private List<JoinpointEntry> filterJoinpointsAsync(List<JoinpointLocation> accessibleJoinpoints,
-                                                       List<JoinpointLocation> ownedJoinpoints,
+    private List<JoinpointEntry> filterJoinpointsAsync(List<JoinpointDatabase.JoinpointLocationWithOwnerName> accessibleJoinpoints,
                                                        UUID playerUuid,
                                                        FilterType filter,
                                                        JoinpointDatabase database) {
         List<JoinpointEntry> result = new ArrayList<>();
 
-        for (JoinpointLocation joinpoint : accessibleJoinpoints) {
+        for (var joinpoint : accessibleJoinpoints) {
             boolean isOwned = playerUuid.equals(joinpoint.getOwner());
             boolean isGlobal = joinpoint.isGlobal();
             boolean isSharedWith = !isOwned && !isGlobal;
@@ -166,12 +175,8 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
             if (!shouldInclude) continue;
 
             // Get owner name (already cached in JoinpointLocationWithOwnerName)
-            String ownerName = "Unknown";
-            if (isOwned) {
-                ownerName = "You";
-            } else if (joinpoint instanceof JoinpointDatabase.JoinpointLocationWithOwnerName withOwner) {
-                ownerName = withOwner.getDisplayName() != null ? withOwner.getDisplayName() : withOwner.getOwnerName();
-            }
+            String ownerName = joinpoint.getOwnerName();
+            Text ownerDisplayName = isOwned ? Text.literal("You") : joinpoint.getDisplayName();
 
             // Get shared player names for owned joinpoints using cached names
             Set<String> sharedWithNames = new HashSet<>();
@@ -179,7 +184,7 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                 getSharedWithNames(database, joinpoint, sharedWithNames);
             }
 
-            result.add(new JoinpointEntry(joinpoint, isOwned, ownerName, sharedWithNames));
+            result.add(new JoinpointEntry(joinpoint, isOwned, ownerName, ownerDisplayName, sharedWithNames));
         }
 
         // Sort by name for consistent display
@@ -204,12 +209,14 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         final JoinpointLocation joinpoint;
         final boolean isOwned;
         final String ownerName;
+        final Text ownerDisplayName;
         final Set<String> sharedWith;
 
-        JoinpointEntry(JoinpointLocation joinpoint, boolean isOwned, String ownerName, Set<String> sharedWith) {
+        JoinpointEntry(JoinpointLocation joinpoint, boolean isOwned, String ownerName, Text ownerDisplayName, Set<String> sharedWith) {
             this.joinpoint = joinpoint;
             this.isOwned = isOwned;
             this.ownerName = ownerName;
+            this.ownerDisplayName = ownerDisplayName;
             this.sharedWith = sharedWith;
         }
     }

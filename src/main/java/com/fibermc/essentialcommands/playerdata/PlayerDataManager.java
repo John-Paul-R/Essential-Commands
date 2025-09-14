@@ -16,8 +16,11 @@ import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.RespawnCondition;
+import com.google.gson.JsonElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.mojang.serialization.JsonOps;
 
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.ClientConnection;
@@ -26,6 +29,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.TextCodecs;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -70,7 +74,7 @@ public class PlayerDataManager {
             PlayerDataManager::handleSendMotdForGameJoin
         );
         ServerPlayConnectionEvents.JOIN.register(
-            PlayerDataManager::handleUpdatePlayerCache
+            (handler, sender, server) -> updatePlayerCache(handler.player)
         );
     }
 
@@ -97,19 +101,19 @@ public class PlayerDataManager {
         }
     }
 
-    private static void handleUpdatePlayerCache(
-        ServerPlayNetworkHandler handler,
-        PacketSender sender,
-        MinecraftServer server
+    private static void updatePlayerCache(
+        ServerPlayerEntity player
     ) {
         try {
-            var player = handler.getPlayer();
             var playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
             var database = ManagerLocator.getInstance().getJoinpointDatabase();
 
-            String nickname = playerData.getNickname().map(text -> text.getString()).orElse(null);
+            String nicknameJson = playerData.getNickname()
+                .map(text -> TextCodecs.CODEC.encodeStart(JsonOps.INSTANCE, text).getOrThrow())
+                .map(JsonElement::toString)
+                .orElse(null);
             database
-                .updatePlayerCacheAsync(player.getUuid(), player.getName().getString(), nickname)
+                .updatePlayerCacheAsync(player.getUuid(), player.getName().getString(), nicknameJson)
                 .exceptionally(err -> {
                     EssentialCommands.LOGGER.error(err);
                     return null;
@@ -183,9 +187,10 @@ public class PlayerDataManager {
                         )
                     );
 
-                changedNicknames.forEach(playerData ->
-                    playerData.save()
-                );
+                changedNicknames.forEach(playerData -> {
+                    playerData.save();
+                    updatePlayerCache(playerData.getPlayer());
+                });
 
                 this.changedNicknames.clear();
                 this.changedTeams.clear();

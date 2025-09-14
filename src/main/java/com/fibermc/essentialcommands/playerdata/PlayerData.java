@@ -221,6 +221,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         this.incomingTeleportRequests.remove(tpAsker);
     }
 
+    @NotNull
     public ServerPlayerEntity getPlayer() {
         return player;
     }
