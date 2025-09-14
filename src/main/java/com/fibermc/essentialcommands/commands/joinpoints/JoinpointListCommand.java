@@ -121,10 +121,19 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                     message.append(" ").append(Text.literal("[Global]").formatted(Formatting.GREEN));
                 } else if (!entry.isOwned) {
                     message.append(" ").append(Text.literal("[Shared]").formatted(Formatting.YELLOW));
-                    message.append(" ").append(Text.literal("by ").formatted(Formatting.GRAY)).append(entry.ownerDisplayName);
                 } else if (!entry.sharedWith.isEmpty()) {
                     message.append(" ").append(Text.literal("[Private+]").formatted(Formatting.BLUE));
                 }
+
+                // This causes an exception on chat packet sending due to a null text component
+//                message
+//                    .append(" ")
+//                    .append(Text.literal("by ").formatted(Formatting.GRAY))
+//                    .append(
+//                        entry.isOwned
+//                            ? ecText.literal("You")
+//                            : entry.ownerDisplayName
+//                    );
 
                 senderPlayer.sendMessage(message);
 
