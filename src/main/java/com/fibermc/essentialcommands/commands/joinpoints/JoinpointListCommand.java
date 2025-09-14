@@ -1,20 +1,14 @@
 package com.fibermc.essentialcommands.commands.joinpoints;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
-import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.JoinpointLocation;
 
 import com.mojang.brigadier.Command;
@@ -30,7 +24,6 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Util;
 
 public class JoinpointListCommand implements Command<ServerCommandSource> {
 
@@ -60,34 +53,6 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         return exec(senderPlayer, FilterType.ALL);
     }
 
-    private <T> CompletableFuture<T> async(Supplier<T> supplier, Consumer<Function<ECText, Text>> sendError)
-    {
-        return CompletableFuture
-            .supplyAsync(supplier, Executors.newVirtualThreadPerTaskExecutor())
-            .exceptionallyAsync(threadException -> {
-                if (!(threadException instanceof CompletionException)) {
-                    EssentialCommands.LOGGER.error(threadException);
-                    sendError.accept(ecText -> ecText.getText(
-                        "cmd.joinpoint.error.unknown",
-                        TextFormatType.Error,
-                        Text.literal(threadException.getMessage())
-                    ));
-                }
-                Function<ECText, Text> errorFunction = switch (threadException.getCause()) {
-                    default -> {
-                        EssentialCommands.LOGGER.error("Unknown error in a Joinpoint list command", threadException);
-                        yield ecText -> ecText.getText(
-                            "cmd.joinpoint.error.unknown",
-                            TextFormatType.Error,
-                            Text.literal(threadException.getCause().getMessage())
-                        );
-                    }
-                };
-                sendError.accept(errorFunction);
-                return null;
-            }, Util.getMainWorkerExecutor());
-    }
-
     private Consumer<Function<ECText, Text>> sendErrorToPlayer(ServerPlayerEntity senderPlayer) {
         var ecText = ECText.access(senderPlayer);
 
@@ -98,8 +63,8 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         };
     }
 
-    private int exec(ServerPlayerEntity senderPlayer, FilterType filter) throws CommandSyntaxException {
-        async(() -> {
+    private int exec(ServerPlayerEntity senderPlayer, FilterType filter) {
+        Async.runCommand(() -> {
             PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
             JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
 

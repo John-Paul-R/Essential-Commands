@@ -3,22 +3,16 @@ package com.fibermc.essentialcommands.commands.joinpoints;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import com.fibermc.essentialcommands.ECPerms;
-import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ChatConfirmationPrompt;
 import com.fibermc.essentialcommands.text.ECText;
-import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.JoinpointLimit;
 import com.fibermc.essentialcommands.types.JoinpointLocation;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
@@ -32,7 +26,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 
 import dev.jpcode.eccore.util.CollectionUtils;
 
@@ -52,93 +45,6 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         String joinpointName = StringArgumentType.getString(context, "joinpoint_name");
         return exec(context, joinpointName);
-    }
-
-    abstract class JoinpointSetException extends RuntimeException {
-        private final String joinpointName;
-
-        public JoinpointSetException(String joinpointName) {
-            this.joinpointName = joinpointName;
-        }
-
-        public String getJoinpointName() {
-            return joinpointName;
-        }
-    }
-
-    final class JoinpointDeleteNotFoundException extends JoinpointSetException {
-        public JoinpointDeleteNotFoundException(String joinpointName) {
-            super(joinpointName);
-        }
-    }
-
-    final class JoinpointDeleteGenericException extends JoinpointSetException {
-        public JoinpointDeleteGenericException(String joinpointName) {
-            super(joinpointName);
-        }
-    }
-
-    final class JoinpointMaxPointsExceededException extends JoinpointSetException {
-        private final int max;
-        private final int current;
-
-        public JoinpointMaxPointsExceededException(String joinpointName, int max, int current) {
-            super(joinpointName);
-            this.max = max;
-            this.current = current;
-        }
-
-        public int getMax() {
-            return max;
-        }
-
-        public int getCurrent() {
-            return current;
-        }
-    }
-
-    private <T> CompletableFuture<T> async(Supplier<T> supplier, Consumer<Function<ECText, Text>> sendError)
-    {
-        return CompletableFuture
-            .supplyAsync(supplier, Executors.newVirtualThreadPerTaskExecutor())
-            .exceptionallyAsync(threadException -> {
-                if (!(threadException instanceof CompletionException)) {
-                    EssentialCommands.LOGGER.error(threadException);
-                    sendError.accept(ecText -> ecText.getText(
-                        "cmd.joinpoint.error.unknown",
-                        TextFormatType.Error,
-                        Text.literal(threadException.getMessage())
-                    ));
-                }
-                Function<ECText, Text> errorFunction = switch (threadException.getCause()) {
-                    case JoinpointDeleteNotFoundException e -> ecText -> ecText.getText(
-                        "cmd.joinpoint.delete.error",
-                        TextFormatType.Error,
-                        ecText.accent(e.getJoinpointName())
-                    );
-                    case JoinpointDeleteGenericException e -> ecText -> ecText.getText(
-                        "cmd.joinpoint.error.not_found",
-                        TextFormatType.Error,
-                        ecText.accent(e.getJoinpointName())
-                    );
-                    case JoinpointMaxPointsExceededException e -> ecText -> ecText.getText(
-                        "cmd.joinpoint.set.error.limit",
-                        TextFormatType.Error,
-                        ecText.accent(e.getJoinpointName()),
-                        Text.literal(String.valueOf(e.getMax()))
-                    );
-                    default -> {
-                        EssentialCommands.LOGGER.error("Unknown error in a Joinpoint set command", threadException);
-                        yield ecText -> ecText.getText(
-                            "cmd.joinpoint.error.unknown",
-                            TextFormatType.Error,
-                            Text.literal(threadException.getCause().getMessage())
-                        );
-                    }
-                };
-                sendError.accept(errorFunction);
-                return null;
-            }, Util.getMainWorkerExecutor());
     }
 
     private Consumer<Function<ECText, Text>> sendErrorToPlayer(ServerPlayerEntity senderPlayer) {
@@ -169,7 +75,7 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         // Capture for lambda
         final Boolean finalIsGlobal = isGlobal;
 
-        async(() -> {
+        Async.runCommand(() -> {
             PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
             JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
 
@@ -223,7 +129,7 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
             CollectionUtils.concat(targetTypePerms, anyTypePerms));
 
         if (joinpoints.size() >= playerMaxJoinpoints) {
-            throw new JoinpointMaxPointsExceededException(joinpointName, playerMaxJoinpoints, joinpoints.size());
+            throw new JoinpointException.Set.MaxPointsExceeded(joinpointName, playerMaxJoinpoints, joinpoints.size());
         }
 
         // Create new joinpoint
@@ -283,7 +189,7 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
     )
     {
         if (!database.joinpointExistsAsync(joinpointName, senderPlayer.getUuid()).join()) {
-            throw new JoinpointDeleteNotFoundException(joinpointName);
+            throw new JoinpointException.Set.DeleteNotFound(joinpointName);
         }
 
         boolean wasSuccessful = database.deleteJoinpointAsync(joinpointName, senderPlayer.getUuid()).join();
@@ -292,7 +198,7 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         if (wasSuccessful) {
             playerData.sendCommandFeedback("cmd.joinpoint.delete.feedback", joinpointNameText);
         } else {
-            throw new JoinpointDeleteGenericException(joinpointName);
+            throw new JoinpointException.Set.DeleteGeneric(joinpointName);
         }
 
         return null;
