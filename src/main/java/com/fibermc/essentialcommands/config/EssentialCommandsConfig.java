@@ -124,8 +124,23 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);
         HOME_LIMIT.changeEvent.register(newValue ->
-                ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue)
+            ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue)
         );
+        JOINPOINT_LIMIT.changeEvent.register(joinpointLimit -> {
+            ECPerms.Registry.Group.joinpoint_limit_groups.clear();
+            for (var limitGroup : joinpointLimit.getLimits().entrySet()) {
+                var key = limitGroup.getKey();
+                var limitNums = limitGroup.getValue();
+
+                ECPerms.Registry.Group.joinpoint_limit_groups.put(
+                    key,
+                    ECPerms.makeNumericPermissionGroup(
+                        "essentialcommands.joinpoint_limit." + key.name().toLowerCase(),
+                        limitNums
+                    )
+                );
+            }
+        });
         // This value is only sent on server start/player connect and, so, cannot be updated for all
         // players immediately via the config reload command without a fair bit of hackery.
 //        NICKNAME_ABOVE_HEAD.changeEvent.register(ign -> {
@@ -141,12 +156,12 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
                     .map(RegistryKey::getValue)
                     .collect(Collectors.toSet());
 
-                EssentialCommands.LOGGER.info("Possible world ids: {}", String.join(",", worldIds.stream().map(Identifier::toString).toList()));
+                LOGGER.info("Possible world ids: {}", String.join(",", worldIds.stream().map(Identifier::toString).toList()));
 
                 var configuredWorldIds = configuredWorldIdStrings.stream()
                     .map(Identifier::of)
                     .toList();
-                EssentialCommands.LOGGER.info("Configured `rtp_enabled_worlds` world ids: {}", String.join(",", configuredWorldIds.stream().map(Identifier::toString).toList()));
+                LOGGER.info("Configured `rtp_enabled_worlds` world ids: {}", String.join(",", configuredWorldIds.stream().map(Identifier::toString).toList()));
 
                 var validConfiguredWorldIds = configuredWorldIdStrings.stream()
                     .map(Identifier::of)
@@ -159,9 +174,9 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
                     .toList();
 
                 if (invalidConfiguredWorldIds.size() > 0) {
-                    EssentialCommands.LOGGER.warn("{} configured `rtp_enabled_worlds` world ids were invalid: {}", invalidConfiguredWorldIds.size(), String.join(",", invalidConfiguredWorldIds.stream().map(Identifier::toString).toList()));
+                    LOGGER.warn("{} configured `rtp_enabled_worlds` world ids were invalid: {}", invalidConfiguredWorldIds.size(), String.join(",", invalidConfiguredWorldIds.stream().map(Identifier::toString).toList()));
                 } else {
-                    EssentialCommands.LOGGER.info("All configured `rtp_enabled_worlds` world ids are valid.");
+                    LOGGER.info("All configured `rtp_enabled_worlds` world ids are valid.");
                 }
 
                 this.validRtpWorldIds.clear();

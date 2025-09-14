@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
@@ -18,6 +19,7 @@ import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ChatConfirmationPrompt;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
+import com.fibermc.essentialcommands.types.JoinpointLimit;
 import com.fibermc.essentialcommands.types.JoinpointLocation;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
@@ -31,6 +33,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+
+import dev.jpcode.eccore.util.CollectionUtils;
 
 public class JoinpointSetCommand implements Command<ServerCommandSource> {
 
@@ -68,6 +72,25 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         }
     }
 
+    final class JoinpointMaxPointsExceededException extends JoinpointSetException {
+        private final int max;
+        private final int current;
+
+        public JoinpointMaxPointsExceededException(String joinpointName, int max, int current) {
+            super(joinpointName);
+            this.max = max;
+            this.current = current;
+        }
+
+        public int getMax() {
+            return max;
+        }
+
+        public int getCurrent() {
+            return current;
+        }
+    }
+
     private <T> CompletableFuture<T> async(Supplier<T> supplier, Consumer<Function<ECText, Text>> sendError)
     {
         return CompletableFuture
@@ -86,6 +109,12 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
                         "cmd.joinpoint.delete.error",
                         TextFormatType.Error,
                         ecText.accent(e.getJoinpointName())
+                    );
+                    case JoinpointMaxPointsExceededException e -> ecText -> ecText.getText(
+                        "cmd.joinpoint.set.error.limit",
+                        TextFormatType.Error,
+                        ecText.accent(e.getJoinpointName()),
+                        Text.literal(String.valueOf(e.getMax()))
                     );
                     default -> {
                         EssentialCommands.LOGGER.error("Unknown error in a Joinpoint set command", threadException);
@@ -151,7 +180,9 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         JoinpointDatabase database
     )
     {
-        boolean exists = database.joinpointExistsAsync(joinpointName, senderPlayer.getUuid()).join();
+        var joinpoints = database.getOwnedJoinpointsAsync(senderPlayer.getUuid()).join();
+
+        boolean exists = joinpoints.stream().anyMatch(joinpoint -> joinpoint.getName().equalsIgnoreCase(joinpointName));
 
         if (exists) {
             // Ask the player whether they want to override the joinpoint
@@ -166,24 +197,37 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
                 "/joinpoint overwrite " + joinpointName,
                 playerEcText.accent("[" + ECText.getInstance().getString("generic.confirm") + "]")
             ).send();
-        } else {
-            // Create new joinpoint
-            Set<UUID> sharedWith = new HashSet<>();
-
-            MinecraftLocation location = new MinecraftLocation(senderPlayer);
-            JoinpointLocation joinpoint = new JoinpointLocation(
-                location, joinpointName, senderPlayer.getUuid(), isGlobal, sharedWith
-            );
-
-            database.createJoinpointAsync(joinpointName, senderPlayer.getUuid(), joinpoint).join();
-
-            Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
-            String messageKey = isGlobal ? "cmd.joinpoint.set.feedback.global"
-                : !sharedWith.isEmpty() ? "cmd.joinpoint.set.feedback.shared"
-                : "cmd.joinpoint.set.feedback";
-
-            playerData.sendCommandFeedback(messageKey, joinpointNameText);
+            return null;
         }
+
+        JoinpointLimit.JoinpointType joinpointType = isGlobal
+            ? JoinpointLimit.JoinpointType.GLOBAL
+            : JoinpointLimit.JoinpointType.SHARED;
+
+        var targetTypePerms = ECPerms.Registry.Group.joinpoint_limit_groups.get(joinpointType);
+        var anyTypePerms = ECPerms.Registry.Group.joinpoint_limit_groups.get(JoinpointLimit.JoinpointType.ANY);
+
+        int playerMaxJoinpoints = ECPerms.getHighestNumericPermission(
+            senderPlayer.getCommandSource(),
+            CollectionUtils.concat(targetTypePerms, anyTypePerms));
+
+        if (joinpoints.size() >= playerMaxJoinpoints) {
+            throw new JoinpointMaxPointsExceededException(joinpointName, playerMaxJoinpoints, joinpoints.size());
+        }
+
+        // Create new joinpoint
+        MinecraftLocation location = new MinecraftLocation(senderPlayer);
+        JoinpointLocation joinpoint = new JoinpointLocation(
+            location, joinpointName, senderPlayer.getUuid(), isGlobal, Set.of()
+        );
+
+        database.createJoinpointAsync(joinpointName, senderPlayer.getUuid(), joinpoint).join();
+
+        Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
+        String messageKey = isGlobal ? "cmd.joinpoint.set.feedback.global"
+            : "cmd.joinpoint.set.feedback";
+
+        playerData.sendCommandFeedback(messageKey, joinpointNameText);
 
         return null;
     }
@@ -212,9 +256,8 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         }
 
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
-        String messageKey = isGlobal ? "cmd.joinpoint.overwrite.feedback.global" :
-            !sharedWith.isEmpty() ? "cmd.joinpoint.overwrite.feedback.shared" :
-                "cmd.joinpoint.overwrite.feedback";
+        String messageKey = isGlobal ? "cmd.joinpoint.overwrite.feedback.global"
+            : "cmd.joinpoint.overwrite.feedback";
 
         playerData.sendCommandFeedback(messageKey, joinpointNameText);
 

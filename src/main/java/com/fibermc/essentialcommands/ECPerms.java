@@ -2,9 +2,12 @@ package com.fibermc.essentialcommands;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import com.fibermc.essentialcommands.types.JoinpointLimit;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import org.jetbrains.annotations.NotNull;
 
@@ -100,6 +103,7 @@ public final class ECPerms {
             public static final String[] invuln_group = {invuln_self, invuln_others};
             public static final String[] config_group = {config_reload};
             public static String[] home_limit_group;
+            public static Map<JoinpointLimit.JoinpointType, String[]> joinpoint_limit_groups = new HashMap<>();
             public static final String[] stateful_player_abilities = {fly_self, fly_others, invuln_self, invuln_others};
         }
 
