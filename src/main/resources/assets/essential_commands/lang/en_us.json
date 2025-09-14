@@ -30,7 +30,7 @@
   "cmd.joinpoint.set.feedback": "Joinpoint '${0}' set.",
   "cmd.joinpoint.set.feedback.global": "Global joinpoint '${0}' set.",
   "cmd.joinpoint.set.feedback.shared": "Shared joinpoint '${0}' set.",
-  "cmd.joinpoint.set.error.limit": "Joinpoint '${0}' could not be set. Joinpoint limit (${1}) reached.",
+  "cmd.joinpoint.set.error.limit": "Joinpoint '${0}' could not be set. Joinpoint limit (${1}) for joinpoint type '${2}' reached.",
   "cmd.joinpoint.set.error.exists": "Joinpoint '${0}' could not be set. A joinpoint with the specified name already exists.",
   "cmd.joinpoint.set.overwrite": "Joinpoint '${0}' already exists.\nWould you like to overwrite the existing joinpoint?",
   "cmd.joinpoint.overwrite.feedback": "Joinpoint '${0}' moved to current location.",

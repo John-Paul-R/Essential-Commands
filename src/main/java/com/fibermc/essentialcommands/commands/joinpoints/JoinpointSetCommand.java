@@ -27,8 +27,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import dev.jpcode.eccore.util.CollectionUtils;
-
 public class JoinpointSetCommand implements Command<ServerCommandSource> {
 
     private final Action action;
@@ -124,24 +122,34 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
         var targetTypePerms = ECPerms.Registry.Group.joinpoint_limit_groups.get(joinpointType);
         var anyTypePerms = ECPerms.Registry.Group.joinpoint_limit_groups.get(JoinpointLimit.JoinpointType.ANY);
 
-        int playerMaxJoinpoints = ECPerms.getHighestNumericPermission(
-            senderPlayer.getCommandSource(),
-            CollectionUtils.concat(targetTypePerms, anyTypePerms));
+        int playerAllowedOfAnyType = anyTypePerms.length == 0 ? -1 : ECPerms.getHighestNumericPermission(senderPlayer.getCommandSource(), anyTypePerms);
+        int playerAllowedCountOfTargetType = targetTypePerms.length == 0 ? -1 : ECPerms.getHighestNumericPermission(senderPlayer.getCommandSource(), targetTypePerms);
 
-        if (joinpoints.size() >= playerMaxJoinpoints) {
-            throw new JoinpointException.Set.MaxPointsExceeded(joinpointName, playerMaxJoinpoints, joinpoints.size());
+        // any(5) -> up to 5 shared or global, any combindation
+        // any(5),shared(3) -> no more then 3 shared. Could have 5 global:0 shared to 2 global:3 shared
+
+        boolean targetTypeIsGlobal = joinpointType == JoinpointLimit.JoinpointType.GLOBAL;
+        int joinpointsOfTargetType = (int)joinpoints.stream().filter(p -> p.isGlobal() == targetTypeIsGlobal).count();
+
+        if (playerAllowedCountOfTargetType != -1) {
+            // if we have an explicit permission for the target type, that overrides all others
+            if (joinpointsOfTargetType >= playerAllowedCountOfTargetType) {
+                throw new JoinpointException.Set.MaxPointsExceeded(joinpointName, playerAllowedCountOfTargetType, joinpointsOfTargetType, joinpointType);
+            }
+        } else if (playerAllowedOfAnyType != -1 && joinpoints.size() >= playerAllowedOfAnyType) {
+            throw new JoinpointException.Set.MaxPointsExceeded(joinpointName, playerAllowedOfAnyType, joinpoints.size(), JoinpointLimit.JoinpointType.ANY);
         }
 
         // Create new joinpoint
         MinecraftLocation location = new MinecraftLocation(senderPlayer);
         JoinpointLocation joinpoint = new JoinpointLocation(
-            location, joinpointName, senderPlayer.getUuid(), isGlobal, Set.of()
+            location, joinpointName, senderPlayer.getUuid(), targetTypeIsGlobal, Set.of()
         );
 
         database.createJoinpointAsync(joinpointName, senderPlayer.getUuid(), joinpoint).join();
 
         Text joinpointNameText = ECText.access(senderPlayer).accent(joinpointName);
-        String messageKey = isGlobal ? "cmd.joinpoint.set.feedback.global"
+        String messageKey = targetTypeIsGlobal ? "cmd.joinpoint.set.feedback.global"
             : "cmd.joinpoint.set.feedback";
 
         playerData.sendCommandFeedback(messageKey, joinpointNameText);

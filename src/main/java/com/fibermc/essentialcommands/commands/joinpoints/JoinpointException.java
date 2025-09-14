@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.commands.joinpoints;
 
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
+import com.fibermc.essentialcommands.types.JoinpointLimit;
 
 import net.minecraft.text.Text;
 
@@ -210,11 +211,13 @@ abstract class JoinpointException extends RuntimeException {
         static final class MaxPointsExceeded extends Set {
             private final int max;
             private final int current;
+            private final JoinpointLimit.JoinpointType limitType;
 
-            public MaxPointsExceeded(String joinpointName, int max, int current) {
+            public MaxPointsExceeded(String joinpointName, int max, int current, JoinpointLimit.JoinpointType limitType) {
                 super(joinpointName);
                 this.max = max;
                 this.current = current;
+                this.limitType = limitType;
             }
 
             public int getMax() {
@@ -230,7 +233,9 @@ abstract class JoinpointException extends RuntimeException {
                 return ecText.getText(
                     "cmd.joinpoint.set.error.limit",
                     TextFormatType.Error,
-                    ecText.accent(this.getJoinpointName())
+                    ecText.accent(this.getJoinpointName()),
+                    ecText.accent(String.valueOf(this.getMax())),
+                    ecText.accent(limitType.name().toLowerCase())
                 );
             }
         }
