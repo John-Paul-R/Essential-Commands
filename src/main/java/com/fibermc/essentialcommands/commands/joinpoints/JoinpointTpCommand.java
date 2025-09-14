@@ -182,7 +182,10 @@ public class JoinpointTpCommand implements Command<ServerCommandSource> {
             "accessible-for-owner",
             (db, player, ctx) -> db
                 .getOwnerPlayerIdByNameAsync(StringArgumentType.getString(ctx, OWNER_PLAYER_ARG), player.getUuid())
-                .thenCompose(ownerId -> db.getAccessibleOwnedJoinpointsAsync(player, ownerId))
+                .thenCompose(ownerId -> ownerId == null
+                    ? CompletableFuture.completedFuture(List.of())
+                    : db.getAccessibleOwnedJoinpointsAsync(player, ownerId)
+                )
                 .thenApply(joinpoints -> joinpoints.stream().map(NamedMinecraftLocation::getName).collect(Collectors.toList()))
         );
 
