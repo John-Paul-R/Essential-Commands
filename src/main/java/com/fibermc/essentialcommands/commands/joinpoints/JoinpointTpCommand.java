@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands;
+package com.fibermc.essentialcommands.commands.joinpoints;
 
 import java.util.List;
 import java.util.UUID;

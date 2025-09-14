@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands;
+package com.fibermc.essentialcommands.commands.joinpoints;
 
 import java.util.Collection;
 import java.util.HashSet;

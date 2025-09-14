@@ -8,6 +8,10 @@ import java.util.function.Predicate;
 
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.bench.*;
+import com.fibermc.essentialcommands.commands.joinpoints.JoinpointListCommand;
+import com.fibermc.essentialcommands.commands.joinpoints.JoinpointSetCommand;
+import com.fibermc.essentialcommands.commands.joinpoints.JoinpointShareCommand;
+import com.fibermc.essentialcommands.commands.joinpoints.JoinpointTpCommand;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
