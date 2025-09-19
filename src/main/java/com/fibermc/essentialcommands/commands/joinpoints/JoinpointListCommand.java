@@ -85,14 +85,15 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                 return null;
             }
 
-            // Send header message
-            String headerKey = switch (filter) {
-                case OWNED -> "cmd.joinpoint.list.header.owned";
-                case SHARED_WITH -> "cmd.joinpoint.list.header.shared_with";
-                case GLOBAL -> "cmd.joinpoint.list.header.global";
-                case ALL -> "cmd.joinpoint.list.header.all";
-            };
-            playerData.sendMessage(headerKey, Text.literal(String.valueOf(filteredJoinpoints.size())));
+            { // Send header message
+                String headerKey = switch (filter) {
+                    case OWNED -> "cmd.joinpoint.list.header.owned";
+                    case SHARED_WITH -> "cmd.joinpoint.list.header.shared_with";
+                    case GLOBAL -> "cmd.joinpoint.list.header.global";
+                    case ALL -> "cmd.joinpoint.list.header.all";
+                };
+                playerData.sendMessage(headerKey, Text.literal(String.valueOf(filteredJoinpoints.size())));
+            }
 
             // Send each joinpoint with details
             var ecText = ECText.access(senderPlayer);
@@ -100,21 +101,22 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                 MutableText message = Text.empty();
 
                 // Joinpoint name (clickable for teleport)
-                MutableText nameText = ecText.accent(entry.joinpoint.getName())
-                    .styled(style -> style
-                        .withClickEvent(new ClickEvent.SuggestCommand(
-                            // right now I've removed this quick tp due to it getting prioritized over the other one
-                            // in command suggestions :/
-//                            entry.isOwned
-//                                ? "/joinpoint tp " + entry.joinpoint.getName()
-//                                :
+                message.append("• ").append(
+                    ecText
+                        .accent(entry.joinpoint.getName())
+                        .styled(style -> style
+                            .withClickEvent(new ClickEvent.SuggestCommand(
+                                // right now I've removed this quick tp due to it getting prioritized over the other one
+                                // in command suggestions :/
+//                                entry.isOwned
+//                                    ? "/joinpoint tp " + entry.joinpoint.getName()
+//                                    :
                                 "/joinpoint tp " + entry.ownerName + " " + entry.joinpoint.getName()
-                        ))
-                        .withHoverEvent(new HoverEvent.ShowText(
-                            Text.literal("Click to suggest teleport command")
-                        )));
-
-                message.append("• ").append(nameText);
+                            ))
+                            .withHoverEvent(new HoverEvent.ShowText(
+                                Text.literal("Click to suggest teleport command")
+                            )))
+                );
 
                 // Add type indicators
                 if (entry.joinpoint.isGlobal()) {
@@ -156,10 +158,12 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         return SINGLE_SUCCESS;
     }
 
-    private List<JoinpointEntry> filterJoinpointsAsync(List<JoinpointDatabase.JoinpointLocationWithOwnerName> accessibleJoinpoints,
-                                                       UUID playerUuid,
-                                                       FilterType filter,
-                                                       JoinpointDatabase database) {
+    private List<JoinpointEntry> filterJoinpointsAsync(
+        List<JoinpointDatabase.JoinpointLocationWithOwnerName> accessibleJoinpoints,
+        UUID playerUuid,
+        FilterType filter,
+        JoinpointDatabase database)
+    {
         List<JoinpointEntry> result = new ArrayList<>();
 
         for (var joinpoint : accessibleJoinpoints) {
@@ -196,15 +200,19 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         return result;
     }
 
-    static void getSharedWithNames(JoinpointDatabase database, JoinpointLocation joinpoint, Set<String> sharedWithNames) {
+    static void getSharedWithNames(
+        JoinpointDatabase database,
+        JoinpointLocation joinpoint,
+        Set<String> sharedWithNames
+    ) {
         var cachedNames = database.getCachedNamesForUuidsAsync(joinpoint.getSharedWith()).join();
         for (UUID uuid : joinpoint.getSharedWith()) {
             String name = cachedNames.get(uuid);
-            if (name != null) {
-                sharedWithNames.add(name);
-            } else {
-                sharedWithNames.add(uuid.toString().substring(0, 8) + "...");
-            }
+            sharedWithNames.add(
+                name != null
+                    ? name
+                    : uuid.toString().substring(0, 8) + "..."
+            );
         }
     }
 
@@ -215,7 +223,13 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         final Text ownerDisplayName;
         final Set<String> sharedWith;
 
-        JoinpointEntry(JoinpointLocation joinpoint, boolean isOwned, String ownerName, Text ownerDisplayName, Set<String> sharedWith) {
+        JoinpointEntry(
+            JoinpointLocation joinpoint,
+            boolean isOwned,
+            String ownerName,
+            Text ownerDisplayName,
+            Set<String> sharedWith
+        ) {
             this.joinpoint = joinpoint;
             this.isOwned = isOwned;
             this.ownerName = ownerName;

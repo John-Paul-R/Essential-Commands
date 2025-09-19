@@ -10,10 +10,10 @@ abstract class JoinpointException extends RuntimeException {
 
     public abstract Text message(ECText ecText);
 
-    private static abstract class Tp extends JoinpointException {
+    private abstract static class Tp extends JoinpointException {
         private final String ownerName;
 
-        public Tp(String ownerName) {
+        Tp(String ownerName) {
             this.ownerName = ownerName;
         }
 
@@ -22,10 +22,10 @@ abstract class JoinpointException extends RuntimeException {
         }
     }
 
-    private static abstract class WithName extends Tp {
+    private abstract static class WithName extends Tp {
         private final String joinpointName;
 
-        public WithName(String joinpointName, String ownerName) {
+        WithName(String joinpointName, String ownerName) {
             super(ownerName);
             this.joinpointName = joinpointName;
         }
@@ -36,7 +36,7 @@ abstract class JoinpointException extends RuntimeException {
     }
 
     static final class TpNotFound extends WithName {
-        public TpNotFound(String joinpointName, String ownerName) {
+        TpNotFound(String joinpointName, String ownerName) {
             super(joinpointName, ownerName);
         }
 
@@ -52,7 +52,7 @@ abstract class JoinpointException extends RuntimeException {
     }
 
     static final class TpNoAccess extends WithName {
-        public TpNoAccess(String joinpointName, String ownerName) {
+        TpNoAccess(String joinpointName, String ownerName) {
             super(joinpointName, ownerName);
         }
 
@@ -68,7 +68,7 @@ abstract class JoinpointException extends RuntimeException {
     }
 
     static final class OwnerNotFound extends Tp {
-        public OwnerNotFound(String ownerName) {
+        OwnerNotFound(String ownerName) {
             super(ownerName);
         }
 
@@ -82,10 +82,10 @@ abstract class JoinpointException extends RuntimeException {
         }
     }
 
-    static abstract class Share extends JoinpointException {
+    abstract static class Share extends JoinpointException {
         private final String joinpointName;
 
-        public Share(String joinpointName) {
+        Share(String joinpointName) {
             this.joinpointName = joinpointName;
         }
 
@@ -95,7 +95,7 @@ abstract class JoinpointException extends RuntimeException {
     }
 
     static final class NotFound extends Share {
-        public NotFound(String joinpointName) {
+        NotFound(String joinpointName) {
             super(joinpointName);
         }
 
@@ -110,7 +110,7 @@ abstract class JoinpointException extends RuntimeException {
     }
 
     static final class AlreadyGlobal extends Share {
-        public AlreadyGlobal(String joinpointName) {
+        AlreadyGlobal(String joinpointName) {
             super(joinpointName);
         }
 
@@ -125,7 +125,7 @@ abstract class JoinpointException extends RuntimeException {
     }
 
     static final class NoNewPlayers extends Share {
-        public NoNewPlayers(String joinpointName) {
+        NoNewPlayers(String joinpointName) {
             super(joinpointName);
         }
 
@@ -139,7 +139,7 @@ abstract class JoinpointException extends RuntimeException {
     }
 
     static final class PlayersNotShared extends Share {
-        public PlayersNotShared(String joinpointName) {
+        PlayersNotShared(String joinpointName) {
             super(joinpointName);
         }
 
@@ -153,7 +153,7 @@ abstract class JoinpointException extends RuntimeException {
     }
 
     static final class CannotClearGlobal extends Share {
-        public CannotClearGlobal(String joinpointName) {
+        CannotClearGlobal(String joinpointName) {
             super(joinpointName);
         }
 
@@ -167,10 +167,10 @@ abstract class JoinpointException extends RuntimeException {
         }
     }
 
-    static abstract class Set extends JoinpointException {
+    abstract static class Set extends JoinpointException {
         private final String joinpointName;
 
-        public Set(String joinpointName) {
+        Set(String joinpointName) {
             this.joinpointName = joinpointName;
         }
 
@@ -179,7 +179,7 @@ abstract class JoinpointException extends RuntimeException {
         }
 
         static final class DeleteNotFound extends Set {
-            public DeleteNotFound(String joinpointName) {
+            DeleteNotFound(String joinpointName) {
                 super(joinpointName);
             }
 
@@ -194,7 +194,7 @@ abstract class JoinpointException extends RuntimeException {
         }
 
         static final class DeleteGeneric extends Set {
-            public DeleteGeneric(String joinpointName) {
+            DeleteGeneric(String joinpointName) {
                 super(joinpointName);
             }
 
@@ -213,7 +213,7 @@ abstract class JoinpointException extends RuntimeException {
             private final int current;
             private final JoinpointLimit.JoinpointType limitType;
 
-            public MaxPointsExceeded(String joinpointName, int max, int current, JoinpointLimit.JoinpointType limitType) {
+            MaxPointsExceeded(String joinpointName, int max, int current, JoinpointLimit.JoinpointType limitType) {
                 super(joinpointName);
                 this.max = max;
                 this.current = current;
