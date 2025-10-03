@@ -10,6 +10,15 @@ dependencies {
     compileOnly files(rootProject.sourceSets.main.output.classesDirs)
     compileOnly files(project(':ec-core').sourceSets.main.output.classesDirs)
 
+    // Make EC available as a mod at runtime for testing
+    modLocalRuntime(project(':')) { transitive = false }
+    modLocalRuntime(project(':ec-core')) { transitive = false }
+
+    // EC's transitive dependencies for runtime
+    modRuntimeOnly "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+    modRuntimeOnly "org.yaml:snakeyaml:${project.snakeyaml_version}"
+    modRuntimeOnly "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
+
     // Fabric API - needed for command registration
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
@@ -30,6 +39,13 @@ dependencies {
 tasks.named('compileJava').configure {
     dependsOn(rootProject.tasks.named('classes'))
     dependsOn(project(':ec-core').tasks.named('classes'))
+}
+
+// Ensure EC jars are rebuilt before running the server
+// This ensures modLocalRuntime uses the latest code
+tasks.matching { it.name.startsWith('run') }.configureEach {
+    dependsOn(rootProject.tasks.named('remapJar'))
+    dependsOn(project(':ec-core').tasks.named('remapJar'))
 }
 
 publishing {

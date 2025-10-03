@@ -1,14 +1,17 @@
 package com.fibermc.joinpoints;
 
+import java.nio.file.Path;
+
+import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.joinpoints.config.JoinpointsConfig;
 import com.fibermc.joinpoints.database.JoinpointDatabase;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.file.Path;
+import net.minecraft.server.MinecraftServer;
+
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 public class Joinpoints implements ModInitializer {
     public static final String MOD_ID = "joinpoints";
@@ -28,6 +31,9 @@ public class Joinpoints implements ModInitializer {
 
         // Initialize config early
         config.loadOrCreateProperties();
+
+        // Register joinpoints lang file with ECText
+        ECText.registerAdditionalLangPath("/assets/joinpoints/lang/%s.json");
 
         // Register commands
         JoinpointsCommandRegistry.register();

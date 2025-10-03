@@ -82,7 +82,7 @@ allprojects {
     repositories {
         gradlePluginPortal()
         mavenCentral()
-//        mavenLocal()
+        mavenLocal()
         maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
 //        maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
         // Add repositories to retrieve artifacts from in here.
