@@ -49,8 +49,11 @@ allprojects {
         testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 
         subprojects.each {
-            implementation project(path: ":${it.name}", configuration: "namedElements")
-            include project("${it.name}:")
+            // Skip joinpoints - it's a separate mod that depends on EC, not a library to include in EC
+            if (it.name != 'joinpoints') {
+                implementation project(path: ":${it.name}", configuration: "namedElements")
+                include project("${it.name}:")
+            }
         }
     }
 
@@ -123,17 +126,16 @@ dependencies {
     include "org.yaml:snakeyaml:${project.snakeyaml_version}"
     modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
     include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
-    
-    // SQLite for joinpoints storage
-    implementation "org.xerial:sqlite-jdbc:3.47.1.0"
-    include "org.xerial:sqlite-jdbc:3.47.1.0"
 
     // mod compatibility
     modCompileOnly  "maven.modrinth:vanish:${project.vanish_version}"
 
     subprojects.each {
-        implementation project(path: ":${it.name}", configuration: "namedElements")
-        include project("${it.name}:")
+        // Skip joinpoints - it's a separate mod that depends on EC, not a library to include in EC
+        if (it.name != 'joinpoints') {
+            implementation project(path: ":${it.name}", configuration: "namedElements")
+            include project("${it.name}:")
+        }
     }
 }
 

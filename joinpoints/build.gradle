@@ -1,0 +1,47 @@
+plugins {
+    id 'maven-publish'
+}
+
+base.archivesName = "joinpoints"
+
+dependencies {
+    // Essential Commands dependency (joinpoints hooks into EC)
+    // Reference the compiled classes directories directly
+    compileOnly files(rootProject.sourceSets.main.output.classesDirs)
+    compileOnly files(project(':ec-core').sourceSets.main.output.classesDirs)
+
+    // Fabric API - needed for command registration
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    // Permissions API - used by joinpoints
+    modImplementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
+
+    // SQLite for joinpoints storage
+    implementation "org.xerial:sqlite-jdbc:3.47.1.0"
+    include "org.xerial:sqlite-jdbc:3.47.1.0"
+
+    testImplementation platform("org.junit:junit-bom:${project.junit_bom_version}")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+}
+
+// Ensure EC is built before joinpoints compiles
+tasks.named('compileJava').configure {
+    dependsOn(rootProject.tasks.named('classes'))
+    dependsOn(project(':ec-core').tasks.named('classes'))
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId 'joinpoints'
+            groupId project.maven_group
+            version project.version
+            artifact(remapJar) { builtBy remapJar }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
+}

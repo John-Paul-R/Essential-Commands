@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands.joinpoints;
+package com.fibermc.joinpoints.commands;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,15 +6,15 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.fibermc.essentialcommands.ECPerms;
-import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.joinpoints.JoinpointsPerms;
+import com.fibermc.joinpoints.Joinpoints;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.database.JoinpointDatabase;
+import com.fibermc.joinpoints.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ChatConfirmationPrompt;
 import com.fibermc.essentialcommands.text.ECText;
-import com.fibermc.essentialcommands.types.JoinpointLimit;
-import com.fibermc.essentialcommands.types.JoinpointLocation;
+import com.fibermc.joinpoints.types.JoinpointLimit;
+import com.fibermc.joinpoints.types.JoinpointLocation;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
 import com.mojang.brigadier.Command;
@@ -75,7 +75,7 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
 
         Async.runCommand(() -> {
             PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
-            JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+            JoinpointDatabase database = Joinpoints.getDatabase();
 
             return switch (action) {
                 case SET -> handleSetAsync(finalIsGlobal, joinpointName, senderPlayer, playerData, database);
@@ -119,11 +119,11 @@ public class JoinpointSetCommand implements Command<ServerCommandSource> {
             ? JoinpointLimit.JoinpointType.GLOBAL
             : JoinpointLimit.JoinpointType.SHARED;
 
-        var targetTypePerms = ECPerms.Registry.Group.joinpoint_limit_groups.get(joinpointType);
-        var anyTypePerms = ECPerms.Registry.Group.joinpoint_limit_groups.get(JoinpointLimit.JoinpointType.ANY);
+        var targetTypePerms = JoinpointsPerms.Registry.Group.joinpoint_limit_groups.get(joinpointType);
+        var anyTypePerms = JoinpointsPerms.Registry.Group.joinpoint_limit_groups.get(JoinpointLimit.JoinpointType.ANY);
 
-        int playerAllowedOfAnyType = anyTypePerms.length == 0 ? -1 : ECPerms.getHighestNumericPermission(senderPlayer.getCommandSource(), anyTypePerms);
-        int playerAllowedCountOfTargetType = targetTypePerms.length == 0 ? -1 : ECPerms.getHighestNumericPermission(senderPlayer.getCommandSource(), targetTypePerms);
+        int playerAllowedOfAnyType = anyTypePerms.length == 0 ? -1 : JoinpointsPerms.getHighestNumericPermission(senderPlayer.getCommandSource(), anyTypePerms);
+        int playerAllowedCountOfTargetType = targetTypePerms.length == 0 ? -1 : JoinpointsPerms.getHighestNumericPermission(senderPlayer.getCommandSource(), targetTypePerms);
 
         // any(5) -> up to 5 shared or global, any combindation
         // any(5),shared(3) -> no more then 3 shared. Could have 5 global:0 shared to 2 global:3 shared

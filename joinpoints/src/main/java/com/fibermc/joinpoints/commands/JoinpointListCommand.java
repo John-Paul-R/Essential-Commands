@@ -1,15 +1,15 @@
-package com.fibermc.essentialcommands.commands.joinpoints;
+package com.fibermc.joinpoints.commands;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.joinpoints.Joinpoints;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.database.JoinpointDatabase;
+import com.fibermc.joinpoints.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
-import com.fibermc.essentialcommands.types.JoinpointLocation;
+import com.fibermc.joinpoints.types.JoinpointLocation;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -67,7 +67,7 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
         Async.runCommand(() -> {
             var senderPlayerId = senderPlayer.getUuid();
             PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
-            JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+            JoinpointDatabase database = Joinpoints.getDatabase();
 
             var joinpoints = database.getAccessibleJoinpointsWithNamesAsync(senderPlayer).join();
 //            List<JoinpointLocation> ownedJoinpoints = database.getOwnedJoinpointsAsync(senderPlayer.getUuid()).join();

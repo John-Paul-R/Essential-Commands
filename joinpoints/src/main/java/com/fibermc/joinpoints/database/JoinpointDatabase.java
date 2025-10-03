@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.database;
+package com.fibermc.joinpoints.database;
 
 import java.io.File;
 import java.sql.*;
@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
-import com.fibermc.essentialcommands.types.JoinpointLocation;
+import com.fibermc.joinpoints.types.JoinpointLocation;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;

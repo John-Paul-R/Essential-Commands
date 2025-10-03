@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands.joinpoints;
+package com.fibermc.joinpoints.commands;
 
 import java.util.List;
 import java.util.UUID;
@@ -8,14 +8,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.fibermc.essentialcommands.EssentialCommands;
-import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.joinpoints.Joinpoints;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.database.JoinpointDatabase;
+import com.fibermc.joinpoints.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.teleportation.PlayerTeleporter;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
-import com.fibermc.essentialcommands.types.JoinpointLocation;
+import com.fibermc.joinpoints.types.JoinpointLocation;
 import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import org.apache.commons.lang3.function.TriFunction;
 import org.apache.logging.log4j.message.ParameterizedMessage;
@@ -69,6 +69,13 @@ public class JoinpointTpCommand implements Command<ServerCommandSource> {
      */
     private @Nullable UUID getJoinpointOwnerIdAsync(ServerPlayerEntity senderPlayer, String ownerName)
     {
+        var server = senderPlayer.getEntityWorld().getServer();
+        var apis = server.getApiServices();
+        var userCache = apis.nameToIdCache();
+
+        // player to owned joinpoints
+        // player to accessible joinpoints
+
         // If owner is self, use sender's UUID
         if (ownerName.equals(senderPlayer.getName().getString())) {
             return senderPlayer.getUuid();
@@ -82,7 +89,7 @@ public class JoinpointTpCommand implements Command<ServerCommandSource> {
         }
 
         { // Go to our cached list of all player names as a last resort (particularly for offline players)
-            JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+            JoinpointDatabase database = Joinpoints.getDatabase();
             var ownerUuid = database.getOwnerPlayerIdByNameAsync(ownerName, senderPlayer.getUuid()).join();
             if (ownerUuid != null) {
                 return ownerUuid;
@@ -96,7 +103,7 @@ public class JoinpointTpCommand implements Command<ServerCommandSource> {
     {
         Async.runCommand(() -> {
             PlayerData senderPlayerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
-            JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+            JoinpointDatabase database = Joinpoints.getDatabase();
 
             var ownerUuid = getJoinpointOwnerIdAsync(senderPlayer, ownerName);
 
@@ -143,7 +150,7 @@ public class JoinpointTpCommand implements Command<ServerCommandSource> {
             return (context, builder) -> {
                 try {
                     ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
-                    JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+                    JoinpointDatabase database = Joinpoints.getDatabase();
                     return getSuggestionsAsync.apply(database, player, context)
                         .thenApply(items -> {
                             for (String item : items) {
