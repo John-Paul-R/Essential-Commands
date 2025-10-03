@@ -9,10 +9,7 @@ import java.util.stream.Stream;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.MotdCommand;
-import com.fibermc.essentialcommands.events.PlayerConnectCallback;
-import com.fibermc.essentialcommands.events.PlayerDataManagerTickCallback;
-import com.fibermc.essentialcommands.events.PlayerDeathCallback;
-import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
+import com.fibermc.essentialcommands.events.*;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import org.jetbrains.annotations.NotNull;
@@ -159,6 +156,7 @@ public class PlayerDataManager {
 
                 changedNicknames.forEach(playerData -> {
                     playerData.save();
+                    NicknameChangeCallback.EVENT.invoker().onNicknameChange(playerData.getPlayer());
                 });
 
                 this.changedNicknames.clear();
