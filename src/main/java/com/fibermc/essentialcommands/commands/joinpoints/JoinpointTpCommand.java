@@ -75,7 +75,7 @@ public class JoinpointTpCommand implements Command<ServerCommandSource> {
         }
 
         { // Try to find owner by name from online players first
-            var ownerPlayer = senderPlayer.getServer().getPlayerManager().getPlayer(ownerName);
+            var ownerPlayer = senderPlayer.getEntityWorld().getServer().getPlayerManager().getPlayer(ownerName);
             if (ownerPlayer != null) {
                 return ownerPlayer.getUuid();
             }
