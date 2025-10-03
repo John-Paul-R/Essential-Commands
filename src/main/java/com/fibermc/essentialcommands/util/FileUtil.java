@@ -68,11 +68,17 @@ public final class FileUtil {
         public record Inst(
             Path ecWorldDataDir,
             Path ecPlayerDataDir,
+            Path ecPlayerProfilesDir,
             Path rulesFile,
             Path disallowedWordsFile
         ) {
             public Path playerDataFilePath(ServerPlayerEntity player) {
                 return this.ecPlayerDataDir()
+                    .resolve(player.getUuidAsString() + ".dat");
+            }
+
+            public Path playerProfileFile(ServerPlayerEntity player) {
+                return this.ecPlayerProfilesDir()
                     .resolve(player.getUuidAsString() + ".dat");
             }
         }
@@ -85,7 +91,8 @@ public final class FileUtil {
             try {
                 return inst = new Inst(
                     getOrCreateWorldDirectory(minecraftServer, "essentialcommands"),
-                    getOrCreateWorldDirectory(minecraftServer, "modplayerdata)"),
+                    getOrCreateWorldDirectory(minecraftServer, "modplayerdata"),
+                    getOrCreateWorldDirectory(minecraftServer, "ec_player_profiles"),
                     ecConfigDir.resolve("rules.txt"),
                     ecConfigDir.resolve("disallowed-words.txt")
                 );
