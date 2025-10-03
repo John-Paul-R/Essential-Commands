@@ -52,6 +52,21 @@ tasks.named('compileJava').configure {
     dependsOn(project(':ec-core').tasks.named('classes'))
 }
 
+// Task to clean Loom cache for EC jars when EC code changes
+// Run this manually if EC changes aren't being picked up: ./gradlew :joinpoints:cleanECCache
+tasks.register('cleanECCache') {
+    group = 'fabric'
+    description = 'Clears cached EC jars from Loom to pick up latest changes'
+    doLast {
+        // Only delete EC-related cached jars, not all remapped mods
+        delete rootProject.fileTree('.gradle/loom-cache/remapped_mods') {
+            include '**/essential_commands-*/**'
+            include '**/ec-core-*/**'
+        }
+        logger.lifecycle('Cleared EC jars from Loom cache')
+    }
+}
+
 // Ensure EC jars are rebuilt before running the server
 tasks.matching { it.name.startsWith('run') }.configureEach {
     dependsOn(rootProject.tasks.named('remapJar'))
