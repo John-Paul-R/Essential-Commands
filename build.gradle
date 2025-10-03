@@ -7,6 +7,9 @@ plugins {
 
 build {
     dependsOn ':ec-core:build'
+    // Don't build joinpoints by default since it requires EC jars to exist first
+    // Build joinpoints separately with: ./gradlew :joinpoints:build
+    // Or for testing: ./gradlew :joinpoints:runServer (which auto-builds EC jars)
 }
 
 ext.env = loadenv()

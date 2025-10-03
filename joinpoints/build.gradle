@@ -2,6 +2,12 @@ plugins {
     id 'maven-publish'
 }
 
+// Ensure EC projects are evaluated and built before joinpoints configuration
+// This is needed because modLocalRuntime needs the jars to exist
+evaluationDependsOnChildren()
+project.evaluationDependsOn(':')
+project.evaluationDependsOn(':ec-core')
+
 base.archivesName = "joinpoints"
 
 dependencies {
@@ -11,8 +17,13 @@ dependencies {
     compileOnly files(project(':ec-core').sourceSets.main.output.classesDirs)
 
     // Make EC available as a mod at runtime for testing
-    modLocalRuntime(project(':')) { transitive = false }
-    modLocalRuntime(project(':ec-core')) { transitive = false }
+    // Only add if jars exist (handles clean builds where jars don't exist yet)
+    def ecJar = rootProject.file("build/libs/essential_commands-${rootProject.version}.jar")
+    def ecCoreJar = project(':ec-core').file("build/libs/ec-core-${project(':ec-core').version}.jar")
+    if (ecJar.exists() && ecCoreJar.exists()) {
+        modLocalRuntime(project(':')) { transitive = false }
+        modLocalRuntime(project(':ec-core')) { transitive = false }
+    }
 
     // EC's transitive dependencies for runtime
     modRuntimeOnly "eu.pb4:placeholder-api:${project.placeholder_api_version}"
@@ -42,7 +53,6 @@ tasks.named('compileJava').configure {
 }
 
 // Ensure EC jars are rebuilt before running the server
-// This ensures modLocalRuntime uses the latest code
 tasks.matching { it.name.startsWith('run') }.configureEach {
     dependsOn(rootProject.tasks.named('remapJar'))
     dependsOn(project(':ec-core').tasks.named('remapJar'))
