@@ -131,16 +131,84 @@ public final class DisallowedWordsCommand {
             var justDisallowed = wordBlocker.disallow(word);
 
             if (justDisallowed) {
-                playerData.sendCommandFeedback("disallowedwords.disallow.success");
+                playerData.sendCommandFeedback("disallowedwords.disallow.success", Text.literal(word));
             } else {
-                playerData.sendCommandFeedback("disallowedwords.disallow.error.already_disallowed");
+                playerData.sendCommandFeedback("disallowedwords.disallow.error.already_disallowed", Text.literal(word));
             }
 
             return SINGLE_SUCCESS;
         }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static final class Allow implements Command<ServerCommandSource> {
+        public static final String WORD_ARG = "word";
+
+        @Override
+        public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+            var playerData = PlayerData.accessFromContextOrThrow(context);
+
+            var word = StringArgumentType.getString(context, WORD_ARG);
+
+            var wordBlocker = DisallowWordSystem.current(context.getSource().getServer());
+
+            var justAllowed = wordBlocker.allow(word);
+
+            if (justAllowed) {
+                playerData.sendCommandFeedback("disallowedwords.allow.success", Text.literal(word));
+            } else {
+                playerData.sendCommandFeedback("disallowedwords.allow.error.not_disallowed", Text.literal(word));
+            }
+
+            return SINGLE_SUCCESS;
+        }
+    }
+
+    public static final class Test implements Command<ServerCommandSource> {
+        public static final String TEXT_ARG = "text";
+
+        @Override
+        public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+            var playerData = PlayerData.accessFromContextOrThrow(context);
+
+            var text = StringArgumentType.getString(context, TEXT_ARG);
+
+            var wordBlocker = DisallowWordSystem.current(context.getSource().getServer());
+
+            var isAllowed = wordBlocker.isAllowed(text);
+
+            if (isAllowed) {
+                playerData.sendCommandFeedback("disallowedwords.test.allowed");
+            } else {
+                playerData.sendCommandFeedback("disallowedwords.test.disallowed");
+            }
+
+            return SINGLE_SUCCESS;
+        }
+    }
+
+    public static final class List implements Command<ServerCommandSource> {
+        @Override
+        public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+            var playerData = PlayerData.accessFromContextOrThrow(context);
+
+            var wordBlocker = DisallowWordSystem.current(context.getSource().getServer());
+
+            if (wordBlocker.disallowedWords.isEmpty()) {
+                playerData.sendCommandFeedback("disallowedwords.list.empty");
+            } else {
+                context.getSource().sendFeedback(
+                    () -> Text.literal(
+                        "Disallowed words (" + wordBlocker.disallowedWords.size() + "): "
+                            + String.join(", ", wordBlocker.disallowedWords)
+                    ),
+                    false
+                );
+            }
+
+            return SINGLE_SUCCESS;
+        }
+    }
+
     public static void reload(MinecraftServer server) throws IOException {
         Path mcDir = server.getRunDirectory();
         var rulesFile = mcDir.resolve("config/essentialcommands/rules.txt").toFile();

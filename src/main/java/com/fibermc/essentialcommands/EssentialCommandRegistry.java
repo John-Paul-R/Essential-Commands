@@ -506,6 +506,49 @@ public final class EssentialCommandRegistry {
                 .build());
         }
 
+        if (CONFIG.ENABLE_DISALLOWED_WORDS) {
+            LiteralArgumentBuilder<ServerCommandSource> disallowedWordsBuilder = CommandManager.literal("disallowedwords");
+            LiteralArgumentBuilder<ServerCommandSource> disallowBuilder = CommandManager.literal("disallow");
+            LiteralArgumentBuilder<ServerCommandSource> allowBuilder = CommandManager.literal("allow");
+            LiteralArgumentBuilder<ServerCommandSource> testBuilder = CommandManager.literal("test");
+            LiteralArgumentBuilder<ServerCommandSource> listBuilder = CommandManager.literal("list");
+            LiteralArgumentBuilder<ServerCommandSource> reloadBuilder = CommandManager.literal("reload");
+
+            disallowBuilder
+                .requires(ECPerms.require(ECPerms.Registry.disallowedwords_manage, 4))
+                .then(argument("word", StringArgumentType.word())
+                    .executes(new DisallowedWordsCommand.Disallow()));
+
+            allowBuilder
+                .requires(ECPerms.require(ECPerms.Registry.disallowedwords_manage, 4))
+                .then(argument("word", StringArgumentType.word())
+                    .executes(new DisallowedWordsCommand.Allow()));
+
+            testBuilder
+                .requires(ECPerms.require(ECPerms.Registry.disallowedwords_test, 0))
+                .then(argument("text", StringArgumentType.greedyString())
+                    .executes(new DisallowedWordsCommand.Test()));
+
+            listBuilder
+                .requires(ECPerms.require(ECPerms.Registry.disallowedwords_list, 4))
+                .executes(new DisallowedWordsCommand.List());
+
+            reloadBuilder
+                .requires(ECPerms.require(ECPerms.Registry.disallowedwords_reload, 4))
+                .executes(DisallowedWordsCommand::reloadCommand);
+
+            LiteralCommandNode<ServerCommandSource> disallowedWordsNode = disallowedWordsBuilder
+                .requires(ECPerms.requireAny(ECPerms.Registry.Group.disallowedwords_group, 0))
+                .build();
+            disallowedWordsNode.addChild(disallowBuilder.build());
+            disallowedWordsNode.addChild(allowBuilder.build());
+            disallowedWordsNode.addChild(testBuilder.build());
+            disallowedWordsNode.addChild(listBuilder.build());
+            disallowedWordsNode.addChild(reloadBuilder.build());
+
+            registerNode.accept(disallowedWordsNode);
+        }
+
         if (CONFIG.ENABLE_FEED) {
             registerNode.accept(CommandManager.literal("feed")
                 .requires(ECPerms.require(ECPerms.Registry.feed_self, 2))
