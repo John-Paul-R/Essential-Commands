@@ -2,10 +2,10 @@ package com.fibermc.essentialcommands.commands;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.util.FileUtil;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -42,13 +42,11 @@ public final class RulesCommand {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void reload(MinecraftServer server) throws IOException {
-        Path mcDir = server.getRunDirectory();
-        var rulesFile = mcDir.resolve("config/essentialcommands/rules.txt").toFile();
-        rulesFile.getParentFile().mkdirs();
-        if (rulesFile.createNewFile()) {
-            EssentialCommands.LOGGER.info("Created rules file at path: " + rulesFile.toPath());
+        var rulesFile = FileUtil.FilePaths.current(server).rulesFile();
+        if (FileUtil.createFileWithDirs(rulesFile)) {
+            EssentialCommands.LOGGER.info("Created rules file at path: {}", rulesFile);
         }
-        String rulesStr = String.join(System.lineSeparator(), Files.readAllLines(rulesFile.toPath()));
+        String rulesStr = String.join(System.lineSeparator(), Files.readAllLines(rulesFile));
         rulesText = TextUtil.parseText(rulesStr);
     }
 }

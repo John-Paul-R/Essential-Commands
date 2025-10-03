@@ -84,7 +84,12 @@ allprojects {
 
     repositories {
         gradlePluginPortal()
-        mavenCentral()
+        mavenCentral {
+            content {
+                includeGroup 'net.codebox'
+                includeGroupByRegex 'net\\.codebox.*'
+            }
+        }
         mavenLocal()
         maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
 //        maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
@@ -111,6 +116,14 @@ allprojects {
             }
         }
         maven { url "https://api.modrinth.com/maven" } // for vanish
+        maven {
+            name = 'central'
+            url = 'https://mvnrepository.com/'
+            content {
+                includeGroup 'net.codebox'
+                includeGroupByRegex 'net\\.codebox.*'
+            }
+        }
     }
 }
 
@@ -129,6 +142,8 @@ dependencies {
     include "org.yaml:snakeyaml:${project.snakeyaml_version}"
     modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
     include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
+    modImplementation "net.codebox:homoglyph:1.2.1"
+    include "net.codebox:homoglyph:1.2.1"
 
     // mod compatibility
     modCompileOnly  "maven.modrinth:vanish:${project.vanish_version}"

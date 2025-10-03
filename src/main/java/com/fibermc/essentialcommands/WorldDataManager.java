@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.WarpLocation;
 import com.fibermc.essentialcommands.types.WarpStorage;
+import com.fibermc.essentialcommands.util.FileUtil;
 import org.apache.logging.log4j.Level;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -23,7 +24,6 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.PersistentState;
 
 import net.fabricmc.fabric.api.event.Event;
@@ -46,7 +46,7 @@ public class WorldDataManager extends PersistentState {
     }
 
     public void onServerStart(MinecraftServer server) {
-        this.saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("essentialcommands");
+        this.saveDir = FileUtil.FilePaths.current(server).ecWorldDataDir();
         try {
             Files.createDirectories(saveDir);
         } catch (IOException e) {

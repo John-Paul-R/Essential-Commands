@@ -11,12 +11,13 @@ import io.netty.util.CharsetUtil;
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.WorldSavePath;
 
 public final class FileUtil {
     private FileUtil() {}
 
-    public static Path getOrCreateWorldDirectory(MinecraftServer server, String subdir) throws IOException {
+    private static Path getOrCreateWorldDirectory(MinecraftServer server, String subdir) throws IOException {
         Path dataDirectoryPath;
         try {
             dataDirectoryPath = Files.createDirectories(server.getSavePath(WorldSavePath.ROOT).resolve(subdir));
@@ -40,5 +41,57 @@ public final class FileUtil {
         }
 
         throw new IOException("Failed to read string from file: %s".formatted(filePath));
+    }
+
+    /**
+     * @return whether the file was created
+     */
+    public static boolean createFileWithDirs(Path path) throws IOException {
+        var file = path.toFile();
+        file.getParentFile().mkdirs();
+        return file.createNewFile();
+    }
+
+    public static final class FilePaths {
+        public static final Path CONFIG = Path.of("./config/EssentialCommands.properties");
+
+        private static MinecraftServer currentServer;
+        private static Inst inst;
+
+        public static Inst current(MinecraftServer server) {
+            if (currentServer != server) {
+                create(server);
+            }
+            return inst;
+        }
+
+        public record Inst(
+            Path ecWorldDataDir,
+            Path ecPlayerDataDir,
+            Path rulesFile,
+            Path disallowedWordsFile
+        ) {
+            public Path playerDataFilePath(ServerPlayerEntity player) {
+                return this.ecPlayerDataDir()
+                    .resolve(player.getUuidAsString() + ".dat");
+            }
+        }
+
+        public static Inst create(MinecraftServer minecraftServer) {
+            currentServer = minecraftServer;
+            Path mcDir = minecraftServer.getRunDirectory();
+            Path configDir = mcDir.resolve("config");
+            Path ecConfigDir = configDir.resolve("essentialcommands");
+            try {
+                return inst = new Inst(
+                    getOrCreateWorldDirectory(minecraftServer, "essentialcommands"),
+                    getOrCreateWorldDirectory(minecraftServer, "modplayerdata)"),
+                    ecConfigDir.resolve("rules.txt"),
+                    ecConfigDir.resolve("disallowed-words.txt")
+                );
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 }

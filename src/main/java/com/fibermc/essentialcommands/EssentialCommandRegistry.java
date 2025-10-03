@@ -17,6 +17,7 @@ import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
+import com.fibermc.essentialcommands.util.FileUtil;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.util.IConsumer;
 
@@ -639,11 +640,12 @@ public final class EssentialCommandRegistry {
             essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
                 .requires(source -> source.hasPermissionLevel(4))
                 .executes((source) -> {
+                    var server = source.getSource().getServer();
                     Path mcDir = source.getSource().getServer().getRunDirectory();
                     try {
                         EssentialsXParser.convertPlayerDataDir(
                             mcDir.resolve("plugins/Essentials/userdata").toFile(),
-                            mcDir.resolve("world/modplayerdata").toFile(),
+                            FileUtil.FilePaths.current(server).ecPlayerDataDir().toFile(),
                             source.getSource().getServer()
                         );
                         source.getSource().sendFeedback(() -> Text.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
