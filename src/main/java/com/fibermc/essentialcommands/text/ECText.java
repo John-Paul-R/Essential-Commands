@@ -13,7 +13,6 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerProfile;
 import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -32,10 +31,10 @@ import net.minecraft.util.JsonHelper;
 import static com.fibermc.essentialcommands.EssentialCommands.*;
 
 public abstract class ECText {
-    protected final Map<String, String> stringMap;
+    protected final Map<String, String> stringMap = new java.util.HashMap<>();
 
     protected ECText(Map<String, String> stringMap) {
-        this.stringMap = stringMap;
+        this.stringMap.putAll(stringMap);
     }
 
     private static final Gson GSON = new Gson();
@@ -49,12 +48,49 @@ public abstract class ECText {
         BACKING_CONFIG.LANGUAGE.changeEvent.register((langId) -> instance = create(langId));
     }
 
+    /**
+     * Register an additional lang file path to be loaded alongside Essential Commands lang files.
+     * @param resourcePathFormat Format string for the resource path (e.g., "/assets/mymod/lang/%s.json")
+     */
+    public static void registerAdditionalLangPath(String resourcePathFormat) {
+        loadLangFile(resourcePathFormat, CONFIG.LANGUAGE, instance.stringMap::put);
+    }
+
     public static void init(MinecraftServer server) {
         ECText.server = server;
     }
 
+    private static void loadLangFile(String resourcePathFormat, String langId, BiConsumer<String, String> entryConsumer) {
+        final String resourceLocation = String.format(resourcePathFormat, langId);
+        try {
+            InputStream inputStream = ECText.class.getResourceAsStream(resourceLocation);
+            if (inputStream == null) {
+                // Try default language if specified language not found
+                inputStream = ECText.class.getResourceAsStream(String.format(resourcePathFormat, DEFAULT_LANGUAGE_SPEC));
+            }
+
+            if (inputStream != null) {
+                try {
+                    load(inputStream, entryConsumer);
+                } catch (Throwable loadEx) {
+                    try {
+                        inputStream.close();
+                    } catch (Throwable closeEx) {
+                        loadEx.addSuppressed(closeEx);
+                    }
+                    throw loadEx;
+                }
+                inputStream.close();
+            }
+        } catch (JsonParseException | IOException ex) {
+            LOGGER.error("Couldn't read strings from {}", resourceLocation, ex);
+        }
+    }
+
     private static ECText create(String langId) {
-        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        Map<String, String> map = new java.util.HashMap<>();
+
+        // Load Essential Commands lang file
         final String resourceFString = "/assets/essential_commands/lang/%s.json";
         final String resourceLocation = String.format(resourceFString, langId);
         try {
@@ -65,7 +101,7 @@ public abstract class ECText {
             }
 
             try {
-                load(inputStream, builder::put);
+                load(inputStream, map::put);
             } catch (Throwable loadEx) {
                 if (inputStream != null) {
                     try {
@@ -85,7 +121,6 @@ public abstract class ECText {
             LOGGER.error("Couldn't read strings from {}", resourceLocation, ex);
         }
 
-        final Map<String, String> map = builder.build();
         return instance = server == null
             ? new ECTextImpl(map, ParserContext.of())
             : ECTextImpl.forServer(map, server);

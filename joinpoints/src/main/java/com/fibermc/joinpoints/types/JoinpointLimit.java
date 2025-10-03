@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.types;
+package com.fibermc.joinpoints.types;
 
 import java.util.HashMap;
 import java.util.List;

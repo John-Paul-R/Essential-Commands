@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 import com.fibermc.essentialcommands.commands.suggestions.OfflinePlayerRepo;
-import com.fibermc.essentialcommands.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 import com.fibermc.essentialcommands.teleportation.TeleportManager;
 
@@ -19,7 +18,6 @@ public final class ManagerLocator {
     private TeleportManager tpManager;
     private WorldDataManager worldDataManager;
     private OfflinePlayerRepo offlinePlayerRepo;
-    private JoinpointDatabase joinpointDatabase;
     private final HashMap<String, Consumer<MinecraftServer>> serverStartActions = new HashMap<>();
 
     public static ManagerLocator instance;
@@ -46,7 +44,6 @@ public final class ManagerLocator {
         this.tpManager = TeleportManager.getInstance();
         this.worldDataManager = WorldDataManager.createForServer(server);
         this.offlinePlayerRepo = new OfflinePlayerRepo(server);
-        this.joinpointDatabase = new JoinpointDatabase(server.getSavePath(net.minecraft.util.WorldSavePath.ROOT).toFile());
         ServerLifecycleEvents.SERVER_STARTED.register(server1 -> {
             serverStartActions.values().forEach(a -> a.accept(server));
             serverStarted = true;
@@ -67,10 +64,6 @@ public final class ManagerLocator {
 
     public OfflinePlayerRepo getOfflinePlayerRepo() {
         return offlinePlayerRepo;
-    }
-
-    public JoinpointDatabase getJoinpointDatabase() {
-        return joinpointDatabase;
     }
 
     public void runAndQueue(String key, Consumer<MinecraftServer> action) {

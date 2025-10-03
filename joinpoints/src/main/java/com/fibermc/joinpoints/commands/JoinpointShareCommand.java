@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands.joinpoints;
+package com.fibermc.joinpoints.commands;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -7,12 +7,12 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.fibermc.essentialcommands.ManagerLocator;
+import com.fibermc.joinpoints.Joinpoints;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.essentialcommands.database.JoinpointDatabase;
+import com.fibermc.joinpoints.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
-import com.fibermc.essentialcommands.types.JoinpointLocation;
+import com.fibermc.joinpoints.types.JoinpointLocation;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -67,7 +67,7 @@ public class JoinpointShareCommand implements Command<ServerCommandSource> {
 
         Async.runCommand(() -> {
             PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
-            JoinpointDatabase database = ManagerLocator.getInstance().getJoinpointDatabase();
+            JoinpointDatabase database = Joinpoints.getDatabase();
 
             return switch (action) {
                 case ADD -> handleAddAsync(finalTargetPlayers, joinpointName, senderPlayer, playerData, database);

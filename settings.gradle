@@ -12,3 +12,4 @@ pluginManagement {
 }
 rootProject.name = 'essential_commands'
 include 'ec-core'
+include 'joinpoints'

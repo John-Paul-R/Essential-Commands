@@ -2,12 +2,9 @@ package com.fibermc.essentialcommands;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import com.fibermc.essentialcommands.types.JoinpointLimit;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,9 +33,6 @@ public final class ECPerms {
         public static final String warp_delete = "essentialcommands.warp.delete";
         public static final String warp_tp_named = "essentialcommands.warp.tp_named";
         public static final String warp_tp_others = "essentialcommands.warp_tp_others";
-        public static final String joinpoint_set = "essentialcommands.joinpoint.set";
-        public static final String joinpoint_tp = "essentialcommands.joinpoint.tp";
-        public static final String joinpoint_delete = "essentialcommands.joinpoint.delete";
         public static final String back = "essentialcommands.back";
         public static final String spawn_tp = "essentialcommands.spawn.tp";
         public static final String spawn_set = "essentialcommands.spawn.set";
@@ -94,14 +88,12 @@ public final class ECPerms {
             public static final String[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};
             public static final String[] home_group = {home_set, home_tp, home_delete};
             public static final String[] warp_group = {warp_set, warp_tp, warp_delete};
-            public static final String[] joinpoint_group = {joinpoint_set, joinpoint_tp, joinpoint_delete};
             public static final String[] spawn_group = {spawn_tp, spawn_set};
             public static final String[] nickname_group = {nickname_self, nickname_others, nickname_reveal};
             public static final String[] fly_group = {fly_self, fly_others};
             public static final String[] invuln_group = {invuln_self, invuln_others};
             public static final String[] config_group = {config_reload};
             public static String[] home_limit_group;
-            public static Map<JoinpointLimit.JoinpointType, String[]> joinpoint_limit_groups = new HashMap<>();
             public static final String[] stateful_player_abilities = {fly_self, fly_others, invuln_self, invuln_others};
         }
 

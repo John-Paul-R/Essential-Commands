@@ -1,11 +1,13 @@
-package com.fibermc.essentialcommands.types;
+package com.fibermc.joinpoints.types;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import com.fibermc.essentialcommands.codec.Codecs;
+import com.fibermc.essentialcommands.types.MinecraftLocation;
+import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
+import com.fibermc.joinpoints.codec.JoinpointCodecs;
 
 import com.mojang.serialization.Codec;
 
@@ -16,7 +18,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 
 public class JoinpointLocation extends NamedMinecraftLocation {
-    public static final Codec<JoinpointLocation> CODEC = Codecs.JOINPOINT_LOCATION;
+    public static final Codec<JoinpointLocation> CODEC = JoinpointCodecs.JOINPOINT_LOCATION;
 
     private final UUID owner;
     private final boolean isGlobal;

@@ -1,4 +1,4 @@
-package com.fibermc.essentialcommands.commands.joinpoints;
+package com.fibermc.joinpoints.commands;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;

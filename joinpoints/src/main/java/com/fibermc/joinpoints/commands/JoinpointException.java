@@ -1,8 +1,8 @@
-package com.fibermc.essentialcommands.commands.joinpoints;
+package com.fibermc.joinpoints.commands;
 
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
-import com.fibermc.essentialcommands.types.JoinpointLimit;
+import com.fibermc.joinpoints.types.JoinpointLimit;
 
 import net.minecraft.text.Text;
 
