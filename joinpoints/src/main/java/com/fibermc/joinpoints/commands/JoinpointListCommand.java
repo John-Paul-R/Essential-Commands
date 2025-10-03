@@ -4,11 +4,11 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.fibermc.joinpoints.Joinpoints;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
-import com.fibermc.joinpoints.database.JoinpointDatabase;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.joinpoints.Joinpoints;
+import com.fibermc.joinpoints.database.JoinpointDatabase;
 import com.fibermc.joinpoints.types.JoinpointLocation;
 
 import com.mojang.brigadier.Command;
@@ -127,15 +127,14 @@ public class JoinpointListCommand implements Command<ServerCommandSource> {
                     message.append(" ").append(Text.literal("[Private+]").formatted(Formatting.BLUE));
                 }
 
-                // This causes an exception on chat packet sending due to a null text component
-//                message
-//                    .append(" ")
-//                    .append(Text.literal("by ").formatted(Formatting.GRAY))
-//                    .append(
-//                        entry.isOwned
-//                            ? ecText.literal("You")
-//                            : entry.ownerDisplayName
-//                    );
+                message
+                    .append(" ")
+                    .append(Text.literal("by ").formatted(Formatting.GRAY))
+                    .append(
+                        entry.isOwned
+                            ? ecText.literal("You")
+                            : entry.ownerDisplayName
+                    );
 
                 senderPlayer.sendMessage(message);
 
