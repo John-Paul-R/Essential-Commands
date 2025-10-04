@@ -58,7 +58,7 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
             var isAllowed = DisallowWordsSystem.current(context.getSource().getServer())
                 .isAllowed(nicknameText.getString());
             if (!isAllowed) {
-                senderChat.sendError("cmd.nickname.error.disallowed_words");
+                senderChat.sendError("cmd.nickname.set.error.disallowed_words");
                 return 1;
             }
         }
