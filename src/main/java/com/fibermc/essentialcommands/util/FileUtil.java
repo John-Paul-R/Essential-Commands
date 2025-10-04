@@ -2,6 +2,7 @@ package com.fibermc.essentialcommands.util;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +28,28 @@ public final class FileUtil {
         }
 
         return dataDirectoryPath;
+    }
+
+    public static Charset detectCharset(Path path) throws IOException {
+        byte[] bom = new byte[4];
+        try (var is = Files.newInputStream(path)) {
+            int read = is.read(bom, 0, 4);
+
+            // UTF-16 BE
+            if (read >= 2 && bom[0] == (byte) 0xFE && bom[1] == (byte) 0xFF) {
+                return StandardCharsets.UTF_16BE;
+            }
+            // UTF-16 LE
+            if (read >= 2 && bom[0] == (byte) 0xFF && bom[1] == (byte) 0xFE) {
+                return StandardCharsets.UTF_16LE;
+            }
+            // UTF-8 BOM
+            if (read >= 3 && bom[0] == (byte) 0xEF && bom[1] == (byte) 0xBB && bom[2] == (byte) 0xBF) {
+                return StandardCharsets.UTF_8;
+            }
+        }
+        // Default to UTF-8 if no BOM
+        return StandardCharsets.UTF_8;
     }
 
     static Charset[] charsetsToTry = new Charset[] {CharsetUtil.UTF_8, CharsetUtil.UTF_16};

@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -22,8 +23,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-
-import dev.jpcode.eccore.util.TextUtil;
+import net.minecraft.util.Util;
 
 public final class DisallowedWordsCommand {
 
@@ -42,7 +42,7 @@ public final class DisallowedWordsCommand {
         try {
             reload(context.getSource().getServer());
             playerData.sendCommandFeedback("disallowedwords.reload.success");
-        } catch (IOException e) {
+        } catch (Exception e) {
             playerData.sendCommandError("disallowedwords.reload.error.unexpected");
             e.printStackTrace();
         }
@@ -52,6 +52,7 @@ public final class DisallowedWordsCommand {
     public static final class DisallowWordSystem {
         private final Homoglyph homoglyph;
         private final ArrayList<String> disallowedWords;
+        private static Path disallowedWordsFile;
         private static final Comparator<String> ORDER = String.CASE_INSENSITIVE_ORDER;
 
         private static MinecraftServer currentServer;
@@ -67,9 +68,12 @@ public final class DisallowedWordsCommand {
         static DisallowWordSystem create(MinecraftServer server) {
             try {
                 currentServer = server;
-                var disallowedWordsFile = FileUtil.FilePaths.current(server).disallowedWordsFile();
+                disallowedWordsFile = FileUtil.FilePaths.current(server).disallowedWordsFile();
+                if (FileUtil.createFileWithDirs(disallowedWordsFile)) {
+                    EssentialCommands.LOGGER.info("Created disallowed words file at path: {}", disallowedWordsFile);
+                }
                 return instance = new DisallowWordSystem(
-                    Files.readAllLines(disallowedWordsFile)
+                    Files.readAllLines(disallowedWordsFile, FileUtil.detectCharset(disallowedWordsFile))
                 );
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -80,6 +84,16 @@ public final class DisallowedWordsCommand {
             homoglyph = HomoglyphBuilder.build();
             this.disallowedWords = new ArrayList<>(disallowedWords);
             this.disallowedWords.sort(ORDER);
+        }
+
+        private void save() {
+            Util.getIoWorkerExecutor().execute(() -> {
+                try {
+                    Files.write(disallowedWordsFile, disallowedWords, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
 
         public boolean isAllowed(String text) {
@@ -102,6 +116,9 @@ public final class DisallowedWordsCommand {
             }
 
             disallowedWords.add(-(index + 1), text);
+
+            save();
+
             return true;
         }
 
@@ -113,6 +130,9 @@ public final class DisallowedWordsCommand {
             }
 
             disallowedWords.remove(index);
+
+            save();
+
             return true;
         }
     }
@@ -209,14 +229,7 @@ public final class DisallowedWordsCommand {
         }
     }
 
-    public static void reload(MinecraftServer server) throws IOException {
-        Path mcDir = server.getRunDirectory();
-        var rulesFile = mcDir.resolve("config/essentialcommands/rules.txt").toFile();
-        rulesFile.getParentFile().mkdirs();
-        if (rulesFile.createNewFile()) {
-            EssentialCommands.LOGGER.info("Created rules file at path: " + rulesFile.toPath());
-        }
-        String rulesStr = String.join(System.lineSeparator(), Files.readAllLines(rulesFile.toPath()));
-        rulesText = TextUtil.parseText(rulesStr);
+    public static void reload(MinecraftServer server) {
+        DisallowedWordsCommand.DisallowWordSystem.create(server);
     }
 }
