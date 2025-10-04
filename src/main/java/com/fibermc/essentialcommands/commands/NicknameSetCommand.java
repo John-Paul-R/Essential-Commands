@@ -1,8 +1,9 @@
 package com.fibermc.essentialcommands.commands;
 
+import com.fibermc.essentialcommands.DisallowWordsSystem;
 import com.fibermc.essentialcommands.ECPerms;
-import com.fibermc.essentialcommands.commands.helpers.FeedbackReceiver;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
+import com.fibermc.essentialcommands.text.Chat;
 import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import eu.pb4.placeholders.api.ParserContext;
@@ -50,32 +51,43 @@ public class NicknameSetCommand implements Command<ServerCommandSource> {
         var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders, 2)
             ? TagParser.DEFAULT_SAFE.parseText(TextNode.convert(nicknameWithContext), ParserContext.of())
             : nicknameWithContext;
-        int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText);
+
+        var senderChat = Chat.of(context);
+
+        if (CONFIG.ENABLE_DISALLOWED_WORDS) {
+            var isAllowed = DisallowWordsSystem.current(context.getSource().getServer())
+                .isAllowed(nicknameText.getString());
+            if (!isAllowed) {
+                senderChat.sendError("cmd.nickname.error.disallowed_words");
+                return 1;
+            }
+        }
+
+        PlayerData.NicknameReturnCode returnCode = PlayerData.access(targetPlayer).setNickname(nicknameText);
 
         var senderPlayer = context.getSource().getPlayer();
-        var senderFeedbackReceiver = FeedbackReceiver.ofSource(context.getSource());
 
         var ecText = ECText.access(senderPlayer);
 
-        //inform command sender that the nickname has been set
-        if (successCode >= 0) {
-            senderFeedbackReceiver.sendCommandFeedback(
+        // inform command sender that the nickname has been set
+        if (returnCode.isSuccess()) {
+            senderChat.sendCommandFeedback(
                 "cmd.nickname.set.feedback",
                 nicknameText != null ? nicknameText : Text.literal(targetPlayer.getGameProfile().name())
             );
         } else {
-            MutableText failReason = switch (successCode) {
-                case -1 -> ecText.getText("cmd.nickname.set.error.perms", TextFormatType.Error);
-                case -2 -> ecText.getText(
+            MutableText failReason = switch (returnCode) {
+                case ERR_PERMS -> ecText.getText("cmd.nickname.set.error.perms", TextFormatType.Error);
+                case ERR_LENGTH -> ecText.getText(
                     "cmd.nickname.set.error.length", TextFormatType.Error,
                     ecText.accent(String.valueOf(nicknameText.getString().length())),
                     ecText.accent(String.valueOf(CONFIG.NICKNAME_MAX_LENGTH))
                 );
                 default -> ecText.getText("generic.error.unknown", TextFormatType.Error);
             };
-            senderFeedbackReceiver.sendCommandError("cmd.nickname.set.error", nicknameText, failReason);
+            senderChat.sendCommandError("cmd.nickname.set.error", nicknameText, failReason);
         }
 
-        return successCode;
+        return returnCode.code;
     }
 }

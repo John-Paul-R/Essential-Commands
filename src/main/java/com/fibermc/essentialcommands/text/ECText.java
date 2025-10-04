@@ -20,7 +20,10 @@ import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import org.jetbrains.annotations.Nullable;
 
+import com.mojang.brigadier.context.CommandContext;
+
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
@@ -183,6 +186,11 @@ public abstract class ECText {
     }
 
     public static ECText access(@Nullable ServerPlayerEntity player) {
+        return player == null ? ECText.getInstance() : ((ServerPlayerEntityAccess) player).ec$getEcText();
+    }
+
+    public static ECText access(CommandContext<ServerCommandSource> context) {
+        var player = context.getSource().getPlayer();
         return player == null ? ECText.getInstance() : ((ServerPlayerEntityAccess) player).ec$getEcText();
     }
 }

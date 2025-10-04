@@ -500,48 +500,66 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         return fullNickname != null ? TextUtil.deepCopy(fullNickname) : null;
     }
 
-    public int setNickname(Text nickname) {
-        int resultCode = 0;
-        // Reset nickname
-        if (nickname == null) {
-            this.nickname = null;
-            resultCode = 1;
-            EssentialCommands.LOGGER.info(
-                "Cleared {}'s nickname",
-                this.player.getGameProfile().name()
-            );
-        } else {
-            // Ensure nickname does not exceed max length
-            if (nickname.getString().length() > CONFIG.NICKNAME_MAX_LENGTH) {
-                return -2;
-            }
-            // Ensure player has permissions required to set the specified nickname
-            boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, this.player.getCommandSource());
-            if (!hasRequiredPerms) {
-                EssentialCommands.LOGGER.info(
-                    "{} attempted to set nickname to '{}', with insufficient permissions to do so.",
-                    this.player.getGameProfile().name(),
-                    nickname
-                );
-                return -1;
-            } else {
-                EssentialCommands.LOGGER.info(
-                    "Set {}'s nickname to '{}'.",
-                    this.player.getGameProfile().name(),
-                    nickname
-                );
-            }
+    public enum NicknameReturnCode {
+        SUCCESS(0),
+        SUCCESS_CLEARED(1),
+        ERR_PERMS(-1),
+        ERR_LENGTH(-2),
+        ;
 
-            // Set nickname
-            this.nickname = nickname;
+        public final int code;
+
+        NicknameReturnCode(int code) {
+            this.code = code;
         }
 
+        public boolean isSuccess() {
+            return this.code >= 0;
+        }
+    }
+
+    private void onNicknameChange() {
         reloadFullNickname();
         PlayerDataManager.getInstance().markNicknameDirty(this);
         this.markDirty();
-        // Return codes based on fail/success
-        //  ex: caused by profanity filter.
-        return resultCode;
+    }
+
+    public NicknameReturnCode setNickname(Text nickname) {
+        // Reset nickname
+        if (nickname == null) {
+            this.nickname = null;
+            EssentialCommands.LOGGER.info("Cleared {}'s nickname", this.player.getGameProfile().name());
+            onNicknameChange();
+            return NicknameReturnCode.SUCCESS_CLEARED;
+        }
+
+        // Ensure nickname does not exceed max length
+        if (nickname.getString().length() > CONFIG.NICKNAME_MAX_LENGTH) {
+            return NicknameReturnCode.ERR_LENGTH;
+        }
+
+        // Ensure player has permissions required to set the specified nickname
+        // (this refers specifically to styling -- this is weird, because it's
+        // based on the perms of the target, not the sender, which it perhaps
+        // ought not be)
+        if (!NicknameTextUtil.checkPerms(nickname, this.player.getCommandSource())) {
+            EssentialCommands.LOGGER.info(
+                "{} attempted to set nickname to '{}', with insufficient permissions to do so.",
+                this.player.getGameProfile().name(),
+                nickname
+            );
+            return NicknameReturnCode.ERR_PERMS;
+        }
+
+        // Set nickname
+        EssentialCommands.LOGGER.info(
+            "Set {}'s nickname to '{}'.",
+            this.player.getGameProfile().name(),
+            nickname
+        );
+        this.nickname = nickname;
+        onNicknameChange();
+        return NicknameReturnCode.SUCCESS;
     }
 
     public void save() {
