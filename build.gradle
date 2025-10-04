@@ -129,6 +129,8 @@ dependencies {
     include "org.yaml:snakeyaml:${project.snakeyaml_version}"
     modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
     include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
+    modImplementation "net.codebox:homoglyph:1.2.1"
+    include "net.codebox:homoglyph:1.2.1"
 
     // mod compatibility
     modCompileOnly  "maven.modrinth:vanish:${project.vanish_version}"

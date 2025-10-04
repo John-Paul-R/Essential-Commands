@@ -41,6 +41,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean ENABLE_AFK;
     public final boolean ENABLE_DAY;
     public final boolean ENABLE_RULES;
+    public final boolean ENABLE_DISALLOWED_WORDS;
     public final boolean ENABLE_BED;
     public final boolean ENABLE_FEED;
     public final boolean ENABLE_HEAL;
@@ -120,6 +121,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.ENABLE_AFK                         = config.ENABLE_AFK.getValue();
         this.ENABLE_DAY                         = config.ENABLE_DAY.getValue();
         this.ENABLE_RULES                       = config.ENABLE_RULES.getValue();
+        this.ENABLE_DISALLOWED_WORDS            = config.ENABLE_DISALLOWED_WORDS.getValue();
         this.ENABLE_BED                         = config.ENABLE_BED.getValue();
         this.ENABLE_FEED                        = config.ENABLE_FEED.getValue();
         this.ENABLE_HEAL                        = config.ENABLE_HEAL.getValue();

@@ -118,12 +118,12 @@ public final class PlayerDataFactory {
     }
 
     public static Path getPlayerDataDirectoryPath(MinecraftServer server) throws IOException {
-        return FileUtil.getOrCreateWorldDirectory(server, "modplayerdata");
+        return FileUtil.FilePaths.current(server).ecPlayerDataDir();
     }
 
     private static File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
-        return getPlayerDataDirectoryPath(player.getEntityWorld().getServer())
-            .resolve(player.getUuidAsString() + ".dat")
+        return FileUtil.FilePaths.current(player.getEntityWorld().getServer())
+            .playerDataFilePath(player)
             .toFile();
     }
 }

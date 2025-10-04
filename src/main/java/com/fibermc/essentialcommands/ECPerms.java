@@ -70,6 +70,10 @@ public final class ECPerms {
         public static final String bypass_randomteleport_cooldown = "essentialcommands.bypass.randomteleport_cooldown";
         public static final String rules_reload = "essentialcommands.rules_reload";
         public static final String rules = "essentialcommands.rules";
+        public static final String disallowedwords_manage = "essentialcommands.disallowedwords.manage";
+        public static final String disallowedwords_test = "essentialcommands.disallowedwords.test";
+        public static final String disallowedwords_list = "essentialcommands.disallowedwords.list";
+        public static final String disallowedwords_reload = "essentialcommands.disallowedwords.reload";
         public static final String feed_self = "essentialcommands.feed.self";
         public static final String feed_others = "essentialcommands.feed.others";
         public static final String heal_self = "essentialcommands.heal.self";
@@ -93,6 +97,7 @@ public final class ECPerms {
             public static final String[] fly_group = {fly_self, fly_others};
             public static final String[] invuln_group = {invuln_self, invuln_others};
             public static final String[] config_group = {config_reload};
+            public static final String[] disallowedwords_group = {disallowedwords_manage, disallowedwords_test, disallowedwords_list, disallowedwords_reload};
             public static String[] home_limit_group;
             public static final String[] stateful_player_abilities = {fly_self, fly_others, invuln_self, invuln_others};
         }

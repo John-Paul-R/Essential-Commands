@@ -1,12 +1,12 @@
 package com.fibermc.essentialcommands;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 import com.fibermc.essentialcommands.commands.RulesCommand;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfig;
 import com.fibermc.essentialcommands.config.EssentialCommandsConfigSnapshot;
 import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.util.FileUtil;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +26,7 @@ public final class EssentialCommands implements ModInitializer {
     public static final String MOD_ID = MOD_METADATA == null ? "essentialcommands | ERR - NO MOD DATA" : MOD_METADATA.getId();
     public static final Logger LOGGER = LogManager.getLogger("EssentialCommands");
     public static final EssentialCommandsConfig BACKING_CONFIG = new EssentialCommandsConfig(
-        Path.of("./config/EssentialCommands.properties"),
+        FileUtil.FilePaths.CONFIG,
         "Essential Commands Config",
         "https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation"
     );
@@ -61,6 +61,7 @@ public final class EssentialCommands implements ModInitializer {
         ManagerLocator managers = ManagerLocator.getInstance();
         managers.init();
         ServerLifecycleEvents.SERVER_STARTING.register((server) -> {
+            FileUtil.FilePaths.create(server);
             ECText.init(server);
             TimeUtil.init(server);
             managers.onServerStart(server);

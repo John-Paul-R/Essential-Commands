@@ -62,6 +62,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> ENABLE_AFK =             new Option<>("enable_afk", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_DAY =             new Option<>("enable_day", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_RULES =           new Option<>("enable_rules", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_DISALLOWED_WORDS = new Option<>("enable_disallowed_words", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_BED =             new Option<>("enable_bed", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_FEED =            new Option<>("enable_feed", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_HEAL =            new Option<>("enable_heal", true, Boolean::parseBoolean);

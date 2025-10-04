@@ -57,8 +57,8 @@ public final class PlayerProfileFactory {
     }
 
     private static File getPlayerProfileFile(ServerPlayerEntity player) throws IOException {
-        return FileUtil.getOrCreateWorldDirectory(player.getEntityWorld().getServer(), "ec_player_profiles")
-            .resolve(player.getUuidAsString() + ".dat")
+        return FileUtil.FilePaths.current(player.getEntityWorld().getServer())
+            .playerProfileFile(player)
             .toFile();
     }
 }
