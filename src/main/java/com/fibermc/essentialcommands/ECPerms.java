@@ -6,6 +6,11 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import me.lucko.fabric.api.permissions.v0.Permissions;
+
+import net.minecraft.command.permission.Permission;
+
+import net.minecraft.command.permission.PermissionLevel;
+
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.server.command.ServerCommandSource;
@@ -112,7 +117,7 @@ public final class ECPerms {
     }
 
     private static boolean isSuperAdmin(ServerCommandSource source) {
-        return source.hasPermissionLevel(4);
+        return source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS));
     }
 
     public static @NotNull Predicate<ServerCommandSource> require(@NotNull String permission, int defaultRequireLevel) {
@@ -127,13 +132,13 @@ public final class ECPerms {
         if (CONFIG.USE_PERMISSIONS_API) {
             try {
                 // TODO: In the future, config option for granting ops all perms.
-                return Permissions.getPermissionValue(source, permission).orElse(source.hasPermissionLevel(Math.max(2, defaultRequireLevel)));
+                return Permissions.getPermissionValue(source, permission).orElse(source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.fromLevel(Math.max(2, defaultRequireLevel)))));
             } catch (Exception e) {
                 EssentialCommands.LOGGER.error(e);
                 return false;
             }
         } else {
-            return source.hasPermissionLevel(defaultRequireLevel);
+            return source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.fromLevel(defaultRequireLevel)));
         }
     }
 
@@ -195,7 +200,7 @@ public final class ECPerms {
 
     public static Stream<String> getGrantedStatefulPlayerAbilityPermissions(ServerPlayerEntity player) {
         var list = Arrays.stream(Registry.Group.stateful_player_abilities);
-        return player.hasPermissionLevel(2)
+        return player.getPermissions().hasPermission(new Permission.Level(PermissionLevel.GAMEMASTERS))
             ? list // TODO: this is hacky
             : list.filter(permission -> check(player.getCommandSource(), permission));
     }

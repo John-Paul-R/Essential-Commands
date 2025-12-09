@@ -8,6 +8,10 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
+
+import net.minecraft.command.permission.Permission;
+import net.minecraft.command.permission.PermissionLevel;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -215,7 +219,7 @@ public final class PlayerTeleporter {
 
     static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
         return (
-            (player.hasPermissionLevel(4) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
+            (player.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS)) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
                 || ECPerms.check(player.getCommandSource(), permission, 5)
         );
     }

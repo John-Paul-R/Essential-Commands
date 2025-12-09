@@ -21,6 +21,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 
 public class BedCommand implements Command<ServerCommandSource> {
     @Override
@@ -64,12 +65,13 @@ public class BedCommand implements Command<ServerCommandSource> {
         Vec3d safeSpawnPos;
         BlockState blockState = world.getBlockState(spawnPos);
         Block block = blockState.getBlock();
+//        ServerPlayerEntity
         if (block instanceof RespawnAnchorBlock
-            && blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isNether(world)
+            && blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isUsable(world, spawnPos)
         ) {
             Optional<Vec3d> optional = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, world, spawnPos);
             safeSpawnPos = optional.orElseGet(() -> new Vec3d((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 1, (double) spawnPos.getZ() + 0.5));
-        } else if (block instanceof BedBlock && BedBlock.isBedWorking(world)) {
+        } else if (block instanceof BedBlock && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.BED_RULE_GAMEPLAY, spawnPos).canSetSpawn(world)) {
             Optional<Vec3d> optional = BedBlock.findWakeUpPosition(EntityType.PLAYER, world, spawnPos, blockState.get(BedBlock.FACING), respawn.respawnData().pitch());
             safeSpawnPos = optional.orElseGet(() -> new Vec3d((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 0.5625, (double) spawnPos.getZ() + 0.5));
         } else {

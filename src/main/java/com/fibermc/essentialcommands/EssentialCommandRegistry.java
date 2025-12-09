@@ -17,6 +17,11 @@ import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
+
+import net.minecraft.command.permission.Permission;
+
+import net.minecraft.command.permission.PermissionLevel;
+
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.util.IConsumer;
 
@@ -628,7 +633,7 @@ public final class EssentialCommandRegistry {
 
         if (true) {
             essentialCommandsRootNode.addChild(CommandManager.literal("deleteAllPlayerData")
-                .requires(source -> source.hasPermissionLevel(4))
+                .requires(source -> source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS)))
                 .executes(new ClearPlayerDataCommand())
                 .build()
             );
@@ -636,7 +641,7 @@ public final class EssentialCommandRegistry {
 
         if (CONFIG.ENABLE_ESSENTIALSX_CONVERT) {
             essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
-                .requires(source -> source.hasPermissionLevel(4))
+                .requires(source -> source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS)))
                 .executes((source) -> {
                     Path mcDir = source.getSource().getServer().getRunDirectory();
                     try {
@@ -653,7 +658,7 @@ public final class EssentialCommandRegistry {
                 }).build()
             );
             essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXWarps")
-                .requires(source -> source.hasPermissionLevel(4))
+                .requires(source -> source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS)))
                 .executes((source) -> {
                     Path mcDir = source.getSource().getServer().getRunDirectory();
                     EssentialsConvertor.warpConvert(
