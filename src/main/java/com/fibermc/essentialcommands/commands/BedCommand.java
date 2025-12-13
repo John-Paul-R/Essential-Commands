@@ -65,7 +65,6 @@ public class BedCommand implements Command<ServerCommandSource> {
         Vec3d safeSpawnPos;
         BlockState blockState = world.getBlockState(spawnPos);
         Block block = blockState.getBlock();
-//        ServerPlayerEntity
         if (block instanceof RespawnAnchorBlock
             && blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isUsable(world, spawnPos)
         ) {
