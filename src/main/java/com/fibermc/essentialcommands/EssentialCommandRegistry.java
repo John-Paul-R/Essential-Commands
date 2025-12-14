@@ -8,6 +8,10 @@ import java.util.function.Predicate;
 
 import com.fibermc.essentialcommands.commands.*;
 import com.fibermc.essentialcommands.commands.bench.*;
+import com.fibermc.essentialcommands.commands.joinpoints.JoinpointListCommand;
+import com.fibermc.essentialcommands.commands.joinpoints.JoinpointSetCommand;
+import com.fibermc.essentialcommands.commands.joinpoints.JoinpointShareCommand;
+import com.fibermc.essentialcommands.commands.joinpoints.JoinpointTpCommand;
 import com.fibermc.essentialcommands.commands.suggestions.ListSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.NicknamePlayersSuggestion;
 import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSuggestion;
@@ -194,6 +198,84 @@ public final class EssentialCommandRegistry {
             registerNode.accept(homeNode);
 
             essentialCommandsRootNode.addChild(homeOverwriteBuilder.build());
+        }
+
+        if (CONFIG.ENABLE_JOINPOINT) {
+            LiteralArgumentBuilder<ServerCommandSource> joinpointBuilder = CommandManager.literal("joinpoint");
+            LiteralArgumentBuilder<ServerCommandSource> joinpointSetBuilder = CommandManager.literal("set");
+            LiteralArgumentBuilder<ServerCommandSource> joinpointTpBuilder = CommandManager.literal("tp");
+            LiteralArgumentBuilder<ServerCommandSource> joinpointDeleteBuilder = CommandManager.literal("delete");
+            LiteralArgumentBuilder<ServerCommandSource> joinpointOverwriteBuilder = CommandManager.literal("overwrite");
+            LiteralArgumentBuilder<ServerCommandSource> joinpointShareBuilder = CommandManager.literal("share");
+            LiteralArgumentBuilder<ServerCommandSource> joinpointListBuilder = CommandManager.literal("list");
+
+            joinpointSetBuilder
+                .requires(ECPerms.require(ECPerms.Registry.joinpoint_set, 0))
+                .then(argument("joinpoint_name", StringArgumentType.word())
+                    .executes(new JoinpointSetCommand(JoinpointSetCommand.Action.SET))
+                    .then(argument("global", BoolArgumentType.bool())
+                        .executes(new JoinpointSetCommand(JoinpointSetCommand.Action.SET))));
+
+            joinpointTpBuilder
+                .requires(ECPerms.require(ECPerms.Registry.joinpoint_tp, 0))
+                .then(argument(JoinpointTpCommand.OWNER_PLAYER_ARG, StringArgumentType.word())
+                    .suggests(JoinpointTpCommand.Suggestion.OWNERS_OF_ACCESSIBLE_JOINPOINTS)
+                    .then(argument("joinpoint_name", StringArgumentType.word())
+                        .suggests(JoinpointTpCommand.Suggestion.ACCESSIBLE_TARGET_PLAYER_JOINPOINTS)
+                        .executes(new JoinpointTpCommand())));
+
+            // this is interfering with the more-important playername suggestions
+//                .then(argument("joinpoint_name", StringArgumentType.word())
+//                .suggests(JoinpointTpCommand.Suggestion.ACCESSIBLE_JOINPOINTS)
+//                .executes(new JoinpointTpCommand()::runOwnJoinpoint))
+
+            joinpointDeleteBuilder
+                .requires(ECPerms.require(ECPerms.Registry.joinpoint_delete, 0))
+                .then(argument("joinpoint_name", StringArgumentType.word())
+                    .suggests(JoinpointTpCommand.Suggestion.OWNED_JOINPOINTS)
+                    .executes(new JoinpointSetCommand(JoinpointSetCommand.Action.DELETE)));
+
+            joinpointOverwriteBuilder
+                .requires(ECPerms.require(ECPerms.Registry.joinpoint_set, 0))
+                .then(argument("joinpoint_name", StringArgumentType.word())
+                    .suggests(JoinpointTpCommand.Suggestion.OWNED_JOINPOINTS)
+                    .executes(new JoinpointSetCommand(JoinpointSetCommand.Action.OVERWRITE))
+                    .then(argument("global", BoolArgumentType.bool())
+                        .executes(new JoinpointSetCommand(JoinpointSetCommand.Action.OVERWRITE))));
+
+            joinpointShareBuilder
+                .requires(ECPerms.require(ECPerms.Registry.joinpoint_set, 0))
+                .then(argument("joinpoint_name", StringArgumentType.word())
+                    .suggests(JoinpointTpCommand.Suggestion.OWNED_JOINPOINTS)
+                    .then(CommandManager.literal("add")
+                        .then(argument("target_players", EntityArgumentType.players())
+                            .executes(new JoinpointShareCommand(JoinpointShareCommand.Action.ADD))))
+                    .then(CommandManager.literal("remove")
+                        .then(argument("target_players", EntityArgumentType.players())
+                            .executes(new JoinpointShareCommand(JoinpointShareCommand.Action.REMOVE))))
+                    .then(CommandManager.literal("list")
+                        .executes(new JoinpointShareCommand(JoinpointShareCommand.Action.LIST)))
+                    .then(CommandManager.literal("clear")
+                        .executes(new JoinpointShareCommand(JoinpointShareCommand.Action.CLEAR))));
+
+            joinpointListBuilder
+                .requires(ECPerms.require(ECPerms.Registry.joinpoint_tp, 0))
+                .executes(new JoinpointListCommand()::runDefault)
+                .then(argument("filter", StringArgumentType.word())
+                    .suggests(JoinpointListCommand.Suggestion.FILTER_TYPES)
+                    .executes(new JoinpointListCommand()));
+
+            LiteralCommandNode<ServerCommandSource> joinpointNode = joinpointBuilder
+                .requires(ECPerms.requireAny(ECPerms.Registry.Group.joinpoint_group, 0))
+                .build();
+            joinpointNode.addChild(joinpointSetBuilder.build());
+            joinpointNode.addChild(joinpointTpBuilder.build());
+            joinpointNode.addChild(joinpointDeleteBuilder.build());
+            joinpointNode.addChild(joinpointOverwriteBuilder.build());
+            joinpointNode.addChild(joinpointShareBuilder.build());
+            joinpointNode.addChild(joinpointListBuilder.build());
+
+            registerNode.accept(joinpointNode);
         }
 
         //Back

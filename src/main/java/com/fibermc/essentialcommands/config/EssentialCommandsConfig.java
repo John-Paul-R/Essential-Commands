@@ -11,6 +11,7 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
+import com.fibermc.essentialcommands.types.JoinpointLimit;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import com.fibermc.essentialcommands.types.RtpCenter;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +48,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> ENABLE_SPAWN =           new Option<>("enable_spawn", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_TPA =             new Option<>("enable_tpa", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_WARP =            new Option<>("enable_warp", true, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> ENABLE_JOINPOINT =       new Option<>("enable_joinpoint", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_NICK =            new Option<>("enable_nick", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_RTP =             new Option<>("enable_rtp", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_FLY =             new Option<>("enable_fly", true, Boolean::parseBoolean);
@@ -73,6 +75,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> ENABLE_SLEEP =           new Option<>("enable_sleep", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_DELETE_ALL_PLAYER_DATA = new Option<>("enable_delete_all_player_data", true, Boolean::parseBoolean);
     @ConfigOption public final Option<List<Integer>> HOME_LIMIT =       new Option<>("home_limit", List.of(1, 2, 5), arrayParser(ConfigUtil::parseInt));
+    @ConfigOption public final Option<JoinpointLimit> JOINPOINT_LIMIT = new Option<>("joinpoint_limit", JoinpointLimit.any(3, 5, 10), JoinpointLimit::parse, JoinpointLimit::serialize);
     @ConfigOption public final Option<Double>  TELEPORT_COOLDOWN =      new Option<>("teleport_cooldown", 1.0, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Double>  TELEPORT_DELAY =         new Option<>("teleport_delay", 0.0, ConfigUtil::parseDouble);
     @ConfigOption public final Option<Boolean> ALLOW_BACK_ON_DEATH =    new Option<>("allow_back_on_death", false, Boolean::parseBoolean);
@@ -120,8 +123,23 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);
         HOME_LIMIT.changeEvent.register(newValue ->
-                ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue)
+            ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue)
         );
+        JOINPOINT_LIMIT.changeEvent.register(joinpointLimit -> {
+            ECPerms.Registry.Group.joinpoint_limit_groups.clear();
+            for (var limitGroup : joinpointLimit.getLimits().entrySet()) {
+                var key = limitGroup.getKey();
+                var limitNums = limitGroup.getValue();
+
+                ECPerms.Registry.Group.joinpoint_limit_groups.put(
+                    key,
+                    ECPerms.makeNumericPermissionGroup(
+                        "essentialcommands.joinpoint_limit." + key.name().toLowerCase(),
+                        limitNums
+                    )
+                );
+            }
+        });
         // This value is only sent on server start/player connect and, so, cannot be updated for all
         // players immediately via the config reload command without a fair bit of hackery.
 //        NICKNAME_ABOVE_HEAD.changeEvent.register(ign -> {
@@ -137,12 +155,12 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
                     .map(RegistryKey::getValue)
                     .collect(Collectors.toSet());
 
-                EssentialCommands.LOGGER.info("Possible world ids: {}", String.join(",", worldIds.stream().map(Identifier::toString).toList()));
+                LOGGER.info("Possible world ids: {}", String.join(",", worldIds.stream().map(Identifier::toString).toList()));
 
                 var configuredWorldIds = configuredWorldIdStrings.stream()
                     .map(Identifier::of)
                     .toList();
-                EssentialCommands.LOGGER.info("Configured `rtp_enabled_worlds` world ids: {}", String.join(",", configuredWorldIds.stream().map(Identifier::toString).toList()));
+                LOGGER.info("Configured `rtp_enabled_worlds` world ids: {}", String.join(",", configuredWorldIds.stream().map(Identifier::toString).toList()));
 
                 var validConfiguredWorldIds = configuredWorldIdStrings.stream()
                     .map(Identifier::of)
@@ -155,9 +173,9 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
                     .toList();
 
                 if (invalidConfiguredWorldIds.size() > 0) {
-                    EssentialCommands.LOGGER.warn("{} configured `rtp_enabled_worlds` world ids were invalid: {}", invalidConfiguredWorldIds.size(), String.join(",", invalidConfiguredWorldIds.stream().map(Identifier::toString).toList()));
+                    LOGGER.warn("{} configured `rtp_enabled_worlds` world ids were invalid: {}", invalidConfiguredWorldIds.size(), String.join(",", invalidConfiguredWorldIds.stream().map(Identifier::toString).toList()));
                 } else {
-                    EssentialCommands.LOGGER.info("All configured `rtp_enabled_worlds` world ids are valid.");
+                    LOGGER.info("All configured `rtp_enabled_worlds` world ids are valid.");
                 }
 
                 this.validRtpWorldIds.clear();

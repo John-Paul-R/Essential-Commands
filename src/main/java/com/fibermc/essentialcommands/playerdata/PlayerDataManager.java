@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.commands.MotdCommand;
@@ -15,8 +16,11 @@ import com.fibermc.essentialcommands.events.PlayerDeathCallback;
 import com.fibermc.essentialcommands.events.PlayerLeaveCallback;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 import com.fibermc.essentialcommands.types.RespawnCondition;
+import com.google.gson.JsonElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.mojang.serialization.JsonOps;
 
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.ClientConnection;
@@ -25,6 +29,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.TextCodecs;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -68,6 +73,9 @@ public class PlayerDataManager {
         ServerPlayConnectionEvents.JOIN.register(
             PlayerDataManager::handleSendMotdForGameJoin
         );
+        ServerPlayConnectionEvents.JOIN.register(
+            (handler, sender, server) -> updatePlayerCache(handler.player)
+        );
     }
 
     public static final Event<PlayerDataManagerTickCallback> TICK_EVENT =
@@ -90,6 +98,29 @@ public class PlayerDataManager {
         if (CONFIG.ENABLE_MOTD) {
             var player = handler.getPlayer();
             MotdCommand.exec(player);
+        }
+    }
+
+    private static void updatePlayerCache(
+        ServerPlayerEntity player
+    ) {
+        try {
+            var playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
+            var database = ManagerLocator.getInstance().getJoinpointDatabase();
+
+            String nicknameJson = playerData.getNickname()
+                .map(text -> TextCodecs.CODEC.encodeStart(JsonOps.INSTANCE, text).getOrThrow())
+                .map(JsonElement::toString)
+                .orElse(null);
+            database
+                .updatePlayerCacheAsync(player.getUuid(), player.getName().getString(), nicknameJson)
+                .exceptionally(err -> {
+                    EssentialCommands.LOGGER.error(err);
+                    return null;
+                });
+        } catch (Exception e) {
+            // Log but don't crash on cache update failure - joinpoint database might not be initialized yet
+            EssentialCommands.LOGGER.error(e);
         }
     }
 
@@ -156,9 +187,10 @@ public class PlayerDataManager {
                         )
                     );
 
-                changedNicknames.forEach(playerData ->
-                    playerData.save()
-                );
+                changedNicknames.forEach(playerData -> {
+                    playerData.save();
+                    updatePlayerCache(playerData.getPlayer());
+                });
 
                 this.changedNicknames.clear();
                 this.changedTeams.clear();

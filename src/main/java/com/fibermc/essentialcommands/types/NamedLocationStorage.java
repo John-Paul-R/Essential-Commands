@@ -13,38 +13,12 @@ import com.mojang.serialization.Codec;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.text.Text;
 
-public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation> implements NbtSerializable {
+public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation> {
     public static final Codec<NamedLocationStorage> CODEC = Codecs.NAMED_LOCATION_STORAGE;
 
     public NamedLocationStorage() {}
-
-    public NamedLocationStorage(NbtCompound nbt) {
-        this();
-        loadNbt(nbt);
-    }
-
-    public static NamedLocationStorage fromNbt(NbtCompound nbt) {
-        // Try codec first
-        var result = CODEC.parse(NbtOps.INSTANCE, nbt);
-        if (result.isSuccess()) {
-            return result.getOrThrow();
-        }
-
-        // Fallback to legacy parsing
-        NamedLocationStorage storage = new NamedLocationStorage();
-        storage.loadNbt(nbt);
-        return storage;
-    }
-
-    public NbtCompound writeNbt(NbtCompound nbt) {
-        return CODEC.encode(this, NbtOps.INSTANCE, nbt)
-            .getOrThrow()
-            .asCompound()
-            .orElseThrow();
-    }
 
     /**
      * Legacy NBT loading method - supports both old list format and compound format

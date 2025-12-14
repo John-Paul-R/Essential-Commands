@@ -1,7 +1,9 @@
 package com.fibermc.essentialcommands.codec;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.fibermc.essentialcommands.WorldData;
 import com.fibermc.essentialcommands.types.*;
@@ -61,6 +63,28 @@ public final class Codecs {
         ).apply(instance, WarpLocation::new)
     );
 
+    public static final Codec<JoinpointLocation> JOINPOINT_LOCATION = RecordCodecBuilder.create(instance ->
+        instance.group(
+            // Inherit all fields from NamedMinecraftLocation
+            WORLD_KEY.fieldOf("WorldRegistryKey").forGetter(JoinpointLocation::dim),
+            Codec.DOUBLE.fieldOf("x").forGetter(MinecraftLocation::x),
+            Codec.DOUBLE.fieldOf("y").forGetter(MinecraftLocation::y),
+            Codec.DOUBLE.fieldOf("z").forGetter(MinecraftLocation::z),
+            Codec.FLOAT.optionalFieldOf("headYaw", 0.0f).forGetter(JoinpointLocation::headYaw),
+            Codec.FLOAT.optionalFieldOf("pitch", 0.0f).forGetter(JoinpointLocation::pitch),
+            // loaded from the map
+            Codec.STRING.optionalFieldOf("name").forGetter(joinpoint -> Optional.of(((JoinpointLocation)joinpoint).getName())),
+
+            // Joinpoint-specific fields
+            Codec.STRING.xmap(UUID::fromString, UUID::toString).fieldOf("owner").forGetter(JoinpointLocation::getOwner),
+            Codec.BOOL.optionalFieldOf("isGlobal", false).forGetter(JoinpointLocation::isGlobal),
+            Codec.STRING.xmap(UUID::fromString, UUID::toString).listOf().optionalFieldOf("sharedWith", java.util.List.of())
+                .xmap(HashSet::new, java.util.List::copyOf)
+                .forGetter(JoinpointLocation::getSharedWith)
+
+        ).apply(instance, JoinpointLocation::new)
+    );
+
     public static final Codec<NamedLocationStorage> NAMED_LOCATION_STORAGE =
         Codec.unboundedMap(Codec.STRING, NAMED_MINECRAFT_LOCATION)
             .xmap(
@@ -90,6 +114,7 @@ public final class Codecs {
                 // Convert WarpStorage to Map for serialization
                 HashMap::new
             );
+
 
     public static final Codec<WorldData> WORLD_DATA = WorldData.CODEC;
 }

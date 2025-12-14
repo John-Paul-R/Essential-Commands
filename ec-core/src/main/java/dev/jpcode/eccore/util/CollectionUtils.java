@@ -1,5 +1,6 @@
 package dev.jpcode.eccore.util;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -156,5 +157,24 @@ public final class CollectionUtils {
             }
         }
         return true;
+    }
+
+    // My code below this point
+    public static <T> T[] concat(T[]... arrays) {
+        int totalLen = 0;
+        for (T[] array : arrays) {
+            totalLen += array.length;
+        }
+
+        @SuppressWarnings("unchecked")
+        T[] dest = (T[]) Array.newInstance(arrays[0].getClass().getComponentType(), totalLen);
+
+        int idx = 0;
+        for (T[] cur : arrays) {
+            System.arraycopy(cur, 0, dest, idx, cur.length);
+            idx += cur.length;
+        }
+
+        return dest;
     }
 }
