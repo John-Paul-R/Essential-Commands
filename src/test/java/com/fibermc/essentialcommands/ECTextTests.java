@@ -8,11 +8,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import net.minecraft.Bootstrap;
+import net.minecraft.server.Bootstrap;
 import net.minecraft.SharedConstants;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,9 +21,9 @@ public class ECTextTests {
     private static ECText ecText;
 
     static {
-        SharedConstants.createGameVersion();
-        Bootstrap.initialize();
-        Registries.bootstrap();
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+        BuiltInRegistries.bootStrap();
     }
 
     @BeforeAll
@@ -40,10 +40,10 @@ public class ECTextTests {
     @DisplayName("getTextInternal - no interpolation")
     void getTextInternal_FormatsCorrectly()
     {
-        var expected = Text.literal("enabled").setStyle(TextFormatType.Default.getStyle());
+        var expected = Component.literal("enabled").setStyle(TextFormatType.Default.getStyle());
         var enabledText = ecText.getText("generic.enabled");
 
-        assertEquals(expected.getContent(), enabledText.getContent());
+        assertEquals(expected.getContents(), enabledText.getContents());
         assertEquals(expected.getStyle(), enabledText.getStyle());
     }
 
@@ -51,15 +51,15 @@ public class ECTextTests {
     @DisplayName("getTextInternal - two interpolated tokens")
     void getTextInternal_TwoInterpolatedTokens_FormatsCorrectly()
     {
-        var playerNameText = Text.literal("Steve").formatted(Formatting.AQUA);
+        var playerNameText = Component.literal("Steve").withStyle(ChatFormatting.AQUA);
         var defaultStyle = TextFormatType.Default.getStyle();
         var accentStyle = TextFormatType.Accent.getStyle();
-        var expectedMessage = Text.empty()
-            .append(Text.literal("Flight ").setStyle(defaultStyle))
-            .append(Text.literal("enabled").setStyle(accentStyle))
-            .append(Text.literal(" for ").setStyle(defaultStyle))
+        var expectedMessage = Component.empty()
+            .append(Component.literal("Flight ").setStyle(defaultStyle))
+            .append(Component.literal("enabled").setStyle(accentStyle))
+            .append(Component.literal(" for ").setStyle(defaultStyle))
             .append(playerNameText)
-            .append(Text.literal(".").setStyle(defaultStyle));
+            .append(Component.literal(".").setStyle(defaultStyle));
 
         var enabledText = ecText.getText("generic.enabled").setStyle(accentStyle);
 
@@ -86,13 +86,13 @@ public class ECTextTests {
     @DisplayName("getTextInternal - first token interpolated")
     void getTextInternal_FirstTokenInterpolated_FormatsCorrectly()
     {
-        var playerNameText = Text.empty()
-            .append(Text.literal("[UnstyledPrefix] "))
-            .append(Text.literal("Steve").formatted(Formatting.AQUA));
+        var playerNameText = Component.empty()
+            .append(Component.literal("[UnstyledPrefix] "))
+            .append(Component.literal("Steve").withStyle(ChatFormatting.AQUA));
         var defaultStyle = TextFormatType.Default.getStyle();
-        var expectedMessage = Text.empty()
+        var expectedMessage = Component.empty()
             .append(playerNameText)
-            .append(Text.literal(" is now AFK.").setStyle(defaultStyle));
+            .append(Component.literal(" is now AFK.").setStyle(defaultStyle));
 
         var actualMessage = ecText.getText("player.afk.enter", playerNameText);
 

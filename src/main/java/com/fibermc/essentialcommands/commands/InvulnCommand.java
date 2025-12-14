@@ -11,14 +11,14 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
-public class InvulnCommand implements Command<ServerCommandSource> {
+public class InvulnCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack source = context.getSource();
+        ServerPlayer targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         boolean shouldEnableInvuln;
         try {
@@ -33,7 +33,7 @@ public class InvulnCommand implements Command<ServerCommandSource> {
 
         // TODO Label boolean values in suggestions, or switch to single state value (present, or it's not)
 
-        var senderPlayerAccess = ((ServerPlayerEntityAccess) source.getPlayerOrThrow());
+        var senderPlayerAccess = ((ServerPlayerEntityAccess) source.getPlayerOrException());
         var enabledText = senderPlayerAccess.ec$getEcText().getText(
             shouldEnableInvuln ? "generic.enabled" : "generic.disabled",
             TextFormatType.Accent);
@@ -47,12 +47,12 @@ public class InvulnCommand implements Command<ServerCommandSource> {
         return 0;
     }
 
-    public static void exec(ServerPlayerEntity target, boolean shouldEnableInvuln) {
+    public static void exec(ServerPlayer target, boolean shouldEnableInvuln) {
         if (shouldEnableInvuln) {
             Pal.grantAbility(target, VanillaAbilities.INVULNERABLE, ECAbilitySources.INVULN_COMMAND);
         } else {
             Pal.revokeAbility(target, VanillaAbilities.INVULNERABLE, ECAbilitySources.INVULN_COMMAND);
         }
-        target.sendAbilitiesUpdate();
+        target.onUpdateAbilities();
     }
 }

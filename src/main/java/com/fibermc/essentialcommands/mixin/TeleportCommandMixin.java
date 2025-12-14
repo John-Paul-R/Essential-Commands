@@ -12,30 +12,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.network.packet.s2c.play.PositionFlag;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.command.TeleportCommand;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.commands.TeleportCommand;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Relative;
 
 @Mixin(value = TeleportCommand.class)
 public class TeleportCommandMixin {
 
-    @Inject(method = "teleport",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z")
+    @Inject(method = "performTeleport",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FFZ)Z")
     )
     private static void execute(
-        ServerCommandSource source,
+        CommandSourceStack source,
         Entity target,
-        ServerWorld world,
+        ServerLevel world,
         double x, double y, double z,
-        Set<PositionFlag> movementFlags,
+        Set<Relative> movementFlags,
         float yaw, float pitch,
         @Coerce Object facingLocation,
         CallbackInfo ci
     ) throws CommandSyntaxException {
-        if (target instanceof ServerPlayerEntity targetPlayer) {
+        if (target instanceof ServerPlayer targetPlayer) {
             // This cast is guaranteed to work because of where we inject.
             var targetPlayerData = ((ServerPlayerEntityAccess)target).ec$getPlayerData();
             if (!targetPlayer.isSpectator()) {

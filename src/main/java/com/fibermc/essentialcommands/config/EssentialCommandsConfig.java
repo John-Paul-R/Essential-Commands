@@ -6,7 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
@@ -14,14 +19,6 @@ import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import com.fibermc.essentialcommands.types.RtpCenter;
 import org.jetbrains.annotations.NotNull;
-
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-
 import dev.jpcode.eccore.config.Config;
 import dev.jpcode.eccore.config.ConfigOption;
 import dev.jpcode.eccore.config.ConfigUtil;
@@ -41,7 +38,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Style> FORMATTING_DEFAULT =     new Option<>("formatting_default", parseStyle("gold"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
     @ConfigOption public final Option<Style> FORMATTING_ACCENT =      new Option<>("formatting_accent", parseStyle("light_purple"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
     @ConfigOption public final Option<Style> FORMATTING_ERROR =       new Option<>("formatting_error", parseStyle("red"), ConfigUtil::parseStyle, ConfigUtil::serializeStyle);
-    @ConfigOption public final Option<Text>  NICKNAME_PREFIX =        new Option<>("nickname_prefix", parseText("{\"text\":\"~\",\"color\":\"red\"}"), TextUtil::parseText, TextUtil::toJsonString);
+    @ConfigOption public final Option<Component>  NICKNAME_PREFIX =        new Option<>("nickname_prefix", parseText("{\"text\":\"~\",\"color\":\"red\"}"), TextUtil::parseText, TextUtil::toJsonString);
     @ConfigOption public final Option<Boolean> ENABLE_BACK =            new Option<>("enable_back", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_HOME =            new Option<>("enable_home", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> ENABLE_SPAWN =           new Option<>("enable_spawn", true, Boolean::parseBoolean);
@@ -94,13 +91,13 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Integer> RTP_MIN_RADIUS =         new Option<>("rtp_min_radius", RTP_RADIUS.getValue(), (String s) -> parseIntOrDefault(s, RTP_RADIUS.getValue()));
     @ConfigOption public final Option<Integer> RTP_COOLDOWN =           new Option<>("rtp_cooldown", 30, ConfigUtil::parseInt);
     @ConfigOption public final Option<Integer> RTP_MAX_ATTEMPTS =       new Option<>("rtp_max_attempts", 15, ConfigUtil::parseInt);
-    @ConfigOption public final Option<List<String>> RTP_ENABLED_WORLDS = new Option<>("rtp_enabled_worlds", List.of(World.OVERWORLD.getValue().getPath()), arrayParser(Object::toString));
+    @ConfigOption public final Option<List<String>> RTP_ENABLED_WORLDS = new Option<>("rtp_enabled_worlds", List.of(Level.OVERWORLD.identifier().getPath()), arrayParser(Object::toString));
     @ConfigOption public final Option<Boolean> BROADCAST_TO_OPS =       new Option<>("broadcast_to_ops", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICK_REVEAL_ON_HOVER =   new Option<>("nick_reveal_on_hover", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> GRANT_LOWEST_NUMERIC_BY_DEFAULT = new Option<>("grant_lowest_numeric_by_default", true, Boolean::parseBoolean);
     @ConfigOption public final Option<String> LANGUAGE = new Option<>("language", "en_us", String::toString);
     @ConfigOption public final Option<String> MOTD = new Option<>("motd", "<yellow>Welcome to our server <blue>%player:displayname%</blue>!\nPlease read the rules.</yellow>", String::toString);
-    @ConfigOption public final Option<Text> AFK_PREFIX = new Option<>("afk_prefix", Text.literal("[AFK] ").formatted(Formatting.GRAY), TextUtil::parseText, TextUtil::toJsonString);
+    @ConfigOption public final Option<Component> AFK_PREFIX = new Option<>("afk_prefix", Component.literal("[AFK] ").withStyle(ChatFormatting.GRAY), TextUtil::parseText, TextUtil::toJsonString);
     @ConfigOption public final Option<Boolean> INVULN_WHILE_AFK = new Option<>("invuln_while_afk", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> AUTO_AFK_ENABLED = new Option<>("auto_afk_enabled", true,  Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> AUTO_AFK_TICKS = new Option<>("auto_afk_time", durationToTicks(Duration.ofMinutes(15)), ConfigUtil::parseDurationToTicks, ConfigUtil::serializeTicksAsDuration);
@@ -133,24 +130,24 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
 
         RTP_ENABLED_WORLDS.changeEvent.register(configuredWorldIdStrings -> {
             ManagerLocator.getInstance().runAndQueue("RTP_ENABLED_WORLDS", server -> {
-                var worldIds = server.getWorldRegistryKeys().stream()
-                    .map(RegistryKey::getValue)
+                var worldIds = server.levelKeys().stream()
+                    .map(ResourceKey::identifier)
                     .collect(Collectors.toSet());
 
                 EssentialCommands.LOGGER.info("Possible world ids: {}", String.join(",", worldIds.stream().map(Identifier::toString).toList()));
 
                 var configuredWorldIds = configuredWorldIdStrings.stream()
-                    .map(Identifier::of)
+                    .map(Identifier::parse)
                     .toList();
                 EssentialCommands.LOGGER.info("Configured `rtp_enabled_worlds` world ids: {}", String.join(",", configuredWorldIds.stream().map(Identifier::toString).toList()));
 
                 var validConfiguredWorldIds = configuredWorldIdStrings.stream()
-                    .map(Identifier::of)
+                    .map(Identifier::parse)
                     .filter(worldIds::contains)
                     .collect(Collectors.toSet());
 
                 var invalidConfiguredWorldIds = configuredWorldIdStrings.stream()
-                    .map(Identifier::of)
+                    .map(Identifier::parse)
                     .filter(v -> !worldIds.contains(v))
                     .toList();
 
@@ -161,8 +158,8 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
                 }
 
                 this.validRtpWorldIds.clear();
-                server.getWorldRegistryKeys().stream()
-                    .filter(k -> validConfiguredWorldIds.contains(k.getValue()))
+                server.levelKeys().stream()
+                    .filter(k -> validConfiguredWorldIds.contains(k.identifier()))
                     .forEach(this.validRtpWorldIds::add);
                 EssentialCommands.refreshConfigSnapshot();
             });
@@ -178,9 +175,9 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
         });
     }
 
-    private final HashSet<RegistryKey<World>> validRtpWorldIds = new HashSet<>();
+    private final HashSet<ResourceKey<Level>> validRtpWorldIds = new HashSet<>();
     @NotNull
-    public Set<RegistryKey<World>> getValidRtpWorldKeys() {
+    public Set<ResourceKey<Level>> getValidRtpWorldKeys() {
         return this.validRtpWorldIds;
     }
 

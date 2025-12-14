@@ -7,15 +7,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
-    @Inject(method = "isSleepingInBed", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "checkBedExists", at = @At("RETURN"), cancellable = true)
     public void modifyIsSleepingInBedReturn(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity self = (LivingEntity)(Object)this;
-        if (!(self instanceof ServerPlayerEntity player)) {
+        if (!(self instanceof ServerPlayer player)) {
             return;
         }
 
@@ -25,10 +25,10 @@ public class LivingEntityMixin {
         }
     }
 
-    @Inject(method = "wakeUp", at = @At("RETURN"))
+    @Inject(method = "stopSleeping", at = @At("RETURN"))
     public void modifyWakeUp(CallbackInfo ci) {
         LivingEntity self = (LivingEntity)(Object)this;
-        if (!(self instanceof ServerPlayerEntity player)) {
+        if (!(self instanceof ServerPlayer player)) {
             return;
         }
 

@@ -13,19 +13,19 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.entity.player.PlayerAbilities;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Abilities;
 
-public class FlyCommand implements Command<ServerCommandSource> {
+public class FlyCommand implements Command<CommandSourceStack> {
 
     public FlyCommand() {
     }
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack source = context.getSource();
+        ServerPlayer targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         boolean shouldEnableFly;
         try {
@@ -38,7 +38,7 @@ public class FlyCommand implements Command<ServerCommandSource> {
                     .getTracker(targetPlayer).isGrantedBy(ECAbilitySources.FLY_COMMAND);
             } catch (NoClassDefFoundError ign) {
                 // If PAL is not found, fall back to toggling the current vanilla flight state.
-                shouldEnableFly = !targetPlayer.getAbilities().allowFlying;
+                shouldEnableFly = !targetPlayer.getAbilities().mayfly;
             }
         }
 
@@ -46,25 +46,25 @@ public class FlyCommand implements Command<ServerCommandSource> {
         return 0;
     }
 
-    public static void exec(ServerCommandSource source, ServerPlayerEntity target, boolean shouldEnableFly) throws CommandSyntaxException {
-        PlayerAbilities playerAbilities = target.getAbilities();
+    public static void exec(CommandSourceStack source, ServerPlayer target, boolean shouldEnableFly) throws CommandSyntaxException {
+        Abilities playerAbilities = target.getAbilities();
 
         PlayerData playerData = ((ServerPlayerEntityAccess) target).ec$getPlayerData();
 
         try {
             playerData.setFlight(shouldEnableFly);
         } catch (NoClassDefFoundError ign) {
-            playerAbilities.allowFlying = shouldEnableFly;
+            playerAbilities.mayfly = shouldEnableFly;
             if (!shouldEnableFly) {
                 playerAbilities.flying = false;
             }
         }
 
-        target.sendAbilitiesUpdate();
+        target.onUpdateAbilities();
 
         // Label boolean values in suggestions, or switch to single state value (present or it's not)
 
-        var senderPlayer = source.getPlayerOrThrow();
+        var senderPlayer = source.getPlayerOrException();
         var senderPlayerData = PlayerData.access(senderPlayer);
         var ecTextTarget = ECText.access(target);
         String enabledString = ecTextTarget.getString(shouldEnableFly ? "generic.enabled" : "generic.disabled");

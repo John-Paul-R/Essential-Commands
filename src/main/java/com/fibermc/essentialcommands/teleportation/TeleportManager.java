@@ -11,10 +11,10 @@ import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 import com.fibermc.essentialcommands.text.TextFormatType;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
-import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 
 import dev.jpcode.eccore.util.TimeUtil;
 
@@ -43,7 +43,7 @@ public final class TeleportManager {
 
     public static void init() {
         getInstance();
-        PlayerDamageCallback.EVENT.register((ServerPlayerEntity playerEntity, DamageSource source) -> instance.onPlayerDamaged(playerEntity, source));
+        PlayerDamageCallback.EVENT.register((ServerPlayer playerEntity, DamageSource source) -> instance.onPlayerDamaged(playerEntity, source));
         PlayerDataManager.TICK_EVENT.register(((playerDataManager, server) -> instance.tick(server)));
     }
 
@@ -88,7 +88,7 @@ public final class TeleportManager {
             var playerData = queuedTeleport.getPlayerData();
             if (shouldInterruptTeleportOnMove
                 && playerData.hasMovedThisTick()
-                && playerData.getPlayer().getEntityPos().distanceTo(queuedTeleport.initialPosition) > maxMoveBeforeInterrupt
+                && playerData.getPlayer().position().distanceTo(queuedTeleport.initialPosition) > maxMoveBeforeInterrupt
                 && !PlayerTeleporter.playerHasTpRulesBypass(playerData.getPlayer(), ECPerms.Registry.bypass_teleport_interrupt_on_move)
             ) {
                 playerData.sendError("teleport.interrupted.moved");
@@ -103,7 +103,7 @@ public final class TeleportManager {
         }
     }
 
-    public void onPlayerDamaged(ServerPlayerEntity playerEntity, DamageSource damageSource) {
+    public void onPlayerDamaged(ServerPlayer playerEntity, DamageSource damageSource) {
         if (!CONFIG.TELEPORT_INTERRUPT_ON_DAMAGED) {
             return;
         }
@@ -112,14 +112,14 @@ public final class TeleportManager {
             && !PlayerTeleporter.playerHasTpRulesBypass(playerEntity, ECPerms.Registry.bypass_teleport_interrupt_on_damaged)
         ) {
             playerAccess.ec$endQueuedTeleport();
-            queuedTeleportMap.remove(playerEntity.getUuid());
+            queuedTeleportMap.remove(playerEntity.getUUID());
             playerAccess.ec$getPlayerData().sendError("teleport.interrupted.damage");
         }
     }
 
     public void startTpRequest(
-        ServerPlayerEntity requestSender,
-        ServerPlayerEntity targetPlayer,
+        ServerPlayer requestSender,
+        ServerPlayer targetPlayer,
         TeleportRequest.Type requestType
     )
     {
@@ -132,7 +132,7 @@ public final class TeleportManager {
         activeTeleportRequests.add(teleportRequest);
     }
 
-    public void startTpCooldown(ServerPlayerEntity player) {
+    public void startTpCooldown(ServerPlayer player) {
         final int teleportCooldownTicks = (int) (CONFIG.TELEPORT_COOLDOWN * TimeUtil.TPS);
         var playerData = PlayerData.access(player);
 
@@ -141,7 +141,7 @@ public final class TeleportManager {
     }
 
     // Generally, you should use PlayerTeleporter.requestTeleport instead of calling the queueTeleport methods directly.
-    void queueTeleport(ServerPlayerEntity player, MinecraftLocation dest, MutableText destName) {
+    void queueTeleport(ServerPlayer player, MinecraftLocation dest, MutableComponent destName) {
         queueTeleport(new QueuedLocationTeleport(PlayerData.access(player), dest, destName));
     }
 
@@ -150,7 +150,7 @@ public final class TeleportManager {
         var playerAccess = ((ServerPlayerEntityAccess) playerData.getPlayer());
 
         QueuedTeleport prevValue = queuedTeleportMap.put(
-            queuedTeleport.getPlayerData().getPlayer().getUuid(),
+            queuedTeleport.getPlayerData().getPlayer().getUUID(),
             queuedTeleport
         );
         if (prevValue != null) {
@@ -158,8 +158,8 @@ public final class TeleportManager {
             var styleUpdater = profile.nonOverwritingColorUpdater(TextFormatType.Accent);
             prevValue.getPlayerData().sendMessage(
                 "teleport.request.canceled_by_new",
-                prevValue.getDestName().styled(styleUpdater),
-                queuedTeleport.getDestName().styled(styleUpdater)
+                prevValue.getDestName().withStyle(styleUpdater),
+                queuedTeleport.getDestName().withStyle(styleUpdater)
             );
         }
 

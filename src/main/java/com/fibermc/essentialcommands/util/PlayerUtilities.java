@@ -2,32 +2,32 @@ package com.fibermc.essentialcommands.util;
 
 import java.util.List;
 
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public final class PlayerUtilities {
     private PlayerUtilities() {}
 
-    public static boolean isNearAngryMonsters(ServerPlayerEntity player) {
-        var world = player.getEntityWorld();
-        var pos = player.getBlockPos();
+    public static boolean isNearAngryMonsters(ServerPlayer player) {
+        var world = player.level();
+        var pos = player.blockPosition();
         double boxHorizontalSize = 8.0;
         double boxHeight = 5.0;
-        Vec3d vec3d = Vec3d.ofBottomCenter(pos);
-        List<HostileEntity> list = world
-            .getEntitiesByClass(
-                HostileEntity.class,
-                new Box(
-                    vec3d.getX() - boxHorizontalSize,
-                    vec3d.getY() - boxHeight,
-                    vec3d.getZ() - boxHorizontalSize,
-                    vec3d.getX() + boxHorizontalSize,
-                    vec3d.getY() + boxHeight,
-                    vec3d.getZ() + boxHorizontalSize
+        Vec3 vec3d = Vec3.atBottomCenterOf(pos);
+        List<Monster> list = world
+            .getEntitiesOfClass(
+                Monster.class,
+                new AABB(
+                    vec3d.x() - boxHorizontalSize,
+                    vec3d.y() - boxHeight,
+                    vec3d.z() - boxHorizontalSize,
+                    vec3d.x() + boxHorizontalSize,
+                    vec3d.y() + boxHeight,
+                    vec3d.z() + boxHorizontalSize
                 ),
-                (entity) -> entity.isAngryAt(world, player)
+                (entity) -> entity.isPreventingPlayerRest(world, player)
             );
 
         return !list.isEmpty();

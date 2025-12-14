@@ -11,31 +11,31 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.SleepManager;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.SleepStatus;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-@Mixin(SleepManager.class)
-public class SleepManagerMixin {
+@Mixin(SleepStatus.class)
+public class SleepStatusMixin {
 
     @Shadow
-    private int total;
+    private int activePlayers;
 
     @Inject(
         method = "update",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerPlayerEntity;isSpectator()Z"
+            target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z"
         ),
         locals = LocalCapture.CAPTURE_FAILSOFT
     )
-    public void orIsAfk(List<ServerPlayerEntity> players,
+    public void orIsAfk(List<ServerPlayer> players,
                         CallbackInfoReturnable<Boolean> cir,
                         int i,
                         int j,
                         Iterator var4,
-                        ServerPlayerEntity serverPlayerEntity
+                        ServerPlayer serverPlayerEntity
     ) {
         if (CONFIG.ENABLE_AFK && CONFIG.AUTO_AFK_ENABLED) {
             var playerData = ((ServerPlayerEntityAccess) serverPlayerEntity).ec$getPlayerData();
@@ -43,7 +43,7 @@ public class SleepManagerMixin {
                 && !serverPlayerEntity.isSleeping() // if they're sleeping, toss the custom afk logic
                 && playerData.ticksSinceLastActionOrMove() > CONFIG.AUTO_AFK_TICKS
             ) {
-                --total;
+                --activePlayers;
             }
         }
     }

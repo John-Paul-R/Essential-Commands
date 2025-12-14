@@ -19,59 +19,60 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.network.packet.s2c.play.PositionFlag;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.TeleportTarget;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Relative;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.portal.TeleportTransition;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-@Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implements ServerPlayerEntityAccess {
+@SuppressWarnings({"checkstyle:IllegalIdentifierName"})
+@Mixin(ServerPlayer.class)
+public abstract class ServerPlayerMixin extends PlayerMixin implements ServerPlayerEntityAccess {
 
     @Shadow
-    public abstract GameMode getGameMode();
+    public abstract GameType gameMode();
 
     @Unique
     public QueuedTeleport ecQueuedTeleport;
 
-    @Inject(method = "onDeath", at = @At("HEAD"))
+    @Inject(method = "die", at = @At("HEAD"))
     public void onDeath(DamageSource damageSource, CallbackInfo callbackInfo) {
-        PlayerDeathCallback.EVENT.invoker().onDeath(((ServerPlayerEntity) (Object) this), damageSource);
+        PlayerDeathCallback.EVENT.invoker().onDeath(((ServerPlayer) (Object) this), damageSource);
     }
 
-    @Inject(method = "damage", at = @At("RETURN"))
-    public void onDamage(ServerWorld world, DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "hurtServer", at = @At("RETURN"))
+    public void onDamage(ServerLevel world, DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> cir) {
         // If damage was actually applied...
         if (cir.getReturnValue()) {
             PlayerDamageCallback.EVENT.invoker().onPlayerDamaged(
-                ((ServerPlayerEntity) (Object) this),
+                ((ServerPlayer) (Object) this),
                 damageSource
             );
         }
     }
 
-    @Inject(method = "changeGameMode", at = @At("RETURN"))
-    public void onChangeGameMode(GameMode gameMode, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "setGameMode", at = @At("RETURN"))
+    public void onChangeGameMode(GameType gameMode, CallbackInfoReturnable<Boolean> cir) {
 //        ((ServerPlayerEntityAccess) this).getEcPlayerData().updatePlayer(((ServerPlayerEntity) (Object) this));
     }
 
-    @Inject(method = "teleportTo(Lnet/minecraft/world/TeleportTarget;)Lnet/minecraft/server/network/ServerPlayerEntity;", at = @At(
+    @Inject(method = "teleport(Lnet/minecraft/world/level/portal/TeleportTransition;)Lnet/minecraft/server/level/ServerPlayer;", at = @At(
         value = "INVOKE",
-        target = "Lnet/minecraft/server/PlayerManager;sendPlayerStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
+        target = "Lnet/minecraft/server/players/PlayerList;sendAllPlayerInfo(Lnet/minecraft/server/level/ServerPlayer;)V"
     ))
-    public void onTeleportBetweenWorlds(TeleportTarget teleportTarget, CallbackInfoReturnable<Entity> cir) {
+    public void onTeleportBetweenWorlds(TeleportTransition teleportTarget, CallbackInfoReturnable<Entity> cir) {
         var playerData = this.ec$getPlayerData();
-        playerData.updatePlayerEntity((ServerPlayerEntity) (Object) this);
+        playerData.updatePlayerEntity((ServerPlayer) (Object) this);
     }
 
-    @Inject(method = "worldChanged", at = @At(value = "RETURN"))
-    public void onWorldChanged(ServerWorld origin, CallbackInfo ci) {
+    @Inject(method = "triggerDimensionChangeTriggers", at = @At(value = "RETURN"))
+    public void onWorldChanged(ServerLevel origin, CallbackInfo ci) {
         var playerData = this.ec$getPlayerData();
         if (CONFIG.RECHECK_PLAYER_ABILITY_PERMISSIONS_ON_DIMENSION_CHANGE) {
             PlayerDataManager.getInstance().scheduleTask(playerData::clearAbilitiesWithoutPermisisons);
@@ -95,10 +96,10 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
         return prevQueuedTeleport;
     }
 
-    @Inject(method = "getPlayerListName", at = @At("RETURN"), cancellable = true)
-    public void getPlayerListName(CallbackInfoReturnable<Text> cir) {
+    @Inject(method = "getTabListDisplayName", at = @At("RETURN"), cancellable = true)
+    public void getPlayerListName(CallbackInfoReturnable<Component> cir) {
         if (EssentialCommandsConfig.getValueSafe(BACKING_CONFIG.NICKNAMES_IN_PLAYER_LIST, true)) {
-            cir.setReturnValue(((ServerPlayerEntity) (Object) this).getDisplayName());
+            cir.setReturnValue(((ServerPlayer) (Object) this).getDisplayName());
             cir.cancel();
         }
     }
@@ -112,9 +113,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
             return ec$playerData;
         }
 
-        ServerPlayerEntity playerEntity = (ServerPlayerEntity) (Object) this;
+        ServerPlayer playerEntity = (ServerPlayer) (Object) this;
         EssentialCommands.LOGGER.info(String.format(
-            "[Essential Commands] Loading PlayerData for player with uuid '%s'.", playerEntity.getUuidAsString()));
+            "[Essential Commands] Loading PlayerData for player with uuid '%s'.", playerEntity.getStringUUID()));
         PlayerData playerData = PlayerDataFactory.create(playerEntity);
         ec$setPlayerData(playerData);
         return playerData;
@@ -134,9 +135,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
             return ec$profile;
         }
 
-        ServerPlayerEntity playerEntity = (ServerPlayerEntity) (Object) this;
+        ServerPlayer playerEntity = (ServerPlayer) (Object) this;
         EssentialCommands.LOGGER.info(String.format(
-            "[Essential Commands] Loading PlayerProfile for player with uuid '%s'.", playerEntity.getUuidAsString()));
+            "[Essential Commands] Loading PlayerProfile for player with uuid '%s'.", playerEntity.getStringUUID()));
         PlayerProfile profile = PlayerProfileFactory.create(playerEntity);
         ec$setProfile(profile);
         return profile;
@@ -156,23 +157,23 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntityMixin implemen
             return ec$ecText;
         }
 
-        return ec$ecText = ECText.forPlayer((ServerPlayerEntity) (Object) this);
+        return ec$ecText = ECText.forPlayer((ServerPlayer) (Object) this);
     }
 
     // Teleport hook (for /back)
-    @Inject(method = "teleport(Lnet/minecraft/server/world/ServerWorld;DDDLjava/util/Set;FFZ)Z", at = @At("HEAD"))
-    public void onTeleport(ServerWorld world, double destX, double destY, double destZ, Set<PositionFlag> flags, float yaw, float pitch, boolean resetCamera, CallbackInfoReturnable<Boolean> cir) {
-        if (getGameMode() != GameMode.SPECTATOR) {
-            this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayerEntity) (Object) this));
+    @Inject(method = "teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FFZ)Z", at = @At("HEAD"))
+    public void onTeleport(ServerLevel world, double destX, double destY, double destZ, Set<Relative> flags, float yaw, float pitch, boolean resetCamera, CallbackInfoReturnable<Boolean> cir) {
+        if (gameMode() != GameType.SPECTATOR) {
+            this.ec$getPlayerData().setPreviousLocation(new MinecraftLocation((ServerPlayer) (Object) this));
         }
     }
 
-    @Inject(method = "enterCombat", at = @At("RETURN"))
+    @Inject(method = "onEnterCombat", at = @At("RETURN"))
     public void onEnterCombat(CallbackInfo ci) {
         ec$playerData.setInCombat(true);
     }
 
-    @Inject(method = "endCombat", at = @At("RETURN"))
+    @Inject(method = "onLeaveCombat", at = @At("RETURN"))
     public void onExitCombat(CallbackInfo ci) {
         ec$playerData.setInCombat(false);
     }

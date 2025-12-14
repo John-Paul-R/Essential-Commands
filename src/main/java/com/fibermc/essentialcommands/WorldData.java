@@ -13,9 +13,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 
 public class WorldData {
     private @Nullable MinecraftLocation spawnLocation;
@@ -43,20 +43,20 @@ public class WorldData {
         this.spawnLocation = spawn;
     }
 
-    public static WorldData fromNbt(NbtCompound nbt) {
+    public static WorldData fromNbt(CompoundTag nbt) {
         // Handle legacy "data" wrapper if present
         nbt = nbt.getCompound("data").orElse(nbt);
         nbt = WorldDataDataFixer.createDataFixer().build().fixer().update(
             WorldDataDataFixer.TYPE,
-            new Dynamic<NbtElement>(NbtOps.INSTANCE, nbt),
-            nbt.getInt(SCHEMA_VERSION_KEY, 0),
+            new Dynamic<Tag>(NbtOps.INSTANCE, nbt),
+            nbt.getIntOr(SCHEMA_VERSION_KEY, 0),
             WorldData.SCHEMA_VERSION
         ).getValue().asCompound().orElseThrow();
 
         return CODEC.parse(NbtOps.INSTANCE, nbt).getOrThrow();
     }
 
-    public NbtCompound toNbt() {
+    public CompoundTag toNbt() {
         var data = CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow().asCompound().orElseThrow();
         data.putInt(SCHEMA_VERSION_KEY, SCHEMA_VERSION);
         return data;

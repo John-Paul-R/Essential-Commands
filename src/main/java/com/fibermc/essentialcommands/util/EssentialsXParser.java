@@ -8,7 +8,7 @@ import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.util.*;
 
-import com.fibermc.essentialcommands.mixin.PersistentStateManagerInvoker;
+import com.fibermc.essentialcommands.mixin.DimensionDataStorageInvoker;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.playerdata.PlayerDataFactory;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
@@ -16,9 +16,8 @@ import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 
@@ -27,7 +26,7 @@ public final class EssentialsXParser {
 
     public static NamedLocationStorage parsePlayerHomes(
         File yamlSource,
-        Map<UUID, RegistryKey<World>> uuidRegistryKeyMap
+        Map<UUID, ResourceKey<net.minecraft.world.level.Level>> uuidRegistryKeyMap
     ) {
         NamedLocationStorage homes = new NamedLocationStorage();
         String yamlStr = null;
@@ -49,15 +48,15 @@ public final class EssentialsXParser {
         homesMap.forEach((String name, Map<String, Object> locData) -> {
             var worldIdentifier = (String) locData.get("world");
             UUID worldUuid = null;
-            RegistryKey<World> worldRegistryKey;
+            ResourceKey<net.minecraft.world.level.Level> worldRegistryKey;
             try {
                 worldUuid = UUID.fromString(worldIdentifier);
                 worldRegistryKey = uuidRegistryKeyMap.get(worldUuid);
             } catch (Exception ign) {
                 worldRegistryKey = switch (worldIdentifier) {
-                    case "world" -> World.OVERWORLD;
-                    case "world_nether" -> World.NETHER;
-                    case "world_the_end" -> World.END;
+                    case "world" -> net.minecraft.world.level.Level.OVERWORLD;
+                    case "world_nether" -> net.minecraft.world.level.Level.NETHER;
+                    case "world_the_end" -> net.minecraft.world.level.Level.END;
                     default -> null;
                 };
             }
@@ -68,23 +67,23 @@ public final class EssentialsXParser {
                     worldRegistryKey = switch (worldName) {
                         case "world" -> {
                             if (worldUuid != null) {
-                                uuidRegistryKeyMap.putIfAbsent(worldUuid, World.OVERWORLD);
+                                uuidRegistryKeyMap.putIfAbsent(worldUuid, net.minecraft.world.level.Level.OVERWORLD);
                             }
-                            yield World.OVERWORLD;
+                            yield net.minecraft.world.level.Level.OVERWORLD;
                         }
                         case "world_nether" -> {
                             if (worldUuid != null) {
-                                uuidRegistryKeyMap.putIfAbsent(worldUuid, World.NETHER);
+                                uuidRegistryKeyMap.putIfAbsent(worldUuid, net.minecraft.world.level.Level.NETHER);
                             }
-                            yield World.NETHER;
+                            yield net.minecraft.world.level.Level.NETHER;
                         }
                         case "world_the_end" -> {
                             if (worldUuid != null) {
-                                uuidRegistryKeyMap.putIfAbsent(worldUuid, World.END);
+                                uuidRegistryKeyMap.putIfAbsent(worldUuid, net.minecraft.world.level.Level.END);
                             }
-                            yield World.END;
+                            yield net.minecraft.world.level.Level.END;
                         }
-                        default -> World.OVERWORLD;
+                        default -> net.minecraft.world.level.Level.OVERWORLD;
                     };
                 }
             }
@@ -105,14 +104,14 @@ public final class EssentialsXParser {
         return homes;
     }
 
-    public static Map<UUID, RegistryKey<World>> getWorldUids(MinecraftServer server) {
+    public static Map<UUID, ResourceKey<net.minecraft.world.level.Level>> getWorldUids(MinecraftServer server) {
 
-        Map<UUID, RegistryKey<World>> uuidRegistryKeyMap = new LinkedHashMap<>();
-        server.getWorlds().forEach(world -> {
+        Map<UUID, ResourceKey<net.minecraft.world.level.Level>> uuidRegistryKeyMap = new LinkedHashMap<>();
+        server.getAllLevels().forEach(world -> {
             // This is dumb. We're taking fabric/vanilla's ideas of these worlds to look for the
             // bukkit/spigot/paper UID. Instead, we should be reading those mods' config files to
             // find the correct directory. Rn this will essentially (heh) always be wrong.
-            var persistentStateManager = ((PersistentStateManagerInvoker) world.getPersistentStateManager());
+            var persistentStateManager = ((DimensionDataStorageInvoker) world.getDataStorage());
             File uidFile = persistentStateManager.invokeGetFile("uid").toFile();
             if (!uidFile.exists()) {
                 uidFile = persistentStateManager.invokeGetFile("../uid").toFile();
@@ -124,15 +123,15 @@ public final class EssentialsXParser {
                 LOGGER.info(String.format("File: %s, UUID: %s", uidFile.getPath(), UUID.nameUUIDFromBytes(uuidBytes)));
                 uuidRegistryKeyMap.put(
                     UUID.nameUUIDFromBytes(uuidBytes),
-                    world.getRegistryKey()
+                    world.dimension()
                 );
             } catch (IOException e) {
                 LOGGER.log(
                     Level.WARN,
                     String.format(
                         "World, %s, did not have a valid uid.dat file. EssentialsX homes set in this dim will likely be remapped to %s.",
-                        world.getRegistryKey().getValue().toString(),
-                        World.OVERWORLD.getValue().toString()
+                        world.dimension().identifier().toString(),
+                        net.minecraft.world.level.Level.OVERWORLD.identifier().toString()
                     )
                 );
             }

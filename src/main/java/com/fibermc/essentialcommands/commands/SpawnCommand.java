@@ -10,14 +10,14 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
-public class SpawnCommand implements Command<ServerCommandSource> {
+public class SpawnCommand implements Command<CommandSourceStack> {
 
     public SpawnCommand() {}
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         var loc = worldDataManager.getSpawn();
 
@@ -27,7 +27,7 @@ public class SpawnCommand implements Command<ServerCommandSource> {
             return -2;
         }
 
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayerOrException();
 
         // Teleport & chat message
         var styledLocationName = ECText.access(senderPlayer).getText("cmd.spawn.location_name");

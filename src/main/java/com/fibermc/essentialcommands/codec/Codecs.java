@@ -9,14 +9,14 @@ import com.fibermc.essentialcommands.types.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.world.World;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 public final class Codecs {
     private Codecs() {}
 
-    public static final Codec<RegistryKey<World>> WORLD_KEY = RegistryKey.createCodec(RegistryKeys.WORLD);
+    public static final Codec<ResourceKey<Level>> WORLD_KEY = ResourceKey.codec(Registries.DIMENSION);
 
     public static final Codec<MinecraftLocation> MINECRAFT_LOCATION = RecordCodecBuilder.create(instance ->
         instance.group(

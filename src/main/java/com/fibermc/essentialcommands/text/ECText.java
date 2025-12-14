@@ -21,13 +21,13 @@ import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.GsonHelper;
 
 import static com.fibermc.essentialcommands.EssentialCommands.*;
 
@@ -99,7 +99,7 @@ public abstract class ECText {
         for (var stringJsonElementEntry : jsonObject.entrySet()) {
             var key = stringJsonElementEntry.getKey();
             var value = stringJsonElementEntry.getValue();
-            String string = TOKEN_PATTERN.matcher(JsonHelper.asString(value, key)).replaceAll("%$1s");
+            String string = TOKEN_PATTERN.matcher(GsonHelper.convertToString(value, key)).replaceAll("%$1s");
             entryConsumer.accept(key, string);
         }
     }
@@ -110,36 +110,36 @@ public abstract class ECText {
 
     public abstract String getString(String key);
 
-    public abstract MutableText getText(String key, Text... args);
+    public abstract MutableComponent getText(String key, Component... args);
 
-    public abstract MutableText getText(String key, TextFormatType textFormatType, Text... args);
+    public abstract MutableComponent getText(String key, TextFormatType textFormatType, Component... args);
 
     //    public abstract MutableText getText(String key, Object... args);
-    public abstract MutableText getText(String key, TextFormatType textFormatType, IStyleProvider styleProvider, Text... args);
+    public abstract MutableComponent getText(String key, TextFormatType textFormatType, IStyleProvider styleProvider, Component... args);
 
     public abstract boolean hasTranslation(String key);
 
     public abstract boolean isRightToLeft();
 
-    public abstract OrderedText reorder(StringVisitable text);
+    public abstract FormattedCharSequence reorder(FormattedText text);
 
-    public MutableText literal(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_DEFAULT);
+    public MutableComponent literal(String str) {
+        return Component.literal(str).setStyle(CONFIG.FORMATTING_DEFAULT);
     }
 
-    public MutableText accent(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_ACCENT);
+    public MutableComponent accent(String str) {
+        return Component.literal(str).setStyle(CONFIG.FORMATTING_ACCENT);
     }
 
-    public MutableText error(String str) {
-        return Text.literal(str).setStyle(CONFIG.FORMATTING_ERROR);
+    public MutableComponent error(String str) {
+        return Component.literal(str).setStyle(CONFIG.FORMATTING_ERROR);
     }
 
-    public List<OrderedText> reorder(List<StringVisitable> texts) {
+    public List<FormattedCharSequence> reorder(List<FormattedText> texts) {
         return texts.stream().map(this::reorder).collect(ImmutableList.toImmutableList());
     }
 
-    public static ECText forPlayer(ServerPlayerEntity player) {
+    public static ECText forPlayer(ServerPlayer player) {
         return new PlayerECTextImpl(
             ECText.getInstance().stringMap,
             ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(player)),
@@ -147,7 +147,7 @@ public abstract class ECText {
         );
     }
 
-    public static ECText access(@Nullable ServerPlayerEntity player) {
+    public static ECText access(@Nullable ServerPlayer player) {
         return player == null ? ECText.getInstance() : ((ServerPlayerEntityAccess) player).ec$getEcText();
     }
 }

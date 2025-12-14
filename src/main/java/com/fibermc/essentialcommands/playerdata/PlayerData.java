@@ -34,19 +34,19 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.entity.player.PlayerAbilities;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.PersistentState;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.phys.Vec3;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -56,10 +56,10 @@ import dev.jpcode.eccore.util.TimeUtil;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class PlayerData extends PersistentState implements IServerPlayerEntityData, IFeedbackReceiver {
+public class PlayerData extends SavedData implements IServerPlayerEntityData, IFeedbackReceiver {
 
     // ServerPlayerEntity
-    private ServerPlayerEntity player;
+    private ServerPlayer player;
     private UUID pUuid;
     private File saveFile;
 
@@ -76,21 +76,21 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     private int tpCooldown;
 
     // Nickname
-    private Text nickname;
-    private MutableText fullNickname;
+    private Component nickname;
+    private MutableComponent fullNickname;
 
     // RTP Cooldown
     private int timeUsedRtp;
 
     private boolean afk;
-    private Vec3d lastTickPos;
+    private Vec3 lastTickPos;
     private boolean isInCombat;
     private int lastActionTick;
     private int lastMovedTick;
     private boolean hasMovedThisTick;
     private boolean isSleepingFromCommand;
 
-    public PlayerData(ServerPlayerEntity player, File saveFile) {
+    public PlayerData(ServerPlayer player, File saveFile) {
         incomingTeleportRequests = new LinkedHashMap<>();
         homes = new NamedLocationStorage();
         initializeRuntimeState(player, saveFile);
@@ -123,7 +123,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     public static PlayerData createWithData(
         Optional<NamedLocationStorage> homes,
         Optional<MinecraftLocation> previousLocation,
-        Optional<Text> nickname,
+        Optional<Component> nickname,
         long timeUsedRtpEpochMs,
         int tpCooldown
     ) {
@@ -144,12 +144,12 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     // Initialize runtime state after deserialization
-    public void initializeRuntimeState(ServerPlayerEntity player, File saveFile) {
+    public void initializeRuntimeState(ServerPlayer player, File saveFile) {
         initializeSaveFileField(saveFile);
         this.player = player;
-        this.lastTickPos = player.getEntityPos();
-        this.lastActionTick = player.getEntityWorld().getServer().getTicks();
-        this.pUuid = player.getUuid();
+        this.lastTickPos = player.position();
+        this.lastActionTick = player.level().getServer().getTickCount();
+        this.pUuid = player.getUUID();
 
         // Re-register events
         playerActEvent.register((packet) -> {
@@ -176,17 +176,17 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         updatePlayerEntity(player);
     }
 
-    private static final DataFixer _playerDataDataFixer = PlayerDataDataFixer.createDataFixer().build().fixer();
+    private static final DataFixer PLAYER_DATA_DATA_FIXER = PlayerDataDataFixer.createDataFixer().build().fixer();
     private static final String SCHEMA_VERSION_KEY = "_sv";
     private static final int SCHEMA_VERSION = 1;
 
-    public static NbtCompound fixData(NbtCompound nbt) {
+    public static CompoundTag fixData(CompoundTag nbt) {
         // Handle legacy "data" wrapper if present
         nbt = nbt.getCompound("data").orElse(nbt);
-        nbt = _playerDataDataFixer.update(
+        nbt = PLAYER_DATA_DATA_FIXER.update(
             PlayerDataDataFixer.TYPE,
-            new Dynamic<NbtElement>(NbtOps.INSTANCE, nbt),
-            nbt.getInt(SCHEMA_VERSION_KEY, 0),
+            new Dynamic<Tag>(NbtOps.INSTANCE, nbt),
+            nbt.getIntOr(SCHEMA_VERSION_KEY, 0),
             SCHEMA_VERSION
         ).getValue().asCompound().orElseThrow();
 
@@ -214,23 +214,23 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public void addIncomingTeleportRequest(TeleportRequest teleportRequest) {
-        this.incomingTeleportRequests.put(teleportRequest.getSenderPlayer().getUuid(), teleportRequest);
+        this.incomingTeleportRequests.put(teleportRequest.getSenderPlayer().getUUID(), teleportRequest);
     }
 
     public void removeIncomingTeleportRequest(UUID tpAsker) {
         this.incomingTeleportRequests.remove(tpAsker);
     }
 
-    public ServerPlayerEntity getPlayer() {
+    public ServerPlayer getPlayer() {
         return player;
     }
 
     // Homes
     public void addHome(String homeName, MinecraftLocation minecraftLocation) throws CommandSyntaxException {
-        int playerMaxHomes = ECPerms.getHighestNumericPermission(this.player.getCommandSource(), ECPerms.Registry.Group.home_limit_group);
+        int playerMaxHomes = ECPerms.getHighestNumericPermission(this.player.createCommandSourceStack(), ECPerms.Registry.Group.home_limit_group);
         if (this.homes.size() < playerMaxHomes) {
             homes.putCommand(homeName, minecraftLocation);
-            this.markDirty();
+            this.setDirty();
         } else {
             var ecText = ECText.access(this.player);
             var homeNameText = ecText.accent(homeName);
@@ -247,28 +247,28 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         return homes.containsKey(homeName);
     }
 
-    public void sendCommandFeedback(Text text) {
-        this.player.getCommandSource().sendFeedback(() -> text, CONFIG.BROADCAST_TO_OPS);
+    public void sendCommandFeedback(Component text) {
+        this.player.createCommandSourceStack().sendSuccess(() -> text, CONFIG.BROADCAST_TO_OPS);
     }
 
-    public void sendCommandFeedback(String messageKey, Text... args) {
+    public void sendCommandFeedback(String messageKey, Component... args) {
         sendCommandFeedback(ECText.access(this.player).getText(messageKey, TextFormatType.Default, args));
     }
 
-    public void sendCommandError(Text text) {
-        this.player.getCommandSource().sendError(text);
+    public void sendCommandError(Component text) {
+        this.player.createCommandSourceStack().sendFailure(text);
     }
 
-    public void sendCommandError(String messageKey, Text... args) {
+    public void sendCommandError(String messageKey, Component... args) {
         sendCommandError(ECText.access(this.player).getText(messageKey, TextFormatType.Error, args));
     }
 
-    public void sendMessage(String messageKey, Text... args) {
-        this.player.sendMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Default, args));
+    public void sendMessage(String messageKey, Component... args) {
+        this.player.sendSystemMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Default, args));
     }
 
-    public void sendError(String messageKey, Text... args) {
-        this.player.sendMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Error, args));
+    public void sendError(String messageKey, Component... args) {
+        this.player.sendSystemMessage(ECText.access(this.player).getText(messageKey, TextFormatType.Error, args));
     }
 
     public Set<String> getHomeNames() {
@@ -305,7 +305,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             }
 
             if (!EssentialCommands.VANISH_PRESENT || !VanishAPI.isVanished(player)) {
-                this.player.getEntityWorld().getServer().getPlayerManager().broadcast(
+                this.player.level().getServer().getPlayerList().broadcastSystemMessage(
                     ECText.getInstance().getText(
                         "player.afk.enter",
                         this.player.getDisplayName()),
@@ -323,7 +323,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             Pal.revokeAbility(this.player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
 
             if (!EssentialCommands.VANISH_PRESENT || !VanishAPI.isVanished(player)) {
-                this.player.getEntityWorld().getServer().getPlayerManager().broadcast(
+                this.player.level().getServer().getPlayerList().broadcastSystemMessage(
                     ECText.getInstance().getText(
                         "player.afk.exit",
                         this.player.getDisplayName()),
@@ -339,8 +339,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public void onTickEnd() {
-        var ticks = player.getEntityWorld().getServer().getTicks();
-        var currentPos = player.getEntityPos();
+        var ticks = player.level().getServer().getTickCount();
+        var currentPos = player.position();
         hasMovedThisTick = !this.lastTickPos.equals(currentPos);
         if (hasMovedThisTick) {
             lastMovedTick = ticks;
@@ -348,7 +348,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
         if (this.afk) {
             if (CONFIG.INVULN_WHILE_AFK) {
-                player.requestTeleport(lastTickPos.x, lastTickPos.y, lastTickPos.z);
+                player.teleportTo(lastTickPos.x, lastTickPos.y, lastTickPos.z);
             } else if (hasMovedThisTick) {
                 this.setAfk(false);
             }
@@ -360,10 +360,10 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
             this.setAfk(true);
         }
 
-        lastTickPos = player.getEntityPos();
+        lastTickPos = player.position();
     }
 
-    public Vec3d getLastTickPos() {
+    public Vec3 getLastTickPos() {
         return lastTickPos;
     }
 
@@ -380,7 +380,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public double distanceMovedThisTick() {
-        return this.lastTickPos.distanceTo(this.player.getEntityPos());
+        return this.lastTickPos.distanceTo(this.player.position());
     }
 
     public int getLastActionTick() {
@@ -388,11 +388,11 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public int ticksSinceLastActionOrMove() {
-        return player.getEntityWorld().getServer().getTicks() - Math.max(lastMovedTick, lastActionTick);
+        return player.level().getServer().getTickCount() - Math.max(lastMovedTick, lastActionTick);
     }
 
     public void updateLastActionTick() {
-        this.lastActionTick = player.getEntityWorld().getServer().getTicks();
+        this.lastActionTick = player.level().getServer().getTickCount();
     }
 
     public boolean isSleepingFromCommand() {
@@ -408,7 +408,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
     public void setPreviousLocation(MinecraftLocation location) {
         this.previousLocation = location;
-        this.markDirty();
+        this.setDirty();
     }
 
     public MinecraftLocation getPreviousLocation() {
@@ -425,21 +425,21 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     public boolean removeHome(String homeName) {
         MinecraftLocation old = this.homes.remove(homeName);
         if (old != null) {
-            this.markDirty();
+            this.setDirty();
             return true;
         }
         return false;
     }
 
     @Override
-    public void updatePlayerEntity(ServerPlayerEntity serverPlayerEntity) {
+    public void updatePlayerEntity(ServerPlayer serverPlayerEntity) {
         boolean couldFly = VanillaAbilities.ALLOW_FLYING.getTracker(this.player).isGrantedBy(ECAbilitySources.FLY_COMMAND);
         this.player = serverPlayerEntity;
         setFlight(couldFly);
     }
 
     private void updateFlight() {
-        this.player.sendAbilitiesUpdate();
+        this.player.onUpdateAbilities();
     }
 
     public void setFlight(boolean canFly) {
@@ -447,7 +447,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     public void setFlight(boolean canFly, boolean flyImmediately) {
-        PlayerAbilities abilities = this.player.getAbilities();
+        Abilities abilities = this.player.getAbilities();
         if (canFly) {
             Pal.grantAbility(this.player, VanillaAbilities.ALLOW_FLYING, ECAbilitySources.FLY_COMMAND);
             if (flyImmediately) {
@@ -487,19 +487,19 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         this.tpCooldown = cooldown;
     }
 
-    public Optional<MutableText> getNickname() {
+    public Optional<MutableComponent> getNickname() {
         return Optional.ofNullable(nickname != null ? nickname.copy() : null);
     }
 
-    public MutableText getFullNickname() {
+    public MutableComponent getFullNickname() {
         return fullNickname;
     }
 
-    public MutableText copyFullNickname() {
+    public MutableComponent copyFullNickname() {
         return fullNickname != null ? TextUtil.deepCopy(fullNickname) : null;
     }
 
-    public int setNickname(Text nickname) {
+    public int setNickname(Component nickname) {
         int resultCode = 0;
         // Reset nickname
         if (nickname == null) {
@@ -515,7 +515,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
                 return -2;
             }
             // Ensure player has permissions required to set the specified nickname
-            boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, this.player.getCommandSource());
+            boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, this.player.createCommandSourceStack());
             if (!hasRequiredPerms) {
                 EssentialCommands.LOGGER.info(
                     "{} attempted to set nickname to '{}', with insufficient permissions to do so.",
@@ -537,14 +537,14 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
         reloadFullNickname();
         PlayerDataManager.getInstance().markNicknameDirty(this);
-        this.markDirty();
+        this.setDirty();
         // Return codes based on fail/success
         //  ex: caused by profanity filter.
         return resultCode;
     }
 
     public void save() {
-        NbtCompound data = CODEC.encodeStart(NbtOps.INSTANCE, this)
+        CompoundTag data = CODEC.encodeStart(NbtOps.INSTANCE, this)
             .getOrThrow().asCompound().orElseThrow();
 
         try {
@@ -556,7 +556,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
 
     public void setTimeUsedRtp(int i) {
         this.timeUsedRtp = i;
-        this.markDirty();
+        this.setDirty();
     }
 
     public int getTimeUsedRtp() {
@@ -564,8 +564,8 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
     }
 
     private void reloadFullNickname() {
-        MutableText baseName = Text.literal(this.getPlayer().getGameProfile().name());
-        MutableText tempFullNickname = Text.empty();
+        MutableComponent baseName = Component.literal(this.getPlayer().getGameProfile().name());
+        MutableComponent tempFullNickname = Component.empty();
         // Note: this doesn't ever display if nickname is null,
         //  because our mixin to getDisplayName does a null check on getNickname
         if (this.nickname != null) {
@@ -586,14 +586,14 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
         this.fullNickname = tempFullNickname;
     }
 
-    public static PlayerData access(@NotNull ServerPlayerEntity player) {
+    public static PlayerData access(@NotNull ServerPlayer player) {
         return ((ServerPlayerEntityAccess) player).ec$getPlayerData();
     }
 
-    public static PlayerData accessFromContextOrThrow(CommandContext<ServerCommandSource> context)
+    public static PlayerData accessFromContextOrThrow(CommandContext<CommandSourceStack> context)
         throws CommandSyntaxException
     {
-        return access(context.getSource().getPlayerOrThrow());
+        return access(context.getSource().getPlayerOrException());
     }
 
     public static final Codec<PlayerData> CODEC = RecordCodecBuilder.create(instance ->
@@ -609,7 +609,7 @@ public class PlayerData extends PersistentState implements IServerPlayerEntityDa
                 .forGetter(pd -> Optional.ofNullable(pd.previousLocation)),
 
             // Nickname
-            TextCodecs.CODEC
+            ComponentSerialization.CODEC
                 .optionalFieldOf("nickname")
                 .forGetter(pd -> Optional.ofNullable(pd.nickname)),
 

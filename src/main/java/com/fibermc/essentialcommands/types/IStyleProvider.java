@@ -6,7 +6,7 @@ import com.fibermc.essentialcommands.text.TextFormatType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.text.Style;
+import net.minecraft.network.chat.Style;
 
 public interface IStyleProvider {
     @Nullable Style getFormattingDefault();

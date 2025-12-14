@@ -4,13 +4,13 @@ import java.util.OptionalInt;
 
 import com.fibermc.essentialcommands.commands.utility.TopCommand;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 public enum HeightFindingStrategy implements HeightFinder {
     SKY_TO_SURFACE__FIRST_SOLID(TopCommand::getTop),
@@ -24,11 +24,11 @@ public enum HeightFindingStrategy implements HeightFinder {
         this.heightFinder = heightFinder;
     }
 
-    public static HeightFindingStrategy forWorld(RegistryKey<World> worldRegistryKey) {
-        if (worldRegistryKey == World.OVERWORLD || worldRegistryKey == World.END) {
+    public static HeightFindingStrategy forWorld(ResourceKey<Level> worldRegistryKey) {
+        if (worldRegistryKey == Level.OVERWORLD || worldRegistryKey == Level.END) {
             return HeightFindingStrategy.SKY_TO_SURFACE__FIRST_SOLID;
         }
-        if (worldRegistryKey == World.NETHER) {
+        if (worldRegistryKey == Level.NETHER) {
             return HeightFindingStrategy.BOTTOM_TO_SKY__FIRST_SAFE_AIR;
         }
 
@@ -37,18 +37,18 @@ public enum HeightFindingStrategy implements HeightFinder {
     }
 
     @Override
-    public OptionalInt getY(Chunk chunk, int x, int z) {
+    public OptionalInt getY(ChunkAccess chunk, int x, int z) {
         return heightFinder.getY(chunk, x, z);
     }
 
-    private static OptionalInt findYBottomUp(Chunk chunk, int x, int z) {
+    private static OptionalInt findYBottomUp(ChunkAccess chunk, int x, int z) {
         final int topY = getChunkHighestNonEmptySectionYOffsetOrTopY(chunk);
-        final int bottomY = chunk.getBottomY();
+        final int bottomY = chunk.getMinY();
         if (topY <= bottomY) {
             return OptionalInt.empty();
         }
 
-        final BlockPos.Mutable mutablePos = new BlockPos.Mutable(x, bottomY, z);
+        final BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos(x, bottomY, z);
         BlockState bsFeet1 = chunk.getBlockState(mutablePos); // Block below feet
         BlockState bsBody2 = chunk.getBlockState(mutablePos.move(Direction.UP)); // Block at feet level
         BlockState bsHead3; // Block at head level
@@ -66,8 +66,8 @@ public enum HeightFindingStrategy implements HeightFinder {
         return OptionalInt.empty();
     }
 
-    public static int getChunkHighestNonEmptySectionYOffsetOrTopY(Chunk chunk) {
-        int i = chunk.getHighestNonEmptySection();
-        return i == chunk.getTopYInclusive() ? chunk.getBottomY() : ChunkSectionPos.getBlockCoord(chunk.sectionIndexToCoord(i));
+    public static int getChunkHighestNonEmptySectionYOffsetOrTopY(ChunkAccess chunk) {
+        int i = chunk.getHighestFilledSectionIndex();
+        return i == chunk.getMaxY() ? chunk.getMinY() : SectionPos.sectionToBlockCoord(chunk.getSectionYFromSectionIndex(i));
     }
 }

@@ -5,17 +5,17 @@ import com.fibermc.essentialcommands.types.WarpLocation;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 public final class WarpSuggestion {
     private WarpSuggestion() {}
 
     //Brigader Suggestions
-    public static final SuggestionProvider<ServerCommandSource> STRING_SUGGESTIONS_PROVIDER
+    public static final SuggestionProvider<CommandSourceStack> STRING_SUGGESTIONS_PROVIDER
         = ListSuggestion.ofContext(
             (ctx) -> ManagerLocator.getInstance()
                 .getWorldDataManager()
-                .getAccessibleWarps(ctx.getSource().getPlayerOrThrow())
+                .getAccessibleWarps(ctx.getSource().getPlayerOrException())
                 .map(WarpLocation::getName)
                 .toList()
         );

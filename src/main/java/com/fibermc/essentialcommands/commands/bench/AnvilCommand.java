@@ -3,32 +3,32 @@ package com.fibermc.essentialcommands.commands.bench;
 import com.fibermc.essentialcommands.screen.AnvilCommandScreenHandler;
 import org.jetbrains.annotations.NotNull;
 
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.ScreenHandlerFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.MenuConstructor;
 
 public class AnvilCommand extends SimpleScreenCommand {
-    private static final ScreenHandlerFactory SCREEN_HANDLER_FACTORY = (syncId, inventory, player) ->
+    private static final MenuConstructor SCREEN_HANDLER_FACTORY = (syncId, inventory, player) ->
         new AnvilCommandScreenHandler(
             syncId,
             inventory,
-            ScreenHandlerContext.create(player.getEntityWorld(), player.getBlockPos())
+            ContainerLevelAccess.create(player.level(), player.blockPosition())
         );
 
     @Override
-    protected Text getScreenTitle() {
-        return Text.translatable("block.minecraft.anvil");
+    protected Component getScreenTitle() {
+        return Component.translatable("block.minecraft.anvil");
     }
 
     @Override
-    protected @NotNull ScreenHandlerFactory getScreenHandlerFactory() {
+    protected @NotNull MenuConstructor getScreenHandlerFactory() {
         return SCREEN_HANDLER_FACTORY;
     }
 
     @Override
-    protected void onOpen(ServerPlayerEntity player) {
-        player.incrementStat(Stats.INTERACT_WITH_ANVIL);
+    protected void onOpen(ServerPlayer player) {
+        player.awardStat(Stats.INTERACT_WITH_ANVIL);
     }
 }

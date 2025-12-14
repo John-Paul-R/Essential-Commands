@@ -2,15 +2,12 @@ package com.fibermc.essentialcommands.config;
 
 import java.util.List;
 import java.util.Set;
-
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import com.fibermc.essentialcommands.types.RtpCenter;
-
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.world.World;
-
 import dev.jpcode.eccore.config.expression.Expression;
 import dev.jpcode.eccore.util.TimeUtil;
 
@@ -20,7 +17,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final Style FORMATTING_DEFAULT;
     public final Style FORMATTING_ACCENT;
     public final Style FORMATTING_ERROR;
-    public final Text NICKNAME_PREFIX;
+    public final Component NICKNAME_PREFIX;
     public final boolean ENABLE_BACK;
     public final boolean ENABLE_HOME;
     public final boolean ENABLE_SPAWN;
@@ -73,13 +70,13 @@ public final class EssentialCommandsConfigSnapshot {
     public final int RTP_MIN_RADIUS;
     public final int RTP_COOLDOWN;
     public final int RTP_MAX_ATTEMPTS;
-    public final Set<RegistryKey<World>> RTP_ENABLED_WORLDS;
+    public final Set<ResourceKey<Level>> RTP_ENABLED_WORLDS;
     public final boolean BROADCAST_TO_OPS;
     public final boolean NICK_REVEAL_ON_HOVER;
     public final boolean GRANT_LOWEST_NUMERIC_BY_DEFAULT;
     public final String LANGUAGE;
     public final String MOTD;
-    public final Text AFK_PREFIX;
+    public final Component AFK_PREFIX;
     public final boolean INVULN_WHILE_AFK;
     public final boolean AUTO_AFK_ENABLED;
     public final int AUTO_AFK_TICKS;

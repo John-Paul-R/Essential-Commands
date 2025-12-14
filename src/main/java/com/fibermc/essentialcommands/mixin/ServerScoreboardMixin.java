@@ -7,14 +7,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.scoreboard.ServerScoreboard;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.server.ServerScoreboard;
+import net.minecraft.world.scores.PlayerTeam;
 
 @Mixin(ServerScoreboard.class)
 public class ServerScoreboardMixin {
 
-    @Inject(method = "addScoreHolderToTeam", at = @At("RETURN"))
-    public void onAddPlayerToTeam(String playerName, Team team, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "addPlayerToTeam", at = @At("RETURN"))
+    public void onAddPlayerToTeam(String playerName, PlayerTeam team, CallbackInfoReturnable<Boolean> cir) {
         try {
             PlayerDataManager.getInstance().markNicknameDirty(playerName);
         } catch (NullPointerException ignore) {
@@ -22,8 +22,8 @@ public class ServerScoreboardMixin {
         }
     }
 
-    @Inject(method = "removeScoreHolderFromTeam", at = @At("RETURN"))
-    public void onRemovePlayerFromTeam(String playerName, Team team, CallbackInfo ci) {
+    @Inject(method = "removePlayerFromTeam(Ljava/lang/String;Lnet/minecraft/world/scores/PlayerTeam;)V", at = @At("RETURN"))
+    public void onRemovePlayerFromTeam(String playerName, PlayerTeam team, CallbackInfo ci) {
         try {
             PlayerDataManager.getInstance().markNicknameDirty(playerName);
         } catch (NullPointerException ignore) {
@@ -31,19 +31,19 @@ public class ServerScoreboardMixin {
         }
     }
 
-    @Inject(method = "updateScoreboardTeam", at = @At("RETURN"))
-    public void onUpdateScoreboardTeam(Team team, CallbackInfo ci) {
+    @Inject(method = "onTeamChanged", at = @At("RETURN"))
+    public void onUpdateScoreboardTeam(PlayerTeam team, CallbackInfo ci) {
         var playerDataManager = PlayerDataManager.getInstance();
         if (playerDataManager != null) {
-            team.getPlayerList().forEach(playerDataManager::markNicknameDirty);
+            team.getPlayers().forEach(playerDataManager::markNicknameDirty);
         }
     }
 
-    @Inject(method = "updateRemovedTeam", at = @At("RETURN"))
-    public void onUpdateRemovedTeam(Team team, CallbackInfo ci) {
+    @Inject(method = "onTeamRemoved", at = @At("RETURN"))
+    public void onUpdateRemovedTeam(PlayerTeam team, CallbackInfo ci) {
         var playerDataManager = PlayerDataManager.getInstance();
         if (playerDataManager != null) {
-            team.getPlayerList().forEach(playerDataManager::markNicknameDirty);
+            team.getPlayers().forEach(playerDataManager::markNicknameDirty);
         }
     }
 

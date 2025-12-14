@@ -6,24 +6,24 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 
 import dev.jpcode.eccore.util.TextUtil;
 
 public final class ChatConfirmationPrompt {
 
-    private final ServerPlayerEntity player;
-    private final MutableText text;
+    private final ServerPlayer player;
+    private final MutableComponent text;
 
-    public ChatConfirmationPrompt(CommandContext<ServerCommandSource> context,
-                                  CommandNode<ServerCommandSource> confirmCommand,
-                                  CommandNode<ServerCommandSource> denyCommand,
-                                  MutableText confirmText,
-                                  MutableText denyText) throws CommandSyntaxException {
+    public ChatConfirmationPrompt(CommandContext<CommandSourceStack> context,
+                                  CommandNode<CommandSourceStack> confirmCommand,
+                                  CommandNode<CommandSourceStack> denyCommand,
+                                  MutableComponent confirmText,
+                                  MutableComponent denyText) throws CommandSyntaxException {
         this(
             context.getSource().getPlayer(),
             CommandUtil.getCommandString(context.getSource(), confirmCommand),
@@ -33,14 +33,14 @@ public final class ChatConfirmationPrompt {
         );
     }
 
-    public ChatConfirmationPrompt(ServerPlayerEntity player,
+    public ChatConfirmationPrompt(ServerPlayer player,
                                   String confirmCommandStr,
                                   String denyCommandStr,
-                                  MutableText confirmText,
-                                  MutableText denyText) {
+                                  MutableComponent confirmText,
+                                  MutableComponent denyText) {
         this.player = player;
         this.text = TextUtil.spaceBetween(
-            new Text[]{
+            new Component[]{
                 confirmText.setStyle(
                     confirmText.getStyle().withClickEvent(new ClickEvent.RunCommand(
                         confirmCommandStr))),
@@ -53,20 +53,20 @@ public final class ChatConfirmationPrompt {
         );
     }
 
-    public ChatConfirmationPrompt(ServerPlayerEntity player,
+    public ChatConfirmationPrompt(ServerPlayer player,
                                   String commandStr,
-                                  MutableText text) {
+                                  MutableComponent text) {
         this.player = player;
-        this.text = Text.literal(" ".repeat(15)).append(
+        this.text = Component.literal(" ".repeat(15)).append(
             text.setStyle(text.getStyle().withClickEvent(
                 new ClickEvent.RunCommand(commandStr))));
     }
 
     public void send() {
-        this.player.sendMessage(this.text);
+        this.player.sendSystemMessage(this.text);
     }
 
-    public MutableText getText() {
+    public MutableComponent getText() {
         return this.text;
     }
 

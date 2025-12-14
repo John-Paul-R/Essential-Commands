@@ -1,8 +1,8 @@
 package com.fibermc.essentialcommands.types;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public interface NbtSerializable {
 
-    NbtCompound writeNbt(NbtCompound tag);
+    CompoundTag writeNbt(CompoundTag tag);
 }

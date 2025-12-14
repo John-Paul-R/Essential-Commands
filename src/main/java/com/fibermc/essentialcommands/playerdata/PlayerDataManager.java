@@ -18,13 +18,13 @@ import com.fibermc.essentialcommands.types.RespawnCondition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.damagesource.DamageSource;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -77,13 +77,13 @@ public class PlayerDataManager {
                 (playerDataManager, server) -> {
                     for (PlayerDataManagerTickCallback event : listeners) {
                         event.onTick(playerDataManager, server);
-                        server.getOverworld().updateSleepingPlayers();
+                        server.overworld().updateSleepingPlayerList();
                     }
                 }
         );
 
     private static void handleSendMotdForGameJoin(
-        ServerPlayNetworkHandler handler,
+        ServerGamePacketListenerImpl handler,
         PacketSender sender,
         MinecraftServer server
     ) {
@@ -112,11 +112,11 @@ public class PlayerDataManager {
     public void queueNicknameUpdatesForAllPlayers() {
         scheduleTask("nickname-update", server -> {
             server
-                .getPlayerManager()
-                .sendToAll(
-                    new PlayerListS2CPacket(
+                .getPlayerList()
+                .broadcastAll(
+                    new ClientboundPlayerInfoUpdatePacket(
                         EnumSet.of(
-                            PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME
+                            ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME
                         ),
                         this.getAllPlayerData()
                             .stream()
@@ -130,27 +130,27 @@ public class PlayerDataManager {
 
     public void tick(MinecraftServer server) {
         if (
-            CONFIG.NICKNAMES_IN_PLAYER_LIST && server.getTicks() % (20 * 5) == 0
+            CONFIG.NICKNAMES_IN_PLAYER_LIST && server.getTickCount() % (20 * 5) == 0
         ) {
             if (this.changedNicknames.size() + this.changedTeams.size() > 0) {
-                PlayerManager serverPlayerManager = server.getPlayerManager();
+                PlayerList serverPlayerManager = server.getPlayerList();
 
-                Set<ServerPlayerEntity> allChangedNicknamePlayers =
+                Set<ServerPlayer> allChangedNicknamePlayers =
                     Stream.concat(
                         changedNicknames.stream().map(PlayerData::getPlayer),
                         changedTeams
                             .stream()
-                            .map(serverPlayerManager::getPlayer)
+                            .map(serverPlayerManager::getPlayerByName)
                     )
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet());
 
                 server
-                    .getPlayerManager()
-                    .sendToAll(
-                        new PlayerListS2CPacket(
+                    .getPlayerList()
+                    .broadcastAll(
+                        new ClientboundPlayerInfoUpdatePacket(
                             EnumSet.of(
-                                PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME
+                                ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME
                             ),
                             allChangedNicknamePlayers
                         )
@@ -211,8 +211,8 @@ public class PlayerDataManager {
 
     // EVENTS
     private static void initializePlayerDataForConnect(
-        ClientConnection connection,
-        ServerPlayerEntity player
+        Connection connection,
+        ServerPlayer player
     ) {
         var playerAccess = ((ServerPlayerEntityAccess) player);
         PlayerData playerData = getInstance().loadPlayerData(player);
@@ -223,15 +223,15 @@ public class PlayerDataManager {
     }
 
     private static void handleUnloadPlayerDataForLeave(
-        ServerPlayerEntity player
+        ServerPlayer player
     ) {
         // Auto-saving should be handled by WorldSaveHandlerMixin. (PlayerData saves when MC server saves players)
         getInstance().unloadPlayerData(player);
     }
 
     public static void handlePlayerDataRespawnSync(
-        ServerPlayerEntity oldPlayerEntity,
-        ServerPlayerEntity newPlayerEntity
+        ServerPlayer oldPlayerEntity,
+        ServerPlayer newPlayerEntity
     ) {
         var oldPlayerAccess = ((ServerPlayerEntityAccess) oldPlayerEntity);
         var newPlayerAccess = ((ServerPlayerEntityAccess) newPlayerEntity);
@@ -249,7 +249,7 @@ public class PlayerDataManager {
      * @param oldPlayerEntity null if first spawn
      */
     public static void handleRespawnAtEcSpawn(
-        @Nullable ServerPlayerEntity oldPlayerEntity,
+        @Nullable ServerPlayer oldPlayerEntity,
         Consumer<MinecraftLocation> onOverwriteSpawn
     ) {
         var worldMgr = ManagerLocator.getInstance().getWorldDataManager();
@@ -264,18 +264,17 @@ public class PlayerDataManager {
             new ExpressionEvaluationContext<>() {
                 private boolean isSameWorld() {
                     return (
-                        oldPlayerEntity == null ||
-                        oldPlayerEntity.getEntityWorld().getRegistryKey() ==
-                        spawnLoc.dim()
+                        oldPlayerEntity == null
+                        || oldPlayerEntity.level().dimension() == spawnLoc.dim()
                     );
                 }
 
                 private boolean hasNoBed() {
                     return (
-                        oldPlayerEntity == null ||
+                        oldPlayerEntity == null
                         // This is not perfect, but 'respawn' is horribly
                         // complex to navigate now
-                        oldPlayerEntity.getRespawn() == null
+                        || oldPlayerEntity.getRespawnConfig() == null
                     );
                 }
 
@@ -300,7 +299,7 @@ public class PlayerDataManager {
     }
 
     private static void handleSetPreviousLocationForDeath(
-        ServerPlayerEntity playerEntity,
+        ServerPlayer playerEntity,
         DamageSource damageSource
     ) {
         PlayerData pData =
@@ -311,10 +310,10 @@ public class PlayerDataManager {
     }
 
     // SET / ADD
-    private PlayerData loadPlayerData(ServerPlayerEntity player) {
+    private PlayerData loadPlayerData(ServerPlayer player) {
         PlayerData playerData =
             ((ServerPlayerEntityAccess) player).ec$getPlayerData();
-        dataMap.put(player.getUuid(), playerData);
+        dataMap.put(player.getUUID(), playerData);
         return playerData;
     }
 
@@ -323,8 +322,8 @@ public class PlayerDataManager {
     }
 
     // SAVE / LOAD
-    private void unloadPlayerData(ServerPlayerEntity player) {
-        this.dataMap.remove(player.getUuid());
+    private void unloadPlayerData(ServerPlayer player) {
+        this.dataMap.remove(player.getUUID());
     }
 
     public Collection<PlayerData> getAllPlayerData() {

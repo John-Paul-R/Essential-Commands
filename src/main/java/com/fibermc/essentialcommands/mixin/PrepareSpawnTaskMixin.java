@@ -10,26 +10,27 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.network.ClientConnection;
-import net.minecraft.server.network.ConnectedClientData;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.network.Connection;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.storage.ValueInput;
 
-@Mixin(targets = "net.minecraft.server.network.PrepareSpawnTask$PlayerSpawn")
+@Mixin(targets = "net.minecraft.server.network.config.PrepareSpawnTask$Ready")
 public abstract class PrepareSpawnTaskMixin {
+    @SuppressWarnings({"checkstyle:MethodName"})
     @Inject(
-        method = "onReady",
+        method = "spawn",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerPlayerEntity;refreshPositionAndAngles(Lnet/minecraft/util/math/Vec3d;FF)V"
+            target = "Lnet/minecraft/server/level/ServerPlayer;snapTo(Lnet/minecraft/world/phys/Vec3;FF)V"
         )
     )
     public void onReady_firstConnect_spawnPositionOverride(
-        ClientConnection connection, ConnectedClientData clientData, CallbackInfoReturnable<ServerPlayerEntity> cir,
+        Connection connection, CommonListenerCookie clientData, CallbackInfoReturnable<ServerPlayer> cir,
         @Local(ordinal = 0) ChunkPos chunkPos,
-        @Local(ordinal = 0) ServerPlayerEntity serverPlayerEntity,
-        @Local(ordinal = 0) Optional<ReadView> playerNbt
+        @Local(ordinal = 0) ServerPlayer serverPlayerEntity,
+        @Local(ordinal = 0) Optional<ValueInput> playerNbt
     ) {
         if (playerNbt.isPresent()) {
             // player data existed, definitely isn't first join
@@ -47,7 +48,7 @@ public abstract class PrepareSpawnTaskMixin {
         }
 
         var pos = location[0];
-        serverPlayerEntity.setServerWorld(serverPlayerEntity.getEntityWorld().getServer().getWorld(location[0].dim()));
-        serverPlayerEntity.refreshPositionAndAngles(pos.pos(), pos.headYaw(), pos.pitch());
+        serverPlayerEntity.setServerLevel(serverPlayerEntity.level().getServer().getLevel(location[0].dim()));
+        serverPlayerEntity.snapTo(pos.pos(), pos.headYaw(), pos.pitch());
     }
 }

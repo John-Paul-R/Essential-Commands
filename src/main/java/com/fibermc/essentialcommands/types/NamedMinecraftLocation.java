@@ -6,11 +6,11 @@ import com.fibermc.essentialcommands.codec.Codecs;
 
 import com.mojang.serialization.Codec;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class NamedMinecraftLocation extends MinecraftLocation {
     public static final Codec<NamedMinecraftLocation> CODEC = Codecs.NAMED_MINECRAFT_LOCATION;
@@ -33,7 +33,7 @@ public class NamedMinecraftLocation extends MinecraftLocation {
     }
 
     public NamedMinecraftLocation(
-        RegistryKey<World> dim,
+        ResourceKey<Level> dim,
         double x,
         double y,
         double z,
@@ -46,8 +46,8 @@ public class NamedMinecraftLocation extends MinecraftLocation {
     }
 
     public NamedMinecraftLocation(
-        RegistryKey<World> dim,
-        Vec3d pos,
+        ResourceKey<Level> dim,
+        Vec3 pos,
         float headYaw,
         float pitch,
         String name
@@ -56,12 +56,12 @@ public class NamedMinecraftLocation extends MinecraftLocation {
         this.name = name;
     }
 
-    public static NamedMinecraftLocation fromNbt(NbtCompound tag) {
+    public static NamedMinecraftLocation fromNbt(CompoundTag tag) {
         return CODEC.parse(NbtOps.INSTANCE, tag)
             .getOrThrow();
     }
 
-    public NbtCompound writeNbt(NbtCompound tag) {
+    public CompoundTag writeNbt(CompoundTag tag) {
         return CODEC.encodeStart(NbtOps.INSTANCE, this)
             .getOrThrow()
             .asCompound()

@@ -9,10 +9,9 @@ import java.util.concurrent.Executors;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.yggdrasil.response.NameAndId;
 
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerConfigEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerPlayer;
 
 public class OfflinePlayerRepo {
 
@@ -23,19 +22,19 @@ public class OfflinePlayerRepo {
         this.server = server;
     }
 
-    public CompletableFuture<ServerPlayerEntity> getOfflinePlayerByNameAsync(String playerName) {
+    public CompletableFuture<ServerPlayer> getOfflinePlayerByNameAsync(String playerName) {
         return getGameProfile(playerName)
             .handle(((gameProfile, throwable) -> gameProfile.map(this::getOfflinePlayer).orElse(null)));
     }
 
-    public ServerPlayerEntity getOfflinePlayer(NameAndId playerProfile) {
-        var player = new ServerPlayerEntity(
+    public ServerPlayer getOfflinePlayer(NameAndId playerProfile) {
+        var player = new ServerPlayer(
             server,
-            server.getOverworld(),
+            server.overworld(),
             new GameProfile(playerProfile.id(), playerProfile.name()),
-            SyncedClientOptions.createDefault());
+            ClientInformation.createDefault());
 
-        server.getPlayerManager().loadPlayerData(new PlayerConfigEntry(playerProfile.id(), playerProfile.name()));
+        server.getPlayerList().loadPlayerData(new net.minecraft.server.players.NameAndId(playerProfile.id(), playerProfile.name()));
 
         return player;
     }
@@ -58,7 +57,7 @@ public class OfflinePlayerRepo {
 
         gameProfileExecutor.execute(() -> {
             try {
-                completable.complete(server.getApiServices().profileRepository().findProfileByName(playerName));
+                completable.complete(server.services().profileRepository().findProfileByName(playerName));
             } catch (Exception ex) {
                 completable.completeExceptionally(ex);
             }

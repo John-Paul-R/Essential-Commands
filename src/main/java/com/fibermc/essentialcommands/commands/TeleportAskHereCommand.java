@@ -11,19 +11,19 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.server.level.ServerPlayer;
 
-public class TeleportAskHereCommand implements Command<ServerCommandSource> {
+public class TeleportAskHereCommand implements Command<CommandSourceStack> {
 
     public TeleportAskHereCommand() {}
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         TeleportManager tpMgr = ManagerLocator.getInstance().getTpManager();
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
-        ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
+        ServerPlayer senderPlayer = context.getSource().getPlayerOrException();
+        ServerPlayer targetPlayer = EntityArgument.getPlayer(context, "target_player");
         var senderPlayerData = PlayerData.access(senderPlayer);
         var targetPlayerData = PlayerData.access(targetPlayer);
 
@@ -43,7 +43,7 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
         var targetPlayerEcText = ECText.access(targetPlayer);
         targetPlayerData.sendMessage(
             "cmd.tpaskhere.receive",
-            targetPlayerEcText.accent(senderPlayer.getNameForScoreboard())
+            targetPlayerEcText.accent(senderPlayer.getScoreboardName())
         );
 
         String senderName = senderPlayer.getGameProfile().name();
@@ -59,7 +59,7 @@ public class TeleportAskHereCommand implements Command<ServerCommandSource> {
         tpMgr.startTpRequest(senderPlayer, targetPlayer, TeleportRequest.Type.TPA_HERE);
 
         //inform command sender that request has been sent
-        var targetPlayerText = ECText.access(senderPlayer).accent(targetPlayer.getNameForScoreboard());
+        var targetPlayerText = ECText.access(senderPlayer).accent(targetPlayer.getScoreboardName());
         senderPlayerData.sendCommandFeedback("cmd.tpask.send", targetPlayerText);
 
         return SINGLE_SUCCESS;

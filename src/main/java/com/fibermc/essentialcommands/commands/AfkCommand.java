@@ -6,15 +6,15 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class AfkCommand implements Command<ServerCommandSource> {
+public class AfkCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var source = context.getSource();
-        var player = source.getPlayerOrThrow();
+        var player = source.getPlayerOrException();
         var playerAccess = ((ServerPlayerEntityAccess) player);
         var playerData = playerAccess.ec$getPlayerData();
 

@@ -9,21 +9,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 
-@Mixin(PlayerListS2CPacket.Action.class)
-public class PlayerListS2CPacketActionMixin {
+@Mixin(ClientboundPlayerInfoUpdatePacket.Action.class)
+public class ClientboundPlayerInfoUpdatePacketActionMixin {
 
     @Mutable
     @Final
     @Shadow
-    PlayerListS2CPacket.Action.Writer writer;
+    ClientboundPlayerInfoUpdatePacket.Action.Writer writer;
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
-    public void ctor(String string, int i, PlayerListS2CPacket.Action.Reader reader, PlayerListS2CPacket.Action.Writer argWriter, CallbackInfo ci) {
+    public void ctor(String string, int i, ClientboundPlayerInfoUpdatePacket.Action.Reader reader, ClientboundPlayerInfoUpdatePacket.Action.Writer argWriter, CallbackInfo ci) {
         if (!"ADD_PLAYER".equals(string)) {
             return;
         }
@@ -42,9 +42,9 @@ public class PlayerListS2CPacketActionMixin {
                     return;
                 }
                 var displayName = playerData.getPlayer().getDisplayName();
-                var displayNameString = displayName.asTruncatedString(16);
-                buf.writeString(displayNameString, 16);
-                PacketCodecs.PROPERTY_MAP.encode(buf, entry.profile().properties());
+                var displayNameString = displayName.getString(16);
+                buf.writeUtf(displayNameString, 16);
+                ByteBufCodecs.GAME_PROFILE_PROPERTIES.encode(buf, entry.profile().properties());
             } else {
                 vanillaWriter.write(buf, entry);
             }

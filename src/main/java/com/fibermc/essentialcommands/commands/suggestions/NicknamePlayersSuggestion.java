@@ -7,20 +7,20 @@ import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.MutableText;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.MutableComponent;
 
 public final class NicknamePlayersSuggestion {
     private NicknamePlayersSuggestion() {}
 
     //Brigader Suggestions
-    public static final SuggestionProvider<ServerCommandSource> STRING_SUGGESTIONS_PROVIDER =
+    public static final SuggestionProvider<CommandSourceStack> STRING_SUGGESTIONS_PROVIDER =
         ListSuggestion.ofContext(context ->
             PlayerDataManager.getInstance().getAllPlayerData().stream()
                 .map(PlayerData::getNickname)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(MutableText::getString)
+                .map(MutableComponent::getString)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList()
         );

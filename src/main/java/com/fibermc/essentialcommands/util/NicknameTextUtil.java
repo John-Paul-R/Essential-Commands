@@ -2,10 +2,10 @@ package com.fibermc.essentialcommands.util;
 
 import com.fibermc.essentialcommands.ECPerms;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
 
 public final class NicknameTextUtil {
     private NicknameTextUtil() {}
@@ -16,7 +16,7 @@ public final class NicknameTextUtil {
         public final boolean hover;
         public final boolean click;
 
-        private NickPerms(ServerCommandSource source) {
+        private NickPerms(CommandSourceStack source) {
             this.color = ECPerms.check(source, ECPerms.Registry.nickname_style_color);
             this.fancy = ECPerms.check(source, ECPerms.Registry.nickname_style_fancy);
             this.hover = ECPerms.check(source, ECPerms.Registry.nickname_style_hover);
@@ -30,7 +30,7 @@ public final class NicknameTextUtil {
     }
 
     // Returns true if they have the permissions for this nickname
-    private static boolean hasPermissionForTextFragment(Text text, NickPerms sourcePerms) {
+    private static boolean hasPermissionForTextFragment(Component text, NickPerms sourcePerms) {
         Style style = text.getStyle();
         // If the nickname has no click event, return true
         // if it DOES have a clickEvent, return true if they have the clickEvent permission...
@@ -42,18 +42,18 @@ public final class NicknameTextUtil {
                     || style.isObfuscated()
                     || style.isStrikethrough()
                     || style.isUnderlined())
-                || !style.getFont().equals(Identifier.of("minecraft:default"))),
+                || !style.getFont().equals(Identifier.parse("minecraft:default"))),
             (sourcePerms.click || (style.getClickEvent() == null)),
             (sourcePerms.hover || (style.getHoverEvent() == null))
         );
     }
 
-    public static boolean checkPerms(Text parentText, NickPerms sourcePerms) {
+    public static boolean checkPerms(Component parentText, NickPerms sourcePerms) {
         if (parentText == null) {
             return true;
         }
         boolean hasRequiredPerms = hasPermissionForTextFragment(parentText, sourcePerms);
-        for (Text text : parentText.getSiblings()) {
+        for (Component text : parentText.getSiblings()) {
             if (!checkPerms(text, sourcePerms)) {
                 hasRequiredPerms = false;
                 break;
@@ -67,7 +67,7 @@ public final class NicknameTextUtil {
         return hasRequiredPerms;
     }
 
-    public static boolean checkPerms(Text parentText, ServerCommandSource source) {
+    public static boolean checkPerms(Component parentText, CommandSourceStack source) {
         return checkPerms(parentText, new NickPerms(source));
     }
 }

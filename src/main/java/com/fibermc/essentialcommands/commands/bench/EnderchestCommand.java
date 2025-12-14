@@ -2,30 +2,30 @@ package com.fibermc.essentialcommands.commands.bench;
 
 import org.jetbrains.annotations.NotNull;
 
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.inventory.ChestMenu;
 
 public class EnderchestCommand extends SimpleScreenCommand {
     @Override
-    protected Text getScreenTitle() {
-        return Text.translatable("container.enderchest");
+    protected Component getScreenTitle() {
+        return Component.translatable("container.enderchest");
     }
 
     @Override
-    protected @NotNull NamedScreenHandlerFactory getScreenHandlerFactory() {
-        return new SimpleNamedScreenHandlerFactory(
+    protected @NotNull MenuProvider getScreenHandlerFactory() {
+        return new SimpleMenuProvider(
             (syncId, inventory, player) ->
-                GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, player.getEnderChestInventory()),
-            Text.translatable("container.enderchest")
+                ChestMenu.threeRows(syncId, inventory, player.getEnderChestInventory()),
+            Component.translatable("container.enderchest")
         );
     }
 
     @Override
-    protected void onOpen(ServerPlayerEntity player) {
-        player.incrementStat(Stats.OPEN_ENDERCHEST);
+    protected void onOpen(ServerPlayer player) {
+        player.awardStat(Stats.OPEN_ENDERCHEST);
     }
 }

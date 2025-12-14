@@ -22,23 +22,23 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 
-public class HomeCommand implements Command<ServerCommandSource> {
+public class HomeCommand implements Command<CommandSourceStack> {
 
     public HomeCommand() {}
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrException()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return exec(senderPlayerData, homeName);
     }
 
-    private static PlayerData getTargetPlayerData(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        return ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+    private static PlayerData getTargetPlayerData(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        return ((ServerPlayerEntityAccess) context.getSource().getPlayerOrException()).ec$getPlayerData();
     }
 
     // TODO: Ideally the styling here should come from a context, intead of from the player we're
@@ -57,8 +57,8 @@ public class HomeCommand implements Command<ServerCommandSource> {
         return homeNames.stream().findAny().get();
     }
 
-    public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData playerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+    public int runDefault(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        PlayerData playerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrException()).ec$getPlayerData();
 
         return exec(
             playerData,
@@ -78,7 +78,7 @@ public class HomeCommand implements Command<ServerCommandSource> {
             Message msg = ecText.getText(
                 "cmd.home.tp.error.not_found",
                 TextFormatType.Error,
-                Text.literal(homeName));
+                Component.literal(homeName));
             throw new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
         }
 
@@ -94,20 +94,20 @@ public class HomeCommand implements Command<ServerCommandSource> {
 
     public static class Suggestion {
         //Brigader Suggestions
-        public static final SuggestionProvider<ServerCommandSource> LIST_SUGGESTION_PROVIDER
+        public static final SuggestionProvider<CommandSourceStack> LIST_SUGGESTION_PROVIDER
             = ListSuggestion.ofContext(Suggestion::getSuggestionsList);
 
         /**
          * Gets a list of suggested strings to be used with Brigader
          */
-        public static List<String> getSuggestionsList(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        public static List<String> getSuggestionsList(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             return new ArrayList<>(HomeCommand.getTargetPlayerData(context).getHomeNames());
         }
 
         /**
          * Gets a set of suggestion entries to be used with ListCommandFactory
          */
-        public static Set<Map.Entry<String, NamedMinecraftLocation>> getSuggestionEntries(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        public static Set<Map.Entry<String, NamedMinecraftLocation>> getSuggestionEntries(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             return HomeCommand.getTargetPlayerData(context).getHomeEntries();
         }
     }

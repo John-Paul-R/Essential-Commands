@@ -8,11 +8,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
 
-import net.minecraft.command.EntitySelector;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.selector.EntitySelector;
+import net.minecraft.server.level.ServerPlayer;
 
 import dev.jpcode.eccore.util.TextUtil;
 
@@ -20,12 +20,12 @@ public final class CommandUtil {
 
     private CommandUtil() {}
 
-    public static RequiredArgumentBuilder<ServerCommandSource, EntitySelector> targetPlayerArgument() {
-        return CommandManager.argument("target_player", EntityArgumentType.player());
+    public static RequiredArgumentBuilder<CommandSourceStack, EntitySelector> targetPlayerArgument() {
+        return Commands.argument("target_player", EntityArgument.player());
     }
 
-    public static String getCommandString(ServerCommandSource source, CommandNode<ServerCommandSource> commandNode) {
-        CommandDispatcher<ServerCommandSource> dispatcher = source.getServer().getCommandManager().getDispatcher();
+    public static String getCommandString(CommandSourceStack source, CommandNode<CommandSourceStack> commandNode) {
+        CommandDispatcher<CommandSourceStack> dispatcher = source.getServer().getCommands().getDispatcher();
 
         return "/" + TextUtil.joinStrings(
             dispatcher.getPath(commandNode),
@@ -37,9 +37,9 @@ public final class CommandUtil {
         return new CommandSyntaxException(new SimpleCommandExceptionType(msg), msg);
     }
 
-    public static ServerPlayerEntity getCommandTargetPlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public static ServerPlayer getCommandTargetPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         try {
-            return EntityArgumentType.getPlayer(context, "target_player");
+            return EntityArgument.getPlayer(context, "target_player");
         } catch (IllegalArgumentException e) {
             return context.getSource().getPlayer();
         }

@@ -1,7 +1,7 @@
 package com.fibermc.essentialcommands.events;
 
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -14,5 +14,5 @@ public interface PlayerDeathCallback {
             }
         });
 
-    void onDeath(ServerPlayerEntity playerEntity, DamageSource damageSource);
+    void onDeath(ServerPlayer playerEntity, DamageSource damageSource);
 }

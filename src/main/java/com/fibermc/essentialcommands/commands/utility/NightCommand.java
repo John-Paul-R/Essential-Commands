@@ -6,23 +6,23 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerLevel;
 
-public class NightCommand implements Command<ServerCommandSource> {
+public class NightCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack source = context.getSource();
         PlayerData playerData = PlayerData.accessFromContextOrThrow(context);
-        ServerWorld world = source.getServer().getOverworld();
-        if (world.isNight()) {
+        ServerLevel world = source.getServer().overworld();
+        if (world.isDarkOutside()) {
             playerData.sendCommandFeedback("cmd.night.error.already_nighttime");
             return -1;
         }
-        long time = world.getTimeOfDay();
+        long time = world.getDayTime();
         long timeToNight = 13000L - time % 24000L;
 
-        world.setTimeOfDay(time + timeToNight);
+        world.setDayTime(time + timeToNight);
         playerData.sendCommandFeedback("cmd.night.feedback");
         return 1;
     }

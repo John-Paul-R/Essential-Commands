@@ -17,7 +17,7 @@ public final class TimeUtil {
     }
 
     public static int getTicks() {
-        return server.getTicks();
+        return server.getTickCount();
     }
 
     public static long ticksToMs(int ticks) {
@@ -29,12 +29,12 @@ public final class TimeUtil {
     }
 
     public static long tickTimeToEpochMs(int ticks) {
-        return ticksToMs(ticks - server.getTicks()) + net.minecraft.util.Util.getEpochTimeMs();
+        return ticksToMs(ticks - server.getTickCount()) + net.minecraft.util.Util.getEpochMillis();
     }
 
     public static int epochTimeMsToTicks(long epochTimeMs) {
-        var msFromNow = epochTimeMs - net.minecraft.util.Util.getEpochTimeMs();
-        return server.getTicks() + msToTicks(msFromNow);
+        var msFromNow = epochTimeMs - net.minecraft.util.Util.getEpochMillis();
+        return server.getTickCount() + msToTicks(msFromNow);
     }
 
     public static int durationToTicks(Duration duration) {

@@ -3,18 +3,18 @@ package com.fibermc.essentialcommands.teleportation;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
 
 public class QueuedLocationTeleport extends QueuedTeleport {
 
     private final MinecraftLocation dest;
 
-    public QueuedLocationTeleport(PlayerData playerData, MinecraftLocation dest, MutableText destName) {
+    public QueuedLocationTeleport(PlayerData playerData, MinecraftLocation dest, MutableComponent destName) {
         super(playerData, destName);
         this.dest = dest;
     }
 
-    public QueuedLocationTeleport(PlayerData playerData, MinecraftLocation dest, MutableText destName, int delay) {
+    public QueuedLocationTeleport(PlayerData playerData, MinecraftLocation dest, MutableComponent destName, int delay) {
         super(playerData, destName, delay);
         this.dest = dest;
     }

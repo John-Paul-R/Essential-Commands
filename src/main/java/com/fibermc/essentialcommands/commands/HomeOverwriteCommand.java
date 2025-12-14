@@ -10,17 +10,17 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
-public class HomeOverwriteCommand implements Command<ServerCommandSource> {
+public class HomeOverwriteCommand implements Command<CommandSourceStack> {
     public HomeOverwriteCommand() {}
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         String homeName = StringArgumentType.getString(context, "home_name");
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity senderPlayer = source.getPlayerOrThrow();
+        CommandSourceStack source = context.getSource();
+        ServerPlayer senderPlayer = source.getPlayerOrException();
         PlayerData playerData = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
 
         var homeNameText = ECText.access(senderPlayer).accent(homeName);

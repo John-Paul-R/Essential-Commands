@@ -7,21 +7,21 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
-public class ExtinguishCommand implements Command<ServerCommandSource> {
+public class ExtinguishCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         PlayerData senderPlayerData = PlayerData.accessFromContextOrThrow(context);
-        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+        ServerPlayer targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         if (!targetPlayer.isOnFire()) {
             senderPlayerData.sendCommandError("cmd.extinguish.error.not_on_fire");
             return 0;
         }
 
-        targetPlayer.setFireTicks(0);
+        targetPlayer.setRemainingFireTicks(0);
 
         senderPlayerData.sendCommandFeedback("cmd.extinguish.feedback");
 

@@ -8,42 +8,42 @@ import com.fibermc.essentialcommands.types.ProfileOption;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-import static net.minecraft.server.command.CommandManager.argument;
+import static net.minecraft.commands.Commands.argument;
 
 public final class ProfileCommand {
     private ProfileCommand() {}
 
-    public static LiteralCommandNode<ServerCommandSource> buildNode() {
-        var root = CommandManager.literal("profile");
-        var set = CommandManager.literal("set");
-        var get = CommandManager.literal("get");
+    public static LiteralCommandNode<CommandSourceStack> buildNode() {
+        var root = Commands.literal("profile");
+        var set = Commands.literal("set");
+        var get = Commands.literal("get");
 
         for (Map.Entry<String, ProfileOption<?>> entry : PlayerProfile.OPTIONS.entrySet()) {
             var name = entry.getKey();
             var option = entry.getValue();
 
-            set.then(CommandManager.literal(name)
+            set.then(Commands.literal(name)
                 .then(argument("value", option.argumentType()).executes((context) -> {
-                    var player = context.getSource().getPlayerOrThrow();
+                    var player = context.getSource().getPlayerOrException();
                     var profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
                     option.profileSetter().setValue(context, "value", profile);
-                    profile.markDirty();
-                    profile.save(context.getSource().getServer().getRegistryManager());
+                    profile.setDirty();
+                    profile.save(context.getSource().getServer().registryAccess());
                     return 0;
                 }))
             );
 
-            get.then(CommandManager.literal(name)
+            get.then(Commands.literal(name)
                 .executes((context) -> {
-                    var player = context.getSource().getPlayerOrThrow();
+                    var player = context.getSource().getPlayerOrException();
                     var profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
-                    context.getSource().sendFeedback(() ->
-                        Text.literal(option.profileGetter().getValue(profile).map(Object::toString).orElse("<not set>")),
+                    context.getSource().sendSuccess(() ->
+                        Component.literal(option.profileGetter().getValue(profile).map(Object::toString).orElse("<not set>")),
                         CONFIG.BROADCAST_TO_OPS);
                     return 0;
                 })
