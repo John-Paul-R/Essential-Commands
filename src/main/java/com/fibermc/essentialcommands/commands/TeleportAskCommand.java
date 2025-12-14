@@ -13,19 +13,19 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.server.level.ServerPlayer;
 
-public class TeleportAskCommand implements Command<ServerCommandSource> {
+public class TeleportAskCommand implements Command<CommandSourceStack> {
 
     public TeleportAskCommand() {}
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         TeleportManager tpMgr = ManagerLocator.getInstance().getTpManager();
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
-        ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "target_player");
+        ServerPlayer senderPlayer = context.getSource().getPlayerOrException();
+        ServerPlayer targetPlayer = EntityArgument.getPlayer(context, "target_player");
         var senderPlayerData = PlayerData.access(senderPlayer);
         var targetPlayerData = PlayerData.access(targetPlayer);
 
@@ -46,7 +46,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
         var targetPlayerProfile = PlayerProfile.access(targetPlayer);
         targetPlayerData.sendMessage(
             "cmd.tpask.receive",
-            senderPlayer.getDisplayName().copy().fillStyle(targetPlayerProfile.getStyle(TextFormatType.Accent))
+            senderPlayer.getDisplayName().copy().withStyle(targetPlayerProfile.getStyle(TextFormatType.Accent))
         );
 
         String senderName = senderPlayer.getGameProfile().name();
@@ -63,7 +63,7 @@ public class TeleportAskCommand implements Command<ServerCommandSource> {
 
         //inform command sender that request has been sent
         var senderPlayerProfile = PlayerProfile.access(senderPlayer);
-        var targetPlayerText = targetPlayer.getDisplayName().copy().fillStyle(senderPlayerProfile.getStyle(TextFormatType.Accent));
+        var targetPlayerText = targetPlayer.getDisplayName().copy().withStyle(senderPlayerProfile.getStyle(TextFormatType.Accent));
         senderPlayerData.sendCommandFeedback("cmd.tpask.send", targetPlayerText);
 
         return SINGLE_SUCCESS;

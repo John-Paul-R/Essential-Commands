@@ -18,18 +18,18 @@ import org.apache.logging.log4j.Level;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.WorldSavePath;
-import net.minecraft.world.PersistentState;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.LevelResource;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 
-public class WorldDataManager extends PersistentState {
+public class WorldDataManager extends SavedData {
     private Path saveDir;
     private File worldDataFile;
     private WorldData data;
@@ -46,7 +46,7 @@ public class WorldDataManager extends PersistentState {
     }
 
     public void onServerStart(MinecraftServer server) {
-        this.saveDir = server.getSavePath(WorldSavePath.ROOT).resolve("essentialcommands");
+        this.saveDir = server.getWorldPath(LevelResource.ROOT).resolve("essentialcommands");
         try {
             Files.createDirectories(saveDir);
         } catch (IOException e) {
@@ -59,12 +59,12 @@ public class WorldDataManager extends PersistentState {
             boolean fileExisted = !worldDataFile.createNewFile();
             if (fileExisted && worldDataFile.length() > 0) {
                 // if files was not JUST created, read data from it.
-                var tag = NbtIo.readCompressed(worldDataFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
+                var tag = NbtIo.readCompressed(worldDataFile.toPath(), NbtAccounter.unlimitedHeap());
                 // `data` was the main obj key in old mc PersistentState schema
                 this.data = WorldData.fromNbt(tag.getCompound("data").orElse(tag));
                 warpsLoadEvent.invoker().accept(this.data.warps());
             } else {
-                this.markDirty();
+                this.setDirty();
                 this.save();
             }
         } catch (IOException e) {
@@ -87,7 +87,7 @@ public class WorldDataManager extends PersistentState {
 
     public void save() {
         EssentialCommands.log(Level.INFO, "Saving world_data.dat (Spawn/Warps)...");
-        NbtCompound data = this.data.toNbt();
+        CompoundTag data = this.data.toNbt();
         try {
             NbtIo.writeCompressed(data, this.worldDataFile.toPath());
         } catch (IOException e) {
@@ -103,13 +103,13 @@ public class WorldDataManager extends PersistentState {
             requiresPermission ? warpName : null,
             warpName
         ));
-        this.markDirty();
+        this.setDirty();
         this.save();
     }
 
     public boolean delWarp(String warpName) {
         MinecraftLocation prevValue = this.data.warps().remove(warpName);
-        this.markDirty();
+        this.setDirty();
         this.save();
         return prevValue != null;
     }
@@ -122,7 +122,7 @@ public class WorldDataManager extends PersistentState {
         return this.data.warps().keySet().stream().toList();
     }
 
-    public Stream<WarpLocation> getAccessibleWarps(ServerPlayerEntity player) {
+    public Stream<WarpLocation> getAccessibleWarps(ServerPlayer player) {
         var warpsStream = this.data.warps().values().stream();
         return (EssentialCommands.CONFIG.USE_PERMISSIONS_API
             ? warpsStream.filter(loc -> loc.hasPermission(player))
@@ -135,7 +135,7 @@ public class WorldDataManager extends PersistentState {
 
     public void setSpawn(MinecraftLocation location) {
         this.data.setSpawn(location);
-        this.markDirty();
+        this.setDirty();
         this.save();
     }
 

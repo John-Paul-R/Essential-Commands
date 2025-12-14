@@ -16,12 +16,12 @@ import org.yaml.snakeyaml.Yaml;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerConfigEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.world.level.Level;
 
 import static com.fibermc.essentialcommands.EssentialCommands.LOGGER;
 
@@ -59,7 +59,7 @@ public final class EssentialsConvertor {
     //  are some good ideas here that might be worth carrying over
     @SuppressWarnings("UnreachableCode") // for some reason IDEA 2024.1 hates casting and grays out everything after (L94)
     public static void homeConvert(MinecraftServer server) {
-        var nameToIdCache = server.getApiServices().nameToIdCache();
+        var nameToIdCache = server.services().nameToIdCache();
         File oldUsersDataDictionary = OLD_USERDATA_PATH.toFile();
         if (!oldUsersDataDictionary.exists() || oldUsersDataDictionary.isFile()) {
             oldUsersDataDictionary.mkdirs();
@@ -69,11 +69,11 @@ public final class EssentialsConvertor {
         if (oldUserDataFiles.size() > 0) {
             LOGGER.info("Found the old home file(s), converting!");
 
-            Map<String, ServerWorld> worldMap = new HashMap<>();
+            Map<String, ServerLevel> worldMap = new HashMap<>();
             int counter = 0;
 
-            for (ServerWorld world : server.getWorlds()) {
-                worldMap.put(world.getRegistryKey().getValue().toString(), world);
+            for (ServerLevel world : server.getAllLevels()) {
+                worldMap.put(world.dimension().identifier().toString(), world);
             }
 
             for (File oldUserDataFile : oldUserDataFiles) {
@@ -84,14 +84,14 @@ public final class EssentialsConvertor {
 
                         if (data.containsKey("homes")) {
                             String playerName = (String) data.get("last-account-name");
-                            Optional<PlayerConfigEntry> playerCache = nameToIdCache.findByName(playerName);
+                            Optional<NameAndId> playerCache = nameToIdCache.get(playerName);
 
                             GameProfile playerProfile = new GameProfile(UUID.fromString(oldUserDataFile.getName().replaceAll(".yml", "").replaceAll(".yaml", "")), playerName);
 
                             Map<String, Map<String, Object>> homesMap = (Map<String, Map<String, Object>>) data.get("homes");
                             for (Map.Entry<String, Map<String, Object>> entry : homesMap.entrySet()) {
-                                ServerWorld world = worldMap.get(COMPARISON_TABLE.get((String) entry.getValue().get("world-name")));
-                                ServerPlayerEntity player = new ServerPlayerEntity(server, world, playerProfile, SyncedClientOptions.createDefault());
+                                ServerLevel world = worldMap.get(COMPARISON_TABLE.get((String) entry.getValue().get("world-name")));
+                                ServerPlayer player = new ServerPlayer(server, world, playerProfile, ClientInformation.createDefault());
 
                                 PlayerData playerData = ((ServerPlayerEntityAccess) player).ec$getPlayerData();
 
@@ -102,7 +102,7 @@ public final class EssentialsConvertor {
                                 float pitch = (float) ((double) entry.getValue().get("pitch"));
                                 String homeName = entry.getKey();
 
-                                playerData.addHome(homeName, new MinecraftLocation(world.getRegistryKey(), x, y, z, yaw, pitch));
+                                playerData.addHome(homeName, new MinecraftLocation(world.dimension(), x, y, z, yaw, pitch));
                                 playerData.save();
 
                                 oldUserDataFile.renameTo(new File(oldUsersDataDictionary, oldUserDataFile.getName() + ".converted"));
@@ -138,11 +138,11 @@ public final class EssentialsConvertor {
         LOGGER.info("Found {} old warp file(s), converting!", oldWarpFiles.size());
 
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        Map<String, World> worldMap = new HashMap<>();
+        Map<String, Level> worldMap = new HashMap<>();
         Map<String, MinecraftLocation> locationMap = new HashMap<>();
 
-        for (World world : server.getWorlds()) {
-            worldMap.put(world.getRegistryKey().getValue().toString(), world);
+        for (Level world : server.getAllLevels()) {
+            worldMap.put(world.dimension().identifier().toString(), world);
         }
 
         for (File oldWarpFile : oldWarpFiles) {
@@ -159,7 +159,7 @@ public final class EssentialsConvertor {
                     locationMap.put(
                         warpName,
                         new MinecraftLocation(
-                            worldMap.get(COMPARISON_TABLE.get(worldName)).getRegistryKey(),
+                            worldMap.get(COMPARISON_TABLE.get(worldName)).dimension(),
                             x, y, z, yaw, pitch));
                 }
             } catch (Exception e) {

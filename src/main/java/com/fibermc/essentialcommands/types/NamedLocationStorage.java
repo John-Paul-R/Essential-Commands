@@ -10,23 +10,23 @@ import com.fibermc.essentialcommands.text.TextFormatType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.text.Text;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 
 public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation> implements NbtSerializable {
     public static final Codec<NamedLocationStorage> CODEC = Codecs.NAMED_LOCATION_STORAGE;
 
     public NamedLocationStorage() {}
 
-    public NamedLocationStorage(NbtCompound nbt) {
+    public NamedLocationStorage(CompoundTag nbt) {
         this();
         loadNbt(nbt);
     }
 
-    public static NamedLocationStorage fromNbt(NbtCompound nbt) {
+    public static NamedLocationStorage fromNbt(CompoundTag nbt) {
         // Try codec first
         var result = CODEC.parse(NbtOps.INSTANCE, nbt);
         if (result.isSuccess()) {
@@ -39,7 +39,7 @@ public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation
         return storage;
     }
 
-    public NbtCompound writeNbt(NbtCompound nbt) {
+    public CompoundTag writeNbt(CompoundTag nbt) {
         return CODEC.encode(this, NbtOps.INSTANCE, nbt)
             .getOrThrow()
             .asCompound()
@@ -48,14 +48,15 @@ public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation
 
     /**
      * Legacy NBT loading method - supports both old list format and compound format
+     *
      * @param nbt NbtCompound or NbtList. (NbtList is deprecated)
      */
-    private void loadNbt(NbtElement nbt) {
-        if (nbt.getType() == 9) {
+    private void loadNbt(Tag nbt) {
+        if (nbt.getId() == 9) {
             // Legacy format - NbtList
-            NbtList homesNbtList = (NbtList) nbt;
-            for (NbtElement t : homesNbtList) {
-                NbtCompound homeTag = (NbtCompound) t;
+            ListTag homesNbtList = (ListTag) nbt;
+            for (Tag t : homesNbtList) {
+                CompoundTag homeTag = (CompoundTag) t;
                 homeTag.getString("homeName").ifPresent((homeName) -> {
                     var location = MinecraftLocation.fromNbt(homeTag);
                     super.put(homeName, new NamedMinecraftLocation(location, homeName));
@@ -63,8 +64,8 @@ public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation
             }
         } else {
             // Legacy compound format
-            NbtCompound nbtCompound = (NbtCompound) nbt;
-            nbtCompound.getKeys().forEach((key) -> {
+            CompoundTag nbtCompound = (CompoundTag) nbt;
+            nbtCompound.keySet().forEach((key) -> {
                 var location = NamedMinecraftLocation.fromNbt(nbtCompound.getCompound(key).orElseThrow());
                 if (!key.equals(location.getName())) {
                     throw new RuntimeException("Home key '%s' did not match home name '%s'".formatted(key, location.getName()));
@@ -83,7 +84,7 @@ public class NamedLocationStorage extends HashMap<String, NamedMinecraftLocation
             return super.put(name, location);
         } else {
             throw CommandUtil.createSimpleException(
-                ECText.getInstance().getText("cmd.home.set.error.exists", TextFormatType.Error, Text.literal(name)));
+                ECText.getInstance().getText("cmd.home.set.error.exists", TextFormatType.Error, Component.literal(name)));
         }
     }
 

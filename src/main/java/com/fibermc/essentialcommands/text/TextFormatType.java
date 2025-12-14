@@ -2,7 +2,7 @@ package com.fibermc.essentialcommands.text;
 
 import java.util.function.UnaryOperator;
 
-import net.minecraft.text.Style;
+import net.minecraft.network.chat.Style;
 
 import dev.jpcode.eccore.config.Option;
 

@@ -11,23 +11,24 @@ import com.fibermc.essentialcommands.text.TextFormatType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.text.Text;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 
 public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSerializable {
+    @SuppressWarnings({"checkstyle:StaticVariableName"})
     public static Codec<WarpStorage> CODEC = Codecs.WARP_STORAGE;
 
     public WarpStorage() {}
 
-    public WarpStorage(NbtCompound nbt) {
+    public WarpStorage(CompoundTag nbt) {
         this();
         loadNbt(nbt);
     }
 
-    public static WarpStorage fromNbt(NbtCompound nbt) {
+    public static WarpStorage fromNbt(CompoundTag nbt) {
         // Try codec first
         var result = CODEC.parse(NbtOps.INSTANCE, nbt);
         if (result.isSuccess()) {
@@ -40,7 +41,7 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
         return storage;
     }
 
-    public NbtCompound writeNbt(NbtCompound nbt) {
+    public CompoundTag writeNbt(CompoundTag nbt) {
         return CODEC.encode(this, NbtOps.INSTANCE, nbt)
             .getOrThrow()
             .asCompound()
@@ -50,12 +51,12 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
     /**
      * @param nbt NbtCompound or NbtList. (Latter is deprecated)
      */
-    private void loadNbt(NbtElement nbt) {
-        if (nbt.getType() == 9) {
+    private void loadNbt(Tag nbt) {
+        if (nbt.getId() == 9) {
             // Legacy format
-            NbtList homesNbtList = (NbtList) nbt;
-            for (NbtElement t : homesNbtList) {
-                NbtCompound homeTag = (NbtCompound) t;
+            ListTag homesNbtList = (ListTag) nbt;
+            for (Tag t : homesNbtList) {
+                CompoundTag homeTag = (CompoundTag) t;
                 String name = homeTag.getString("homeName").orElseThrow();
                 var location = MinecraftLocation.fromNbt(homeTag);
                 super.put(
@@ -70,8 +71,8 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
                 );
             }
         } else {
-            NbtCompound nbtCompound = (NbtCompound) nbt;
-            nbtCompound.getKeys().forEach((key) -> {
+            CompoundTag nbtCompound = (CompoundTag) nbt;
+            nbtCompound.keySet().forEach((key) -> {
                 var location = WarpLocation.fromNbt(nbtCompound.getCompound(key).orElseThrow());
                 if (!key.equals(location.getName())) {
                     throw new RuntimeException("Warp key '%s' did not match home name '%s'".formatted(key, location.getName()));
@@ -87,7 +88,7 @@ public class WarpStorage extends HashMap<String, WarpLocation> implements NbtSer
             return super.put(name, location);
         } else {
             throw CommandUtil.createSimpleException(
-                ECText.getInstance().getText("cmd.warp.set.error.exists", TextFormatType.Error, Text.literal(name)));
+                ECText.getInstance().getText("cmd.warp.set.error.exists", TextFormatType.Error, Component.literal(name)));
         }
     }
 

@@ -4,17 +4,17 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "LivingEntityMixin",
-    "PersistentStateManagerInvoker",
-    "PlayerEntityMixin",
-    "PlayerListS2CPacketActionMixin",
-    "PlayerManagerMixin",
+    "DimensionDataStorageInvoker",
+    "PlayerMixin",
+    "ClientboundPlayerInfoUpdatePacketActionMixin",
+    "PlayerListMixin",
     "PrepareSpawnTaskMixin",
-    "ServerPlayerEntityMixin",
-    "ServerPlayNetworkHandlerMixin",
+    "ServerPlayerMixin",
+    "ServerGamePacketListenerImplMixin",
     "ServerScoreboardMixin",
-    "SleepManagerMixin",
+    "SleepStatusMixin",
     "TeleportCommandMixin",
-    "WorldSaveHandlerMixin"
+    "PlayerDataStorageMixin"
   ],
   "client": [
   ],

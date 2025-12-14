@@ -13,7 +13,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 public final class ListSuggestion {
     private ListSuggestion() {}
@@ -34,8 +34,8 @@ public final class ListSuggestion {
     }
 
     @Contract(pure = true)
-    public static @NotNull SuggestionProvider<ServerCommandSource> of(Supplier<Collection<String>> suggestionCollection) {
-        return (CommandContext<ServerCommandSource> context, SuggestionsBuilder builder)
+    public static @NotNull SuggestionProvider<CommandSourceStack> of(Supplier<Collection<String>> suggestionCollection) {
+        return (CommandContext<CommandSourceStack> context, SuggestionsBuilder builder)
             -> buildSuggestions(builder, suggestionCollection.get());
     }
 

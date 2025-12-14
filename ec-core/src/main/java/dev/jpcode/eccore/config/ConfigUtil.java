@@ -4,7 +4,10 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.GsonHelper;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonSyntaxException;
 import org.apache.logging.log4j.Level;
@@ -13,12 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.JsonOps;
-
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.JsonHelper;
-
 import dev.jpcode.eccore.util.TimeUtil;
 
 import static dev.jpcode.eccore.config.Config.LOGGER;
@@ -53,16 +50,16 @@ public final class ConfigUtil {
     @Nullable
     public static Style parseStyle(String styleStr) {
         Style outStyle = null;
-        Formatting formatting = Formatting.byName(styleStr);
+        ChatFormatting formatting = ChatFormatting.getByName(styleStr);
         if (formatting != null) {
-            outStyle = Style.EMPTY.withFormatting(formatting);
+            outStyle = Style.EMPTY.applyFormat(formatting);
         }
 
         if (outStyle == null) {
             try {
-                outStyle = Style.Codecs.CODEC.parse(
+                outStyle = Style.Serializer.CODEC.parse(
                     JsonOps.INSTANCE,
-                    JsonHelper.deserialize(styleStr)
+                    GsonHelper.parse(styleStr)
                 ).result().orElse(null);
             } catch (JsonSyntaxException e) {
                 LOGGER.log(Level.ERROR, String.format(
@@ -74,8 +71,8 @@ public final class ConfigUtil {
         return outStyle;
     }
 
-    public static Text parseTextOrDefault(String textStr, String defaultTextStr) {
-        Text outText = null;
+    public static Component parseTextOrDefault(String textStr, String defaultTextStr) {
+        Component outText = null;
         if (textStr != null) {
             outText = parseText(textStr);
         }
@@ -154,7 +151,7 @@ public final class ConfigUtil {
     }
 
     public static String serializeStyle(Style style) {
-        return Style.Codecs.CODEC.encodeStart(JsonOps.INSTANCE, style).result().orElse(JsonNull.INSTANCE).toString();
+        return Style.Serializer.CODEC.encodeStart(JsonOps.INSTANCE, style).result().orElse(JsonNull.INSTANCE).toString();
     }
 
     public static int parseDurationToTicks(String str) {

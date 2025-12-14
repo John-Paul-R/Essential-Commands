@@ -4,15 +4,15 @@ import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public class TeleportRequest {
 
-    public ServerPlayerEntity getSenderPlayer() {
+    public ServerPlayer getSenderPlayer() {
         return senderPlayer.getPlayer();
     }
 
-    public ServerPlayerEntity getTargetPlayer() {
+    public ServerPlayer getTargetPlayer() {
         return targetPlayer.getPlayer();
     }
 
@@ -35,15 +35,15 @@ public class TeleportRequest {
     private boolean isEnded = false;
     private int ageTicks = 0;
 
-    public TeleportRequest(ServerPlayerEntity senderPlayer, ServerPlayerEntity targetPlayer, Type requestType) {
+    public TeleportRequest(ServerPlayer senderPlayer, ServerPlayer targetPlayer, Type requestType) {
         this.type = requestType;
         this.senderPlayer = ((ServerPlayerEntityAccess) senderPlayer).ec$getPlayerData();
         this.targetPlayer = ((ServerPlayerEntityAccess) targetPlayer).ec$getPlayerData();
     }
 
     public void queue() {
-        ServerPlayerEntity teleportee;
-        ServerPlayerEntity tpDestination;
+        ServerPlayer teleportee;
+        ServerPlayer tpDestination;
 
         if (type == Type.TPA_HERE) {
             tpDestination = senderPlayer.getPlayer();
@@ -70,7 +70,7 @@ public class TeleportRequest {
     public void end() {
         var targetPlayerData = this.getTargetPlayerData();
         if (targetPlayerData != null) {
-            targetPlayerData.removeIncomingTeleportRequest(this.getSenderPlayer().getUuid());
+            targetPlayerData.removeIncomingTeleportRequest(this.getSenderPlayer().getUUID());
             this.getSenderPlayerData().removeSentTeleportRequest(this);
         }
         isEnded = true;

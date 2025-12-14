@@ -13,26 +13,26 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 import dev.jpcode.eccore.util.TextUtil;
 
-public class NearCommand implements Command<ServerCommandSource> {
+public class NearCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         PlayerData senderPlayerData = PlayerData.accessFromContextOrThrow(context);
-        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+        ServerPlayer targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         return exec(senderPlayerData, targetPlayer, EssentialCommands.CONFIG.NEAR_COMMAND_DEFAULT_RADIUS);
     }
 
-    public static int withRange(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public static int withRange(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         PlayerData senderPlayerData = PlayerData.accessFromContextOrThrow(context);
-        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+        ServerPlayer targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         int range = IntegerArgumentType.getInteger(context, "range");
 
@@ -46,20 +46,20 @@ public class NearCommand implements Command<ServerCommandSource> {
         return exec(senderPlayerData, targetPlayer, range);
     }
 
-    public static int exec(PlayerData senderPlayerData, ServerPlayerEntity targetPlayer, int range) {
-        Vec3d basePos = targetPlayer.getEntityPos();
+    public static int exec(PlayerData senderPlayerData, ServerPlayer targetPlayer, int range) {
+        Vec3 basePos = targetPlayer.position();
 
-        List<Text> players = targetPlayer.getEntityWorld().getPlayers().stream()
+        List<Component> players = targetPlayer.level().players().stream()
             .filter(player ->
-                targetPlayer.getUuid() != player.getUuid()
-                && basePos.isInRange(player.getEntityPos(), range)
-                && (!EssentialCommands.VANISH_PRESENT || VanishAPI.canSeePlayer((ServerPlayerEntity) player, senderPlayerData.getPlayer()))
+                targetPlayer.getUUID() != player.getUUID()
+                && basePos.closerThan(player.position(), range)
+                && (!EssentialCommands.VANISH_PRESENT || VanishAPI.canSeePlayer((ServerPlayer) player, senderPlayerData.getPlayer()))
             )
-            .map(PlayerEntity::getDisplayName)
+            .map(Player::getDisplayName)
             .toList();
 
         if (players.isEmpty()) senderPlayerData.sendCommandFeedback("cmd.near.feedback.empty");
-        else senderPlayerData.sendCommandFeedback("cmd.near.feedback.list", TextUtil.join(players, Text.literal(", ")));
+        else senderPlayerData.sendCommandFeedback("cmd.near.feedback.list", TextUtil.join(players, Component.literal(", ")));
 
         return SINGLE_SUCCESS;
     }

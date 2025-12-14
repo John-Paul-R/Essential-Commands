@@ -8,27 +8,25 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
-
-import net.minecraft.command.permission.Permission;
-import net.minecraft.command.permission.PermissionLevel;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import dev.jpcode.eccore.util.TextUtil;
 
@@ -36,16 +34,16 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
 public final class PlayerTeleporter {
     private static final Logger LOGGER = LogManager.getLogger("PlayerTeleporter");
-    private static ErrorReporter errorReporter = new ErrorReporter.Impl();
+    private static ProblemReporter errorReporter = new ProblemReporter.Collector();
 
     private PlayerTeleporter() {}
 
-    public static void requestTeleport(PlayerData pData, MinecraftLocation dest, MutableText destName) {
+    public static void requestTeleport(PlayerData pData, MinecraftLocation dest, MutableComponent destName) {
         requestTeleport(new QueuedLocationTeleport(pData, dest, destName));
     }
 
     public static void requestTeleport(QueuedTeleport queuedTeleport) {
-        ServerPlayerEntity player = queuedTeleport.getPlayerData().getPlayer();
+        ServerPlayer player = queuedTeleport.getPlayerData().getPlayer();
 //        if (pData.getTpCooldown() < 0 || player.getEntityWorld().getServer().getPlayerManager().isOperator(player.getGameProfile())) {
 //            //send TP request to tpManager
 //        }
@@ -56,7 +54,7 @@ public final class PlayerTeleporter {
         }
     }
 
-    public static void requestTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
+    public static void requestTeleport(ServerPlayer playerEntity, MinecraftLocation dest, MutableComponent destName) {
         requestTeleport(((ServerPlayerEntityAccess) playerEntity).ec$getPlayerData(), dest, destName);
     }
 
@@ -65,14 +63,14 @@ public final class PlayerTeleporter {
         teleport(queuedTeleport.getPlayerData(), queuedTeleport.getDest(), queuedTeleport.getDestName());
     }
 
-    public static void teleport(PlayerData pData, MinecraftLocation dest, MutableText destName) { //forceTeleport
-        ServerPlayerEntity player = pData.getPlayer();
+    public static void teleport(PlayerData pData, MinecraftLocation dest, MutableComponent destName) { //forceTeleport
+        ServerPlayer player = pData.getPlayer();
 
         // If teleporting between dimensions is disabled and player doesn't have TP rules override
         if (!CONFIG.ALLOW_TELEPORT_BETWEEN_DIMENSIONS
             && !playerHasTpRulesBypass(player, ECPerms.Registry.bypass_allow_teleport_between_dimensions)) {
             // If this teleport is between dimensions
-            if (dest.dim() != player.getEntityWorld().getRegistryKey()) {
+            if (dest.dim() != player.level().dimension()) {
                 pData.sendError("teleport.error.interdimensional_teleport_disabled");
                 return;
             }
@@ -88,21 +86,21 @@ public final class PlayerTeleporter {
      * @param dest the destination location for the teleportation
      * @param destName the name of the destination to be displayed in messages
      */
-    private static void execTeleport(ServerPlayerEntity playerEntity, MinecraftLocation dest, MutableText destName) {
-        var playerServer = playerEntity.getEntityWorld().getServer();
-        var targetWorld = playerServer.getWorld(dest.dim());
+    private static void execTeleport(ServerPlayer playerEntity, MinecraftLocation dest, MutableComponent destName) {
+        var playerServer = playerEntity.level().getServer();
+        var targetWorld = playerServer.getLevel(dest.dim());
 
         if (targetWorld == null) {
             throw new NullPointerException(String.format("Could not find teleport target world, '%s'", dest.dim()));
         }
 
-        BlockPos playerPos = playerEntity.getBlockPos();
-        Vec3d targetVec = new Vec3d(dest.pos().x, dest.pos().y, dest.pos().z);
+        BlockPos playerPos = playerEntity.blockPosition();
+        Vec3 targetVec = new Vec3(dest.pos().x, dest.pos().y, dest.pos().z);
 
-        playerEntity.teleport(targetWorld, targetVec.x, targetVec.y, targetVec.z, Set.of(), dest.headYaw(), dest.pitch(), false);
+        playerEntity.teleportTo(targetWorld, targetVec.x, targetVec.y, targetVec.z, Set.of(), dest.headYaw(), dest.pitch(), false);
 
         if (CONFIG.TELEPORT_FOLLOWERS) {
-            List<TameableEntity> pets = detectTamedPets(playerEntity, playerPos);
+            List<TamableAnimal> pets = detectTamedPets(playerEntity, playerPos);
             teleportTamedEntities(pets, targetWorld, targetVec, playerEntity);
         }
 
@@ -116,20 +114,20 @@ public final class PlayerTeleporter {
      * @param playerPos the position of the player
      * @return a list of tamed pets that belong to the player and are not sitting
      */
-    private static List<TameableEntity> detectTamedPets(ServerPlayerEntity playerEntity, BlockPos playerPos) {
+    private static List<TamableAnimal> detectTamedPets(ServerPlayer playerEntity, BlockPos playerPos) {
         double radius = Math.max(CONFIG.TELEPORT_FOLLOWERS_RADIUS, 0);
-        ServerWorld playerWorld = (ServerWorld) playerEntity.getEntityWorld();
+        ServerLevel playerWorld = (ServerLevel) playerEntity.level();
 
-        return playerWorld.getEntitiesByClass(TameableEntity.class, new Box(playerPos).expand(radius), pet -> {
-            boolean isTamed = pet.isTamed();
+        return playerWorld.getEntitiesOfClass(TamableAnimal.class, new AABB(playerPos).inflate(radius), pet -> {
+            boolean isTamed = pet.isTame();
             var petOwner = pet.getOwner();
             if (petOwner == null) {
-                LOGGER.warn("failed to find owner for pet with id '{}', name '{}'", pet.getUuid(), pet.getDisplayName().getString());
+                LOGGER.warn("failed to find owner for pet with id '{}', name '{}'", pet.getUUID(), pet.getDisplayName().getString());
                 return false;
             }
-            UUID ownerUuid = petOwner.getUuid();
-            boolean isSameOwner = ownerUuid != null && ownerUuid.equals(playerEntity.getUuid());
-            boolean isSitting = pet.isSitting();
+            UUID ownerUuid = petOwner.getUUID();
+            boolean isSameOwner = ownerUuid != null && ownerUuid.equals(playerEntity.getUUID());
+            boolean isSitting = pet.isOrderedToSit();
 
             return isTamed && isSameOwner && !isSitting;
         });
@@ -143,15 +141,15 @@ public final class PlayerTeleporter {
      * @param targetVec the position where the entities will be teleported
      * @param playerEntity the player entity who owns the tamed entities
      */
-    private static void teleportTamedEntities(List<TameableEntity> pets, ServerWorld targetWorld, Vec3d targetVec, ServerPlayerEntity playerEntity) {
-        for (TameableEntity pet : pets) {
-            if (pet.getEntityWorld() != targetWorld) {
+    private static void teleportTamedEntities(List<TamableAnimal> pets, ServerLevel targetWorld, Vec3 targetVec, ServerPlayer playerEntity) {
+        for (TamableAnimal pet : pets) {
+            if (pet.level() != targetWorld) {
                 if (!transferEntityToWorld(pet, targetWorld, targetVec, playerEntity)) {
-                    LOGGER.warn("Failed to transfer pet {} ({}) to {}", pet.getType().getTranslationKey(), pet.getUuid(), targetWorld.getRegistryKey().getValue());
+                    LOGGER.warn("Failed to transfer pet {} ({}) to {}", pet.getType().getDescriptionId(), pet.getUUID(), targetWorld.dimension().identifier());
                 }
             } else {
                 targetWorld.getChunk((int) targetVec.x >> 4, (int) targetVec.z >> 4);
-                pet.teleport(targetVec.x, targetVec.y + 0.5, targetVec.z, false);
+                pet.randomTeleport(targetVec.x, targetVec.y + 0.5, targetVec.z, false);
             }
         }
     }
@@ -165,25 +163,25 @@ public final class PlayerTeleporter {
      * @param playerEntity the player entity who owns the tamed entity
      * @return true if the entity was successfully transferred, false otherwise
      */
-    private static boolean transferEntityToWorld(TameableEntity pet, ServerWorld targetWorld, Vec3d targetVec, ServerPlayerEntity playerEntity) {
-        NbtWriteView entityData = NbtWriteView.create(errorReporter);
+    private static boolean transferEntityToWorld(TamableAnimal pet, ServerLevel targetWorld, Vec3 targetVec, ServerPlayer playerEntity) {
+        TagValueOutput entityData = TagValueOutput.createWithoutContext(errorReporter);
 //        entityData.
-        pet.saveSelfData(entityData); // Store full entity data
+        pet.saveAsPassenger(entityData); // Store full entity data
 
-        var entityDataReadView = NbtReadView.create(errorReporter, targetWorld.getRegistryManager(), entityData.getNbt());
-        Entity newPet = EntityType.loadEntityWithPassengers(entityDataReadView, targetWorld, SpawnReason.COMMAND, (e) -> {
-            e.setPos(targetVec.x, targetVec.y, targetVec.z);
+        var entityDataReadView = TagValueInput.create(errorReporter, targetWorld.registryAccess(), entityData.buildResult());
+        Entity newPet = EntityType.loadEntityRecursive(entityDataReadView, targetWorld, EntitySpawnReason.COMMAND, (e) -> {
+            e.setPosRaw(targetVec.x, targetVec.y, targetVec.z);
             return e;
         });
 
-        if (newPet instanceof TameableEntity newTamedPet) {
-            newTamedPet.setTamed(true, true);
+        if (newPet instanceof TamableAnimal newTamedPet) {
+            newTamedPet.setTame(true, true);
             newTamedPet.setOwner(playerEntity);
-            targetWorld.spawnEntity(newTamedPet);
+            targetWorld.addFreshEntity(newTamedPet);
 
             // sanity check to make sure the entity has spawned
             if (newTamedPet.isRemoved()) {
-                LOGGER.error("Failed to spawn pet {} ({}) in {}", newTamedPet.getType().getTranslationKey(), newTamedPet.getUuid(), targetWorld.getRegistryKey().getValue());
+                LOGGER.error("Failed to spawn pet {} ({}) in {}", newTamedPet.getType().getDescriptionId(), newTamedPet.getUUID(), targetWorld.dimension().identifier());
                 return false;
             }
 
@@ -191,7 +189,7 @@ public final class PlayerTeleporter {
             return true;
         } else {
             // Failed to create entity from NBT
-            LOGGER.error("Failed to create entity from NBT for pet ({})!", pet.getUuid());
+            LOGGER.error("Failed to create entity from NBT for pet ({})!", pet.getUUID());
             return false;
         }
     }
@@ -203,24 +201,24 @@ public final class PlayerTeleporter {
      * @param destName the name of the destination to be displayed in the message
      * @param dest the destination location for the teleportation
      */
-    private static void sendTeleportMessage(ServerPlayerEntity playerEntity, MutableText destName, MinecraftLocation dest) {
+    private static void sendTeleportMessage(ServerPlayer playerEntity, MutableComponent destName, MinecraftLocation dest) {
         var playerAccess = ((ServerPlayerEntityAccess) playerEntity);
         var playerProfile = playerAccess.ec$getProfile();
         playerAccess.ec$getPlayerData().sendMessage(
             "teleport.done",
             playerProfile.shouldPrintTeleportCoordinates().orElse(CONFIG.PRINT_TELEPORT_COORDINATES)
                 ? TextUtil.join(
-                new Text[]{destName, dest.toText(playerProfile)},
-                Text.literal(" ")
+                new Component[]{destName, dest.toText(playerProfile)},
+                Component.literal(" ")
             )
                 : destName
         );
     }
 
-    static boolean playerHasTpRulesBypass(ServerPlayerEntity player, String permission) {
+    static boolean playerHasTpRulesBypass(ServerPlayer player, String permission) {
         return (
-            (player.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS)) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
-                || ECPerms.check(player.getCommandSource(), permission, 5)
+            (player.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS)) && CONFIG.OPS_BYPASS_TELEPORT_RULES)
+                || ECPerms.check(player.createCommandSourceStack(), permission, 5)
         );
     }
 }

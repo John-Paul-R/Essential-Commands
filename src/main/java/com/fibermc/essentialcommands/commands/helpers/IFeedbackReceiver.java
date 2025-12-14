@@ -1,13 +1,13 @@
 package com.fibermc.essentialcommands.commands.helpers;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public interface IFeedbackReceiver {
-    void sendCommandFeedback(Text text);
+    void sendCommandFeedback(Component text);
 
-    void sendCommandFeedback(String messageKey, Text... args);
+    void sendCommandFeedback(String messageKey, Component... args);
 
-    void sendCommandError(Text text);
+    void sendCommandError(Component text);
 
-    void sendCommandError(String messageKey, Text... args);
+    void sendCommandError(String messageKey, Component... args);
 }

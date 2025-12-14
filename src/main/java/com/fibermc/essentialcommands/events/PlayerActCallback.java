@@ -1,8 +1,8 @@
 package com.fibermc.essentialcommands.events;
 
-import net.minecraft.network.listener.ServerPlayPacketListener;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 
 public interface PlayerActCallback {
-    void onPlayerAct(Packet<ServerPlayPacketListener> packet);
+    void onPlayerAct(Packet<ServerGamePacketListener> packet);
 }

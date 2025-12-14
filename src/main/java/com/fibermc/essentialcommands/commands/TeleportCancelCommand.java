@@ -7,20 +7,20 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 import dev.jpcode.eccore.util.TextUtil;
 
-public class TeleportCancelCommand implements Command<ServerCommandSource> {
+public class TeleportCancelCommand implements Command<CommandSourceStack> {
 
     public TeleportCancelCommand() {}
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         //Store command sender
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayerOrThrow();
+        ServerPlayer senderPlayer = context.getSource().getPlayerOrException();
         var senderPlayerData = PlayerData.access(senderPlayer);
 
         var existingTeleportRequests = senderPlayerData.getSentTeleportRequests();
@@ -36,8 +36,8 @@ public class TeleportCancelCommand implements Command<ServerCommandSource> {
         senderPlayerData.sendCommandFeedback(
             "cmd.tpcancel.feedback",
             TextUtil.join(
-                targetPlayers.stream().map(PlayerData::getPlayer).map(ServerPlayerEntity::getDisplayName).toList(),
-                Text.literal(", "))
+                targetPlayers.stream().map(PlayerData::getPlayer).map(ServerPlayer::getDisplayName).toList(),
+                Component.literal(", "))
         );
 
         return SINGLE_SUCCESS;

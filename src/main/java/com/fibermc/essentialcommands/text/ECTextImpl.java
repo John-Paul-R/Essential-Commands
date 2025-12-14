@@ -12,9 +12,11 @@ import eu.pb4.placeholders.api.parsers.NodeParser;
 import eu.pb4.placeholders.api.parsers.TagLikeParser;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.StringDecomposer;
 
 public class ECTextImpl extends ECText {
     private final ParserContext parserContext;
@@ -41,38 +43,38 @@ public class ECTextImpl extends ECText {
     }
 
     // Literals
-    public MutableText getTextLiteral(String key, TextFormatType textFormatType) {
+    public MutableComponent getTextLiteral(String key, TextFormatType textFormatType) {
         return getTextLiteral(key, textFormatType, null);
     }
 
-    public MutableText getTextLiteral(
+    public MutableComponent getTextLiteral(
         String key,
         TextFormatType textFormatType,
         @Nullable IStyleProvider styleProvider)
     {
-        return Text.literal(getString(key))
+        return Component.literal(getString(key))
             .setStyle(styleProvider == null
                 ? textFormatType.getStyle()
                 : styleProvider.getStyle(textFormatType));
     }
 
     // Interpolated
-    public MutableText getText(String key, Text... args) {
+    public MutableComponent getText(String key, Component... args) {
         return getTextInternal(key, TextFormatType.Default, null, args);
     }
 
-    public MutableText getText(String key, TextFormatType textFormatType, Text... args) {
+    public MutableComponent getText(String key, TextFormatType textFormatType, Component... args) {
         return getTextInternal(key, textFormatType, null, args);
     }
 
-    public MutableText getText(String key, TextFormatType textFormatType, IStyleProvider styleProvider, Text... args) {
+    public MutableComponent getText(String key, TextFormatType textFormatType, IStyleProvider styleProvider, Component... args) {
         return getTextInternal(key, textFormatType, styleProvider, args);
     }
 
     private NodeParser parserForContext(
         TextFormatType textFormatType,
         @Nullable IStyleProvider styleProvider,
-        List<MutableText> args)
+        List<MutableComponent> args)
     {
         return TagLikeParser.of(
             TagLikeParser.PLACEHOLDER_USER,
@@ -106,17 +108,17 @@ public class ECTextImpl extends ECText {
         );
     }
 
-    private static int hashText(Text text) {
-        return Objects.hash(text.getContent(), text.getStyle());
+    private static int hashText(Component text) {
+        return Objects.hash(text.getContents(), text.getStyle());
     }
 
-    public MutableText getTextInternal(
+    public MutableComponent getTextInternal(
         String key,
         TextFormatType textFormatType,
         @Nullable IStyleProvider styleProvider,
-        Text... args)
+        Component... args)
     {
-        var argsList = Arrays.stream(args).map(Text::copy).toList();
+        var argsList = Arrays.stream(args).map(Component::copy).toList();
         var argsHashes = argsList.stream()
             .map(ECTextImpl::hashText)
             .collect(Collectors.toCollection(HashSet::new));
@@ -145,23 +147,23 @@ public class ECTextImpl extends ECText {
     }
 
     interface TextVisitor {
-        MutableText accept(Text text);
+        MutableComponent accept(Component text);
     }
 
-    private static final Style DEFAULT_ARGUMENT_STYLE = Style.EMPTY.withColor(Formatting.WHITE);
+    private static final Style DEFAULT_ARGUMENT_STYLE = Style.EMPTY.withColor(ChatFormatting.WHITE);
 
-    TextVisitor defaultStylesVisitor(Function<Text, @Nullable Style> defaultStyleProvider) {
+    TextVisitor defaultStylesVisitor(Function<Component, @Nullable Style> defaultStyleProvider) {
         return text -> {
-            MutableText txt = text.copy();
+            MutableComponent txt = text.copy();
             var defaultStyleForText = defaultStyleProvider.apply(txt);
             if (defaultStyleForText != null) {
-                txt.setStyle(txt.getStyle().withParent(defaultStyleForText));
+                txt.setStyle(txt.getStyle().applyTo(defaultStyleForText));
             }
             return txt;
         };
     }
 
-    MutableText visitText(Text root, TextVisitor textVisitor, Predicate<Text> shouldStopAfter) {
+    MutableComponent visitText(Component root, TextVisitor textVisitor, Predicate<Component> shouldStopAfter) {
         var txt = textVisitor.accept(root);
         if (shouldStopAfter.test(root)) {
             return txt;
@@ -182,12 +184,12 @@ public class ECTextImpl extends ECText {
         return false;
     }
 
-    public OrderedText reorder(StringVisitable text) {
+    public FormattedCharSequence reorder(FormattedText text) {
         return (visitor) ->
             text.visit((style, string) ->
-                TextVisitFactory.visitFormatted(string, style, visitor)
+                StringDecomposer.iterateFormatted(string, style, visitor)
                     ? Optional.empty()
-                    : StringVisitable.TERMINATE_VISIT, Style.EMPTY).isPresent();
+                    : FormattedText.STOP_ITERATION, Style.EMPTY).isPresent();
     }
 
 }

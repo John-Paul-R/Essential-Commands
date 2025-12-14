@@ -7,20 +7,20 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandlerFactory;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.inventory.MenuConstructor;
 
-public abstract class SimpleScreenCommand implements Command<ServerCommandSource> {
+public abstract class SimpleScreenCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var senderPlayer = context.getSource().getPlayerOrException();
         var senderPlayerData = PlayerData.access(senderPlayer);
 
-        senderPlayer.openHandledScreen(createNamedScreenHandlerFactory());
+        senderPlayer.openMenu(createNamedScreenHandlerFactory());
 
         senderPlayerData.sendCommandFeedback("cmd.workbench.feedback", getScreenTitle());
 
@@ -29,13 +29,13 @@ public abstract class SimpleScreenCommand implements Command<ServerCommandSource
         return 0;
     }
 
-    protected NamedScreenHandlerFactory createNamedScreenHandlerFactory() {
-        return new SimpleNamedScreenHandlerFactory(getScreenHandlerFactory(), getScreenTitle());
+    protected MenuProvider createNamedScreenHandlerFactory() {
+        return new SimpleMenuProvider(getScreenHandlerFactory(), getScreenTitle());
     }
 
-    protected abstract Text getScreenTitle();
+    protected abstract Component getScreenTitle();
 
-    protected abstract @NotNull ScreenHandlerFactory getScreenHandlerFactory();
+    protected abstract @NotNull MenuConstructor getScreenHandlerFactory();
 
-    protected abstract void onOpen(ServerPlayerEntity player);
+    protected abstract void onOpen(ServerPlayer player);
 }

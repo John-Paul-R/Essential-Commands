@@ -2,7 +2,7 @@ package com.fibermc.essentialcommands.commands.helpers;
 
 import java.util.OptionalInt;
 
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 @FunctionalInterface
 public interface HeightFinder {
@@ -11,6 +11,6 @@ public interface HeightFinder {
      *
      * @return A Y value corresponding to the player's feet pos
      */
-    OptionalInt getY(Chunk chunk, int x, int z);
+    OptionalInt getY(ChunkAccess chunk, int x, int z);
 }
 

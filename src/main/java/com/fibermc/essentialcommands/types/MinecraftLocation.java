@@ -6,70 +6,70 @@ import com.fibermc.essentialcommands.text.TextFormatType;
 
 import com.mojang.serialization.Codec;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class MinecraftLocation {
     public static final Codec<MinecraftLocation> CODEC = Codecs.MINECRAFT_LOCATION;
 
-    private Vec3d pos;
+    private Vec3 pos;
     private float pitch;
     private float headYaw;
-    private RegistryKey<World> dim;
+    private ResourceKey<Level> dim;
 
     protected MinecraftLocation() {}
 
-    public MinecraftLocation(RegistryKey<World> dim, double x, double y, double z) {
+    public MinecraftLocation(ResourceKey<Level> dim, double x, double y, double z) {
         this.dim = dim;
-        this.pos = new Vec3d(x, y, z);
+        this.pos = new Vec3(x, y, z);
         this.pitch = 0f;
         this.headYaw = 0f;
         //todo world.getPersistentStateManager().
     }
 
-    public MinecraftLocation(RegistryKey<World> dim, double x, double y, double z, float headYaw, float pitch) {
+    public MinecraftLocation(ResourceKey<Level> dim, double x, double y, double z, float headYaw, float pitch) {
         this.dim = dim;
-        this.pos = new Vec3d(x, y, z);
+        this.pos = new Vec3(x, y, z);
         this.headYaw = headYaw;
         this.pitch = pitch;
     }
 
-    public MinecraftLocation(RegistryKey<World> dim, Vec3i vec3i, float headYaw, float pitch) {
+    public MinecraftLocation(ResourceKey<Level> dim, Vec3i vec3i, float headYaw, float pitch) {
         this.dim = dim;
-        this.pos = Vec3d.ofCenter(vec3i);
+        this.pos = Vec3.atCenterOf(vec3i);
         this.headYaw = headYaw;
         this.pitch = pitch;
     }
 
-    public MinecraftLocation(RegistryKey<World> dim, Vec3d pos, float headYaw, float pitch) {
+    public MinecraftLocation(ResourceKey<Level> dim, Vec3 pos, float headYaw, float pitch) {
         this.dim = dim;
         this.pos = pos;
         this.headYaw = headYaw;
         this.pitch = pitch;
     }
 
-    public MinecraftLocation(ServerPlayerEntity player) {
-        this.dim = player.getEntityWorld().getRegistryKey();
-        this.pos = Vec3d.ZERO.add(player.getEntityPos());
-        this.headYaw = player.getHeadYaw();
-        this.pitch = player.getPitch();
+    public MinecraftLocation(ServerPlayer player) {
+        this.dim = player.level().dimension();
+        this.pos = Vec3.ZERO.add(player.position());
+        this.headYaw = player.getYHeadRot();
+        this.pitch = player.getXRot();
     }
 
-    public MinecraftLocation(NbtCompound tag) {
-        this.dim = RegistryKey.of(
-            RegistryKeys.WORLD,
+    public MinecraftLocation(CompoundTag tag) {
+        this.dim = ResourceKey.create(
+            Registries.DIMENSION,
             Identifier.tryParse(tag.getString("WorldRegistryKey").orElseThrow())
         );
-        this.pos = new Vec3d(
+        this.pos = new Vec3(
             tag.getDouble("x").orElseThrow(),
             tag.getDouble("y").orElseThrow(),
             tag.getDouble("z").orElseThrow()
@@ -78,32 +78,32 @@ public class MinecraftLocation {
         this.pitch = tag.getFloat("pitch").orElse(0f);
     }
 
-    public NbtCompound asNbt() {
-        return this.writeNbt(new NbtCompound());
+    public CompoundTag asNbt() {
+        return this.writeNbt(new CompoundTag());
     }
 
-    public static MinecraftLocation fromNbt(NbtCompound tag) {
+    public static MinecraftLocation fromNbt(CompoundTag tag) {
         return CODEC.parse(NbtOps.INSTANCE, tag)
             .getOrThrow();
     }
 
-    public NbtCompound writeNbt(NbtCompound tag) {
+    public CompoundTag writeNbt(CompoundTag tag) {
         return CODEC.encodeStart(NbtOps.INSTANCE, this)
             .getOrThrow()
             .asCompound()
             .orElseThrow();
     }
 
-    protected MutableText toLiteralTextSimple() {
-        return Text.literal(String.format("(%.1f, %.1f, %.1f)", pos().x, pos().y, pos().z));
+    protected MutableComponent toLiteralTextSimple() {
+        return Component.literal(String.format("(%.1f, %.1f, %.1f)", pos().x, pos().y, pos().z));
     }
 
-    public Text toText(PlayerProfile playerProfile) {
+    public Component toText(PlayerProfile playerProfile) {
         return toLiteralTextSimple()
             .setStyle(playerProfile.getStyle(TextFormatType.Accent));
     }
 
-    public Vec3d pos() {
+    public Vec3 pos() {
         return pos;
     }
 
@@ -131,7 +131,7 @@ public class MinecraftLocation {
         return pos.z;
     }
 
-    public RegistryKey<World> dim() {
+    public ResourceKey<Level> dim() {
         return dim;
     }
 }

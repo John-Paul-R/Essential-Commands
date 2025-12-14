@@ -7,11 +7,11 @@ import com.fibermc.essentialcommands.codec.Codecs;
 
 import com.mojang.serialization.Codec;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 
 public class WarpLocation extends NamedMinecraftLocation {
     public static final Codec<WarpLocation> CODEC = Codecs.WARP_LOCATION;
@@ -33,7 +33,7 @@ public class WarpLocation extends NamedMinecraftLocation {
     }
 
     public WarpLocation(
-        RegistryKey<World> dim,
+        ResourceKey<Level> dim,
         double x,
         double y,
         double z,
@@ -46,7 +46,7 @@ public class WarpLocation extends NamedMinecraftLocation {
         this.permissionString = permissionString.orElse(null);
     }
 
-    public static WarpLocation fromNbt(NbtCompound tag) {
+    public static WarpLocation fromNbt(CompoundTag tag) {
         var result = CODEC.parse(NbtOps.INSTANCE, tag);
 
         if (result.isSuccess()) {
@@ -62,12 +62,12 @@ public class WarpLocation extends NamedMinecraftLocation {
     }
 
     @Override
-    public NbtCompound asNbt() {
-        return this.writeNbt(new NbtCompound());
+    public CompoundTag asNbt() {
+        return this.writeNbt(new CompoundTag());
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound tag) {
+    public CompoundTag writeNbt(CompoundTag tag) {
         return CODEC.encodeStart(NbtOps.INSTANCE, this)
             .getOrThrow()
             .asCompound()
@@ -78,9 +78,9 @@ public class WarpLocation extends NamedMinecraftLocation {
         return permissionString;
     }
 
-    public boolean hasPermission(ServerPlayerEntity player) {
+    public boolean hasPermission(ServerPlayer player) {
         return permissionString == null || ECPerms.check(
-            player.getCommandSource(),
+            player.createCommandSourceStack(),
             String.format("%s.%s", ECPerms.Registry.warp_tp_named, permissionString));
     }
 }

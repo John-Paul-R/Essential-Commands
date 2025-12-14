@@ -7,24 +7,24 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.entity.player.HungerManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.food.FoodData;
 
-public class FeedCommand implements Command<ServerCommandSource> {
+public class FeedCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         PlayerData senderPlayerData = PlayerData.accessFromContextOrThrow(context);
-        ServerPlayerEntity targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+        ServerPlayer targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
-        HungerManager hungerManager = targetPlayer.getHungerManager();
-        if (!hungerManager.isNotFull()) {
+        FoodData hungerManager = targetPlayer.getFoodData();
+        if (!hungerManager.needsFood()) {
             senderPlayerData.sendCommandError("cmd.feed.error.full");
             return 0;
         }
 
         hungerManager.setFoodLevel(20);
-        hungerManager.setSaturationLevel(5);
+        hungerManager.setSaturation(5);
 //        hungerManager.setExhaustion(0);
         // idk, you ca only add to it now
 

@@ -13,20 +13,21 @@ import eu.pb4.placeholders.api.parsers.TagParser;
 
 import com.mojang.serialization.JsonOps;
 
-import net.minecraft.text.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.contents.PlainTextContents;
 
 public final class TextUtil {
     private TextUtil() {}
 
-    public static MutableText concat(Text... arr) {
-        MutableText out = Text.empty();
-        for (Text text : arr) {
+    public static MutableComponent concat(Component... arr) {
+        MutableComponent out = Component.empty();
+        for (Component text : arr) {
             out.append(text);
         }
         return out;
     }
 
-    public static MutableText deepCopy(Text text) {
+    public static MutableComponent deepCopy(Component text) {
         if (text.getSiblings().isEmpty()) {
             return text.copy();
         }
@@ -41,8 +42,8 @@ public final class TextUtil {
     }
 
     /**
-     * <p>Joins the elements of the provided array into a single Text
-     * containing the provided list of elements.</p>
+     * Joins the elements of the provided array into a single Text
+     * containing the provided list of elements.
      *
      * <p>No delimiter is added before or after the list.
      * Null objects or empty strings within the array are represented by
@@ -62,26 +63,26 @@ public final class TextUtil {
      * @return the joined String, <code>null</code> if null array input
      * @since 2.0
      */
-    public static MutableText join(Text[] array, Text separator) {
+    public static MutableComponent join(Component[] array, Component separator) {
         if (array == null) {
             return null;
         }
         return join(array, separator, 0, array.length);
     }
 
-    public static MutableText join(Collection<Text> textCollection, Text separator) {
+    public static MutableComponent join(Collection<Component> textCollection, Component separator) {
         if (textCollection == null) {
             return null;
         }
-        return join(textCollection.toArray(new Text[0]), separator, 0, textCollection.size());
+        return join(textCollection.toArray(new Component[0]), separator, 0, textCollection.size());
     }
 
-    public static MutableText join(Collection<String> stringCollection, Text separator, Style stringsFormatting) {
+    public static MutableComponent join(Collection<String> stringCollection, Component separator, Style stringsFormatting) {
         if (stringCollection == null) {
             return null;
         }
         return join(
-            stringCollection.stream().map(str -> Text.literal(str).setStyle(stringsFormatting)).toArray(Text[]::new),
+            stringCollection.stream().map(str -> Component.literal(str).setStyle(stringsFormatting)).toArray(Component[]::new),
             separator, 0, stringCollection.size()
         );
     }
@@ -116,7 +117,7 @@ public final class TextUtil {
         return buf.toString();
     }
 
-    public static MutableText join(Text[] array, Text separator, int startIndex, int endIndex) {
+    public static MutableComponent join(Component[] array, Component separator, int startIndex, int endIndex) {
         if (array == null) {
             return null;
         }
@@ -124,7 +125,7 @@ public final class TextUtil {
         if (bufSize <= 0) {
             return null;
         }
-        MutableText buf = Text.empty();
+        MutableComponent buf = Component.empty();
         for (int i = startIndex; i < endIndex; i++) {
             if (i > startIndex) {
                 buf.append(separator);
@@ -136,9 +137,9 @@ public final class TextUtil {
         return buf;
     }
 
-    public static MutableText spaceBetween(Text[] array, int totalWidth, int padding) {
+    public static MutableComponent spaceBetween(Component[] array, int totalWidth, int padding) {
         int totalTextSize = 0;
-        for (Text txt : array) {
+        for (Component txt : array) {
             String str = txt.getString();
             totalTextSize += str.length();
         }
@@ -148,37 +149,37 @@ public final class TextUtil {
             return concat(array);
         }
 
-        MutableText outText = Text.empty();
+        MutableComponent outText = Component.empty();
         String lrPadStr = " ".repeat(padding);
         String spaceStr = " ".repeat((totalWidth - padding * 2 - totalTextSize) / (array.length - 1));
-        outText.append(Text.literal(lrPadStr));
+        outText.append(Component.literal(lrPadStr));
 
         for (int i = 0; i < array.length; i++) {
             outText.append(array[i]);
             if (i != array.length - 1) {
-                outText.append(Text.literal(spaceStr));
+                outText.append(Component.literal(spaceStr));
             }
         }
 
-        outText.append(Text.literal(lrPadStr));
+        outText.append(Component.literal(lrPadStr));
 
         return outText;
     }
 
-    public static MutableText clickableTeleport(MutableText originalText, String destinationName, String commandBaseString) {
+    public static MutableComponent clickableTeleport(MutableComponent originalText, String destinationName, String commandBaseString) {
         String teleportCommand = String.format("%s %s", commandBaseString, destinationName);
 
         Style outStyle = originalText.getStyle()
             .withClickEvent(new ClickEvent.RunCommand(teleportCommand))
-            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to teleport to "
+            .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to teleport to "
                 + destinationName
                 + ".")));
 
         return originalText.setStyle(outStyle);
     }
 
-    public static String toJsonString(Text text) {
-        return TextCodecs.CODEC
+    public static String toJsonString(Component text) {
+        return ComponentSerialization.CODEC
             .encodeStart(JsonOps.INSTANCE, text)
             .getOrThrow()
             .toString();
@@ -194,12 +195,12 @@ public final class TextUtil {
     }
 
     static {
-        registerTextParser(str -> TextCodecs.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(str)).getOrThrow());
+        registerTextParser(str -> ComponentSerialization.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(str)).getOrThrow());
         registerTextParser(str -> TagParser.DEFAULT.parseText(str, ParserContext.of()));
     }
 
-    public static Text parseText(String textStr) {
-        Text outText = null;
+    public static Component parseText(String textStr) {
+        Component outText = null;
         for (StringToTextParser parser : TEXT_PARSERS) {
             try {
                 outText = parser.parseText(textStr);
@@ -215,20 +216,20 @@ public final class TextUtil {
         throw new RuntimeException(String.format("Failed to parse string '%s' as MinecraftText using any parsing strategy", textStr));
     }
 
-    public static Collector<Text, MutableText, MutableText> collect() {
+    public static Collector<Component, MutableComponent, MutableComponent> collect() {
         return new Collector<>() {
             @Override
-            public Supplier<MutableText> supplier() {
-                return Text::empty;
+            public Supplier<MutableComponent> supplier() {
+                return Component::empty;
             }
 
             @Override
-            public BiConsumer<MutableText, Text> accumulator() {
-                return MutableText::append;
+            public BiConsumer<MutableComponent, Component> accumulator() {
+                return MutableComponent::append;
             }
 
             @Override
-            public BinaryOperator<MutableText> combiner() {
+            public BinaryOperator<MutableComponent> combiner() {
                 return (r1, r2) -> {
                     r1.append(r2);
                     return r1;
@@ -236,7 +237,7 @@ public final class TextUtil {
             }
 
             @Override
-            public Function<MutableText, MutableText> finisher() {
+            public Function<MutableComponent, MutableComponent> finisher() {
                 return (a) -> a;
             }
 
@@ -252,17 +253,17 @@ public final class TextUtil {
      *
      * @return flattened text
      */
-    public static List<Text> flattenRoot(Text text) {
+    public static List<Component> flattenRoot(Component text) {
         var siblings = text.getSiblings();
-        if (text.getContent().equals(PlainTextContent.EMPTY) && siblings.size() == 1) {
+        if (text.getContents().equals(PlainTextContents.EMPTY) && siblings.size() == 1) {
             return siblings;
         } else if (siblings.size() == 0) {
             return List.of(text);
         }
 
-        List<Text> content = new ArrayList<>(siblings.size() + 1);
-        if (!text.getContent().equals(PlainTextContent.EMPTY)) {
-            content.add(text.copyContentOnly().setStyle(text.getStyle()));
+        List<Component> content = new ArrayList<>(siblings.size() + 1);
+        if (!text.getContents().equals(PlainTextContents.EMPTY)) {
+            content.add(text.plainCopy().setStyle(text.getStyle()));
         }
         content.addAll(siblings);
 

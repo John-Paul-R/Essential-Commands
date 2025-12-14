@@ -1,9 +1,9 @@
 package com.fibermc.essentialcommands.playerdata;
 
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public interface IServerPlayerEntityData {
-    ServerPlayerEntity getPlayer();
+    ServerPlayer getPlayer();
 
-    void updatePlayerEntity(ServerPlayerEntity newPlayerEntity);
+    void updatePlayerEntity(ServerPlayer newPlayerEntity);
 }

@@ -18,23 +18,23 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Style;
-import net.minecraft.world.PersistentState;
+import net.minecraft.network.chat.Style;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.saveddata.SavedData;
 
 import dev.jpcode.eccore.config.ConfigUtil;
 
-public class PlayerProfile extends PersistentState implements IServerPlayerEntityData, IStyleProvider {
+public class PlayerProfile extends SavedData implements IServerPlayerEntityData, IStyleProvider {
 
-    private ServerPlayerEntity player;
+    private ServerPlayer player;
     private final File saveFile;
     private ProfileOptions profileOptions;
 
-    public PlayerProfile(@NotNull ServerPlayerEntity player, File saveFile) {
+    public PlayerProfile(@NotNull ServerPlayer player, File saveFile) {
         this.player = player;
         this.saveFile = saveFile;
         this.profileOptions = new ProfileOptions();
@@ -102,9 +102,9 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
         static final String PRINT_TELEPORT_COORDINATES = "printTeleportCoordinates";
     }
 
-    public void fromNbt(NbtCompound tag) {
+    public void fromNbt(CompoundTag tag) {
         // `data` was the main obj key in old mc PersistentState schema
-        NbtCompound dataTag = tag.getCompound("data").orElse(tag);
+        CompoundTag dataTag = tag.getCompound("data").orElse(tag);
         this.profileOptions = new ProfileOptions();
 
         this.profileOptions.formattingDefault = dataTag.getString(StorageKey.FORMATTING_DEAULT)
@@ -119,7 +119,7 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
         this.profileOptions.printTeleportCoordinates = dataTag.getBoolean(StorageKey.PRINT_TELEPORT_COORDINATES);
     }
 
-    public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup wrapperLookup) {
+    public CompoundTag writeNbt(CompoundTag tag, HolderLookup.Provider wrapperLookup) {
         this.profileOptions.formattingDefault
             .ifPresent(style -> tag.putString(StorageKey.FORMATTING_DEAULT, ConfigUtil.serializeStyle(style)));
 
@@ -135,8 +135,8 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
         return tag;
     }
 
-    public void save(RegistryWrapper.WrapperLookup wrapperLookup) {
-        NbtCompound data = this.writeNbt(new NbtCompound(), wrapperLookup);
+    public void save(HolderLookup.Provider wrapperLookup) {
+        CompoundTag data = this.writeNbt(new CompoundTag(), wrapperLookup);
 
         try {
             NbtIo.writeCompressed(data, this.saveFile.toPath());
@@ -146,22 +146,22 @@ public class PlayerProfile extends PersistentState implements IServerPlayerEntit
     }
 
     @Override
-    public ServerPlayerEntity getPlayer() {
+    public ServerPlayer getPlayer() {
         return player;
     }
 
     @Override
-    public void updatePlayerEntity(ServerPlayerEntity newPlayerEntity) {
+    public void updatePlayerEntity(ServerPlayer newPlayerEntity) {
         this.player = newPlayerEntity;
     }
 
-    public static PlayerProfile access(@NotNull ServerPlayerEntity player) {
+    public static PlayerProfile access(@NotNull ServerPlayer player) {
         return ((ServerPlayerEntityAccess) player).ec$getProfile();
     }
 
-    public static PlayerProfile accessFromContextOrThrow(CommandContext<ServerCommandSource> context)
+    public static PlayerProfile accessFromContextOrThrow(CommandContext<CommandSourceStack> context)
         throws CommandSyntaxException
     {
-        return access(context.getSource().getPlayerOrThrow());
+        return access(context.getSource().getPlayerOrException());
     }
 }

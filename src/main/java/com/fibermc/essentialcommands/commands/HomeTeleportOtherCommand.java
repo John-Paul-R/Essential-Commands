@@ -20,27 +20,27 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class HomeTeleportOtherCommand extends HomeCommand implements Command<ServerCommandSource> {
+public class HomeTeleportOtherCommand extends HomeCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrException()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         return HomeCommand.exec(senderPlayerData, getTargetPlayerData(context), homeName);
     }
 
-    private static PlayerData getTargetPlayerData(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        return ((ServerPlayerEntityAccess) EntityArgumentType.getPlayer(context, "target_player")).ec$getPlayerData();
+    private static PlayerData getTargetPlayerData(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        return ((ServerPlayerEntityAccess) EntityArgument.getPlayer(context, "target_player")).ec$getPlayerData();
     }
 
-    public int runDefault(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+    public int runDefault(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrException()).ec$getPlayerData();
         var targetPlayerData = getTargetPlayerData(context);
 
         return HomeCommand.exec(
@@ -50,8 +50,8 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
         );
     }
 
-    public int runOfflinePlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
+    public int runOfflinePlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrException()).ec$getPlayerData();
         String homeName = StringArgumentType.getString(context, "home_name");
 
         var targetPlayerName = StringArgumentType.getString(context, "target_player");
@@ -60,7 +60,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
             .getOfflinePlayerByNameAsync(targetPlayerName)
             .whenComplete((playerEntity, err) -> {
                 if (playerEntity == null) {
-                    context.getSource().sendError(Text.of("No player with the specified name found."));
+                    context.getSource().sendFailure(Component.nullToEmpty("No player with the specified name found."));
                     return;
                 }
 
@@ -73,14 +73,14 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
                         homeName
                     );
                 } catch (CommandSyntaxException e) {
-                    context.getSource().sendError(ECText.access(senderPlayerData.getPlayer()).error(e.getMessage()));
+                    context.getSource().sendFailure(ECText.access(senderPlayerData.getPlayer()).error(e.getMessage()));
                 }
             });
         return SINGLE_SUCCESS;
 
     }
 
-    public static int runListOffline(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public static int runListOffline(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var targetPlayerName = StringArgumentType.getString(context, "target_player");
         var senderPlayerProfile = PlayerProfile.accessFromContextOrThrow(context);
         ManagerLocator.getInstance()
@@ -88,7 +88,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
             .getOfflinePlayerByNameAsync(targetPlayerName)
             .whenComplete((targetPlayerEntity, err) -> {
                 if (targetPlayerEntity == null) {
-                    context.getSource().sendError(Text.of("No player with the specified name found."));
+                    context.getSource().sendFailure(Component.nullToEmpty("No player with the specified name found."));
                     return;
                 }
 
@@ -101,7 +101,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
                     senderPlayerProfile
                 );
 
-                context.getSource().sendFeedback(() ->
+                context.getSource().sendSuccess(() ->
                     suggestionText,
                     CONFIG.BROADCAST_TO_OPS
                 );
@@ -112,20 +112,20 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Ser
 
     public static class Suggestion {
         //Brigader Suggestions
-        public static final SuggestionProvider<ServerCommandSource> LIST_SUGGESTION_PROVIDER
+        public static final SuggestionProvider<CommandSourceStack> LIST_SUGGESTION_PROVIDER
             = ListSuggestion.ofContext(HomeTeleportOtherCommand.Suggestion::getSuggestionsList);
 
         /**
          * Gets a list of suggested strings to be used with Brigader
          */
-        public static List<String> getSuggestionsList(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        public static List<String> getSuggestionsList(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             return new ArrayList<>(HomeTeleportOtherCommand.getTargetPlayerData(context).getHomeNames());
         }
 
         /**
          * Gets a set of suggestion entries to be used with ListCommandFactory
          */
-        public static Set<Map.Entry<String, NamedMinecraftLocation>> getSuggestionEntries(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        public static Set<Map.Entry<String, NamedMinecraftLocation>> getSuggestionEntries(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             return HomeTeleportOtherCommand.getTargetPlayerData(context).getHomeEntries();
         }
 

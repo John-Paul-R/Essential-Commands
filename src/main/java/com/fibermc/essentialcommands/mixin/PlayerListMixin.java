@@ -15,93 +15,93 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ConnectedClientData;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.TeleportTarget;
+import net.minecraft.network.Connection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.phys.Vec3;
 
-@Mixin(PlayerManager.class)
-public abstract class PlayerManagerMixin {
+@Mixin(PlayerList.class)
+public abstract class PlayerListMixin {
 
     @Inject(
-        method = "onPlayerConnect",
+        method = "placeNewPlayer",
         at = @At(
             value = "INVOKE",
             // We inject right after the vanilla player join message is sent. Mostly to ensure LuckPerms permissions are
             // loaded (for role styling in EC MOTD).
-            target = "Lnet/minecraft/server/PlayerManager;sendToAll(Lnet/minecraft/network/packet/Packet;)V"
+            target = "Lnet/minecraft/server/players/PlayerList;broadcastAll(Lnet/minecraft/network/protocol/Packet;)V"
         )
     )
-    public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
+    public void onPlayerConnect(Connection connection, ServerPlayer player, CommonListenerCookie clientData, CallbackInfo ci) {
         PlayerConnectCallback.EVENT.invoker().onPlayerConnect(connection, player);
         // Just to be _super_ sure there is no incorrect persistance of this invuln.
         Pal.revokeAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.AFK_INVULN);
     }
 
     @Inject(method = "remove", at = @At("HEAD"))
-    public void onPlayerLeave(ServerPlayerEntity player, CallbackInfo callbackInfo) {
+    public void onPlayerLeave(ServerPlayer player, CallbackInfo callbackInfo) {
         PlayerLeaveCallback.EVENT.invoker().onPlayerLeave(player);
     }
 
     @SuppressWarnings("checkstyle:NoWhitespaceBefore")
-    @Inject(method = "respawnPlayer", at = @At(
+    @Inject(method = "respawn", at = @At(
         value = "INVOKE",
         // This target is near-immediately after the new ServerPlayerEntity is
         // created. This lets us update the EC PlayerData, sooner, might be
         // before the new ServerPlayerEntity is fully initialized.
-        target = "Lnet/minecraft/server/network/ServerPlayerEntity;copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V"
+        target = "Lnet/minecraft/server/level/ServerPlayer;restoreFrom(Lnet/minecraft/server/level/ServerPlayer;Z)V"
     ))
     public void onRespawnPlayer(
-        ServerPlayerEntity oldServerPlayerEntity, boolean alive, Entity.RemovalReason removalReason,
-        CallbackInfoReturnable<ServerPlayerEntity> cir,
-        @Local(ordinal = 1) ServerPlayerEntity serverPlayerEntity
+        ServerPlayer oldServerPlayerEntity, boolean alive, Entity.RemovalReason removalReason,
+        CallbackInfoReturnable<ServerPlayer> cir,
+        @Local(ordinal = 1) ServerPlayer serverPlayerEntity
     ) {
         PlayerDataManager.handlePlayerDataRespawnSync(oldServerPlayerEntity, serverPlayerEntity);
     }
 
-    @SuppressWarnings({"checkstyle:NoWhitespaceBefore", "checkstyle:MethodName"})
-    @Inject(method = "respawnPlayer", at = @At(
+    @SuppressWarnings({"checkstyle:NoWhitespaceBefore", "checkstyle:MethodName", "checkstyle:LineLength"})
+    @Inject(method = "respawn", at = @At(
         value = "INVOKE",
         // This target lets us modify respawn position and dimension (player maybe not _fully_ initialized, still)
-        target = "Lnet/minecraft/server/network/ServerPlayerEntity;<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/world/ServerWorld;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/network/packet/c2s/common/SyncedClientOptions;)V"
+        target = "Lnet/minecraft/server/level/ServerPlayer;<init>(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/server/level/ServerLevel;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/server/level/ClientInformation;)V"
     ))
     public void onRespawnPlayer_forRespawnLocationOverwrite(
-        CallbackInfoReturnable<ServerPlayerEntity> cir
-        , @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity oldServerPlayerEntity
-        , @Local(ordinal = 0) LocalRef<TeleportTarget> teleportTargetLocalRef
-        , @Local(ordinal = 0) LocalRef<ServerWorld> teleportTargetServerWorld
+        CallbackInfoReturnable<ServerPlayer> cir
+        , @Local(ordinal = 0, argsOnly = true) ServerPlayer oldServerPlayerEntity
+        , @Local(ordinal = 0) LocalRef<TeleportTransition> teleportTargetLocalRef
+        , @Local(ordinal = 0) LocalRef<ServerLevel> teleportTargetServerWorld
     ) {
         PlayerDataManager.handleRespawnAtEcSpawn(oldServerPlayerEntity, (spawnLoc) -> {
-            var targetWorld = oldServerPlayerEntity.getEntityWorld().getServer().getWorld(spawnLoc.dim());
+            var targetWorld = oldServerPlayerEntity.level().getServer().getLevel(spawnLoc.dim());
             teleportTargetServerWorld.set(targetWorld);
-            teleportTargetLocalRef.set(new TeleportTarget(
+            teleportTargetLocalRef.set(new TeleportTransition(
                 targetWorld,
                 spawnLoc.pos(),
-                Vec3d.ZERO,
+                Vec3.ZERO,
                 0,
                 0,
-                TeleportTarget.NO_OP
+                TeleportTransition.DO_NOTHING
             ));
         });
     }
 
     @SuppressWarnings({"checkstyle:NoWhitespaceBefore", "checkstyle:MethodName"})
-    @Inject(method = "respawnPlayer", at = @At(
+    @Inject(method = "respawn", at = @At(
         value = "INVOKE",
         // This target lets us modify respawn position
-        target = "Lnet/minecraft/server/world/ServerWorld;getLevelProperties()Lnet/minecraft/world/WorldProperties;"
+        target = "Lnet/minecraft/server/level/ServerLevel;getLevelData()Lnet/minecraft/world/level/storage/LevelData;"
     ))
     public void onRespawnPlayer_afterSetPosition(
-        CallbackInfoReturnable<ServerPlayerEntity> cir
-        , @Local(ordinal = 0, argsOnly = true) ServerPlayerEntity oldServerPlayerEntity
-        , @Local(ordinal = 1) ServerPlayerEntity serverPlayerEntity
+        CallbackInfoReturnable<ServerPlayer> cir
+        , @Local(ordinal = 0, argsOnly = true) ServerPlayer oldServerPlayerEntity
+        , @Local(ordinal = 1) ServerPlayer serverPlayerEntity
     ) {
         PlayerDataManager.handleRespawnAtEcSpawn(oldServerPlayerEntity, (spawnLoc) -> {
-            serverPlayerEntity.setServerWorld(serverPlayerEntity.getEntityWorld().getServer().getWorld(spawnLoc.dim()));
+            serverPlayerEntity.setServerLevel(serverPlayerEntity.level().getServer().getLevel(spawnLoc.dim()));
         });
         PlayerRespawnCallback.EVENT.invoker().onPlayerRespawn(oldServerPlayerEntity, serverPlayerEntity);
     }

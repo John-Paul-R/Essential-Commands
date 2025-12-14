@@ -5,8 +5,8 @@ import java.util.Map;
 import com.fibermc.essentialcommands.types.IStyleProvider;
 import eu.pb4.placeholders.api.ParserContext;
 
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class PlayerECTextImpl extends ECTextImpl {
     private final IStyleProvider styleProvider;
@@ -17,32 +17,32 @@ public class PlayerECTextImpl extends ECTextImpl {
     }
 
     @Override
-    public MutableText getTextLiteral(String key, TextFormatType textFormatType) {
+    public MutableComponent getTextLiteral(String key, TextFormatType textFormatType) {
         return getTextLiteral(key, textFormatType, this.styleProvider);
     }
 
     @Override
-    public MutableText getText(String key, Text... args) {
+    public MutableComponent getText(String key, Component... args) {
         return getTextInternal(key, TextFormatType.Default, this.styleProvider, args);
     }
 
     @Override
-    public MutableText getText(String key, TextFormatType textFormatType, Text... args) {
+    public MutableComponent getText(String key, TextFormatType textFormatType, Component... args) {
         return getTextInternal(key, textFormatType, this.styleProvider, args);
     }
 
     @Override
-    public MutableText literal(String str) {
-        return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Default));
+    public MutableComponent literal(String str) {
+        return Component.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Default));
     }
 
     @Override
-    public MutableText accent(String str) {
-        return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Accent));
+    public MutableComponent accent(String str) {
+        return Component.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Accent));
     }
 
     @Override
-    public MutableText error(String str) {
-        return Text.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Error));
+    public MutableComponent error(String str) {
+        return Component.literal(str).setStyle(this.styleProvider.getStyle(TextFormatType.Error));
     }
 }

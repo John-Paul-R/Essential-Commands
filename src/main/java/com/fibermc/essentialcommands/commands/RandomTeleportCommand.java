@@ -24,16 +24,16 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 import dev.jpcode.eccore.util.TextUtil;
 
@@ -48,7 +48,7 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
  *
  */
 @SuppressWarnings("checkstyle:all")
-public class RandomTeleportCommand implements Command<ServerCommandSource> {
+public class RandomTeleportCommand implements Command<CommandSourceStack> {
 
     public RandomTeleportCommand() {}
 
@@ -64,12 +64,12 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
     });
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
-        ServerWorld world = context.getSource().getWorld();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        ServerLevel world = context.getSource().getLevel();
         var ecText = ECText.access(player);
-        if (!CONFIG.RTP_ENABLED_WORLDS.contains(world.getRegistryKey())) {
-            var currentWorldAsText = Text.of(world.getRegistryKey().getValue().toString());
+        if (!CONFIG.RTP_ENABLED_WORLDS.contains(world.dimension())) {
+            var currentWorldAsText = Component.nullToEmpty(world.dimension().identifier().toString());
             PlayerData.access(player).sendCommandError(TextUtil.concat(
                 ecText.getText("cmd.rtp.error.pre", TextFormatType.Error),
                 ecText.getText("cmd.rtp.error.world_not_enabled", TextFormatType.Error, currentWorldAsText)
@@ -78,7 +78,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         }
 
         if (CONFIG.RTP_COOLDOWN > 0 && !ECPerms.check(context.getSource(), ECPerms.Registry.bypass_randomteleport_cooldown)) {
-            int curServerTickTime = context.getSource().getServer().getTicks();
+            int curServerTickTime = context.getSource().getServer().getTickCount();
             var playerData = PlayerData.access(player);
             var rtpCooldownEndTime = playerData.getTimeUsedRtp() + CONFIG.RTP_COOLDOWN * 20;
             var rtpCooldownRemaining = rtpCooldownEndTime - curServerTickTime;
@@ -111,13 +111,13 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         public final int topY;
         public final int bottomY;
 
-        public ExecutionContext(ServerWorld world) {
-            this.topY = world.getTopYInclusive();
-            this.bottomY = world.getBottomY();
+        public ExecutionContext(ServerLevel world) {
+            this.topY = world.getMaxY();
+            this.bottomY = world.getMinY();
         }
     }
 
-    private static void exec(ServerPlayerEntity player, ServerWorld world) {
+    private static void exec(ServerPlayer player, ServerLevel world) {
         var centerOpt = getRtpCenter(player);
         if (centerOpt.isEmpty()) {
             return;
@@ -125,7 +125,7 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         Vec3i center = centerOpt.get();
 
         final var executionContext = new ExecutionContext(world);
-        final var heightFinder = HeightFindingStrategy.forWorld(world.getRegistryKey());
+        final var heightFinder = HeightFindingStrategy.forWorld(world.dimension());
 
         int timesRun = 0;
         Optional<BlockPos> pos;
@@ -141,12 +141,12 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         // Teleport the player
         PlayerTeleporter.requestTeleport(
             player,
-            new MinecraftLocation(world.getRegistryKey(), pos.get(), 0, 0),
+            new MinecraftLocation(world.dimension(), pos.get(), 0, 0),
             ECText.access(player).getText("cmd.rtp.location_name")
         );
     }
 
-    private static Optional<Vec3i> getRtpCenter(ServerPlayerEntity player) {
+    private static Optional<Vec3i> getRtpCenter(ServerPlayer player) {
         var configuredRtpCenter = CONFIG.RTP_CENTER.getPosition();
         if (configuredRtpCenter.isPresent()) {
             var pair = configuredRtpCenter.get();
@@ -172,12 +172,12 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return Optional.empty();
     }
 
-    private static Optional<BlockPos> findRtpPosition(ServerWorld world, Vec3i center, HeightFinder heightFinder, ExecutionContext ctx) {
+    private static Optional<BlockPos> findRtpPosition(ServerLevel world, Vec3i center, HeightFinder heightFinder, ExecutionContext ctx) {
         // Search for a valid y-level (not in a block, underwater, out of the world, etc.)
         final BlockPos targetXZ = getRandomXZ(center);
-        final Chunk chunk = world.getChunk(targetXZ);
+        final ChunkAccess chunk = world.getChunk(targetXZ);
 
-        for (BlockPos.Mutable candidateBlock : getChunkCandidateBlocks(chunk.getPos())) {
+        for (BlockPos.MutableBlockPos candidateBlock : getChunkCandidateBlocks(chunk.getPos())) {
             final int x = candidateBlock.getX();
             final int z = candidateBlock.getZ();
             final OptionalInt yOpt = heightFinder.getY(chunk, x, z);
@@ -213,8 +213,8 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return new BlockPos(new_x, 0, new_z);
     }
 
-    private static boolean isSafePosition(Chunk chunk, BlockPos pos, ExecutionContext ctx) {
-        if (pos.getY() <= chunk.getBottomY()) {
+    private static boolean isSafePosition(ChunkAccess chunk, BlockPos pos, ExecutionContext ctx) {
+        if (pos.getY() <= chunk.getMinY()) {
             return false;
         }
 
@@ -222,10 +222,10 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
         return pos.getY() < ctx.topY && blockState.getFluidState().isEmpty() && blockState.getBlock() != Blocks.FIRE;
     }
 
-    public static Iterable<BlockPos.Mutable> getChunkCandidateBlocks(ChunkPos chunkPos) {
+    public static Iterable<BlockPos.MutableBlockPos> getChunkCandidateBlocks(ChunkPos chunkPos) {
         return () -> new Iterator<>() {
             private int _idx = -1;
-            private final BlockPos.Mutable _pos = new BlockPos.Mutable();
+            private final BlockPos.MutableBlockPos _pos = new BlockPos.MutableBlockPos();
 
             @Override
             public boolean hasNext() {
@@ -233,14 +233,14 @@ public class RandomTeleportCommand implements Command<ServerCommandSource> {
             }
 
             @Override
-            public BlockPos.Mutable next() {
+            public BlockPos.MutableBlockPos next() {
                 _idx++;
                 return switch (_idx) {
-                    case 0 -> _pos.set(chunkPos.getStartX(), 0, chunkPos.getStartZ());
-                    case 1 -> _pos.set(chunkPos.getStartX(), 0, chunkPos.getEndZ());
-                    case 2 -> _pos.set(chunkPos.getEndX(), 0, chunkPos.getStartZ());
-                    case 3 -> _pos.set(chunkPos.getEndX(), 0, chunkPos.getEndZ());
-                    case 4 -> _pos.set(chunkPos.getCenterX(), 0, chunkPos.getCenterZ());
+                    case 0 -> _pos.set(chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ());
+                    case 1 -> _pos.set(chunkPos.getMinBlockX(), 0, chunkPos.getMaxBlockZ());
+                    case 2 -> _pos.set(chunkPos.getMaxBlockX(), 0, chunkPos.getMinBlockZ());
+                    case 3 -> _pos.set(chunkPos.getMaxBlockX(), 0, chunkPos.getMaxBlockZ());
+                    case 4 -> _pos.set(chunkPos.getMiddleBlockX(), 0, chunkPos.getMiddleBlockZ());
                     default -> throw new IllegalStateException("Unexpected value: " + _idx);
                 };
             }

@@ -11,17 +11,17 @@ import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import com.fibermc.essentialcommands.util.FileUtil;
 import org.apache.logging.log4j.Level;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public final class PlayerDataFactory {
     private PlayerDataFactory() {}
 
-    private static PlayerData create(ServerPlayerEntity player, File playerDataFile) {
+    private static PlayerData create(ServerPlayer player, File playerDataFile) {
         boolean fileExisted = false;
 
         try {
@@ -32,7 +32,7 @@ public final class PlayerDataFactory {
 
         if (fileExisted && playerDataFile.length() != 0) {
             try {
-                var tag = NbtIo.readCompressed(playerDataFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
+                var tag = NbtIo.readCompressed(playerDataFile.toPath(), NbtAccounter.unlimitedHeap());
 
                 tag = PlayerData.fixData(tag);
 
@@ -53,7 +53,7 @@ public final class PlayerDataFactory {
             }
         } else {
             PlayerData pData = new PlayerData(player, playerDataFile);
-            pData.markDirty();
+            pData.setDirty();
             pData.save();
             return pData;
         }
@@ -68,9 +68,9 @@ public final class PlayerDataFactory {
         PlayerData playerData = null;
         if (Files.exists(saveFile.toPath()) && saveFile.length() != 0) {
             try {
-                NbtCompound tag = NbtIo.readCompressed(saveFile.toPath(), NbtSizeTracker.ofUnlimitedBytes());
+                CompoundTag tag = NbtIo.readCompressed(saveFile.toPath(), NbtAccounter.unlimitedHeap());
                 // Handle legacy "data" wrapper if present
-                NbtCompound dataTag = tag.getCompound("data").orElse(tag);
+                CompoundTag dataTag = tag.getCompound("data").orElse(tag);
 
                 playerData = PlayerData.CODEC.parse(
                     NbtOps.INSTANCE,
@@ -100,18 +100,18 @@ public final class PlayerDataFactory {
             playerData = new PlayerData(saveFile);
         }
 
-        playerData.markDirty();
+        playerData.setDirty();
         return playerData;
     }
 
-    public static PlayerData create(ServerPlayerEntity player) {
+    public static PlayerData create(ServerPlayer player) {
         try {
             return create(player, getPlayerDataFile(player));
         } catch (IOException ex) {
             EssentialCommands.log(
                 Level.ERROR,
                 "Failed to create player data file for player with id '{}'. Player data may fail to save, or other unexpected behavior may occur.",
-                player.getUuidAsString());
+                player.getStringUUID());
             EssentialCommands.LOGGER.error(ex);
         }
         return new PlayerData(player, null);
@@ -121,9 +121,9 @@ public final class PlayerDataFactory {
         return FileUtil.getOrCreateWorldDirectory(server, "modplayerdata");
     }
 
-    private static File getPlayerDataFile(ServerPlayerEntity player) throws IOException {
-        return getPlayerDataDirectoryPath(player.getEntityWorld().getServer())
-            .resolve(player.getUuidAsString() + ".dat")
+    private static File getPlayerDataFile(ServerPlayer player) throws IOException {
+        return getPlayerDataDirectoryPath(player.level().getServer())
+            .resolve(player.getStringUUID() + ".dat")
             .toFile();
     }
 }

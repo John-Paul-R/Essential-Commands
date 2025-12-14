@@ -11,28 +11,28 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.server.level.ServerPlayer;
 
-public class WarpTpCommand implements Command<ServerCommandSource> {
+public class WarpTpCommand implements Command<CommandSourceStack> {
 
     public WarpTpCommand() {}
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity senderPlayer = context.getSource().getPlayer();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer senderPlayer = context.getSource().getPlayer();
         exec(context, senderPlayer);
 
         return SINGLE_SUCCESS;
     }
 
     private void exec(
-        CommandContext<ServerCommandSource> context,
-        ServerPlayerEntity targetPlayer) throws CommandSyntaxException
+        CommandContext<CommandSourceStack> context,
+        ServerPlayer targetPlayer) throws CommandSyntaxException
     {
         var worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
-        var senderPlayer = context.getSource().getPlayerOrThrow();
+        var senderPlayer = context.getSource().getPlayerOrException();
         var ecText = ECText.access(senderPlayer);
 
         String warpName = StringArgumentType.getString(context, "warp_name");
@@ -60,8 +60,8 @@ public class WarpTpCommand implements Command<ServerCommandSource> {
             ecText.getText("cmd.warp.location_name", warpNameText));
     }
 
-    public int runOther(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        exec(context, EntityArgumentType.getPlayer(context, "target_player"));
+    public int runOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        exec(context, EntityArgument.getPlayer(context, "target_player"));
         return 0;
     }
 }

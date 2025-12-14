@@ -6,15 +6,12 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import me.lucko.fabric.api.permissions.v0.Permissions;
-
-import net.minecraft.command.permission.Permission;
-
-import net.minecraft.command.permission.PermissionLevel;
-
 import org.jetbrains.annotations.NotNull;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -116,37 +113,38 @@ public final class ECPerms {
         });
     }
 
-    private static boolean isSuperAdmin(ServerCommandSource source) {
-        return source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS));
+    private static boolean isSuperAdmin(CommandSourceStack source) {
+        return source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS));
     }
 
-    public static @NotNull Predicate<ServerCommandSource> require(@NotNull String permission, int defaultRequireLevel) {
+    public static @NotNull Predicate<CommandSourceStack> require(@NotNull String permission, int defaultRequireLevel) {
         return player -> check(player, permission, defaultRequireLevel);
     }
 
-    public static @NotNull Predicate<ServerCommandSource> requireAny(@NotNull String[] permissions, int defaultRequireLevel) {
+    public static @NotNull Predicate<CommandSourceStack> requireAny(@NotNull String[] permissions, int defaultRequireLevel) {
         return player -> checkAny(player, permissions, defaultRequireLevel);
     }
 
-    public static boolean check(@NotNull ServerCommandSource source, @NotNull String permission, int defaultRequireLevel) {
+    public static boolean check(@NotNull CommandSourceStack source, @NotNull String permission, int defaultRequireLevel) {
         if (CONFIG.USE_PERMISSIONS_API) {
             try {
                 // TODO: In the future, config option for granting ops all perms.
-                return Permissions.getPermissionValue(source, permission).orElse(source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.fromLevel(Math.max(2, defaultRequireLevel)))));
+                return Permissions.getPermissionValue(source, permission).orElse(source.permissions()
+                    .hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(Math.max(2, defaultRequireLevel)))));
             } catch (Exception e) {
                 EssentialCommands.LOGGER.error(e);
                 return false;
             }
         } else {
-            return source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.fromLevel(defaultRequireLevel)));
+            return source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(defaultRequireLevel)));
         }
     }
 
-    public static boolean check(@NotNull ServerCommandSource source, @NotNull String permission) {
+    public static boolean check(@NotNull CommandSourceStack source, @NotNull String permission) {
         return check(source, permission, 4);
     }
 
-    public static boolean checkAny(@NotNull ServerCommandSource source, @NotNull String[] permissions, int defaultRequireLevel) {
+    public static boolean checkAny(@NotNull CommandSourceStack source, @NotNull String[] permissions, int defaultRequireLevel) {
         for (String permission : permissions) {
             if (check(source, permission, defaultRequireLevel)) {
                 return true;
@@ -159,7 +157,7 @@ public final class ECPerms {
         return Integer.parseInt(permission.substring(permission.lastIndexOf('.') + 1));
     }
 
-    public static int getHighestNumericPermission(@NotNull ServerCommandSource source, @NotNull String[] permissionGroup) {
+    public static int getHighestNumericPermission(@NotNull CommandSourceStack source, @NotNull String[] permissionGroup) {
         // No effective numeric limits for ops.
         if (isSuperAdmin(source)) {
             return Integer.MAX_VALUE;
@@ -198,10 +196,10 @@ public final class ECPerms {
         return numericValues.stream().map(el -> trueBasePermission.concat(el.toString())).toArray(String[]::new);
     }
 
-    public static Stream<String> getGrantedStatefulPlayerAbilityPermissions(ServerPlayerEntity player) {
+    public static Stream<String> getGrantedStatefulPlayerAbilityPermissions(ServerPlayer player) {
         var list = Arrays.stream(Registry.Group.stateful_player_abilities);
-        return player.getPermissions().hasPermission(new Permission.Level(PermissionLevel.GAMEMASTERS))
+        return player.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))
             ? list // TODO: this is hacky
-            : list.filter(permission -> check(player.getCommandSource(), permission));
+            : list.filter(permission -> check(player.createCommandSourceStack(), permission));
     }
 }

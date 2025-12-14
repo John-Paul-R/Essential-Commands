@@ -10,14 +10,14 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
-public class WarpDeleteCommand implements Command<ServerCommandSource> {
+public class WarpDeleteCommand implements Command<CommandSourceStack> {
 
     public WarpDeleteCommand() {}
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         WorldDataManager worldDataManager = ManagerLocator.getInstance().getWorldDataManager();
         var senderPlayerData = PlayerData.accessFromContextOrThrow(context);
         String warpName = StringArgumentType.getString(context, "warp_name");

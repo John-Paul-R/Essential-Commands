@@ -8,11 +8,11 @@ import com.fibermc.essentialcommands.teleportation.TeleportRequest;
 
 import com.mojang.brigadier.context.CommandContext;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
 public class TeleportAcceptCommand extends TeleportResponseCommand {
-    protected int exec(CommandContext<ServerCommandSource> context, ServerPlayerEntity respondingPlayer, ServerPlayerEntity requesterPlayer) {
+    protected int exec(CommandContext<CommandSourceStack> context, ServerPlayer respondingPlayer, ServerPlayer requesterPlayer) {
         var senderPlayerData = PlayerData.access(respondingPlayer);
         var targetPlayerData = ((ServerPlayerEntityAccess) requesterPlayer).ec$getPlayerData();
 

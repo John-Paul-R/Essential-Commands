@@ -7,30 +7,30 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
-public class SleepCommand implements Command<ServerCommandSource> {
+public class SleepCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var source = context.getSource();
-        var player = source.getPlayerOrThrow();
+        var player = source.getPlayerOrException();
         var playerData = PlayerData.access(player);
-        var pos = player.getBlockPos();
+        var pos = player.blockPosition();
 
         if (player.isSleeping()) {
-            player.wakeUp();
+            player.stopSleeping();
             return SINGLE_SUCCESS;
         }
 
         if (!CONFIG.SLEEP_NEAR_MONSTERS && PlayerUtilities.isNearAngryMonsters(player)) {
-            PlayerData.access(player).sendCommandError(Text.translatable("block.minecraft.bed.not_safe"));
+            PlayerData.access(player).sendCommandError(Component.translatable("block.minecraft.bed.not_safe"));
             return 0;
         }
 
-        player.sleep(pos);
+        player.startSleeping(pos);
         playerData.setIsSleepingFromCommand(true);
 
         return SINGLE_SUCCESS;

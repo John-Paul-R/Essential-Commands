@@ -5,12 +5,12 @@ import java.nio.file.Path;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-import net.minecraft.world.PersistentStateManager;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 
-@Mixin(PersistentStateManager.class)
-public interface PersistentStateManagerInvoker {
+@Mixin(DimensionDataStorage.class)
+public interface DimensionDataStorageInvoker {
 
-    @Invoker("getFile")
+    @Invoker("getDataFile")
     Path invokeGetFile(String id);
 
 }

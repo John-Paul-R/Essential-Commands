@@ -9,8 +9,8 @@ import eu.pb4.placeholders.api.parsers.TagParser;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 
@@ -22,14 +22,14 @@ public final class MotdCommand {
         .add(TagParser.QUICK_TEXT_WITH_STF)
         .build();
 
-    public static int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        var player = context.getSource().getPlayerOrThrow();
+    public static int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = context.getSource().getPlayerOrException();
         exec(player);
         return 0;
     }
 
-    public static void exec(ServerPlayerEntity player) {
-        player.getCommandSource().sendFeedback(
+    public static void exec(ServerPlayer player) {
+        player.createCommandSourceStack().sendSuccess(
             () -> Placeholders.parseText(
                 NODE_PARSER.parseNode(CONFIG.MOTD),
                 PlaceholderContext.of(player)

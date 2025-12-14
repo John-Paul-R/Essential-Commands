@@ -15,9 +15,9 @@ import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import dev.jpcode.eccore.util.TextUtil;
 
@@ -28,16 +28,16 @@ public final class ListCommandFactory {
     private ListCommandFactory() {}
 
     // Specify leading response text, and supplier of list of strings/Text
-    public static <T> Command<ServerCommandSource> create(
+    public static <T> Command<CommandSourceStack> create(
         String responsePreText,
         String commandExecText,
         SuggestionListProvider<Entry<String, T>> suggestionsProvider)
     {
-        return (CommandContext<ServerCommandSource> context) -> {
+        return (CommandContext<CommandSourceStack> context) -> {
             var styleProvider = PlayerProfile.accessFromContextOrThrow(context);
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
-            context.getSource().sendFeedback(() ->
+            context.getSource().sendSuccess(() ->
                 getSuggestionText(responsePreText, commandExecText, suggestionsList, Entry::getKey, styleProvider),
                 CONFIG.BROADCAST_TO_OPS
             );
@@ -45,17 +45,17 @@ public final class ListCommandFactory {
         };
     }
 
-    public static <T> Command<ServerCommandSource> create(
+    public static <T> Command<CommandSourceStack> create(
         String responsePreText,
         String commandExecText,
         SuggestionListProvider<T> suggestionsProvider,
         Function<T, String> nameAccessor)
     {
-        return (CommandContext<ServerCommandSource> context) -> {
+        return (CommandContext<CommandSourceStack> context) -> {
             var styleProvider = PlayerProfile.accessFromContextOrThrow(context);
             Collection<T> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
-            context.getSource().sendFeedback(() ->
+            context.getSource().sendSuccess(() ->
                     getSuggestionText(responsePreText, commandExecText, suggestionsList, nameAccessor, styleProvider),
                 CONFIG.BROADCAST_TO_OPS
             );
@@ -63,20 +63,20 @@ public final class ListCommandFactory {
         };
     }
 
-    public static <T> Text getSuggestionText(
+    public static <T> Component getSuggestionText(
         String responsePreText,
         String commandExecText,
         Collection<T> suggestionsList,
         Function<T, String> nameAccessor,
         IStyleProvider styleProvider)
     {
-        MutableText responseText = Text.empty()
-            .append(Text.literal(responsePreText).setStyle(styleProvider.getStyle(TextFormatType.Default)));
+        MutableComponent responseText = Component.empty()
+            .append(Component.literal(responsePreText).setStyle(styleProvider.getStyle(TextFormatType.Default)));
 
-        List<Text> suggestionTextList = suggestionsList.stream()
+        List<Component> suggestionTextList = suggestionsList.stream()
             .map(nameAccessor)
             .map((name) -> clickableTeleport(
-                Text.literal(name).setStyle(styleProvider.getStyle(TextFormatType.Accent)),
+                Component.literal(name).setStyle(styleProvider.getStyle(TextFormatType.Accent)),
                 name,
                 String.format("/%s", commandExecText)))
             .collect(Collectors.toList());
@@ -84,7 +84,7 @@ public final class ListCommandFactory {
         if (suggestionTextList.size() > 0) {
             responseText.append(TextUtil.join(
                 suggestionTextList,
-                Text.literal(", ").setStyle(styleProvider.getStyle(TextFormatType.Default))
+                Component.literal(", ").setStyle(styleProvider.getStyle(TextFormatType.Default))
             ));
         } else {
             responseText.append(ECText.getInstance().getText("cmd.list.feedback.empty", TextFormatType.Error, styleProvider));

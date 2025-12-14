@@ -1,17 +1,17 @@
 package com.fibermc.essentialcommands.screen;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.AnvilScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 
-public class AnvilCommandScreenHandler extends AnvilScreenHandler {
-    public AnvilCommandScreenHandler(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
+public class AnvilCommandScreenHandler extends AnvilMenu {
+    public AnvilCommandScreenHandler(int syncId, Inventory playerInventory, ContainerLevelAccess context) {
         super(syncId, playerInventory, context);
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return true;
     }
 

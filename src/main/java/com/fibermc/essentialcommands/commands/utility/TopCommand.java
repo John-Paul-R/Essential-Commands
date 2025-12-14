@@ -10,22 +10,22 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 
-public class TopCommand implements Command<ServerCommandSource> {
+public class TopCommand implements Command<CommandSourceStack> {
     @SuppressWarnings("checkstyle:LocalVariableName")
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity player = source.getPlayerOrThrow();
-        World world = source.getWorld();
-        BlockPos playerPos = player.getBlockPos();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack source = context.getSource();
+        ServerPlayer player = source.getPlayerOrException();
+        Level world = source.getLevel();
+        BlockPos playerPos = player.blockPosition();
 
         OptionalInt new_y;
         int new_x = playerPos.getX();
@@ -33,7 +33,7 @@ public class TopCommand implements Command<ServerCommandSource> {
 
         final BlockPos targetXZ = new BlockPos(new_x, 0, new_z);
 
-        Chunk chunk = world.getChunk(targetXZ);
+        ChunkAccess chunk = world.getChunk(targetXZ);
         new_y = getTop(chunk, new_x, new_z);
 
         if (new_y.isEmpty()) {
@@ -43,21 +43,21 @@ public class TopCommand implements Command<ServerCommandSource> {
         // Teleport the player
         PlayerTeleporter.requestTeleport(
             player,
-            new MinecraftLocation(world.getRegistryKey(), new_x, new_y.getAsInt(), new_z, player.getHeadYaw(), player.getPitch()),
+            new MinecraftLocation(world.dimension(), new_x, new_y.getAsInt(), new_z, player.getYHeadRot(), player.getXRot()),
             ECText.access(player).getText("cmd.top.location_name")
         );
 
         return 0;
     }
 
-    public static OptionalInt getTop(Chunk chunk, int x, int z) {
+    public static OptionalInt getTop(ChunkAccess chunk, int x, int z) {
         final int maxY = calculateMaxY(chunk);
-        final int bottomY = chunk.getBottomY();
+        final int bottomY = chunk.getMinY();
         if (maxY <= bottomY) {
             return OptionalInt.empty();
         }
 
-        final BlockPos.Mutable mutablePos = new BlockPos.Mutable(x, maxY, z);
+        final BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos(x, maxY, z);
         boolean isAir1 = chunk.getBlockState(mutablePos).isAir(); // Block at head level
         boolean isAir2 = chunk.getBlockState(mutablePos.move(Direction.DOWN)).isAir(); // Block at feet level
         boolean isAir3; // Block below feet
@@ -75,13 +75,13 @@ public class TopCommand implements Command<ServerCommandSource> {
         return OptionalInt.empty();
     }
 
-    private static int calculateMaxY(Chunk chunk) {
-        final int maxY = chunk.getTopYInclusive();
-        ChunkSection[] sections = chunk.getSectionArray();
+    private static int calculateMaxY(ChunkAccess chunk) {
+        final int maxY = chunk.getMaxY();
+        LevelChunkSection[] sections = chunk.getSections();
         int maxSectionIndex = Math.min(sections.length - 1, maxY >> 4);
 
         for (int index = maxSectionIndex; index >= 0; --index) {
-            if (!sections[index].isEmpty()) {
+            if (!sections[index].hasOnlyAir()) {
                 return Math.min(index << 4 + 15, maxY);
             }
         }

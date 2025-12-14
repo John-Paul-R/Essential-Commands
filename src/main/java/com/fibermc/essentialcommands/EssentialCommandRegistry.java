@@ -17,11 +17,6 @@ import com.fibermc.essentialcommands.text.ECText;
 import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
-
-import net.minecraft.command.permission.Permission;
-
-import net.minecraft.command.permission.PermissionLevel;
-
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.util.IConsumer;
 
@@ -33,17 +28,19 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.command.argument.TextArgumentType;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.ComponentArgument;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 
 import static com.fibermc.essentialcommands.EssentialCommands.BACKING_CONFIG;
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 /**
  * Primary registry class for EssentialCommands.
@@ -54,19 +51,19 @@ public final class EssentialCommandRegistry {
     private EssentialCommandRegistry() {}
 
     public static void register(
-        CommandDispatcher<ServerCommandSource> dispatcher,
-        CommandRegistryAccess commandRegistryAccess,
-        CommandManager.RegistrationEnvironment registrationEnvironment
+        CommandDispatcher<CommandSourceStack> dispatcher,
+        CommandBuildContext commandRegistryAccess,
+        Commands.CommandSelection registrationEnvironment
     ) {
-        RootCommandNode<ServerCommandSource> rootNode = dispatcher.getRoot();
+        RootCommandNode<CommandSourceStack> rootNode = dispatcher.getRoot();
 
-        LiteralCommandNode<ServerCommandSource> essentialCommandsRootNode;
+        LiteralCommandNode<CommandSourceStack> essentialCommandsRootNode;
         {
-            LiteralCommandNode<ServerCommandSource> ecInfoNode = CommandManager.literal("info")
+            LiteralCommandNode<CommandSourceStack> ecInfoNode = Commands.literal("info")
                 .executes(new ModInfoCommand())
                 .build();
 
-            essentialCommandsRootNode = CommandManager.literal("essentialcommands")
+            essentialCommandsRootNode = Commands.literal("essentialcommands")
                 .executes(ecInfoNode.getCommand())
                 .build();
 
@@ -74,7 +71,7 @@ public final class EssentialCommandRegistry {
         }
 
         var excludedTopLevelCommands = new HashSet<>(CONFIG.EXCLUDED_TOP_LEVEL_COMMANDS);
-        IConsumer<LiteralCommandNode<ServerCommandSource>> registerNode = CONFIG.REGISTER_TOP_LEVEL_COMMANDS
+        IConsumer<LiteralCommandNode<CommandSourceStack>> registerNode = CONFIG.REGISTER_TOP_LEVEL_COMMANDS
             ? (node) -> {
                 if (excludedTopLevelCommands.contains(node.getLiteral())) {
                     excludedTopLevelCommands.remove(node.getLiteral());
@@ -86,18 +83,18 @@ public final class EssentialCommandRegistry {
             : essentialCommandsRootNode::addChild;
 
         if (CONFIG.ENABLE_TPA) {
-            registerNode.accept(CommandManager.literal("tpa")
+            registerNode.accept(Commands.literal("tpa")
                 .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                 .then(CommandUtil.targetPlayerArgument()
                     .executes(new TeleportAskCommand()))
                 .build());
 
-            registerNode.accept(CommandManager.literal("tpcancel")
+            registerNode.accept(Commands.literal("tpcancel")
                 .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
                 .executes(new TeleportCancelCommand())
                 .build());
 
-            registerNode.accept(CommandManager.literal("tpaccept")
+            registerNode.accept(Commands.literal("tpaccept")
                 .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                 .executes(new TeleportAcceptCommand()::runDefault)
                 .then(CommandUtil.targetPlayerArgument()
@@ -105,7 +102,7 @@ public final class EssentialCommandRegistry {
                     .executes(new TeleportAcceptCommand()))
                 .build());
 
-            registerNode.accept(CommandManager.literal("tpdeny")
+            registerNode.accept(Commands.literal("tpdeny")
                 .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                 .executes(new TeleportDenyCommand()::runDefault)
                 .then(CommandUtil.targetPlayerArgument()
@@ -113,7 +110,7 @@ public final class EssentialCommandRegistry {
                     .executes(new TeleportDenyCommand()))
                 .build());
 
-            registerNode.accept(CommandManager.literal("tpahere")
+            registerNode.accept(Commands.literal("tpahere")
                 .requires(ECPerms.require(ECPerms.Registry.tpahere, 0))
                 .then(CommandUtil.targetPlayerArgument()
                     .executes(new TeleportAskHereCommand()))
@@ -121,15 +118,15 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_HOME) {
-            LiteralArgumentBuilder<ServerCommandSource> homeBuilder = CommandManager.literal("home");
-            LiteralArgumentBuilder<ServerCommandSource> homeSetBuilder = CommandManager.literal("set");
-            LiteralArgumentBuilder<ServerCommandSource> homeTpBuilder = CommandManager.literal("tp");
-            LiteralArgumentBuilder<ServerCommandSource> homeTpOtherBuilder = CommandManager.literal("tp_other");
-            LiteralArgumentBuilder<ServerCommandSource> homeTpOfflineBuilder = CommandManager.literal("tp_offline");
-            LiteralArgumentBuilder<ServerCommandSource> homeDeleteBuilder = CommandManager.literal("delete");
-            LiteralArgumentBuilder<ServerCommandSource> homeListBuilder = CommandManager.literal("list");
-            LiteralArgumentBuilder<ServerCommandSource> homeListOfflineBuilder = CommandManager.literal("list_offline");
-            LiteralArgumentBuilder<ServerCommandSource> homeOverwriteBuilder = CommandManager.literal("overwritehome");
+            LiteralArgumentBuilder<CommandSourceStack> homeBuilder = Commands.literal("home");
+            LiteralArgumentBuilder<CommandSourceStack> homeSetBuilder = Commands.literal("set");
+            LiteralArgumentBuilder<CommandSourceStack> homeTpBuilder = Commands.literal("tp");
+            LiteralArgumentBuilder<CommandSourceStack> homeTpOtherBuilder = Commands.literal("tp_other");
+            LiteralArgumentBuilder<CommandSourceStack> homeTpOfflineBuilder = Commands.literal("tp_offline");
+            LiteralArgumentBuilder<CommandSourceStack> homeDeleteBuilder = Commands.literal("delete");
+            LiteralArgumentBuilder<CommandSourceStack> homeListBuilder = Commands.literal("list");
+            LiteralArgumentBuilder<CommandSourceStack> homeListOfflineBuilder = Commands.literal("list_offline");
+            LiteralArgumentBuilder<CommandSourceStack> homeOverwriteBuilder = Commands.literal("overwritehome");
 
             homeSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_set, 0))
@@ -146,7 +143,7 @@ public final class EssentialCommandRegistry {
 
             homeTpOtherBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
-                .then(argument("target_player", EntityArgumentType.player())
+                .then(argument("target_player", EntityArgument.player())
                     .then(argument("home_name", StringArgumentType.word())
                         .suggests(HomeTeleportOtherCommand.Suggestion.LIST_SUGGESTION_PROVIDER)
                         .executes(new HomeTeleportOtherCommand())));
@@ -180,7 +177,7 @@ public final class EssentialCommandRegistry {
                 .then(argument("home_name", StringArgumentType.word())
                 .executes(new HomeOverwriteCommand()));
 
-            LiteralCommandNode<ServerCommandSource> homeNode = homeBuilder
+            LiteralCommandNode<CommandSourceStack> homeNode = homeBuilder
                 .requires(ECPerms.requireAny(ECPerms.Registry.Group.home_group, 0))
                 .build();
             homeNode.addChild(homeTpBuilder.build());
@@ -198,12 +195,12 @@ public final class EssentialCommandRegistry {
 
         //Back
         if (CONFIG.ENABLE_BACK) {
-            LiteralArgumentBuilder<ServerCommandSource> backBuilder = CommandManager.literal("back");
+            LiteralArgumentBuilder<CommandSourceStack> backBuilder = Commands.literal("back");
             backBuilder
                 .requires(ECPerms.require(ECPerms.Registry.back, 0))
                 .executes(new BackCommand());
 
-            LiteralCommandNode<ServerCommandSource> backNode = backBuilder.build();
+            LiteralCommandNode<CommandSourceStack> backNode = backBuilder.build();
 
             rootNode.addChild(backNode);
             essentialCommandsRootNode.addChild(backNode);
@@ -211,12 +208,12 @@ public final class EssentialCommandRegistry {
 
         //Warp
         if (CONFIG.ENABLE_WARP) {
-            LiteralArgumentBuilder<ServerCommandSource> warpBuilder = CommandManager.literal("warp");
-            LiteralArgumentBuilder<ServerCommandSource> warpSetBuilder = CommandManager.literal("set");
-            LiteralArgumentBuilder<ServerCommandSource> warpTpBuilder = CommandManager.literal("tp");
-            LiteralArgumentBuilder<ServerCommandSource> warpTpOtherBuilder = CommandManager.literal("tp_other");
-            LiteralArgumentBuilder<ServerCommandSource> warpDeleteBuilder = CommandManager.literal("delete");
-            LiteralArgumentBuilder<ServerCommandSource> warpListBuilder = CommandManager.literal("list");
+            LiteralArgumentBuilder<CommandSourceStack> warpBuilder = Commands.literal("warp");
+            LiteralArgumentBuilder<CommandSourceStack> warpSetBuilder = Commands.literal("set");
+            LiteralArgumentBuilder<CommandSourceStack> warpTpBuilder = Commands.literal("tp");
+            LiteralArgumentBuilder<CommandSourceStack> warpTpOtherBuilder = Commands.literal("tp_other");
+            LiteralArgumentBuilder<CommandSourceStack> warpDeleteBuilder = Commands.literal("delete");
+            LiteralArgumentBuilder<CommandSourceStack> warpListBuilder = Commands.literal("list");
 
             warpSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.warp_set, 4))
@@ -233,7 +230,7 @@ public final class EssentialCommandRegistry {
 
             warpTpOtherBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
-                .then(argument("target_player", EntityArgumentType.player())
+                .then(argument("target_player", EntityArgument.player())
                     .then(argument("warp_name", StringArgumentType.word())
                         .suggests(WarpSuggestion.STRING_SUGGESTIONS_PROVIDER)
                         .executes(new WarpTpCommand()::runOther)));
@@ -249,11 +246,11 @@ public final class EssentialCommandRegistry {
                 .executes(ListCommandFactory.create(
                     ECText.getInstance().getString("cmd.warp.list.start"),
                     "warp tp",
-                    (context) -> ManagerLocator.getInstance().getWorldDataManager().getAccessibleWarps(context.getSource().getPlayerOrThrow()).toList(),
+                    (context) -> ManagerLocator.getInstance().getWorldDataManager().getAccessibleWarps(context.getSource().getPlayerOrException()).toList(),
                     NamedMinecraftLocation::getName
                 ));
 
-            LiteralCommandNode<ServerCommandSource> warpNode = warpBuilder
+            LiteralCommandNode<CommandSourceStack> warpNode = warpBuilder
                 .requires(ECPerms.requireAny(ECPerms.Registry.Group.warp_group, 0))
                 .build();
             warpNode.addChild(warpTpBuilder.build());
@@ -267,9 +264,9 @@ public final class EssentialCommandRegistry {
 
         //Spawn
         if (CONFIG.ENABLE_SPAWN) {
-            LiteralArgumentBuilder<ServerCommandSource> spawnBuilder = CommandManager.literal("spawn");
-            LiteralArgumentBuilder<ServerCommandSource> spawnSetBuilder = CommandManager.literal("set");
-            LiteralArgumentBuilder<ServerCommandSource> spawnTpBuilder = CommandManager.literal("tp");
+            LiteralArgumentBuilder<CommandSourceStack> spawnBuilder = Commands.literal("spawn");
+            LiteralArgumentBuilder<CommandSourceStack> spawnSetBuilder = Commands.literal("set");
+            LiteralArgumentBuilder<CommandSourceStack> spawnTpBuilder = Commands.literal("tp");
 
             spawnSetBuilder
                 .requires(ECPerms.require(ECPerms.Registry.spawn_set, 4))
@@ -283,7 +280,7 @@ public final class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.spawn_tp, 0))
                 .executes(cmd);
 
-            LiteralCommandNode<ServerCommandSource> spawnNode = spawnBuilder.build();
+            LiteralCommandNode<CommandSourceStack> spawnNode = spawnBuilder.build();
             spawnNode.addChild(spawnSetBuilder.build());
             spawnNode.addChild(spawnTpBuilder.build());
 
@@ -291,19 +288,19 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_NICK) {
-            LiteralArgumentBuilder<ServerCommandSource> nickBuilder = CommandManager.literal("nickname");
-            LiteralArgumentBuilder<ServerCommandSource> nickSetBuilder = CommandManager.literal("set");
-            LiteralArgumentBuilder<ServerCommandSource> nickClearBuilder = CommandManager.literal("clear");
-            LiteralArgumentBuilder<ServerCommandSource> nickRevealBuilder = CommandManager.literal("reveal");
+            LiteralArgumentBuilder<CommandSourceStack> nickBuilder = Commands.literal("nickname");
+            LiteralArgumentBuilder<CommandSourceStack> nickSetBuilder = Commands.literal("set");
+            LiteralArgumentBuilder<CommandSourceStack> nickClearBuilder = Commands.literal("clear");
+            LiteralArgumentBuilder<CommandSourceStack> nickRevealBuilder = Commands.literal("reveal");
 
-            Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.nickname_self, 2);
-            Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 2);
+            Predicate<CommandSourceStack> permissionSelf = ECPerms.require(ECPerms.Registry.nickname_self, 2);
+            Predicate<CommandSourceStack> permissionOther = ECPerms.require(ECPerms.Registry.nickname_others, 2);
             nickSetBuilder.requires(permissionSelf)
-                .then(argument("nickname", TextArgumentType.text(commandRegistryAccess))
+                .then(argument("nickname", ComponentArgument.textComponent(commandRegistryAccess))
                     .executes(new NicknameSetCommand())
                 ).then(CommandUtil.targetPlayerArgument()
                     .requires(permissionOther)
-                    .then(argument("nickname", TextArgumentType.text(commandRegistryAccess))
+                    .then(argument("nickname", ComponentArgument.textComponent(commandRegistryAccess))
                         .executes(new NicknameSetCommand())
                     ).then(argument("nickname_placeholder_api", StringArgumentType.greedyString())
                         .executes(NicknameSetCommand::runStringToText)
@@ -327,7 +324,7 @@ public final class EssentialCommandRegistry {
                     .executes(new RealNameCommand())
                 );
 
-            LiteralCommandNode<ServerCommandSource> nickNode = nickBuilder
+            LiteralCommandNode<CommandSourceStack> nickNode = nickBuilder
                 .requires(ECPerms.requireAny(ECPerms.Registry.Group.nickname_group, 2))
                 .build();
             nickNode.addChild(nickSetBuilder.build());
@@ -338,12 +335,12 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_RTP) {
-            registerNode.accept(CommandManager.literal("randomteleport")
+            registerNode.accept(Commands.literal("randomteleport")
                 .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
                 .executes(new RandomTeleportCommand())
                 .build());
 
-            registerNode.accept(CommandManager.literal("rtp")
+            registerNode.accept(Commands.literal("rtp")
                 .requires(ECPerms.require(ECPerms.Registry.randomteleport, 2))
                 .executes(new RandomTeleportCommand())
                 .build()
@@ -351,11 +348,11 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_FLY) {
-            LiteralArgumentBuilder<ServerCommandSource> flyBuilder = CommandManager.literal("fly");
-            LiteralArgumentBuilder<ServerCommandSource> flySpeedBuilder = CommandManager.literal("speed");
+            LiteralArgumentBuilder<CommandSourceStack> flyBuilder = Commands.literal("fly");
+            LiteralArgumentBuilder<CommandSourceStack> flySpeedBuilder = Commands.literal("speed");
 
-            Predicate<ServerCommandSource> permissionSelf = ECPerms.require(ECPerms.Registry.fly_self, 2);
-            Predicate<ServerCommandSource> permissionOther = ECPerms.require(ECPerms.Registry.fly_others, 2);
+            Predicate<CommandSourceStack> permissionSelf = ECPerms.require(ECPerms.Registry.fly_self, 2);
+            Predicate<CommandSourceStack> permissionOther = ECPerms.require(ECPerms.Registry.fly_others, 2);
 
             flyBuilder
                 .requires(permissionSelf)
@@ -369,18 +366,18 @@ public final class EssentialCommandRegistry {
 
             flySpeedBuilder
                 .requires(permissionSelf)
-                .then(CommandManager.literal("reset")
+                .then(Commands.literal("reset")
                     .executes(new FlySpeedCommand()::reset))
                 .then(argument("fly_speed", IntegerArgumentType.integer(0))
                     .executes(new FlySpeedCommand()))
                 .then(CommandUtil.targetPlayerArgument()
                     .requires(permissionOther)
-                    .then(CommandManager.literal("reset")
+                    .then(Commands.literal("reset")
                         .executes(new FlySpeedCommand()::reset))
                     .then(argument("fly_speed", IntegerArgumentType.integer(0))
                         .executes(new FlySpeedCommand())));
 
-            LiteralCommandNode<ServerCommandSource> flyNode = flyBuilder.build();
+            LiteralCommandNode<CommandSourceStack> flyNode = flyBuilder.build();
             flyNode.addChild(flySpeedBuilder.build());
 
             registerNode.accept(flyNode);
@@ -388,7 +385,7 @@ public final class EssentialCommandRegistry {
 
         if (CONFIG.ENABLE_INVULN) {
             registerNode.accept(
-                CommandManager.literal("invuln")
+                Commands.literal("invuln")
                     .requires(ECPerms.require(ECPerms.Registry.invuln_self, 2))
                     .executes(new InvulnCommand())
                     .then(CommandUtil.targetPlayerArgument()
@@ -399,79 +396,79 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_WORKBENCH) {
-            registerNode.accept(CommandManager.literal("workbench")
+            registerNode.accept(Commands.literal("workbench")
                 .requires(ECPerms.require(ECPerms.Registry.workbench, 0))
                 .executes(new WorkbenchCommand())
                 .build());
 
-            registerNode.accept(CommandManager.literal("stonecutter")
+            registerNode.accept(Commands.literal("stonecutter")
                 .requires(ECPerms.require(ECPerms.Registry.stonecutter, 0))
                 .executes(new StonecutterCommand())
                 .build());
 
-            registerNode.accept(CommandManager.literal("grindstone")
+            registerNode.accept(Commands.literal("grindstone")
                 .requires(ECPerms.require(ECPerms.Registry.grindstone, 0))
                 .executes(new GrindstoneCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_ANVIL) {
-            registerNode.accept(CommandManager.literal("anvil")
+            registerNode.accept(Commands.literal("anvil")
                 .requires(ECPerms.require(ECPerms.Registry.anvil, 0))
                 .executes(new AnvilCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_ENDERCHEST) {
-            registerNode.accept(CommandManager.literal("enderchest")
+            registerNode.accept(Commands.literal("enderchest")
                     .requires(ECPerms.require(ECPerms.Registry.enderchest, 0))
                     .executes(new EnderchestCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_WASTEBIN) {
-            registerNode.accept(CommandManager.literal("wastebin")
+            registerNode.accept(Commands.literal("wastebin")
                 .requires(ECPerms.require(ECPerms.Registry.wastebin, 0))
                 .executes(new WastebinCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_TOP) {
-            registerNode.accept(CommandManager.literal("top")
+            registerNode.accept(Commands.literal("top")
                 .requires(ECPerms.require(ECPerms.Registry.top, 2))
                 .executes(new TopCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_GAMETIME) {
-            registerNode.accept(CommandManager.literal("gametime")
+            registerNode.accept(Commands.literal("gametime")
                 .requires(ECPerms.require(ECPerms.Registry.gametime, 0))
                 .executes(new GametimeCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_AFK) {
-            registerNode.accept(CommandManager.literal("afk")
+            registerNode.accept(Commands.literal("afk")
                 .requires(ECPerms.require(ECPerms.Registry.afk, 0))
                 .executes(new AfkCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_BED) {
-            registerNode.accept(CommandManager.literal("bed")
+            registerNode.accept(Commands.literal("bed")
                 .requires(ECPerms.require(ECPerms.Registry.bed, 0))
                 .executes(new BedCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_SLEEP) {
-            registerNode.accept(CommandManager.literal("sleep")
+            registerNode.accept(Commands.literal("sleep")
                 .requires(ECPerms.require(ECPerms.Registry.sleep, 0))
                 .executes(new SleepCommand())
                 .build());
         }
 
-        registerNode.accept(CommandManager.literal("lastPos")
+        registerNode.accept(Commands.literal("lastPos")
             .requires(ECPerms.require("essentialcommands.admin.lastpos", 2))
                 .then(argument("target_player", StringArgumentType.word())
                 .executes((context) -> {
@@ -481,11 +478,11 @@ public final class EssentialCommandRegistry {
                         .getOfflinePlayerByNameAsync(targetPlayerName)
                         .whenComplete((playerEntity, err) -> {
                             if (playerEntity == null) {
-                                context.getSource().sendError(Text.of("No player with the specified name found."));
+                                context.getSource().sendFailure(Component.nullToEmpty("No player with the specified name found."));
                                 return;
                             }
-                            context.getSource().sendFeedback(() ->
-                                Text.of(playerEntity.getEntityPos().toString()),
+                            context.getSource().sendSuccess(() ->
+                                Component.nullToEmpty(playerEntity.position().toString()),
                                 EssentialCommands.CONFIG.BROADCAST_TO_OPS);
                         });
                     return 1;
@@ -493,14 +490,14 @@ public final class EssentialCommandRegistry {
             .build());
 
         if (CONFIG.ENABLE_DAY) {
-            registerNode.accept(CommandManager.literal("day")
+            registerNode.accept(Commands.literal("day")
                 .requires(ECPerms.require(ECPerms.Registry.time_set_day, 2))
                 .executes(new DayCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_RULES) {
-            registerNode.accept(CommandManager.literal("rules")
+            registerNode.accept(Commands.literal("rules")
                 .requires(ECPerms.require(ECPerms.Registry.rules, 0))
                 .executes(RulesCommand::run)
                 .then(literal("reload")
@@ -510,7 +507,7 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_FEED) {
-            registerNode.accept(CommandManager.literal("feed")
+            registerNode.accept(Commands.literal("feed")
                 .requires(ECPerms.require(ECPerms.Registry.feed_self, 2))
                 .executes(new FeedCommand())
                 .then(CommandUtil.targetPlayerArgument()
@@ -520,7 +517,7 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_HEAL) {
-            registerNode.accept(CommandManager.literal("heal")
+            registerNode.accept(Commands.literal("heal")
                 .requires(ECPerms.require(ECPerms.Registry.heal_self, 2))
                 .executes(new HealCommand())
                 .then(CommandUtil.targetPlayerArgument()
@@ -530,7 +527,7 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_EXTINGUISH) {
-            LiteralCommandNode<ServerCommandSource> node = CommandManager.literal("extinguish")
+            LiteralCommandNode<CommandSourceStack> node = Commands.literal("extinguish")
                 .requires(ECPerms.require(ECPerms.Registry.extinguish_self, 2))
                 .executes(new ExtinguishCommand())
                 .then(CommandUtil.targetPlayerArgument()
@@ -539,25 +536,25 @@ public final class EssentialCommandRegistry {
                     .build();
 
             registerNode.accept(node);
-            registerNode.accept(CommandManager.literal("ext").redirect(node).build());
+            registerNode.accept(Commands.literal("ext").redirect(node).build());
         }
 
         if (CONFIG.ENABLE_SUICIDE) {
-            registerNode.accept(CommandManager.literal("suicide")
+            registerNode.accept(Commands.literal("suicide")
                 .requires(ECPerms.require(ECPerms.Registry.suicide, 0))
                 .executes(new SuicideCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_NIGHT) {
-            registerNode.accept(CommandManager.literal("night")
+            registerNode.accept(Commands.literal("night")
                 .requires(ECPerms.require(ECPerms.Registry.time_set_night, 2))
                 .executes(new NightCommand())
                 .build());
         }
 
         if (CONFIG.ENABLE_REPAIR) {
-            registerNode.accept(CommandManager.literal("repair")
+            registerNode.accept(Commands.literal("repair")
                 .requires(ECPerms.require(ECPerms.Registry.repair_self, 2))
                 .executes(new RepairCommand())
                 .then(CommandUtil.targetPlayerArgument()
@@ -567,7 +564,7 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_NEAR) {
-            registerNode.accept(CommandManager.literal("near")
+            registerNode.accept(Commands.literal("near")
                 .requires(ECPerms.require(ECPerms.Registry.near_self, 2))
                 .executes(new NearCommand())
                 .then(argument("range", IntegerArgumentType.integer())
@@ -579,7 +576,7 @@ public final class EssentialCommandRegistry {
         }
 
         if (CONFIG.ENABLE_MOTD) {
-            registerNode.accept(CommandManager.literal("motd")
+            registerNode.accept(Commands.literal("motd")
                 .requires(ECPerms.require(ECPerms.Registry.motd, 0))
                 .executes(MotdCommand::run)
                 .build());
@@ -588,14 +585,14 @@ public final class EssentialCommandRegistry {
         var profileNode = ProfileCommand.buildNode();
         essentialCommandsRootNode.addChild(profileNode);
 
-        LiteralCommandNode<ServerCommandSource> configNode = CommandManager.literal("config")
+        LiteralCommandNode<CommandSourceStack> configNode = Commands.literal("config")
             .requires(ECPerms.requireAny(ECPerms.Registry.Group.config_group, 4))
-            .then(CommandManager.literal("reload")
+            .then(Commands.literal("reload")
                 .executes((context) -> {
                     BACKING_CONFIG.loadOrCreateProperties();
                     var player = context.getSource().getPlayer();
                     var ecText = player != null ? ECText.access(player) : ECText.getInstance();
-                    context.getSource().sendFeedback(() ->
+                    context.getSource().sendSuccess(() ->
                         ecText.getText("cmd.config.reload"),
                         true
                     );
@@ -603,23 +600,23 @@ public final class EssentialCommandRegistry {
                 }).requires(
                     ECPerms.require(ECPerms.Registry.config_reload, 4)
                 ).build())
-            .then(CommandManager.literal("display")
+            .then(Commands.literal("display")
                 .requires(ECPerms.require(ECPerms.Registry.config_reload, 4))
                 .executes((context) -> {
                     BACKING_CONFIG.loadOrCreateProperties();
-                    context.getSource().sendFeedback(
+                    context.getSource().sendSuccess(
                         BACKING_CONFIG::stateAsText,
                         false
                     );
                     return 1;
                 })
-                .then(CommandManager.argument("config_property", StringArgumentType.word())
+                .then(Commands.argument("config_property", StringArgumentType.word())
                     .suggests(ListSuggestion.of(BACKING_CONFIG::getPublicFieldNames))
                     .executes(context -> {
                         try {
-                            Text t = BACKING_CONFIG.getFieldValueAsText(
+                            Component t = BACKING_CONFIG.getFieldValueAsText(
                                 StringArgumentType.getString(context, "config_property"));
-                            context.getSource().sendFeedback(() -> t, false);
+                            context.getSource().sendSuccess(() -> t, false);
                         } catch (NoSuchFieldException e) {
                             e.printStackTrace();
                         }
@@ -632,40 +629,40 @@ public final class EssentialCommandRegistry {
         essentialCommandsRootNode.addChild(configNode);
 
         if (true) {
-            essentialCommandsRootNode.addChild(CommandManager.literal("deleteAllPlayerData")
-                .requires(source -> source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS)))
+            essentialCommandsRootNode.addChild(Commands.literal("deleteAllPlayerData")
+                .requires(source -> source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS)))
                 .executes(new ClearPlayerDataCommand())
                 .build()
             );
         }
 
         if (CONFIG.ENABLE_ESSENTIALSX_CONVERT) {
-            essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXPlayerHomes")
-                .requires(source -> source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS)))
+            essentialCommandsRootNode.addChild(Commands.literal("convertEssentialsXPlayerHomes")
+                .requires(source -> source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS)))
                 .executes((source) -> {
-                    Path mcDir = source.getSource().getServer().getRunDirectory();
+                    Path mcDir = source.getSource().getServer().getServerDirectory();
                     try {
                         EssentialsXParser.convertPlayerDataDir(
                             mcDir.resolve("plugins/Essentials/userdata").toFile(),
                             mcDir.resolve("world/modplayerdata").toFile(),
                             source.getSource().getServer()
                         );
-                        source.getSource().sendFeedback(() -> Text.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
+                        source.getSource().sendSuccess(() -> Component.literal("Successfully converted data dirs."), CONFIG.BROADCAST_TO_OPS);
                     } catch (NotDirectoryException | FileNotFoundException e) {
                         e.printStackTrace();
                     }
                     return 0;
                 }).build()
             );
-            essentialCommandsRootNode.addChild(CommandManager.literal("convertEssentialsXWarps")
-                .requires(source -> source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.OWNERS)))
+            essentialCommandsRootNode.addChild(Commands.literal("convertEssentialsXWarps")
+                .requires(source -> source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS)))
                 .executes((source) -> {
-                    Path mcDir = source.getSource().getServer().getRunDirectory();
+                    Path mcDir = source.getSource().getServer().getServerDirectory();
                     EssentialsConvertor.warpConvert(
                         source.getSource().getServer(),
                         mcDir.resolve("plugins/Essentials/warps").toFile()
                     );
-                    source.getSource().sendFeedback(() -> Text.literal("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
+                    source.getSource().sendSuccess(() -> Component.literal("Successfully converted warps."), CONFIG.BROADCAST_TO_OPS);
                     return 0;
                 }).build()
             );

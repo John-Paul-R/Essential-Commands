@@ -12,22 +12,22 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.block.BedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RespawnAnchorBlock;
-import net.minecraft.entity.EntityType;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RespawnAnchorBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
-public class BedCommand implements Command<ServerCommandSource> {
+public class BedCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var source = context.getSource();
-        var player = source.getPlayerOrThrow();
+        var player = source.getPlayerOrException();
 
         var safeSpawnPos = getSafeSpawnPos(player);
         if (safeSpawnPos.isEmpty()) {
@@ -50,40 +50,40 @@ public class BedCommand implements Command<ServerCommandSource> {
      * if a "safe" spawnpoint cannot be found, we'll return a point just above the respawn target
      * block)
      */
-    private static Optional<MinecraftLocation> getSafeSpawnPos(ServerPlayerEntity player) {
-        var respawn = player.getRespawn();
+    private static Optional<MinecraftLocation> getSafeSpawnPos(ServerPlayer player) {
+        var respawn = player.getRespawnConfig();
         if (respawn == null) {
             return Optional.empty();
         }
 
         var respawnPosData = respawn.respawnData().globalPos();
-        ServerWorld world = player.getEntityWorld().getServer().getWorld(respawnPosData.dimension());
+        ServerLevel world = player.level().getServer().getLevel(respawnPosData.dimension());
         var spawnPos = respawnPosData.pos();
 
         // Safe Position Calculation, based on the game respawn position calculation logic,
         // which was basically rewritten because the game code caused the state of the RespawnAnchorBlock to be refreshed.
-        Vec3d safeSpawnPos;
+        Vec3 safeSpawnPos;
         BlockState blockState = world.getBlockState(spawnPos);
         Block block = blockState.getBlock();
         if (block instanceof RespawnAnchorBlock
-            && blockState.get(RespawnAnchorBlock.CHARGES) > 0 && RespawnAnchorBlock.isUsable(world, spawnPos)
+            && blockState.getValue(RespawnAnchorBlock.CHARGE) > 0 && RespawnAnchorBlock.canSetSpawn(world, spawnPos)
         ) {
-            Optional<Vec3d> optional = RespawnAnchorBlock.findRespawnPosition(EntityType.PLAYER, world, spawnPos);
-            safeSpawnPos = optional.orElseGet(() -> new Vec3d((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 1, (double) spawnPos.getZ() + 0.5));
-        } else if (block instanceof BedBlock && world.getEnvironmentAttributes().getAttributeValue(EnvironmentAttributes.BED_RULE_GAMEPLAY, spawnPos).canSetSpawn(world)) {
-            Optional<Vec3d> optional = BedBlock.findWakeUpPosition(EntityType.PLAYER, world, spawnPos, blockState.get(BedBlock.FACING), respawn.respawnData().pitch());
-            safeSpawnPos = optional.orElseGet(() -> new Vec3d((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 0.5625, (double) spawnPos.getZ() + 0.5));
+            Optional<Vec3> optional = RespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, world, spawnPos);
+            safeSpawnPos = optional.orElseGet(() -> new Vec3((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 1, (double) spawnPos.getZ() + 0.5));
+        } else if (block instanceof BedBlock && world.environmentAttributes().getValue(EnvironmentAttributes.BED_RULE, spawnPos).canSetSpawn(world)) {
+            Optional<Vec3> optional = BedBlock.findStandUpPosition(EntityType.PLAYER, world, spawnPos, blockState.getValue(BedBlock.FACING), respawn.respawnData().pitch());
+            safeSpawnPos = optional.orElseGet(() -> new Vec3((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 0.5625, (double) spawnPos.getZ() + 0.5));
         } else {
-            boolean bl = block.canMobSpawnInside(blockState);
-            BlockState blockState2 = world.getBlockState(spawnPos.up());
-            boolean bl2 = blockState2.getBlock().canMobSpawnInside(blockState2);
+            boolean bl = block.isPossibleToRespawnInThis(blockState);
+            BlockState blockState2 = world.getBlockState(spawnPos.above());
+            boolean bl2 = blockState2.getBlock().isPossibleToRespawnInThis(blockState2);
             if (bl && bl2) {
-                safeSpawnPos = new Vec3d((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 0.1, (double) spawnPos.getZ() + 0.5);
+                safeSpawnPos = new Vec3((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 0.1, (double) spawnPos.getZ() + 0.5);
             } else {
-                safeSpawnPos = Vec3d.ofBottomCenter(spawnPos);
+                safeSpawnPos = Vec3.atBottomCenterOf(spawnPos);
             }
         }
 
-        return Optional.of(new MinecraftLocation(respawnPosData.dimension(), safeSpawnPos.getX(), safeSpawnPos.getY(), safeSpawnPos.getZ()));
+        return Optional.of(new MinecraftLocation(respawnPosData.dimension(), safeSpawnPos.x(), safeSpawnPos.y(), safeSpawnPos.z()));
     }
 }

@@ -6,12 +6,12 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 
-public class NicknameClearCommand implements Command<ServerCommandSource> {
+public class NicknameClearCommand implements Command<CommandSourceStack> {
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var senderPlayerData = PlayerData.accessFromContextOrThrow(context);
 
         var targetPlayer = CommandUtil.getCommandTargetPlayer(context);
@@ -22,7 +22,7 @@ public class NicknameClearCommand implements Command<ServerCommandSource> {
         //inform command sender that the nickname has been set
         senderPlayerData.sendCommandFeedback(
             "cmd.nickname.set.feedback",
-            Text.literal(targetPlayer.getGameProfile().name())
+            Component.literal(targetPlayer.getGameProfile().name())
         );
 
         return SINGLE_SUCCESS;

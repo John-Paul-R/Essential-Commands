@@ -9,11 +9,11 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 
-public class GametimeCommand implements Command<ServerCommandSource> {
+public class GametimeCommand implements Command<CommandSourceStack> {
 
     private final String modVersion = EssentialCommands.MOD_METADATA.getVersion().getFriendlyString();
     private static final int TICKS_PER_SECOND = 20;
@@ -25,11 +25,11 @@ public class GametimeCommand implements Command<ServerCommandSource> {
     private static final int MINUTES_PER_DAY = HOURS_PER_DAY * MINUTES_PER_HOUR;
 
     @Override
-    public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        Text t = getFormattedTime(
-                context.getSource().getWorld().getTimeOfDay(),
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        Component t = getFormattedTime(
+                context.getSource().getLevel().getDayTime(),
                 PlayerProfile.accessFromContextOrThrow(context));
-        context.getSource().sendFeedback(() -> t, false);
+        context.getSource().sendSuccess(() -> t, false);
 
         return 0;
     }
@@ -46,12 +46,12 @@ public class GametimeCommand implements Command<ServerCommandSource> {
         );
     }
 
-    private static Text getFormattedTime(long time, IStyleProvider styleProvider) {
-        return Text.translatable(
+    private static Component getFormattedTime(long time, IStyleProvider styleProvider) {
+        return Component.translatable(
                 "commands.time.query",
-                Text.literal(formatGameTimeOfDay(time)).setStyle(styleProvider.getStyle(TextFormatType.Accent)))
+                Component.literal(formatGameTimeOfDay(time)).setStyle(styleProvider.getStyle(TextFormatType.Accent)))
             .setStyle(styleProvider.getStyle(TextFormatType.Default)
                 .withHoverEvent(
-                    new HoverEvent.ShowText(Text.literal(String.valueOf(time % 24000L)))));
+                    new HoverEvent.ShowText(Component.literal(String.valueOf(time % 24000L)))));
     }
 }
