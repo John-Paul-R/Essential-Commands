@@ -32,7 +32,10 @@ public class HomeCommand implements Command<ServerCommandSource> {
     @Override
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         PlayerData senderPlayerData = ((ServerPlayerEntityAccess) context.getSource().getPlayerOrThrow()).ec$getPlayerData();
-        String homeName = StringArgumentType.getString(context, "home_name");
+        
+        String homeName = context.getArguments().containsKey("home_name") 
+            ? StringArgumentType.getString(context, "home_name") 
+            : "home";
 
         return exec(senderPlayerData, homeName);
     }
