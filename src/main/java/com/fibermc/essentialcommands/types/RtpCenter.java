@@ -41,7 +41,7 @@ public sealed interface RtpCenter permits RtpCenter.Spawn, RtpCenter.Coordinates
         }
 
         private static final Pattern REGEX = Pattern.compile(
-            "(?:COORDINATES)?\\(?\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)?",
+            "(?:COORDINATES)?\\(?\\s*(-?\\d+)\\s*,\\s*(-?\\d+)\\s*\\)?",
             Pattern.CASE_INSENSITIVE
         );
     }
