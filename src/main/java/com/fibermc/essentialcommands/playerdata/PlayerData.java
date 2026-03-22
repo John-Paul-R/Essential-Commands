@@ -399,11 +399,17 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
         return isSleepingFromCommand;
     }
 
-    public void setIsSleepingFromCommand(boolean sleepingFromCommand) {
-        this.isSleepingFromCommand = sleepingFromCommand;
-        if (CONFIG.SLEEP_INVULN && sleepingFromCommand) {
-            Pal.grantAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.SLEEP_INVULN);
+    public void setIsSleepingFromCommand(boolean isStartingSleeping) {
+        if (this.isSleepingFromCommand == isStartingSleeping) {
+            return;
         }
+        if (isStartingSleeping) {
+            Pal.grantAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.SLEEP_INVULN);
+        } else {
+            // ending sleeping
+            Pal.revokeAbility(player, VanillaAbilities.INVULNERABLE, ECAbilitySources.SLEEP_INVULN);
+        }
+        this.isSleepingFromCommand = isStartingSleeping;
     }
 
     public void setPreviousLocation(MinecraftLocation location) {
