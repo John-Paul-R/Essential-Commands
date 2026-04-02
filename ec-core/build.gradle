@@ -1,11 +1,12 @@
 plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
 }
 
 dependencies {
     // Required dependencies (expose as api so root project can use them)
-    modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modApi "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    implementation "eu.pb4:placeholder-api:${project.placeholder_api_version}"
 
     testImplementation platform("org.junit:junit-bom:${project.junit_bom_version}")
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -21,10 +22,10 @@ publishing {
             groupId project.maven_group
             version project.version
             // Main
-            artifact(remapJar) { builtBy remapJar }
+            artifact(jar) { builtBy jar }
             // Sources
             artifact(sourcesJar) {
-                builtBy remapSourcesJar
+                builtBy sourcesJar
 
             }
         }
