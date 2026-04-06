@@ -23,6 +23,42 @@ allprojects {
     apply plugin: 'net.fabricmc.fabric-loom'
     apply plugin: 'idea'
 
+    group = project.maven_group
+    String vers_suffix = getenv("VERSION_SUFFIX")
+    String full_version = vers_suffix != 'NOT FOUND' && vers_suffix != ''
+        ? "${project.mod_version}-mc${project.minecraft_version}+${vers_suffix}"
+        : "${project.mod_version}-mc${project.minecraft_version}"
+
+    version = full_version
+    base.archivesName = "${project.mod_id}"
+    println "version: $full_version"
+    println "base.archivesName: ${base.archivesName.get()}"
+
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+//        mavenLocal()
+        maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
+        maven { url 'https://maven.nucleoid.xyz' } // Used by FabricPlaceholderAPI
+        maven {
+            name = 'Ladysnake Mods'
+            url = 'https://maven.ladysnake.org/releases'
+            content {
+                includeGroup 'io.github.ladysnake'
+                includeGroupByRegex 'org\\.ladysnake.*'
+            }
+        }
+        maven {
+            name = 'jpcode'
+            url = 'https://maven.jpcode.dev/'
+            content {
+                includeGroup 'io.github.ladysnake'
+                includeGroupByRegex 'org\\.ladysnake.*'
+            }
+        }
+        maven { url "https://api.modrinth.com/maven" } // for vanish
+    }
+
     loom {
         splitEnvironmentSourceSets()
 
@@ -33,17 +69,6 @@ allprojects {
             }
         }
     }
-
-    group = project.maven_group
-    String vers_suffix = getenv("VERSION_SUFFIX")
-    String full_version = vers_suffix != 'NOT FOUND' && vers_suffix != ''
-        ? "${project.mod_version}-mc${project.minecraft_version}+${vers_suffix}"
-        : "${project.mod_version}-mc${project.minecraft_version}"
-
-    version = full_version
-    base.archivesName = "${project.mod_id}"
-    println "version: $full_version"
-    println "base.archivesName: $base.archivesName"
 
     // Common dependencies for all projects
     dependencies {
@@ -66,57 +91,47 @@ allprojects {
         }
     }
 
-    test {
-        useJUnitPlatform()
-    }
-
-    java {
-        withSourcesJar()
-    }
-
-    tasks.withType(Jar).configureEach {
-        it.from rootProject.file('LICENCE')
-    }
-
     processResources {
         inputs.property 'id', project.mod_id
         inputs.property 'name', project.mod_name
         inputs.property 'version', project.version
 
         filesMatching('fabric.mod.json') {
-            expand(['id': project.mod_id, 'name': project.mod_name, 'version': project.version])
+            expand([
+                'id': project.mod_id,
+                'name': project.mod_name,
+                'version': project.version
+            ])
         }
     }
 
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-//        mavenLocal()
-        maven { name 'Fabric'; url 'https://maven.fabricmc.net/' }
-//        maven { name 'TerraformersMC'; url 'https://maven.terraformersmc.com/' }
-        // Add repositories to retrieve artifacts from in here.
-        // You should only use this when depending on other mods because
-        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-        // for more information about repositories.
-        maven { url 'https://maven.nucleoid.xyz' } // Used by FabricPlaceholderAPI
-        maven {
-            name = 'Ladysnake Mods'
-            url = 'https://maven.ladysnake.org/releases'
-            content {
-                includeGroup 'io.github.ladysnake'
-                includeGroupByRegex 'org\\.ladysnake.*'
-            }
+    tasks.withType(JavaCompile).configureEach {
+        // ensure that the encoding is set to UTF-8, no matter what the system default is
+        // this fixes some edge cases with special characters not displaying correctly
+        // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+        // If Javadoc is generated, this must be specified in that task too.
+        it.options.encoding = "UTF-8"
+        // java version
+        it.options.release.set(25)
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    java {
+        withSourcesJar()
+
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
+    }
+
+    jar {
+        inputs.property "archivesName", project.base.archivesName
+
+        from("LICENSE") {
+            rename { "${it}_${inputs.properties.archivesName}"}
         }
-        maven {
-            name = 'jpcode'
-            url = 'https://maven.jpcode.dev/'
-            content {
-                includeGroup 'io.github.ladysnake'
-                includeGroupByRegex 'org\\.ladysnake.*'
-            }
-        }
-        maven { url "https://api.modrinth.com/maven" } // for vanish
     }
 }
 
@@ -142,26 +157,13 @@ dependencies {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    // ensure that the encoding is set to UTF-8, no matter what the system default is
-    // this fixes some edge cases with special characters not displaying correctly
-    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-    // If Javadoc is generated, this must be specified in that task too.
-    it.options.encoding = "UTF-8"
-    // java version
-    it.options.release.set(25)
-}
-
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        create("mavenJava", MavenPublication) {
             artifactId = project.mod_id
             groupId = project.maven_group
             version = project.version
-            artifact(jar) { builtBy jar }
-            artifact(sourcesJar) {
-                builtBy sourcesJar
-            }
+            from components.java
         }
     }
     // Add repositories to publish to

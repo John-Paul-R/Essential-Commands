@@ -19,17 +19,12 @@ dependencies {
 publishing {
     // Declare all publications
     publications {
-        mavenJava(MavenPublication) {
+        create("mavenJava", MavenPublication) {
             artifactId project.mod_id
             groupId project.maven_group
             version project.version
             // Main
-            artifact(jar) { builtBy jar }
-//            // Sources
-//            artifact(sourcesJar) {
-//                builtBy sourcesJar
-//
-//            }
+            from components.java
         }
     }
 }
