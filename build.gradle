@@ -23,6 +23,17 @@ allprojects {
     apply plugin: 'net.fabricmc.fabric-loom'
     apply plugin: 'idea'
 
+    loom {
+        splitEnvironmentSourceSets()
+
+        mods {
+            "${project.mod_id}" {
+                sourceSet sourceSets.main
+                sourceSet sourceSets.client
+            }
+        }
+    }
+
     group = project.maven_group
     String vers_suffix = getenv("VERSION_SUFFIX")
     String full_version = vers_suffix != 'NOT FOUND' && vers_suffix != ''
@@ -39,6 +50,8 @@ allprojects {
         // Fabric
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
         implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+        implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        implementation "eu.pb4:placeholder-api:${project.placeholder_api_version}"
 
         // Code Quality
         compileOnly "org.jetbrains:annotations:${project.jetbrains_annotations_version}"
@@ -136,7 +149,7 @@ tasks.withType(JavaCompile).configureEach {
     // If Javadoc is generated, this must be specified in that task too.
     it.options.encoding = "UTF-8"
     // java version
-    it.options.release.set(21)
+    it.options.release.set(25)
 }
 
 publishing {
@@ -192,7 +205,7 @@ publisher {
     setCurseEnvironment("both")
 
     setArtifact(jar)
-    setJavaVersions([JavaVersion.VERSION_21])
+    setJavaVersions([JavaVersion.VERSION_25])
 
     // Add subproject artifacts as additional files
     subprojects.each { subproject ->
