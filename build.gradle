@@ -67,6 +67,10 @@ allprojects {
                 sourceSet sourceSets.main
                 sourceSet sourceSets.client
             }
+            "ec-core" {
+                sourceSet sourceSets.main
+                sourceSet sourceSets.client
+            }
         }
     }
 
