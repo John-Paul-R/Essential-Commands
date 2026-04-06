@@ -19,6 +19,7 @@ import net.minecraft.commands.arguments.ComponentArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.ResolutionContext;
 import net.minecraft.server.level.ServerPlayer;
 
 import dev.jpcode.eccore.util.TextUtil;
@@ -40,15 +41,17 @@ public class NicknameSetCommand implements Command<CommandSourceStack> {
         ServerPlayer targetPlayer = CommandUtil.getCommandTargetPlayer(context);
 
         var nicknameWithContext = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_selector_and_ctx, 2)
-            ? ComponentUtils.updateForEntity(
-                context.getSource(),
+            ? ComponentUtils.resolve(
+                ResolutionContext.builder()
+                    .withSource(context.getSource())
+                    .withEntityOverride(targetPlayer)
+                    .build(),
                 rawNicknameText,
-                targetPlayer,
                 0)
             : rawNicknameText;
 
         var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders, 2)
-            ? TagParser.DEFAULT_SAFE.parseText(TextNode.convert(nicknameWithContext), ParserContext.of())
+            ? TagParser.DEFAULT_SAFE.parseComponent(TextNode.convert(nicknameWithContext), ParserContext.of())
             : nicknameWithContext;
         int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText);
 

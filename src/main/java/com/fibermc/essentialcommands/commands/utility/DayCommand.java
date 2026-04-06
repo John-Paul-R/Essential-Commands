@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ServerLevelData;
 
 public class DayCommand implements Command<CommandSourceStack> {
     @Override
@@ -19,10 +20,11 @@ public class DayCommand implements Command<CommandSourceStack> {
             playerData.sendCommandFeedback("cmd.day.error.already_daytime");
             return -1;
         }
-        long time = world.getDayTime();
+        long time = world.getGameTime();
         long timeToDay = 24000L - time % 24000L;
 
-        world.setDayTime(time + timeToDay);
+        ((ServerLevelData)world.getLevelData()).setGameTime(time + timeToDay);
+
         playerData.sendCommandFeedback("cmd.day.feedback");
         return 1;
     }

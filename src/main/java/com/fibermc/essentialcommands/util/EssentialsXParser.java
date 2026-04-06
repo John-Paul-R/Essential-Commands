@@ -8,12 +8,10 @@ import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.util.*;
 
-import com.fibermc.essentialcommands.mixin.DimensionDataStorageInvoker;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.playerdata.PlayerDataFactory;
 import com.fibermc.essentialcommands.types.NamedLocationStorage;
 import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
-import org.apache.logging.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
 import net.minecraft.resources.ResourceKey;
@@ -104,38 +102,43 @@ public final class EssentialsXParser {
         return homes;
     }
 
+    // NOTE - NO LONGER FUNCTIONAL
+    // With minecraft 26.1.1, the world data format that uses a uid.dat file per world is definitively gone
+    // (unless I'm misinterpresting and this was always a spigot thing) -- given that, the way we were matching
+    // worlds in the past will not work.
+    // Should revisit and see how EssentialsX does thing in the future
     public static Map<UUID, ResourceKey<net.minecraft.world.level.Level>> getWorldUids(MinecraftServer server) {
 
         Map<UUID, ResourceKey<net.minecraft.world.level.Level>> uuidRegistryKeyMap = new LinkedHashMap<>();
-        server.getAllLevels().forEach(world -> {
-            // This is dumb. We're taking fabric/vanilla's ideas of these worlds to look for the
-            // bukkit/spigot/paper UID. Instead, we should be reading those mods' config files to
-            // find the correct directory. Rn this will essentially (heh) always be wrong.
-            var persistentStateManager = ((DimensionDataStorageInvoker) world.getDataStorage());
-            File uidFile = persistentStateManager.invokeGetFile("uid").toFile();
-            if (!uidFile.exists()) {
-                uidFile = persistentStateManager.invokeGetFile("../uid").toFile();
-            }
-
-            try {
-                LOGGER.info(String.format("Attempting to read file: %s", uidFile.getPath()));
-                byte[] uuidBytes = Files.readAllBytes(uidFile.toPath());
-                LOGGER.info(String.format("File: %s, UUID: %s", uidFile.getPath(), UUID.nameUUIDFromBytes(uuidBytes)));
-                uuidRegistryKeyMap.put(
-                    UUID.nameUUIDFromBytes(uuidBytes),
-                    world.dimension()
-                );
-            } catch (IOException e) {
-                LOGGER.log(
-                    Level.WARN,
-                    String.format(
-                        "World, %s, did not have a valid uid.dat file. EssentialsX homes set in this dim will likely be remapped to %s.",
-                        world.dimension().identifier().toString(),
-                        net.minecraft.world.level.Level.OVERWORLD.identifier().toString()
-                    )
-                );
-            }
-        });
+//        server.getAllLevels().forEach(world -> {
+//            // This is dumb. We're taking fabric/vanilla's ideas of these worlds to look for the
+//            // bukkit/spigot/paper UID. Instead, we should be reading those mods' config files to
+//            // find the correct directory. Rn this will essentially (heh) always be wrong.
+//            var persistentStateManager = ((DimensionDataStorageInvoker) world.getDataStorage());
+//            File uidFile = persistentStateManager.invokeGetFile("uid").toFile();
+//            if (!uidFile.exists()) {
+//                uidFile = persistentStateManager.invokeGetFile("../uid").toFile();
+//            }
+//
+//            try {
+//                LOGGER.info(String.format("Attempting to read file: %s", uidFile.getPath()));
+//                byte[] uuidBytes = Files.readAllBytes(uidFile.toPath());
+//                LOGGER.info(String.format("File: %s, UUID: %s", uidFile.getPath(), UUID.nameUUIDFromBytes(uuidBytes)));
+//                uuidRegistryKeyMap.put(
+//                    UUID.nameUUIDFromBytes(uuidBytes),
+//                    world.dimension()
+//                );
+//            } catch (IOException e) {
+//                LOGGER.log(
+//                    Level.WARN,
+//                    String.format(
+//                        "World, %s, did not have a valid uid.dat file. EssentialsX homes set in this dim will likely be remapped to %s.",
+//                        world.dimension().identifier().toString(),
+//                        net.minecraft.world.level.Level.OVERWORLD.identifier().toString()
+//                    )
+//                );
+//            }
+//        });
 
         return uuidRegistryKeyMap;
     }

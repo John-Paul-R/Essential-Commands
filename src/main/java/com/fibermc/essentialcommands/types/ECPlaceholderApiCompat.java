@@ -15,7 +15,7 @@ public final class ECPlaceholderApiCompat {
     private static Component getText(TextNode node, ParserContext context) {
         return node instanceof ParentNode
             ? ECPlaceholderApiCompat.toText((ParentNode) node, context)
-            : node.toText(context, true);
+            : node.toComponent(context, true);
     }
 
     public static Component toText(ParentNode node, ParserContext context) {

@@ -27,7 +27,7 @@ public class GametimeCommand implements Command<CommandSourceStack> {
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         Component t = getFormattedTime(
-                context.getSource().getLevel().getDayTime(),
+                context.getSource().getLevel().getGameTime(),
                 PlayerProfile.accessFromContextOrThrow(context));
         context.getSource().sendSuccess(() -> t, false);
 

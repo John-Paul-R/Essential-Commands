@@ -7,13 +7,16 @@ import java.util.stream.Collectors;
 
 import com.fibermc.essentialcommands.types.IStyleProvider;
 import eu.pb4.placeholders.api.ParserContext;
-import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import eu.pb4.placeholders.api.parsers.TagLikeParser;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.StringDecomposer;
@@ -34,7 +37,7 @@ public class ECTextImpl extends ECText {
     public static ECText forServer(Map<String, String> stringMap, MinecraftServer server) {
         return new ECTextImpl(
             stringMap,
-            ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(server))
+            ServerPlaceholderContext.of(server).asParserContext()
         );
     }
 
@@ -124,7 +127,7 @@ public class ECTextImpl extends ECText {
             .collect(Collectors.toCollection(HashSet::new));
 
         var parser = parserForContext(textFormatType, styleProvider, argsList);
-        var parsedText = parser.parseText(
+        var parsedText = parser.parseComponent(
             getString(key),
             this.parserContext
         );

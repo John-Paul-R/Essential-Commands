@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import eu.pb4.placeholders.api.ParserContext;
-import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.chat.Component;
@@ -142,7 +142,7 @@ public abstract class ECText {
     public static ECText forPlayer(ServerPlayer player) {
         return new PlayerECTextImpl(
             ECText.getInstance().stringMap,
-            ParserContext.of(PlaceholderContext.KEY, PlaceholderContext.of(player)),
+            ServerPlaceholderContext.of(player).asParserContext(),
             PlayerProfile.access(player)
         );
     }

@@ -5,12 +5,13 @@ import java.nio.file.Path;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
-@Mixin(DimensionDataStorage.class)
+@Mixin(SavedDataStorage.class)
 public interface DimensionDataStorageInvoker {
 
     @Invoker("getDataFile")
-    Path invokeGetFile(String id);
+    Path invokeGetFile(Identifier id);
 
 }

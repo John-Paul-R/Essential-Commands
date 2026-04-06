@@ -196,7 +196,7 @@ public final class TextUtil {
 
     static {
         registerTextParser(str -> ComponentSerialization.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(str)).getOrThrow());
-        registerTextParser(str -> TagParser.DEFAULT.parseText(str, ParserContext.of()));
+        registerTextParser(str -> TagParser.DEFAULT.parseComponent(str, ParserContext.of()));
     }
 
     public static Component parseText(String textStr) {

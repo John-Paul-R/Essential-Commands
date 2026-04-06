@@ -1,7 +1,6 @@
 package com.fibermc.essentialcommands.commands;
 
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import eu.pb4.placeholders.api.parsers.ParserBuilder;
 import eu.pb4.placeholders.api.parsers.TagParser;
@@ -18,7 +17,7 @@ public final class MotdCommand {
     private MotdCommand() {}
 
     private static final NodeParser NODE_PARSER = ParserBuilder.of()
-        .globalPlaceholders()
+        .commonPlaceholders()
         .add(TagParser.QUICK_TEXT_WITH_STF)
         .build();
 
@@ -30,9 +29,9 @@ public final class MotdCommand {
 
     public static void exec(ServerPlayer player) {
         player.createCommandSourceStack().sendSuccess(
-            () -> Placeholders.parseText(
+            () -> NODE_PARSER.parseComponent(
                 NODE_PARSER.parseNode(CONFIG.MOTD),
-                PlaceholderContext.of(player)
+                ServerPlaceholderContext.of(player).asParserContext()
             ),
             false
         );

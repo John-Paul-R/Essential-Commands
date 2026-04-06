@@ -11,7 +11,7 @@ final class ECPlaceholderRegistry {
 
     public static void register() {
         var namespace = EssentialCommands.MOD_ID;
-        Placeholders.register(
+        Placeholders.registerServer(
             Identifier.fromNamespaceAndPath(namespace, "nickname"),
             (ctx, arg) -> {
                 if (ctx.hasPlayer()) {
