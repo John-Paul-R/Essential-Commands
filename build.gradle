@@ -83,11 +83,6 @@ allprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
         testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-
-        subprojects.each {
-            implementation project(path: ":${it.name}")
-            include project("${it.name}:")
-        }
     }
 
     processResources {
@@ -132,6 +127,29 @@ allprojects {
             rename { "${it}_${inputs.properties.archivesName}"}
         }
     }
+
+    publishing {
+        publications {
+            create("mavenJava", MavenPublication) {
+                artifactId = project.mod_id
+                groupId = project.maven_group
+                version = project.version
+                from components.java
+            }
+        }
+        // Add repositories to publish to
+        repositories {
+            mavenLocal { }
+            maven {
+                name 'GitHub'
+                url "https://maven.pkg.github.com/${project.gh_owner}/${project.gh_repo}"
+                credentials {
+                    username = getenv('GITHUB_ACTOR')
+                    password = getenv('GITHUB_TOKEN')
+                }
+            }
+        }
+    }
 }
 
 // Root-project-specific dependencies
@@ -153,29 +171,6 @@ dependencies {
     subprojects.each {
         implementation project(path: ":${it.name}")
         include project("${it.name}:")
-    }
-}
-
-publishing {
-    publications {
-        create("mavenJava", MavenPublication) {
-            artifactId = project.mod_id
-            groupId = project.maven_group
-            version = project.version
-            from components.java
-        }
-    }
-    // Add repositories to publish to
-    repositories {
-        mavenLocal { }
-        maven {
-            name 'GitHub'
-            url "https://maven.pkg.github.com/${project.gh_owner}/${project.gh_repo}"
-            credentials {
-                username = getenv('GITHUB_ACTOR')
-                password = getenv('GITHUB_TOKEN')
-            }
-        }
     }
 }
 

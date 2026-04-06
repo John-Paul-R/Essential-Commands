@@ -1,25 +1,3 @@
-//dependencies {
-//    // Required dependencies (expose as api so root project can use them)
-//    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-//    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-//    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-//    implementation "eu.pb4:placeholder-api:${project.placeholder_api_version}"
-//
-//    testImplementation platform("org.junit:junit-bom:${project.junit_bom_version}")
-//    testImplementation 'org.junit.jupiter:junit-jupiter'
-//    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-//    testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
-//}
+dependencies {
 
-publishing {
-    // Declare all publications
-    publications {
-        create("mavenJava", MavenPublication) {
-            artifactId project.mod_id
-            groupId project.maven_group
-            version project.version
-            // Main
-            from components.java
-        }
-    }
 }
