@@ -19,6 +19,17 @@ tasks.named('jar').configure {
     dependsOn(tasks.named('compileTestGroovy'))
 }
 
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        "${project.mod_id}" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
 allprojects {
     apply plugin: 'net.fabricmc.fabric-loom'
     apply plugin: 'idea'
@@ -57,21 +68,6 @@ allprojects {
             }
         }
         maven { url "https://api.modrinth.com/maven" } // for vanish
-    }
-
-    loom {
-        splitEnvironmentSourceSets()
-
-        mods {
-            "${project.mod_id}" {
-                sourceSet sourceSets.main
-                sourceSet sourceSets.client
-            }
-            "ec-core" {
-                sourceSet sourceSets.main
-                sourceSet sourceSets.client
-            }
-        }
     }
 
     // Common dependencies for all projects
