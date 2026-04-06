@@ -1,7 +1,6 @@
 plugins {
     id 'groovy'
-    id 'net.fabricmc.fabric-loom' version "${loom_version}"
-    id 'maven-publish'
+    id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
     id "com.hypherionmc.modutils.modpublisher" version "2.1.6"
 }
 
@@ -19,19 +18,9 @@ tasks.named('jar').configure {
     dependsOn(tasks.named('compileTestGroovy'))
 }
 
-loom {
-    splitEnvironmentSourceSets()
-
-    mods {
-        "${project.mod_id}" {
-            sourceSet sourceSets.main
-            sourceSet sourceSets.client
-        }
-    }
-}
-
 allprojects {
     apply plugin: 'net.fabricmc.fabric-loom'
+    apply plugin: 'maven-publish'
     apply plugin: 'idea'
 
     group = project.maven_group
@@ -68,6 +57,16 @@ allprojects {
             }
         }
         maven { url "https://api.modrinth.com/maven" } // for vanish
+    }
+
+    loom {
+        splitEnvironmentSourceSets()
+
+        mods {
+            "${project.mod_id}" {
+                sourceSet sourceSets.main
+            }
+        }
     }
 
     // Common dependencies for all projects

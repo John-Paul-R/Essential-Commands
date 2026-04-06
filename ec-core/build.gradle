@@ -1,19 +1,3 @@
-plugins {
-    id 'net.fabricmc.fabric-loom' version "${loom_version}"
-    id 'maven-publish'
-}
-
-loom {
-    splitEnvironmentSourceSets()
-
-    mods {
-        "${project.mod_id}" {
-            sourceSet sourceSets.main
-            sourceSet sourceSets.client
-        }
-    }
-}
-
 dependencies {
     // Required dependencies (expose as api so root project can use them)
     minecraft "com.mojang:minecraft:${project.minecraft_version}"

@@ -64,7 +64,7 @@ jobs:
         env:
           IS_PIPELINE: true
           VERSION_SUFFIX: ${{ steps.version_suffix.version_suffix }}
-        run: gradle clean build
+        run: gradle clean build --stacktrace
 
       - name: 🎯 Prepare mod-only artifact dir
         run: |
