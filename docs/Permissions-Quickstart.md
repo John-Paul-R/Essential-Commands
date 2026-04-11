@@ -64,23 +64,23 @@ this:
         "level": 100,
         "overrides": {
             "permission_keys": {
-                "essentialcommands.warp.set": true,
-                "essentialcommands.warp.delete": true
+                "essentialcommands.warp.set": "allow",
+                "essentialcommands.warp.delete": "allow"
             }
         }
     },
     "everyone": {
         "overrides": {
             "permission_keys": {
-                "essentialcommands.tpa": true,
-                "essentialcommands.tpahere": true,
-                "essentialcommands.tpaccept": true,
-                "essentialcommands.tpdeny": true,
-                "essentialcommands.home.set": true,
-                "essentialcommands.home.tp": true,
-                "essentialcommands.home.delete": true,
-                "essentialcommands.warp.tp": true,
-                "essentialcommands.randomteleport": true
+                "essentialcommands.tpa": "allow",
+                "essentialcommands.tpahere": "allow",
+                "essentialcommands.tpaccept": "allow",
+                "essentialcommands.tpdeny": "allow",
+                "essentialcommands.home.set": "allow",
+                "essentialcommands.home.tp": "allow",
+                "essentialcommands.home.delete": "allow",
+                "essentialcommands.warp.tp": "allow",
+                "essentialcommands.randomteleport": "allow"
             }
         }
     }
