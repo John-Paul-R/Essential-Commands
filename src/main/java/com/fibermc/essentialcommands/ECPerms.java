@@ -129,6 +129,9 @@ public final class ECPerms {
         if (CONFIG.USE_PERMISSIONS_API) {
             try {
                 // TODO: In the future, config option for granting ops all perms.
+                if (defaultRequireLevel > 4) {
+                    return Permissions.getPermissionValue(source, permission).orElse(false);
+                }
                 return Permissions.getPermissionValue(source, permission).orElse(source.permissions()
                     .hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(Math.max(2, defaultRequireLevel)))));
             } catch (Exception e) {
