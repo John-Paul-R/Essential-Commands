@@ -4,4 +4,15 @@ api_token_env: CROWDIN_PERSONAL_TOKEN
 files:
   - source: /src/main/resources/data/essential_commands/lang/en_us.json
     translation: /src/main/resources/data/essential_commands/lang/%locale_with_underscore%.json
-
+    language_mapping:
+      locale_with_underscore:
+        de-DE: de_de
+        fr-FR: fr_fr
+        pt-BR: pt_br
+        zh-TW: zh_tw
+        en-US: en_us
+        ko-KR: ko_kr
+        ru-RU: ru_ru
+        es-ES: es_es
+        nl-NL: nl_nl
+        zh-CN: zh_cn
