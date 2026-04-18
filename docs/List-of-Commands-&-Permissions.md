@@ -20,7 +20,7 @@ Grant access to all subcommands using wildcards, like so:
 | /tpa \<player>                                 | `essentialcommands.tpa`                       | Request to teleport to a player.                                                                             |
 | /tpahere \<player>                             | `essentialcommands.tpahere`                   | Request that a player teleports to you.                                                                      |
 | /tpaccept \<player>                            | `essentialcommands.tpaccept`                  | Accept player's teleport request.                                                                            |
-| /tpdeny \<player>                              | `essentialcommands.tpdeny`                    | Deny Player's teleport request.                                                                              |
+| /tpdeny \<player>                              | `essentialcommands.tpdeny`                    | Deny player's teleport request.                                                                              |
 | /home set \<home_name>                         | `essentialcommands.home.set`                  | Set a personal home location.                                                                                |
 | /home tp \<home_name>                          | `essentialcommands.home.tp`                   | Teleport to your home.                                                                                       |
 | /home delete \<home_name>                      | `essentialcommands.home.delete`               | Delete your home.                                                                                            |
@@ -62,9 +62,9 @@ Grant access to all subcommands using wildcards, like so:
 | /day                                           | `essentialcommands.day`                       | Advance the time to the beginning of the next day, if it is nighttime.                                       |
 | /night                                         | `essentialcommands.night`                     | Advance the time to nighttime, if it is daytime.                                                             |
 | /afk                                           | `essentialcommands.afk`                       | Mark yourself as afk until you interact or use `/afk` again. Grants invuln if `invuln_while_afk` is enabled. |
-| /bed                                           | `essentialcommands.bed`                       | Teleport yourself to you vanilla bed spawn / spawnpoint.                                                     |
+| /bed                                           | `essentialcommands.bed`                       | Teleport yourself to your vanilla bed spawn / spawnpoint.                                                    |
 | /sleep                                         | `essentialcommands.sleep`                     | Start sleeping, no matter where you are!                                                                     |
-| /lastPos \<target-player>                      | `essentialcommands.admin.lasPos`              | Get the last possition of the specified (possibly offline) player.                                           |
+| /lastPos \<target-player>                      | `essentialcommands.admin.lasPos`              | Get the last position of the specified (possibly offline) player.                                            |
 | /rules                                         | `essentialcommands.rules`                     | Print the rules to the chat for self                                                                         |
 | /rules reload                                  | `essentialcommands.rules_reload`              | Reload the rules from the rules file.                                                                        |
 | /feed                                          | `essentialcommands.feed.self`                 | Fill your hunger bar & clear exhaustion.                                                                     |
@@ -72,9 +72,8 @@ Grant access to all subcommands using wildcards, like so:
 | /heal                                          | `essentialcommands.heal.self`                 | Fill your health.                                                                                            |
 | /heal \<target-player>                         | `essentialcommands.heal.others`               | Fill the target player's health.                                                                             |
 | /repair                                        | `essentialcommands.repair`                    | Repair held item.                                                                                            |
-| /suicide                                       | `essentialcommands.suicide`                   | Die.
 | /extinguish                                    | `essentialcommands.extinguish.self`           | Stop burning on self.                                                                                        |
-| /extinguish \<target-player>                   | `essentialcommands.extinguish.others`         | Stop burning on terget player.                                                                               |
+| /extinguish \<target-player>                   | `essentialcommands.extinguish.others`         | Stop burning on target player.                                                                               |
 | N/A                                            | `essentialcommands.nickname.style.color`      | Allows setting colorful nicknames.                                                                           |
 | N/A                                            | `essentialcommands.nickname.style.fancy`      | Allows setting nicknames that have special formatting (italic, bold, etc.)                                   |
 | N/A                                            | `essentialcommands.nickname.style.hover`      | Allows setting nicknames that show text on hover.                                                            |
