@@ -327,7 +327,7 @@ This admin command allows tracking a player's most recent position, even if they
 
 | Feature | Commands | Permissions |
 |---------|----------|------------|
-| Get player's last position | `/lastpos <player>` | `essentialcommands.admin.lasPos` |
+| Get player's last position | `/lastpos <player>` | `essentialcommands.admin.lastPos` |
 
 ### Clear Player Data
 This command is extremely powerful and should be restricted to server administrators only. It completely erases all data about all players stored by Essential Commands.

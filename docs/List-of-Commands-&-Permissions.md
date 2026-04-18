@@ -64,7 +64,7 @@ Grant access to all subcommands using wildcards, like so:
 | /afk                                           | `essentialcommands.afk`                       | Mark yourself as afk until you interact or use `/afk` again. Grants invuln if `invuln_while_afk` is enabled. |
 | /bed                                           | `essentialcommands.bed`                       | Teleport yourself to your vanilla bed spawn / spawnpoint.                                                    |
 | /sleep                                         | `essentialcommands.sleep`                     | Start sleeping, no matter where you are!                                                                     |
-| /lastPos \<target-player>                      | `essentialcommands.admin.lasPos`              | Get the last position of the specified (possibly offline) player.                                            |
+| /lastPos \<target-player>                      | `essentialcommands.admin.lastPos`              | Get the last position of the specified (possibly offline) player.                                           |
 | /rules                                         | `essentialcommands.rules`                     | Print the rules to the chat for self                                                                         |
 | /rules reload                                  | `essentialcommands.rules_reload`              | Reload the rules from the rules file.                                                                        |
 | /feed                                          | `essentialcommands.feed.self`                 | Fill your hunger bar & clear exhaustion.                                                                     |
