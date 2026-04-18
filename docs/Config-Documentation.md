@@ -75,7 +75,7 @@ The config file can be found at `config/EssentialCommands.properties`
 | rtp_cooldown                                           | 30                         | integer                      |
 | rtp_enabled_worlds                                     | overworld                  | world name (ex `the_nether`) |
 | rtp_max_attempts                                       | 15                         | integer                      |
-| rtp_min_radius                                         | `rtp_radius` (1000)        | integer (`<= rtp_radius`)    |
+| rtp_min_radius                                         | auto-matches `rtp_radius`  | integer (`<= rtp_radius`)    |
 | rtp_radius                                             | 1000                       | integer                      |
 | sleep_invuln                                           | false                      | boolean                      |
 | sleep_near_monsters                                    | false                      | boolean                      |
