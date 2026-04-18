@@ -71,8 +71,8 @@ Grant access to all subcommands using wildcards, like so:
 | /feed \<target-player>                         | `essentialcommands.feed.others`               | Fill the target player's hunger bar & clear exhaustion.                                                      |
 | /heal                                          | `essentialcommands.heal.self`                 | Fill your health.                                                                                            |
 | /heal \<target-player>                         | `essentialcommands.heal.others`               | Fill the target player's health.                                                                             |
-| /repair                                        | `essentialcommands.repair`                     | Repair held item.                                                                                            |
-| /suicide                                       | `essentialcommands.suicide`                     | Die.
+| /repair                                        | `essentialcommands.repair`                    | Repair held item.                                                                                            |
+| /suicide                                       | `essentialcommands.suicide`                   | Die.
 | /extinguish                                    | `essentialcommands.extinguish.self`           | Stop burning on self.                                                                                        |
 | /extinguish \<target-player>                   | `essentialcommands.extinguish.others`         | Stop burning on terget player.                                                                               |
 | N/A                                            | `essentialcommands.nickname.style.color`      | Allows setting colorful nicknames.                                                                           |
