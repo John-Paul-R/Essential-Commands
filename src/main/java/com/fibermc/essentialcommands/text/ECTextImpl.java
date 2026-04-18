@@ -12,10 +12,8 @@ import xyz.nucleoid.server.translations.api.LocalizationTarget;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.FormattedCharSequence;
 
 public class ECTextImpl extends ECText {
     /** Marker for inline-key references that survived from the legacy template syntax. */
@@ -123,20 +121,5 @@ public class ECTextImpl extends ECText {
 
     protected Style styleFor(TextFormatType textFormatType, @Nullable IStyleProvider styleProvider) {
         return styleProvider == null ? textFormatType.getStyle() : styleProvider.getStyle(textFormatType);
-    }
-
-    @Override
-    public boolean hasTranslation(String key) {
-        return Localization.raw(key, target()) != null;
-    }
-
-    @Override
-    public boolean isRightToLeft() {
-        return false;
-    }
-
-    @Override
-    public FormattedCharSequence reorder(FormattedText text) {
-        return rawReorder(text);
     }
 }

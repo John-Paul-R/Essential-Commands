@@ -31,7 +31,6 @@ public class ECTextTests {
     @BeforeAll
     public static void setup() {
         try {
-            ECText.init(null);
             ecText = ECText.getInstance();
         } catch (NoSuchElementException ignored) {
             // We don't care about this. Is a startup error in EssentialCommands.java relating to loading ModMetadata.
