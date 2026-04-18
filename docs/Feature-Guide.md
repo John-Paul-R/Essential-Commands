@@ -121,6 +121,9 @@ Teleport to a random location in the world.
 - `rtp_cooldown` - Cooldown between random teleports (seconds) - Default: `30`
 - `rtp_max_attempts` - Maximum tries to find valid location - Default: `15`
 - `rtp_enabled_worlds` - Worlds where RTP is enabled - Default: `overworld`
+  - valid values are the registry keys of worlds that exist on your server. In vanilla, that's: `minecraft:overworld`, `minecraft:the_nether`, `minecraft:the_end`
+  - any number of entries may be provided, separated by commas, e.g. `overworld,the_nether,the_end`
+  - milelage may vary in The End, as the RTP algorithm currently struggles to quickly find safe locations in void-heavy worlds
 
 #### Bed Command
 Teleport to your bed or spawnpoint.
