@@ -1,9 +1,7 @@
 package com.fibermc.essentialcommands.text;
 
-import java.util.Map;
-
 import com.fibermc.essentialcommands.types.IStyleProvider;
-import eu.pb4.placeholders.api.ParserContext;
+import xyz.nucleoid.server.translations.api.LocalizationTarget;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -11,24 +9,24 @@ import net.minecraft.network.chat.MutableComponent;
 public class PlayerECTextImpl extends ECTextImpl {
     private final IStyleProvider styleProvider;
 
-    public PlayerECTextImpl(Map<String, String> stringMap, ParserContext parserContext, IStyleProvider styleProvider) {
-        super(stringMap, parserContext);
+    public PlayerECTextImpl(LocalizationTarget target, IStyleProvider styleProvider) {
+        super(target::getLanguageCode);
         this.styleProvider = styleProvider;
     }
 
     @Override
     public MutableComponent getTextLiteral(String key, TextFormatType textFormatType) {
-        return getTextLiteral(key, textFormatType, this.styleProvider);
+        return Component.literal(getString(key)).setStyle(styleProvider.getStyle(textFormatType));
     }
 
     @Override
     public MutableComponent getText(String key, Component... args) {
-        return getTextInternal(key, TextFormatType.Default, this.styleProvider, args);
+        return buildText(key, TextFormatType.Default, this.styleProvider, args);
     }
 
     @Override
     public MutableComponent getText(String key, TextFormatType textFormatType, Component... args) {
-        return getTextInternal(key, textFormatType, this.styleProvider, args);
+        return buildText(key, textFormatType, this.styleProvider, args);
     }
 
     @Override

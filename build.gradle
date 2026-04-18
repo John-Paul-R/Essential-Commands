@@ -76,6 +76,7 @@ allprojects {
         implementation "net.fabricmc:fabric-loader:${project.loader_version}"
         implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
         implementation "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+        implementation "xyz.nucleoid:server-translations-api:${project.server_translations_api_version}"
 
         // Code Quality
         compileOnly "org.jetbrains:annotations:${project.jetbrains_annotations_version}"
@@ -160,6 +161,7 @@ dependencies {
     implementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
     include "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
     include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
+    include "xyz.nucleoid:server-translations-api:${project.server_translations_api_version}"
     implementation "org.yaml:snakeyaml:${project.snakeyaml_version}"
     include "org.yaml:snakeyaml:${project.snakeyaml_version}"
     implementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"

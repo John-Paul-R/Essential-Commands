@@ -12,9 +12,11 @@ import net.minecraft.server.Bootstrap;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.ChatFormatting;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 @DisplayName("ECText")
 public class ECTextTests {
@@ -37,79 +39,60 @@ public class ECTextTests {
     }
 
     @Test
-    @DisplayName("getTextInternal - no interpolation")
-    void getTextInternal_FormatsCorrectly()
-    {
-        var expected = Component.literal("enabled").setStyle(TextFormatType.Default.getStyle());
+    @DisplayName("getText - emits translatable with style applied")
+    void getText_NoArgs_EmitsTranslatable() {
+        var component = ecText.getText("generic.enabled");
+
+        var contents = assertInstanceOf(TranslatableContents.class, component.getContents());
+        assertEquals("generic.enabled", contents.getKey());
+        assertEquals(0, contents.getArgs().length);
+        assertEquals(TextFormatType.Default.getStyle(), component.getStyle());
+    }
+
+    @Test
+    @DisplayName("getText - two args become translatable args")
+    void getText_TwoArgs_ArgsArePassedThrough() {
         var enabledText = ecText.getText("generic.enabled");
-
-        assertEquals(expected.getContents(), enabledText.getContents());
-        assertEquals(expected.getStyle(), enabledText.getStyle());
-    }
-
-    @Test
-    @DisplayName("getTextInternal - two interpolated tokens")
-    void getTextInternal_TwoInterpolatedTokens_FormatsCorrectly()
-    {
         var playerNameText = Component.literal("Steve").withStyle(ChatFormatting.AQUA);
-        var defaultStyle = TextFormatType.Default.getStyle();
-        var accentStyle = TextFormatType.Accent.getStyle();
-        var expectedMessage = Component.empty()
-            .append(Component.literal("Flight ").setStyle(defaultStyle))
-            .append(Component.literal("enabled").setStyle(accentStyle))
-            .append(Component.literal(" for ").setStyle(defaultStyle))
-            .append(playerNameText)
-            .append(Component.literal(".").setStyle(defaultStyle));
 
-        var enabledText = ecText.getText("generic.enabled").setStyle(accentStyle);
+        var actual = ecText.getText("cmd.fly.feedback", enabledText, playerNameText);
 
-        var actualMessage = ecText.getText("cmd.fly.feedback", enabledText, playerNameText);
-
-        var expectedString = expectedMessage.getString();
-        var actualString = actualMessage.getString();
-
-        assertEquals(expectedString, actualString);
-
-        // this guarantee is gone after some lib upgrades
-//        var expectedSiblings = expectedMessage.getSiblings();
-//        var actualSiblings = actualMessage.getSiblings();
-//        for (int i = 0; i < expectedSiblings.size(); i++) {
-//            var inputToken = expectedSiblings.get(i);
-//            var actualToken = actualSiblings.get(i);
-//
-//            assertEquals(inputToken.getContent(), actualToken.getContent());
-//            assertEquals(inputToken.getStyle(), actualToken.getStyle());
-//        }
+        var contents = assertInstanceOf(TranslatableContents.class, actual.getContents());
+        assertEquals("cmd.fly.feedback", contents.getKey());
+        assertEquals(2, contents.getArgs().length);
+        assertEquals(enabledText, contents.getArgs()[0]);
+        assertEquals(playerNameText, contents.getArgs()[1]);
     }
 
     @Test
-    @DisplayName("getTextInternal - first token interpolated")
-    void getTextInternal_FirstTokenInterpolated_FormatsCorrectly()
-    {
-        var playerNameText = Component.empty()
-            .append(Component.literal("[UnstyledPrefix] "))
-            .append(Component.literal("Steve").withStyle(ChatFormatting.AQUA));
-        var defaultStyle = TextFormatType.Default.getStyle();
-        var expectedMessage = Component.empty()
-            .append(playerNameText)
-            .append(Component.literal(" is now AFK.").setStyle(defaultStyle));
+    @DisplayName("getText - unstyled arg is stamped with white color")
+    void getText_UnstyledArg_GetsWhiteColor() {
+        var unstyledArg = Component.literal("Steve");
 
-        var actualMessage = ecText.getText("player.afk.enter", playerNameText);
+        var actual = ecText.getText("player.afk.enter", unstyledArg);
 
-        var expectedString = expectedMessage.getString();
-        var actualString = actualMessage.getString();
+        var contents = assertInstanceOf(TranslatableContents.class, actual.getContents());
+        assertEquals(1, contents.getArgs().length);
+        var preppedArg = (Component) contents.getArgs()[0];
+        assertEquals(ChatFormatting.WHITE.getColor().intValue(), preppedArg.getStyle().getColor().getValue());
+    }
 
-        assertEquals(expectedString, actualString);
+    @Test
+    @DisplayName("getText - already-styled arg is preserved as-is")
+    void getText_StyledArg_KeepsItsColor() {
+        var styledArg = Component.literal("Steve").withStyle(ChatFormatting.AQUA);
 
-        // This guarantee is gone after some lib upgrades
-//        var expectedSiblings = expectedMessage.getSiblings();
-//        var actualSiblings = actualMessage.getSiblings();
-//        for (int i = 0; i < expectedSiblings.size(); i++) {
-//            var inputToken = expectedSiblings.get(i);
-//            var actualToken = actualSiblings.get(i);
-//
-//            assertEquals(inputToken.getContent(), actualToken.getContent());
-//            assertEquals(inputToken.getStyle(), actualToken.getStyle());
-//        }
+        var actual = ecText.getText("player.afk.enter", styledArg);
+
+        var contents = assertInstanceOf(TranslatableContents.class, actual.getContents());
+        var preppedArg = (Component) contents.getArgs()[0];
+        assertEquals(ChatFormatting.AQUA.getColor().intValue(), preppedArg.getStyle().getColor().getValue());
+    }
+
+    @Test
+    @DisplayName("getText - error format type applies error style")
+    void getText_ErrorFormat_AppliesErrorStyle() {
+        var actual = ecText.getText("generic.enabled", TextFormatType.Error);
+        assertEquals(TextFormatType.Error.getStyle(), actual.getStyle());
     }
 }

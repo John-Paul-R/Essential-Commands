@@ -1,198 +1,142 @@
 package com.fibermc.essentialcommands.text;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fibermc.essentialcommands.types.IStyleProvider;
-import eu.pb4.placeholders.api.ParserContext;
-import eu.pb4.placeholders.api.ServerPlaceholderContext;
-import eu.pb4.placeholders.api.parsers.NodeParser;
-import eu.pb4.placeholders.api.parsers.TagLikeParser;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.server.translations.api.Localization;
+import xyz.nucleoid.server.translations.api.LocalizationTarget;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.StringDecomposer;
 
 public class ECTextImpl extends ECText {
-    private final ParserContext parserContext;
+    /** Marker for inline-key references that survived from the legacy template syntax. */
+    private static final Pattern NESTED_REF_PATTERN = Pattern.compile("\\$\\{l:([^}]+)\\}");
+    /** Synthetic key prefix used when we have to pre-resolve a template containing nested refs. */
+    private static final String SYNTH_KEY_PREFIX = "essentialcommands.__inline__.";
+    /** Color stamped onto unstyled args so they don't inherit the template's accent/error color. */
+    private static final ChatFormatting DEFAULT_ARGUMENT_COLOR = ChatFormatting.WHITE;
 
-    public ECTextImpl(
-        Map<String, String> stringMap,
-        ParserContext parserContext)
-    {
-        super(stringMap);
-        // In normal operation, `server` should always be present. For testing and other contexts,
-        // that is not guaranteed. This is admittedly a bit hacky.
-        this.parserContext = parserContext;
+    private final LanguageCodeSupplier targetLanguageCode;
+
+    public ECTextImpl(LanguageCodeSupplier targetLanguageCode) {
+        this.targetLanguageCode = targetLanguageCode;
     }
 
-    public static ECText forServer(Map<String, String> stringMap, MinecraftServer server) {
-        return new ECTextImpl(
-            stringMap,
-            ServerPlaceholderContext.of(server).asParserContext()
-        );
+    @FunctionalInterface
+    public interface LanguageCodeSupplier {
+        @Nullable String get();
     }
 
+    private LocalizationTarget target() {
+        String code = this.targetLanguageCode.get();
+        return () -> code;
+    }
+
+    @Override
     public String getString(String key) {
-        return super.stringMap.getOrDefault(key, key);
+        String resolved = Localization.raw(key, target());
+        return resolved != null ? resolved : key;
     }
 
-    // Literals
+    @Override
     public MutableComponent getTextLiteral(String key, TextFormatType textFormatType) {
-        return getTextLiteral(key, textFormatType, null);
+        return Component.literal(getString(key)).setStyle(styleFor(textFormatType, null));
     }
 
-    public MutableComponent getTextLiteral(
-        String key,
-        TextFormatType textFormatType,
-        @Nullable IStyleProvider styleProvider)
-    {
-        return Component.literal(getString(key))
-            .setStyle(styleProvider == null
-                ? textFormatType.getStyle()
-                : styleProvider.getStyle(textFormatType));
-    }
-
-    // Interpolated
+    @Override
     public MutableComponent getText(String key, Component... args) {
-        return getTextInternal(key, TextFormatType.Default, null, args);
+        return buildText(key, TextFormatType.Default, null, args);
     }
 
+    @Override
     public MutableComponent getText(String key, TextFormatType textFormatType, Component... args) {
-        return getTextInternal(key, textFormatType, null, args);
+        return buildText(key, textFormatType, null, args);
     }
 
+    @Override
     public MutableComponent getText(String key, TextFormatType textFormatType, IStyleProvider styleProvider, Component... args) {
-        return getTextInternal(key, textFormatType, styleProvider, args);
+        return buildText(key, textFormatType, styleProvider, args);
     }
 
-    private NodeParser parserForContext(
-        TextFormatType textFormatType,
-        @Nullable IStyleProvider styleProvider,
-        List<MutableComponent> args)
-    {
-        return TagLikeParser.of(
-            TagLikeParser.PLACEHOLDER_USER,
-            TagLikeParser.Provider.placeholderText(placeholderId -> {
-                if (placeholderId.startsWith("l:")) {
-                    // handling the ${l:lang.key.here} case for interpolating value from elsewhere in language files
-                    var idxAndFormattingCode = placeholderId.split(":");
-                    if (idxAndFormattingCode.length < 2) {
-                        throw new IllegalArgumentException(
-                            "Specified lang interpolation prefix ('l'), but no lang key was provided. Expected the form: 'l:lang.key.here'. Received: "
-                                + placeholderId);
-                    }
-                    if (idxAndFormattingCode.length > 3) {
-                        throw new IllegalArgumentException("lang string placeholder had an unexpected second ':'. Received: " + placeholderId);
-                    }
-
-                    return getTextInternal(idxAndFormattingCode[1], textFormatType, styleProvider);
-                }
-
-                if (placeholderId.matches("\\d+")) {
-                    // handling the ${1} case for argument interpolation
-                    int targetIndex = Integer.parseInt(placeholderId);
-                    if (targetIndex > args.size()) {
-                        throw new IllegalArgumentException("Invalid 'Argument' placeholder: targeted argument with (0-based) index '" + targetIndex + "' but only " + args.size() + " were present");
-                    }
-                    return args.get(targetIndex);
-                }
-
-                return null;
-            })
-        );
-    }
-
-    private static int hashText(Component text) {
-        return Objects.hash(text.getContents(), text.getStyle());
-    }
-
-    public MutableComponent getTextInternal(
+    protected MutableComponent buildText(
         String key,
         TextFormatType textFormatType,
         @Nullable IStyleProvider styleProvider,
-        Component... args)
-    {
-        var argsList = Arrays.stream(args).map(Component::copy).toList();
-        var argsHashes = argsList.stream()
-            .map(ECTextImpl::hashText)
-            .collect(Collectors.toCollection(HashSet::new));
+        Component... args
+    ) {
+        Style outerStyle = styleFor(textFormatType, styleProvider);
+        Object[] preppedArgs = prepArgs(args);
 
-        var parser = parserForContext(textFormatType, styleProvider, argsList);
-        var parsedText = parser.parseComponent(
-            getString(key),
-            this.parserContext
-        );
+        String template = Localization.raw(key, target());
+        if (template == null || !NESTED_REF_PATTERN.matcher(template).find()) {
+            // Fast path: vanilla TranslatableContents -- Server-Translations resolves per recipient.
+            return Component.translatable(key, preppedArgs).withStyle(outerStyle);
+        }
 
-        var specifiedStyle = styleProvider == null
-            ? textFormatType.getStyle()
-            : styleProvider.getStyle(textFormatType);
-
-        return visitText(
-            parsedText,
-            defaultStylesVisitor(
-                // currently using reference equality -- if internals of TextPlaceholderAPI change, this might not be ok
-                (node) -> argsHashes.contains(hashText(node))
-                    ? DEFAULT_ARGUMENT_STYLE
-                    : specifiedStyle
-            ),
-            // we should stop traversal downward in the tree when we hit one of the args
-            (node) -> argsHashes.contains(hashText(node))
-        );
+        // Slow path: ${l:nestedKey} present. Pre-resolve the template in our target language,
+        // then emit a synthetic-key translatable so vanilla's Formatter-based renderer can splice
+        // the user args plus a nested Component.translatable per ${l:...} marker.
+        return inlineNestedKeys(key, template, preppedArgs).withStyle(outerStyle);
     }
 
-    interface TextVisitor {
-        MutableComponent accept(Component text);
+    private static MutableComponent inlineNestedKeys(String key, String template, Object[] preppedArgs) {
+        List<Object> allArgs = new ArrayList<>(preppedArgs.length + 2);
+        for (Object a : preppedArgs) allArgs.add(a);
+
+        Matcher m = NESTED_REF_PATTERN.matcher(template);
+        StringBuilder rewritten = new StringBuilder();
+        while (m.find()) {
+            String nestedKey = m.group(1);
+            allArgs.add(Component.translatable(nestedKey));
+            m.appendReplacement(rewritten, Matcher.quoteReplacement("%" + allArgs.size() + "$s"));
+        }
+        m.appendTail(rewritten);
+
+        return Component.translatableWithFallback(SYNTH_KEY_PREFIX + key, rewritten.toString(), allArgs.toArray());
     }
 
-    private static final Style DEFAULT_ARGUMENT_STYLE = Style.EMPTY.withColor(ChatFormatting.WHITE);
-
-    TextVisitor defaultStylesVisitor(Function<Component, @Nullable Style> defaultStyleProvider) {
-        return text -> {
-            MutableComponent txt = text.copy();
-            var defaultStyleForText = defaultStyleProvider.apply(txt);
-            if (defaultStyleForText != null) {
-                txt.setStyle(txt.getStyle().applyTo(defaultStyleForText));
+    /**
+     * Copies each arg, stamping {@link #DEFAULT_ARGUMENT_COLOR} onto any whose root style has no color.
+     * Preserves the legacy behavior where unstyled args render white instead of inheriting the template's color.
+     */
+    private static Object[] prepArgs(Component[] args) {
+        Object[] result = new Object[args.length];
+        for (int i = 0; i < args.length; i++) {
+            Component arg = args[i];
+            if (arg.getStyle().getColor() == null) {
+                result[i] = arg.copy().withStyle(arg.getStyle().withColor(DEFAULT_ARGUMENT_COLOR));
+            } else {
+                result[i] = arg;
             }
-            return txt;
-        };
+        }
+        return result;
     }
 
-    MutableComponent visitText(Component root, TextVisitor textVisitor, Predicate<Component> shouldStopAfter) {
-        var txt = textVisitor.accept(root);
-        if (shouldStopAfter.test(root)) {
-            return txt;
-        }
-        var siblings = txt.getSiblings();
-        for (int i = 0; i < siblings.size(); i++) {
-            // DO NOT USE replaceAll here it may lead to exceptions (may be unsupported)
-            siblings.set(i, visitText(siblings.get(i), textVisitor, shouldStopAfter));
-        }
-        return txt;
+    protected Style styleFor(TextFormatType textFormatType, @Nullable IStyleProvider styleProvider) {
+        return styleProvider == null ? textFormatType.getStyle() : styleProvider.getStyle(textFormatType);
     }
 
+    @Override
     public boolean hasTranslation(String key) {
-        return super.stringMap.containsKey(key);
+        return Localization.raw(key, target()) != null;
     }
 
+    @Override
     public boolean isRightToLeft() {
         return false;
     }
 
+    @Override
     public FormattedCharSequence reorder(FormattedText text) {
-        return (visitor) ->
-            text.visit((style, string) ->
-                StringDecomposer.iterateFormatted(string, style, visitor)
-                    ? Optional.empty()
-                    : FormattedText.STOP_ITERATION, Style.EMPTY).isPresent();
+        return rawReorder(text);
     }
-
 }
