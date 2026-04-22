@@ -20,6 +20,6 @@ To change the language used in Essential Commands, change the `language` setting
 
 ## For Translators and Developers
 
-The language files can be found in the [`src/main/resources/assets/essential_commands/lang`][lang-github] directory. To add a new one, simply copy the `en_us.json` file, naming it using the `[language-2-chars]_[region-2-chars].json` format shown above, then edit the file, replacing the English values with their equivalents in your desired language!
+The language files can be found in the [`src/main/resources/data/essential_commands/lang`][lang-github] directory. To add a new one, simply copy the `en_us.json` file, naming it using the `[language-2-chars]_[region-2-chars].json` format shown above, then edit the file, replacing the English values with their equivalents in your desired language!
 
-[lang-github]: https://github.com/John-Paul-R/Essential-Commands/tree/26.x/src/main/resources/assets/essential_commands/lang
+[lang-github]: https://github.com/John-Paul-R/Essential-Commands/tree/26.x/src/main/resources/data/essential_commands/lang
