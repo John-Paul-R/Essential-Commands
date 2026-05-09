@@ -3,7 +3,6 @@ package com.fibermc.essentialcommands.commands;
 import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import eu.pb4.placeholders.api.parsers.ParserBuilder;
-import eu.pb4.placeholders.api.parsers.TagParser;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -18,7 +17,9 @@ public final class MotdCommand {
 
     private static final NodeParser NODE_PARSER = ParserBuilder.of()
         .commonPlaceholders()
-        .add(TagParser.QUICK_TEXT_WITH_STF)
+        .serverPlaceholders()
+        .quickText()
+        .simplifiedTextFormat()
         .build();
 
     public static int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
