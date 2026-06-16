@@ -3,6 +3,7 @@ package dev.jpcode.eccore.config;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -50,7 +51,12 @@ public final class ConfigUtil {
     @Nullable
     public static Style parseStyle(String styleStr) {
         Style outStyle = null;
-        ChatFormatting formatting = ChatFormatting.getByName(styleStr);
+        ChatFormatting formatting;
+        try {
+            formatting = ChatFormatting.valueOf(styleStr.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            formatting = null;
+        }
         if (formatting != null) {
             outStyle = Style.EMPTY.applyFormat(formatting);
         }

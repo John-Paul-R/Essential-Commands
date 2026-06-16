@@ -16,7 +16,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.attribute.EnvironmentAttributes;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RespawnAnchorBlock;
@@ -68,10 +68,10 @@ public class BedCommand implements Command<CommandSourceStack> {
         if (block instanceof RespawnAnchorBlock
             && blockState.getValue(RespawnAnchorBlock.CHARGE) > 0 && RespawnAnchorBlock.canSetSpawn(world, spawnPos)
         ) {
-            Optional<Vec3> optional = RespawnAnchorBlock.findStandUpPosition(EntityType.PLAYER, world, spawnPos);
+            Optional<Vec3> optional = RespawnAnchorBlock.findStandUpPosition(EntityTypes.PLAYER, world, spawnPos);
             safeSpawnPos = optional.orElseGet(() -> new Vec3((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 1, (double) spawnPos.getZ() + 0.5));
         } else if (block instanceof BedBlock && world.environmentAttributes().getValue(EnvironmentAttributes.BED_RULE, spawnPos).canSetSpawn(world)) {
-            Optional<Vec3> optional = BedBlock.findStandUpPosition(EntityType.PLAYER, world, spawnPos, blockState.getValue(BedBlock.FACING), respawn.respawnData().pitch());
+            Optional<Vec3> optional = BedBlock.findStandUpPosition(EntityTypes.PLAYER, world, spawnPos, blockState.getValue(BedBlock.FACING), respawn.respawnData().pitch());
             safeSpawnPos = optional.orElseGet(() -> new Vec3((double) spawnPos.getX() + 0.5, (double) spawnPos.getY() + 0.5625, (double) spawnPos.getZ() + 0.5));
         } else {
             boolean bl = block.isPossibleToRespawnInThis(blockState);
