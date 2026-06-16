@@ -117,7 +117,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     public EssentialCommandsConfig(Path savePath, String displayName, String documentationLink) {
         super(savePath, displayName, documentationLink);
         HOME_LIMIT.changeEvent.register(newValue ->
-                ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup("essentialcommands.home.limit", newValue)
+                ECPerms.Registry.Group.home_limit_group = ECPerms.makeNumericPermissionGroup(ECPerms.of("home.limit"), newValue)
         );
         // This value is only sent on server start/player connect and, so, cannot be updated for all
         // players immediately via the config reload command without a fair bit of hackery.

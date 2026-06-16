@@ -481,7 +481,7 @@ public final class EssentialCommandRegistry {
         }
 
         registerNode.accept(Commands.literal("lastPos")
-            .requires(ECPerms.require("essentialcommands.admin.lastpos", 2))
+            .requires(ECPerms.require(ECPerms.Registry.admin_lastpos, 2))
                 .then(argument("target_player", StringArgumentType.word())
                 .executes((context) -> {
                     var targetPlayerName = StringArgumentType.getString(context, "target_player");

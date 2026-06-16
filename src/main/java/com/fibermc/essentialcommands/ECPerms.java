@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.minecraft.resources.Identifier;
+
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.commands.CommandSourceStack;
@@ -22,81 +23,82 @@ public final class ECPerms {
 //            `essentialcommands.<command>.*`
     @SuppressWarnings({"checkstyle:constantname", "checkstyle:staticvariablename"})
     public static final class Registry {
-        public static final String tpa = "essentialcommands.tpa";
-        public static final String tpahere = "essentialcommands.tpahere";
-        public static final String tpaccept = "essentialcommands.tpaccept";
-        public static final String tpdeny = "essentialcommands.tpdeny";
-        public static final String home_set = "essentialcommands.home.set";
-        public static final String home_tp = "essentialcommands.home.tp";
-        public static final String home_tp_others = "essentialcommands.home_tp_others";
-        public static final String home_delete = "essentialcommands.home.delete";
-        public static final String warp_set = "essentialcommands.warp.set";
-        public static final String warp_tp = "essentialcommands.warp.tp";
-        public static final String warp_delete = "essentialcommands.warp.delete";
-        public static final String warp_tp_named = "essentialcommands.warp.tp_named";
-        public static final String warp_tp_others = "essentialcommands.warp_tp_others";
-        public static final String back = "essentialcommands.back";
-        public static final String spawn_tp = "essentialcommands.spawn.tp";
-        public static final String spawn_set = "essentialcommands.spawn.set";
-        public static final String nickname_self = "essentialcommands.nickname.self";
-        public static final String nickname_others = "essentialcommands.nickname.others";
-        public static final String nickname_reveal = "essentialcommands.nickname.reveal";
-        public static final String nickname_style_color = "essentialcommands.nickname.style.color";
-        public static final String nickname_style_fancy = "essentialcommands.nickname.style.fancy";
-        public static final String nickname_style_hover = "essentialcommands.nickname.style.hover";
-        public static final String nickname_style_click = "essentialcommands.nickname.style.click";
-        public static final String nickname_selector_and_ctx = "essentialcommands.nickname.style.selector_and_context";
-        public static final String nickname_placeholders = "essentialcommands.nickname.placeholders";
-        public static final String randomteleport = "essentialcommands.randomteleport";
-        public static final String fly_self = "essentialcommands.fly.self";
-        public static final String fly_others = "essentialcommands.fly.others";
-        public static final String invuln_self = "essentialcommands.invuln.self";
-        public static final String invuln_others = "essentialcommands.invuln.others";
-        public static final String workbench = "essentialcommands.workbench";
-        public static final String stonecutter = "essentialcommands.stonecutter";
-        public static final String grindstone = "essentialcommands.grindstone";
-        public static final String anvil = "essentialcommands.anvil";
-        public static final String enderchest = "essentialcommands.enderchest";
-        public static final String wastebin = "essentialcommands.wastebin";
-        public static final String top = "essentialcommands.top";
-        public static final String gametime = "essentialcommands.gametime";
-        public static final String time_set_day = "essentialcommands.day";
-        public static final String afk = "essentialcommands.afk";
-        public static final String bed = "essentialcommands.bed";
-        public static final String sleep = "essentialcommands.sleep";
-        public static final String config_reload = "essentialcommands.config.reload";
-        public static final String bypass_teleport_delay = "essentialcommands.bypass.teleport_delay";
-        public static final String bypass_allow_teleport_between_dimensions = "essentialcommands.bypass.allow_teleport_between_dimensions";
-        public static final String bypass_teleport_interrupt_on_damaged = "essentialcommands.bypass.teleport_interrupt_on_damaged";
-        public static final String bypass_teleport_interrupt_on_move = "essentialcommands.bypass.teleport_interrupt_on_move";
-        public static final String bypass_randomteleport_cooldown = "essentialcommands.bypass.randomteleport_cooldown";
-        public static final String rules_reload = "essentialcommands.rules_reload";
-        public static final String rules = "essentialcommands.rules";
-        public static final String feed_self = "essentialcommands.feed.self";
-        public static final String feed_others = "essentialcommands.feed.others";
-        public static final String heal_self = "essentialcommands.heal.self";
-        public static final String heal_others = "essentialcommands.heal.others";
-        public static final String extinguish_self = "essentialcommands.extinguish.self";
-        public static final String extinguish_others = "essentialcommands.extinguish.others";
-        public static final String suicide = "essentialcommands.suicide";
-        public static final String time_set_night = "essentialcommands.night";
-        public static final String repair_self = "essentialcommands.repair.self";
-        public static final String repair_others = "essentialcommands.repair.others";
-        public static final String near_self = "essentialcommands.near.self";
-        public static final String near_others = "essentialcommands.near.others";
-        public static final String motd = "essentialcommands.motd";
+        public static final Identifier tpa = of("tpa");
+        public static final Identifier tpahere = of("tpahere");
+        public static final Identifier tpaccept = of("tpaccept");
+        public static final Identifier tpdeny = of("tpdeny");
+        public static final Identifier home_set = of("home.set");
+        public static final Identifier home_tp = of("home.tp");
+        public static final Identifier home_tp_others = of("home_tp_others");
+        public static final Identifier home_delete = of("home.delete");
+        public static final Identifier warp_set = of("warp.set");
+        public static final Identifier warp_tp = of("warp.tp");
+        public static final Identifier warp_delete = of("warp.delete");
+        public static final Identifier warp_tp_named = of("warp.tp_named");
+        public static final Identifier warp_tp_others = of("warp_tp_others");
+        public static final Identifier back = of("back");
+        public static final Identifier spawn_tp = of("spawn.tp");
+        public static final Identifier spawn_set = of("spawn.set");
+        public static final Identifier nickname_self = of("nickname.self");
+        public static final Identifier nickname_others = of("nickname.others");
+        public static final Identifier nickname_reveal = of("nickname.reveal");
+        public static final Identifier nickname_style_color = of("nickname.style.color");
+        public static final Identifier nickname_style_fancy = of("nickname.style.fancy");
+        public static final Identifier nickname_style_hover = of("nickname.style.hover");
+        public static final Identifier nickname_style_click = of("nickname.style.click");
+        public static final Identifier nickname_selector_and_ctx = of("nickname.style.selector_and_context");
+        public static final Identifier nickname_placeholders = of("nickname.placeholders");
+        public static final Identifier randomteleport = of("randomteleport");
+        public static final Identifier fly_self = of("fly.self");
+        public static final Identifier fly_others = of("fly.others");
+        public static final Identifier invuln_self = of("invuln.self");
+        public static final Identifier invuln_others = of("invuln.others");
+        public static final Identifier workbench = of("workbench");
+        public static final Identifier stonecutter = of("stonecutter");
+        public static final Identifier grindstone = of("grindstone");
+        public static final Identifier anvil = of("anvil");
+        public static final Identifier enderchest = of("enderchest");
+        public static final Identifier wastebin = of("wastebin");
+        public static final Identifier top = of("top");
+        public static final Identifier gametime = of("gametime");
+        public static final Identifier time_set_day = of("day");
+        public static final Identifier afk = of("afk");
+        public static final Identifier bed = of("bed");
+        public static final Identifier sleep = of("sleep");
+        public static final Identifier config_reload = of("config.reload");
+        public static final Identifier bypass_teleport_delay = of("bypass.teleport_delay");
+        public static final Identifier bypass_allow_teleport_between_dimensions = of("bypass.allow_teleport_between_dimensions");
+        public static final Identifier bypass_teleport_interrupt_on_damaged = of("bypass.teleport_interrupt_on_damaged");
+        public static final Identifier bypass_teleport_interrupt_on_move = of("bypass.teleport_interrupt_on_move");
+        public static final Identifier bypass_randomteleport_cooldown = of("bypass.randomteleport_cooldown");
+        public static final Identifier rules_reload = of("rules_reload");
+        public static final Identifier rules = of("rules");
+        public static final Identifier feed_self = of("feed.self");
+        public static final Identifier feed_others = of("feed.others");
+        public static final Identifier heal_self = of("heal.self");
+        public static final Identifier heal_others = of("heal.others");
+        public static final Identifier extinguish_self = of("extinguish.self");
+        public static final Identifier extinguish_others = of("extinguish.others");
+        public static final Identifier suicide = of("suicide");
+        public static final Identifier time_set_night = of("night");
+        public static final Identifier repair_self = of("repair.self");
+        public static final Identifier repair_others = of("repair.others");
+        public static final Identifier near_self = of("near.self");
+        public static final Identifier near_others = of("near.others");
+        public static final Identifier motd = of("motd");
+        public static final Identifier admin_lastpos = of("admin.lastpos");
 
         public static final class Group {
-            public static final String[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};
-            public static final String[] home_group = {home_set, home_tp, home_delete};
-            public static final String[] warp_group = {warp_set, warp_tp, warp_delete};
-            public static final String[] spawn_group = {spawn_tp, spawn_set};
-            public static final String[] nickname_group = {nickname_self, nickname_others, nickname_reveal};
-            public static final String[] fly_group = {fly_self, fly_others};
-            public static final String[] invuln_group = {invuln_self, invuln_others};
-            public static final String[] config_group = {config_reload};
-            public static String[] home_limit_group;
-            public static final String[] stateful_player_abilities = {fly_self, fly_others, invuln_self, invuln_others};
+            public static final Identifier[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};
+            public static final Identifier[] home_group = {home_set, home_tp, home_delete};
+            public static final Identifier[] warp_group = {warp_set, warp_tp, warp_delete};
+            public static final Identifier[] spawn_group = {spawn_tp, spawn_set};
+            public static final Identifier[] nickname_group = {nickname_self, nickname_others, nickname_reveal};
+            public static final Identifier[] fly_group = {fly_self, fly_others};
+            public static final Identifier[] invuln_group = {invuln_self, invuln_others};
+            public static final Identifier[] config_group = {config_reload};
+            public static Identifier[] home_limit_group;
+            public static final Identifier[] stateful_player_abilities = {fly_self, fly_others, invuln_self, invuln_others};
         }
 
         public static String[] per_warp_permissions = null;
@@ -113,27 +115,30 @@ public final class ECPerms {
         });
     }
 
+    public static Identifier of(String name) {
+        return Identifier.fromNamespaceAndPath("essentialcommands", name);
+    }
+
     private static boolean isSuperAdmin(CommandSourceStack source) {
         return source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.OWNERS));
     }
 
-    public static @NotNull Predicate<CommandSourceStack> require(@NotNull String permission, int defaultRequireLevel) {
+    public static @NotNull Predicate<CommandSourceStack> require(@NotNull Identifier permission, int defaultRequireLevel) {
         return player -> check(player, permission, defaultRequireLevel);
     }
 
-    public static @NotNull Predicate<CommandSourceStack> requireAny(@NotNull String[] permissions, int defaultRequireLevel) {
+    public static @NotNull Predicate<CommandSourceStack> requireAny(@NotNull Identifier[] permissions, int defaultRequireLevel) {
         return player -> checkAny(player, permissions, defaultRequireLevel);
     }
 
-    public static boolean check(@NotNull CommandSourceStack source, @NotNull String permission, int defaultRequireLevel) {
+    public static boolean check(@NotNull CommandSourceStack source, @NotNull Identifier permission, int defaultRequireLevel) {
         if (CONFIG.USE_PERMISSIONS_API) {
             try {
                 // TODO: In the future, config option for granting ops all perms.
                 if (defaultRequireLevel > 4) {
-                    return Permissions.getPermissionValue(source, permission).orElse(false);
+                    return source.checkPermission(permission, false);
                 }
-                return Permissions.getPermissionValue(source, permission).orElse(source.permissions()
-                    .hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(Math.max(2, defaultRequireLevel)))));
+                return source.checkPermission(permission, PermissionLevel.byId(defaultRequireLevel));
             } catch (Exception e) {
                 EssentialCommands.LOGGER.error(e);
                 return false;
@@ -143,12 +148,12 @@ public final class ECPerms {
         }
     }
 
-    public static boolean check(@NotNull CommandSourceStack source, @NotNull String permission) {
+    public static boolean check(@NotNull CommandSourceStack source, @NotNull Identifier permission) {
         return check(source, permission, 4);
     }
 
-    public static boolean checkAny(@NotNull CommandSourceStack source, @NotNull String[] permissions, int defaultRequireLevel) {
-        for (String permission : permissions) {
+    public static boolean checkAny(@NotNull CommandSourceStack source, @NotNull Identifier[] permissions, int defaultRequireLevel) {
+        for (Identifier permission : permissions) {
             if (check(source, permission, defaultRequireLevel)) {
                 return true;
             }
@@ -156,11 +161,12 @@ public final class ECPerms {
         return false;
     }
 
-    private static int getNumericValue(String permission) {
-        return Integer.parseInt(permission.substring(permission.lastIndexOf('.') + 1));
+    private static int getNumericValue(Identifier permission) {
+        String permissionString = getPermissionString(permission);
+        return Integer.parseInt(permissionString.substring(permissionString.lastIndexOf('.') + 1));
     }
 
-    public static int getHighestNumericPermission(@NotNull CommandSourceStack source, @NotNull String[] permissionGroup) {
+    public static int getHighestNumericPermission(@NotNull CommandSourceStack source, @NotNull Identifier[] permissionGroup) {
         // No effective numeric limits for ops.
         if (isSuperAdmin(source)) {
             return Integer.MAX_VALUE;
@@ -186,7 +192,7 @@ public final class ECPerms {
             // Set value to -1 in the case where the user has no relevant permissions set.
             highestValue = -1;
         }
-        for (String permission : permissionGroup) {
+        for (Identifier permission : permissionGroup) {
             if (check(source, permission)) {
                 highestValue = Math.max(highestValue, getNumericValue(permission));
             }
@@ -194,15 +200,19 @@ public final class ECPerms {
         return highestValue;
     }
 
-    public static String[] makeNumericPermissionGroup(String basePermission, Collection<Integer> numericValues) {
-        String trueBasePermission = basePermission.endsWith(".") ? basePermission : basePermission + ".";
-        return numericValues.stream().map(el -> trueBasePermission.concat(el.toString())).toArray(String[]::new);
+    public static Identifier[] makeNumericPermissionGroup(Identifier basePermission, Collection<Integer> numericValues) {
+        Identifier trueBasePermission = basePermission.getPath().endsWith(".") ? basePermission : basePermission.withSuffix(".");
+        return numericValues.stream().map(el -> trueBasePermission.withSuffix(el.toString())).toArray(Identifier[]::new);
     }
 
-    public static Stream<String> getGrantedStatefulPlayerAbilityPermissions(ServerPlayer player) {
+    public static Stream<Identifier> getGrantedStatefulPlayerAbilityPermissions(ServerPlayer player) {
         var list = Arrays.stream(Registry.Group.stateful_player_abilities);
         return player.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))
             ? list // TODO: this is hacky
             : list.filter(permission -> check(player.createCommandSourceStack(), permission));
+    }
+
+    private static String getPermissionString(Identifier permission) {
+        return permission.getNamespace() + "." + permission.getPath();
     }
 }

@@ -81,6 +81,6 @@ public class WarpLocation extends NamedMinecraftLocation {
     public boolean hasPermission(ServerPlayer player) {
         return permissionString == null || ECPerms.check(
             player.createCommandSourceStack(),
-            String.format("%s.%s", ECPerms.Registry.warp_tp_named, permissionString));
+            ECPerms.Registry.warp_tp_named.withSuffix("." + permissionString));
     }
 }
