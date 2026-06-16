@@ -155,11 +155,7 @@ allprojects {
 
 // Root-project-specific dependencies
 dependencies {
-    implementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
-
     // JIJ Dependencies (include for packaging)
-    implementation "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
-    include "me.lucko:fabric-permissions-api:${project.permissions_api_version}"
     include "eu.pb4:placeholder-api:${project.placeholder_api_version}"
     include "xyz.nucleoid:server-translations-api:${project.server_translations_api_version}"
     implementation "org.yaml:snakeyaml:${project.snakeyaml_version}"
