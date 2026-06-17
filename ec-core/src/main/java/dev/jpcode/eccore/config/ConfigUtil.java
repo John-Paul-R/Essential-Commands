@@ -51,27 +51,27 @@ public final class ConfigUtil {
 
     @Nullable
     public static Style parseStyle(String styleStr) {
-        Style outStyle = null;
-        TextColor formatting = TextColor.parseColor(styleStr).result().orElse(null);
-
-        if (formatting != null) {
-            outStyle = Style.EMPTY.withColor(formatting);
-        }
-
-        if (outStyle == null) {
-            try {
-                outStyle = Style.Serializer.CODEC.parse(
-                    JsonOps.INSTANCE,
-                    GsonHelper.parse(styleStr)
-                ).result().orElse(null);
-            } catch (JsonSyntaxException e) {
-                LOGGER.log(Level.ERROR, String.format(
-                    "Malformed Style JSON in config: %s", styleStr
-                ));
+        {
+            var simpleFormattingStyle = TextColor.parseColor(styleStr)
+                .result()
+                .map(Style.EMPTY::withColor);
+            if (simpleFormattingStyle.isPresent()) {
+                return simpleFormattingStyle.get();
             }
         }
 
-        return outStyle;
+        try {
+            var styleJson = GsonHelper.parse(styleStr);
+            return Style.Serializer.CODEC
+                .parse(JsonOps.INSTANCE, styleJson)
+                .result()
+                .orElse(null);
+        } catch (JsonSyntaxException e) {
+            LOGGER.log(Level.ERROR, String.format(
+                "Malformed Style JSON in config: %s", styleStr
+            ));
+            return null;
+        }
     }
 
     public static Component parseTextOrDefault(String textStr, String defaultTextStr) {
