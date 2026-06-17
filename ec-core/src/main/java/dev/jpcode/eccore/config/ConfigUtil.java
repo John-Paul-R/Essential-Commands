@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.util.GsonHelper;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonSyntaxException;
@@ -29,8 +30,8 @@ public final class ConfigUtil {
 
     private ConfigUtil() {}
 
-    // TODO do not delclair serializer objects out here. Pretty sure is bad for concurrent parsing.
-//    private static final Style.Serializer STYLE_JSON_DESERIALIZER = new Style.Serializer();
+    // TODO do not declare serializer objects out here. Pretty sure is bad for concurrent parsing.
+    //    private static final Style.Serializer STYLE_JSON_DESERIALIZER = new Style.Serializer();
 
     public static Style parseStyleOrDefault(String styleStr, String defaultStyleStr) {
         Style outStyle = null;
@@ -51,14 +52,10 @@ public final class ConfigUtil {
     @Nullable
     public static Style parseStyle(String styleStr) {
         Style outStyle = null;
-        ChatFormatting formatting;
-        try {
-            formatting = ChatFormatting.valueOf(styleStr.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException exception) {
-            formatting = null;
-        }
+        TextColor formatting = TextColor.parseColor(styleStr).result().orElse(null);
+
         if (formatting != null) {
-            outStyle = Style.EMPTY.applyFormat(formatting);
+            outStyle = Style.EMPTY.withColor(formatting);
         }
 
         if (outStyle == null) {
