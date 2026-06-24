@@ -138,7 +138,7 @@ public final class ECPerms {
                 if (defaultRequireLevel > 4) {
                     return source.checkPermission(permission, false);
                 }
-                return source.checkPermission(permission, PermissionLevel.byId(defaultRequireLevel));
+                return source.checkPermission(permission, PermissionLevel.byId(Math.max(2, defaultRequireLevel)));
             } catch (Exception e) {
                 EssentialCommands.LOGGER.error(e);
                 return false;
