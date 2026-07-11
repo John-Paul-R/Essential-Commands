@@ -29,11 +29,12 @@ public final class ListCommandFactory {
 
     // Specify leading response text, and supplier of list of strings/Text
     public static <T> Command<CommandSourceStack> create(
-        String responsePreText,
+        String translationKey,
         String commandExecText,
         SuggestionListProvider<Entry<String, T>> suggestionsProvider)
     {
         return (CommandContext<CommandSourceStack> context) -> {
+            String responsePreText = ECText.getInstance().getString(translationKey);
             var styleProvider = PlayerProfile.accessFromContextOrThrow(context);
             Collection<Entry<String, T>> suggestionsList = suggestionsProvider.getSuggestionList(context);
 
@@ -46,12 +47,13 @@ public final class ListCommandFactory {
     }
 
     public static <T> Command<CommandSourceStack> create(
-        String responsePreText,
+        String translationKey,
         String commandExecText,
         SuggestionListProvider<T> suggestionsProvider,
         Function<T, String> nameAccessor)
     {
         return (CommandContext<CommandSourceStack> context) -> {
+            String responsePreText = ECText.getInstance().getString(translationKey);
             var styleProvider = PlayerProfile.accessFromContextOrThrow(context);
             Collection<T> suggestionsList = suggestionsProvider.getSuggestionList(context);
 

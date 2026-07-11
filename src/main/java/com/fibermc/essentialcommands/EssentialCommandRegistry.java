@@ -168,7 +168,7 @@ public final class EssentialCommandRegistry {
             homeListBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_tp, 0))
                 .executes(ListCommandFactory.create(
-                    ECText.getInstance().getString("cmd.home.list.start"),
+                    "cmd.home.list.start",
                     "home tp",
                     HomeCommand.Suggestion::getSuggestionEntries));
 
@@ -255,7 +255,7 @@ public final class EssentialCommandRegistry {
             warpListBuilder
                 .requires(ECPerms.require(ECPerms.Registry.warp_tp, 0))
                 .executes(ListCommandFactory.create(
-                    ECText.getInstance().getString("cmd.warp.list.start"),
+                    "cmd.warp.list.start",
                     "warp tp",
                     (context) -> ManagerLocator.getInstance().getWorldDataManager().getAccessibleWarps(context.getSource().getPlayerOrException()).toList(),
                     NamedMinecraftLocation::getName
