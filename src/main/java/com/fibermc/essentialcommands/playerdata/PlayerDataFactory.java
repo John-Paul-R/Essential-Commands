@@ -65,6 +65,15 @@ public final class PlayerDataFactory {
     public static PlayerData create(NamedLocationStorage homes, File saveFile) {
         String fileName = saveFile.getName();
         UUID playerUuid = UUID.fromString(fileName.substring(0, fileName.indexOf(".dat")));
+
+        if (PlayerDataManager.exists()) {
+            PlayerData activePlayerData = PlayerDataManager.getInstance().getByUuid(playerUuid);
+            if (activePlayerData != null) {
+                activePlayerData.homes.putAll(homes);
+                activePlayerData.setDirty();
+                return activePlayerData;
+            }
+        }
         PlayerData playerData = null;
         if (Files.exists(saveFile.toPath()) && saveFile.length() != 0) {
             try {
@@ -98,6 +107,7 @@ public final class PlayerDataFactory {
 
         if (playerData == null) {
             playerData = new PlayerData(saveFile);
+            playerData.homes.putAll(homes);
         }
 
         playerData.setDirty();
