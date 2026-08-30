@@ -12,7 +12,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
 
 public class WarpTpCommand implements Command<CommandSourceStack> {
@@ -61,7 +60,7 @@ public class WarpTpCommand implements Command<CommandSourceStack> {
     }
 
     public int runOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        exec(context, EntityArgument.getPlayer(context, "target_player"));
+        exec(context, NicknameTargetResolver.getPlayer(context, "target_player"));
         return 0;
     }
 }

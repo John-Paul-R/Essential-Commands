@@ -16,6 +16,7 @@ import com.fibermc.essentialcommands.ECPerms;
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.ManagerLocator;
 import com.fibermc.essentialcommands.playerdata.PlayerDataManager;
+import com.fibermc.essentialcommands.types.NicknameCommandArgMode;
 import com.fibermc.essentialcommands.types.RespawnCondition;
 import com.fibermc.essentialcommands.types.RtpCenter;
 import org.jetbrains.annotations.NotNull;
@@ -85,6 +86,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<Boolean> OPS_BYPASS_TELEPORT_RULES =  new Option<>("ops_bypass_teleport_rules", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICKNAMES_IN_PLAYER_LIST =   new Option<>("nicknames_in_player_list", true, Boolean::parseBoolean);
     @ConfigOption public final Option<Integer> NICKNAME_MAX_LENGTH =    new Option<>("nickname_max_length", 32, ConfigUtil::parseInt);
+    @ConfigOption public final Option<NicknameCommandArgMode> NICKNAMES_AS_COMMAND_ARG = new Option<>("nicknames_as_command_arg", NicknameCommandArgMode.Never, NicknameCommandArgMode::valueOf);
     @ConfigOption public final Option<Boolean> NICKNAME_ABOVE_HEAD =    new Option<>("nickname_above_head", false, Boolean::parseBoolean);
     @ConfigOption public final Option<RtpCenter> RTP_CENTER =           new Option<>("rtp_center", RtpCenter.spawn(), RtpCenter::parse, RtpCenter::serialize);
     @ConfigOption public final Option<Integer> RTP_RADIUS =             new Option<>("rtp_radius", 1000, ConfigUtil::parseInt);

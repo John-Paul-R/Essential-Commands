@@ -39,6 +39,7 @@ import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
 public class PlayerDataManager {
 
     private final ConcurrentHashMap<UUID, PlayerData> dataMap;
+    private final ConcurrentHashMap<String, List<PlayerData>> dataByNicknameMap;
     private final List<PlayerData> changedNicknames;
     private final List<String> changedTeams;
     private final List<ServerTask> nextTickTasks;
@@ -50,6 +51,7 @@ public class PlayerDataManager {
         this.changedTeams = new ArrayList<>();
         this.nextTickTasks = new ArrayList<>();
         this.dataMap = new ConcurrentHashMap<>();
+        this.dataByNicknameMap = new ConcurrentHashMap<>();
     }
 
     public static void init() {
@@ -101,8 +103,14 @@ public class PlayerDataManager {
         return instance != null ? instance : new PlayerDataManager();
     }
 
-    public void markNicknameDirty(PlayerData playerData) {
+    public void markDisplayNameDirty(PlayerData playerData) {
         changedNicknames.add(playerData);
+    }
+
+    public void markNicknameDirty(PlayerData playerData, @Nullable String oldNormalizedNickname) {
+        markDisplayNameDirty(playerData);
+        removeFromNicknameMap(playerData, oldNormalizedNickname);
+        addToNicknameMap(playerData);
     }
 
     public void markNicknameDirty(String playerName) {
@@ -314,6 +322,7 @@ public class PlayerDataManager {
         PlayerData playerData =
             ((ServerPlayerEntityAccess) player).ec$getPlayerData();
         dataMap.put(player.getUUID(), playerData);
+        addToNicknameMap(playerData);
         return playerData;
     }
 
@@ -323,7 +332,10 @@ public class PlayerDataManager {
 
     // SAVE / LOAD
     private void unloadPlayerData(ServerPlayer player) {
-        this.dataMap.remove(player.getUUID());
+        PlayerData playerData = this.dataMap.remove(player.getUUID());
+        if (playerData != null) {
+            removeFromNicknameMap(playerData, playerData.getNormalizedNickname());
+        }
     }
 
     public Collection<PlayerData> getAllPlayerData() {
@@ -335,19 +347,38 @@ public class PlayerDataManager {
         return dataMap.get(uuid);
     }
 
-    /**
-     * Case insentitive
-     */
+    private static String nicknameKey(String nickname) {
+        return PlayerData.normalizeNickname(nickname);
+    }
+
+    private void addToNicknameMap(PlayerData playerData) {
+        String key = playerData.getNormalizedNickname();
+        if (key != null && !key.isBlank()) {
+            dataByNicknameMap.compute(key, (k, list) -> {
+                if (list == null) list = new ArrayList<>();
+                list.add(playerData);
+                return list;
+            });
+        }
+    }
+
+    // Key is passed explicitly because the caller captures it before mutation.
+    private void removeFromNicknameMap(PlayerData playerData, @Nullable String key) {
+        if (key != null) {
+            dataByNicknameMap.computeIfPresent(key, (k, list) -> {
+                list.remove(playerData);
+                return list.isEmpty() ? null : list;
+            });
+        }
+    }
+
+    // Case-insensitive, whitespace-insensitive lookup.
+    public List<PlayerData> getByNickname(String nickname) {
+        List<PlayerData> result = dataByNicknameMap.get(nicknameKey(nickname));
+        return result != null ? List.copyOf(result) : List.of();
+    }
+
     public List<PlayerData> getPlayerDataMatchingNickname(String nickname) {
-        return dataMap
-            .values()
-            .stream()
-            .filter(playerData ->
-                playerData
-                    .getNickname()
-                    .map(nick -> nick.getString().equalsIgnoreCase(nickname))
-                    .orElse(false)
-            )
-            .collect(Collectors.toList());
+        return getByNickname(nickname);
     }
 }

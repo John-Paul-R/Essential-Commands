@@ -212,6 +212,10 @@ Customize player display names.
 - `nick_reveal_on_hover` - Show real name on nickname hover - Default: `true`
 - `nickname_above_head` - Show nickname above player's head - Default: `false`
 - `nicknames_in_player_list` - Show nicknames in tab list - Default: `true`
+- `nicknames_as_command_arg` - Whether nicknames can be used as player arguments in commands - Default: `Never`
+  - `Never` - Nicknames are not resolved in any command argument
+  - `EssentialCommandsOnly` - Nicknames resolve and suggest only in Essential Commands
+  - `Everywhere` - Nicknames resolve and suggest in all commands (e.g. `/tp`, `/give`)
 
 ## Utility Commands
 

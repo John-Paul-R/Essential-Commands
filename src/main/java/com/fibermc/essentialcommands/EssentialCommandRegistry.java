@@ -32,7 +32,6 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ComponentArgument;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
@@ -84,7 +83,7 @@ public final class EssentialCommandRegistry {
         if (CONFIG.ENABLE_TPA) {
             registerNode.accept(Commands.literal("tpa")
                 .requires(ECPerms.require(ECPerms.Registry.tpa, 0))
-                .then(CommandUtil.targetPlayerArgument()
+                .then(NicknameTargetResolver.targetPlayerArgument()
                     .executes(new TeleportAskCommand()))
                 .build());
 
@@ -96,7 +95,7 @@ public final class EssentialCommandRegistry {
             registerNode.accept(Commands.literal("tpaccept")
                 .requires(ECPerms.require(ECPerms.Registry.tpaccept, 0))
                 .executes(new TeleportAcceptCommand()::runDefault)
-                .then(CommandUtil.targetPlayerArgument()
+                .then(NicknameTargetResolver.targetPlayerArgument()
                     .suggests(TeleportResponseSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new TeleportAcceptCommand()))
                 .build());
@@ -104,14 +103,14 @@ public final class EssentialCommandRegistry {
             registerNode.accept(Commands.literal("tpdeny")
                 .requires(ECPerms.require(ECPerms.Registry.tpdeny, 0))
                 .executes(new TeleportDenyCommand()::runDefault)
-                .then(CommandUtil.targetPlayerArgument()
+                .then(NicknameTargetResolver.targetPlayerArgument()
                     .suggests(TeleportResponseSuggestion.STRING_SUGGESTIONS_PROVIDER)
                     .executes(new TeleportDenyCommand()))
                 .build());
 
             registerNode.accept(Commands.literal("tpahere")
                 .requires(ECPerms.require(ECPerms.Registry.tpahere, 0))
-                .then(CommandUtil.targetPlayerArgument()
+                .then(NicknameTargetResolver.targetPlayerArgument()
                     .executes(new TeleportAskHereCommand()))
                 .build());
         }
@@ -148,7 +147,7 @@ public final class EssentialCommandRegistry {
 
             homeTpOtherBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
-                .then(argument("target_player", EntityArgument.player())
+                .then(CommandUtil.targetPlayerArgument()
                     .then(argument("home_name", StringArgumentType.word())
                         .suggests(HomeTeleportOtherCommand.Suggestion.LIST_SUGGESTION_PROVIDER)
                         .executes(new HomeTeleportOtherCommand())));
@@ -241,7 +240,7 @@ public final class EssentialCommandRegistry {
 
             warpTpOtherBuilder
                 .requires(ECPerms.require(ECPerms.Registry.home_tp_others, 2))
-                .then(argument("target_player", EntityArgument.player())
+                .then(CommandUtil.targetPlayerArgument()
                     .then(argument("warp_name", StringArgumentType.word())
                         .suggests(WarpSuggestion.STRING_SUGGESTIONS_PROVIDER)
                         .executes(new WarpTpCommand()::runOther)));

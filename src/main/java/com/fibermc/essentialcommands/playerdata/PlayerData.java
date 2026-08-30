@@ -26,6 +26,7 @@ import io.github.ladysnake.pal.Pal;
 import io.github.ladysnake.pal.VanillaAbilities;
 import me.drex.vanish.api.VanishAPI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -77,6 +78,7 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
 
     // Nickname
     private Component nickname;
+    private String normalizedNickname;
     private MutableComponent fullNickname;
 
     // RTP Cooldown
@@ -133,6 +135,7 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
         pd.homes = homes.orElseGet(NamedLocationStorage::new);
         pd.previousLocation = previousLocation.orElse(null);
         pd.nickname = nickname.orElse(null);
+        pd.normalizedNickname = nickname.map(n -> normalizeNickname(n.getString())).orElse(null);
         pd.timeUsedRtp = TimeUtil.epochTimeMsToTicks(timeUsedRtpEpochMs);
         pd.tpCooldown = tpCooldown;
         return pd;
@@ -331,7 +334,7 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
             }
         }
 
-        PlayerDataManager.getInstance().markNicknameDirty(this);
+        PlayerDataManager.getInstance().markDisplayNameDirty(this);
     }
 
     public boolean isAfk() {
@@ -491,6 +494,17 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
         return Optional.ofNullable(nickname != null ? nickname.copy() : null);
     }
 
+    // Whitespace is stripped because command arguments cannot contain spaces,
+    // so "Foo Bar" must be reachable as "FooBar".
+    public static String normalizeNickname(String nickname) {
+        return nickname.replaceAll("\\s+", "").toLowerCase(Locale.ROOT);
+    }
+
+    @Nullable
+    public String getNormalizedNickname() {
+        return normalizedNickname;
+    }
+
     public MutableComponent getFullNickname() {
         return fullNickname;
     }
@@ -500,10 +514,12 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
     }
 
     public int setNickname(Component nickname) {
+        String oldNormalizedNickname = this.normalizedNickname;
         int resultCode = 0;
         // Reset nickname
         if (nickname == null) {
             this.nickname = null;
+            this.normalizedNickname = null;
             resultCode = 1;
             EssentialCommands.LOGGER.info(
                 "Cleared {}'s nickname",
@@ -533,10 +549,11 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
 
             // Set nickname
             this.nickname = nickname;
+            this.normalizedNickname = normalizeNickname(nickname.getString());
         }
 
         reloadFullNickname();
-        PlayerDataManager.getInstance().markNicknameDirty(this);
+        PlayerDataManager.getInstance().markNicknameDirty(this, oldNormalizedNickname);
         this.setDirty();
         // Return codes based on fail/success
         //  ex: caused by profanity filter.

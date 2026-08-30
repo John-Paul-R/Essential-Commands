@@ -12,7 +12,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
 
 public class TeleportAskHereCommand implements Command<CommandSourceStack> {
@@ -23,7 +22,7 @@ public class TeleportAskHereCommand implements Command<CommandSourceStack> {
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         TeleportManager tpMgr = ManagerLocator.getInstance().getTpManager();
         ServerPlayer senderPlayer = context.getSource().getPlayerOrException();
-        ServerPlayer targetPlayer = EntityArgument.getPlayer(context, "target_player");
+        ServerPlayer targetPlayer = NicknameTargetResolver.getPlayer(context, "target_player");
         var senderPlayerData = PlayerData.access(senderPlayer);
         var targetPlayerData = PlayerData.access(targetPlayer);
 

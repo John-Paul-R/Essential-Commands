@@ -13,7 +13,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
 
 public abstract class TeleportResponseCommand implements Command<CommandSourceStack> {
@@ -22,7 +21,7 @@ public abstract class TeleportResponseCommand implements Command<CommandSourceSt
         return exec(
             context,
             context.getSource().getPlayer(),
-            EntityArgument.getPlayer(context, "target_player")
+            NicknameTargetResolver.getPlayer(context, "target_player")
         );
     }
 

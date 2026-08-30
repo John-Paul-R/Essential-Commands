@@ -64,6 +64,7 @@ The config file can be found at `config/EssentialCommands.properties`
 | nickname_above_head                                    | false                      | boolean                      |
 | nickname_max_length                                    | 32                         | integer                      |
 | nickname_prefix                                        | {"text":"~","color":"red"} | MinecraftText                |
+| nicknames_as_command_arg                               | Never                      | NicknameCommandArgMode       |
 | nicknames_in_player_list                               | true                       | boolean                      |
 | ops_bypass_teleport_rules                              | true                       | boolean                      |
 | persist_back_location                                  | false                      | boolean                      |
@@ -130,6 +131,17 @@ Essentially, any value that works for `/tellraw`'s message field. (JSON text or 
 You can use a tellraw generator like [MinecraftJson](https://www.minecraftjson.com/) to create this JSON text with a graphical interface and preview.
 
 Examples: `"Alexandra"`, `{"text":"Alex","color":"green","bold":true}`
+
+### `NicknameCommandArgMode`
+
+Controls whether player nicknames can be used in place of real usernames in
+command arguments.
+
+Valid values:
+
+- `Never` - nicknames are not resolved in any command argument (default)
+- `EssentialCommandsOnly` - nicknames resolve and suggest only in Essential Commands
+- `Everywhere` - nicknames resolve and suggest in all commands (e.g. `/tp`, `/give`)
 
 ### `RespawnCondition`
 

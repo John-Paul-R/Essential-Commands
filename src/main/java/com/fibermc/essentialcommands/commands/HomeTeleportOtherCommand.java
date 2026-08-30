@@ -21,7 +21,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 
 import static com.fibermc.essentialcommands.EssentialCommands.CONFIG;
@@ -36,7 +35,7 @@ public class HomeTeleportOtherCommand extends HomeCommand implements Command<Com
     }
 
     private static PlayerData getTargetPlayerData(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        return ((ServerPlayerEntityAccess) EntityArgument.getPlayer(context, "target_player")).ec$getPlayerData();
+        return ((ServerPlayerEntityAccess) NicknameTargetResolver.getPlayer(context, "target_player")).ec$getPlayerData();
     }
 
     public int runDefault(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

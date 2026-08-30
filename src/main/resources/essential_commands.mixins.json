@@ -3,18 +3,20 @@
   "package": "com.fibermc.essentialcommands.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "LivingEntityMixin",
-    "DimensionDataStorageInvoker",
-    "PlayerMixin",
     "ClientboundPlayerInfoUpdatePacketActionMixin",
+    "DimensionDataStorageInvoker",
+    "EntityArgumentNicknameSuggestionMixin",
+    "EntitySelectorNicknameMixin",
+    "LivingEntityMixin",
+    "PlayerDataStorageMixin",
     "PlayerListMixin",
+    "PlayerMixin",
     "PrepareSpawnTaskMixin",
-    "ServerPlayerMixin",
     "ServerGamePacketListenerImplMixin",
+    "ServerPlayerMixin",
     "ServerScoreboardMixin",
     "SleepStatusMixin",
-    "TeleportCommandMixin",
-    "PlayerDataStorageMixin"
+    "TeleportCommandMixin"
   ],
   "client": [
   ],

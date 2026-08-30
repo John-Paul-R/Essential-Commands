@@ -7,10 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
-
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -21,7 +18,7 @@ public final class CommandUtil {
     private CommandUtil() {}
 
     public static RequiredArgumentBuilder<CommandSourceStack, EntitySelector> targetPlayerArgument() {
-        return Commands.argument("target_player", EntityArgument.player());
+        return NicknameTargetResolver.targetPlayerArgumentNonGreedy();
     }
 
     public static String getCommandString(CommandSourceStack source, CommandNode<CommandSourceStack> commandNode) {
@@ -39,7 +36,7 @@ public final class CommandUtil {
 
     public static ServerPlayer getCommandTargetPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         try {
-            return EntityArgument.getPlayer(context, "target_player");
+            return NicknameTargetResolver.getPlayer(context, "target_player");
         } catch (IllegalArgumentException e) {
             return context.getSource().getPlayer();
         }
