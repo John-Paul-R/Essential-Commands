@@ -216,6 +216,7 @@ Customize player display names.
   - `Never` - Nicknames are not resolved in any command argument
   - `EssentialCommandsOnly` - Nicknames resolve and suggest only in Essential Commands
   - `Everywhere` - Nicknames resolve and suggest in all commands (e.g. `/tp`, `/give`)
+- `nicknames_must_be_unique` - Block nicknames that duplicate another player's nickname or match an existing username (case-insensitive) - Default: `false`
 
 ## Utility Commands
 

@@ -24,6 +24,7 @@
   "cmd.nickname.set.error": "Nickname could not be set to '%1$s'. Reason: %2$s",
   "cmd.nickname.set.error.perms": "Player has insufficient permissions for specified nickname.",
   "cmd.nickname.set.error.length": "Length of supplied nickname (%1$s) exceeded max nickname length (%2$s)",
+  "cmd.nickname.set.error.taken": "The nickname ('%1$s') is already in use or conflicts with an existing username.",
   "cmd.rtp.error.pre": "Could not execute command '/rtp'. Reason: ",
   "cmd.rtp.error.world_not_enabled": "RTP is not enabled in the world '%1$s'",
   "cmd.rtp.error.cooldown": "Command is on cooldown. (%1$s seconds remaining.)",

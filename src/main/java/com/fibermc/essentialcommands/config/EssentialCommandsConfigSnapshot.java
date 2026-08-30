@@ -2,13 +2,16 @@ package com.fibermc.essentialcommands.config;
 
 import java.util.List;
 import java.util.Set;
+
+import com.fibermc.essentialcommands.types.NicknameCommandArgMode;
+import com.fibermc.essentialcommands.types.RespawnCondition;
+import com.fibermc.essentialcommands.types.RtpCenter;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import com.fibermc.essentialcommands.types.NicknameCommandArgMode;
-import com.fibermc.essentialcommands.types.RespawnCondition;
-import com.fibermc.essentialcommands.types.RtpCenter;
+
 import dev.jpcode.eccore.config.expression.Expression;
 import dev.jpcode.eccore.util.TimeUtil;
 
@@ -66,6 +69,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final boolean NICKNAMES_IN_PLAYER_LIST;
     public final int NICKNAME_MAX_LENGTH;
     public final NicknameCommandArgMode NICKNAMES_AS_COMMAND_ARG;
+    public final boolean NICKNAMES_MUST_BE_UNIQUE;
     public final boolean NICKNAME_ABOVE_HEAD;
     public final RtpCenter RTP_CENTER;
     public final int RTP_RADIUS;
@@ -146,6 +150,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.NICKNAMES_IN_PLAYER_LIST           = config.NICKNAMES_IN_PLAYER_LIST.getValue();
         this.NICKNAME_MAX_LENGTH                = config.NICKNAME_MAX_LENGTH.getValue();
         this.NICKNAMES_AS_COMMAND_ARG           = config.NICKNAMES_AS_COMMAND_ARG.getValue();
+        this.NICKNAMES_MUST_BE_UNIQUE           = config.NICKNAMES_MUST_BE_UNIQUE.getValue();
         this.NICKNAME_ABOVE_HEAD                = config.NICKNAME_ABOVE_HEAD.getValue();
         this.RTP_CENTER                         = config.RTP_CENTER.getValue();
         this.RTP_RADIUS                         = config.RTP_RADIUS.getValue();

@@ -74,6 +74,10 @@ public class NicknameSetCommand implements Command<CommandSourceStack> {
                     ecText.accent(String.valueOf(nicknameText.getString().length())),
                     ecText.accent(String.valueOf(CONFIG.NICKNAME_MAX_LENGTH))
                 );
+                case -3 -> ecText.getText(
+                    "cmd.nickname.set.error.taken", TextFormatType.Error,
+                    ecText.accent(nicknameText.getString())
+                );
                 default -> ecText.getText("generic.error.unknown", TextFormatType.Error);
             };
             senderFeedbackReceiver.sendCommandError("cmd.nickname.set.error", nicknameText, failReason);

@@ -547,9 +547,27 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
                 );
             }
 
+            String candidateNormalized = normalizeNickname(nickname.getString());
+
+            if (CONFIG.NICKNAMES_MUST_BE_UNIQUE) {
+                List<PlayerData> existing = PlayerDataManager.getInstance().getByNickname(candidateNormalized);
+                boolean takenByOther = existing.stream().anyMatch(pd -> pd != this);
+                if (takenByOther) {
+                    return -3;
+                }
+
+                var nameCache = this.player.level().getServer().services().nameToIdCache();
+                boolean matchesOtherUsername = nameCache.get(candidateNormalized)
+                    .filter(profile -> !profile.id().equals(this.player.getUUID()))
+                    .isPresent();
+                if (matchesOtherUsername) {
+                    return -3;
+                }
+            }
+
             // Set nickname
             this.nickname = nickname;
-            this.normalizedNickname = normalizeNickname(nickname.getString());
+            this.normalizedNickname = candidateNormalized;
         }
 
         reloadFullNickname();

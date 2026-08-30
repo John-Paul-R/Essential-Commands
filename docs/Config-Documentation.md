@@ -66,6 +66,7 @@ The config file can be found at `config/EssentialCommands.properties`
 | nickname_prefix                                        | {"text":"~","color":"red"} | MinecraftText                |
 | nicknames_as_command_arg                               | Never                      | NicknameCommandArgMode       |
 | nicknames_in_player_list                               | true                       | boolean                      |
+| nicknames_must_be_unique                               | false                      | boolean                      |
 | ops_bypass_teleport_rules                              | true                       | boolean                      |
 | persist_back_location                                  | false                      | boolean                      |
 | print_teleport_coordinates                             | true                       | boolean                      |
