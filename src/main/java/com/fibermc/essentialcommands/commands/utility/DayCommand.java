@@ -7,24 +7,32 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.clock.ClockTimeMarkers;
+import net.minecraft.world.clock.WorldClock;
+
+import java.util.Optional;
 
 public class DayCommand implements Command<CommandSourceStack> {
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         CommandSourceStack source = context.getSource();
         PlayerData playerData = PlayerData.accessFromContextOrThrow(context);
-        ServerLevel world = source.getServer().overworld();
-        if (world.isBrightOutside()) {
+        ServerLevel level = source.getPlayer().level();
+
+        Optional<Holder<WorldClock>> clock = level.dimensionType().defaultClock();
+        if (clock.isEmpty()) {
+            playerData.sendCommandError("generic.level.no_clock");
+            return -2;
+        }
+
+        if (level.isBrightOutside()) {
             playerData.sendCommandFeedback("cmd.day.error.already_daytime");
             return -1;
         }
-        long time = world.getGameTime();
-        long timeToDay = 24000L - time % 24000L;
 
-        ((ServerLevelData)world.getLevelData()).setGameTime(time + timeToDay);
-
+        level.getServer().clockManager().moveToTimeMarker(clock.get(), ClockTimeMarkers.DAY);
         playerData.sendCommandFeedback("cmd.day.feedback");
         return 1;
     }

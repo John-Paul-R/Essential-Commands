@@ -103,6 +103,7 @@
   "generic.confirm": "Confirm",
   "generic.deny": "Deny",
   "generic.accept": "Accept",
+  "generic.level.no_clock": "This dimension does not have a clock",
 
   "essentialcommands.fullprefix": "[Essential Commands] ",
   "essentialcommands.smallprefix": "[EC] ",
