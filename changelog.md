@@ -1,10 +1,29 @@
+## Essential Commands `v0.42.0` (mc 26.2)
+
+**Features**
+
+- Allow commands to target players by nicknames (#389) (by @ImTau)
+    - New config option: `nicknames_as_command_arg` with the possible values `Everywhere`, `EssentialCommandsOnly`, `Never`
+- New config option, `nicknames_must_be_unique`, to force unique nicknames
+
+Fixes:
+
+- night/day commands incorrectly upgraded (@arnokeesman)
+- fix EssentialsX home conversion breaking for players online during the conversion & more (#399) (by @ImTau) 
+
+Language updates:
+
+- add Polish (pl_pl) localization
+
+--- --- ---
+
 ## Essential Commands `v0.41.0` (mc 26.2)
 
 - fix: default permissions under some conditions (#393) by @eclipseisoffline
 - fix: translations in list commands (#394) by @arnokeesman
 - lang: add Swedish localization (#395) by dotar
 
----
+--- --- ---
 
 ## Essential Commands `v0.40.0-beta1` (mc 26.2.0 snapshot 2)
 
@@ -2077,4 +2096,3 @@ Add /warp command.
 Update to 1.17 with all the existing features! (in theory)
 
 --- --- ---
-
