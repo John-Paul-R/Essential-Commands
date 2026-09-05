@@ -78,6 +78,8 @@ Grant access to all subcommands using wildcards, like so:
 | N/A                                            | `essentialcommands.nickname.style.fancy`      | Allows setting nicknames that have special formatting (italic, bold, etc.)                                   |
 | N/A                                            | `essentialcommands.nickname.style.hover`      | Allows setting nicknames that show text on hover.                                                            |
 | N/A                                            | `essentialcommands.nickname.style.click`      | Allows setting nicknames that execute an action on click.                                                    |
+| N/A                                            | `essentialcommands.nickname.placeholders`     | Parse Placeholder API tags in `/nickname set`.                                                               |
+| N/A                                            | `essentialcommands.nickname.style.selector_and_context` | Resolve selectors in nickname text against the target player.                                       |
 | /essentialcommands config reload               | `essentialcommands.config.reload`             | Reload essentialcommands config.                                                                             |
 
 ## Rules/Config Bypass Permissions
@@ -99,4 +101,12 @@ Essentially, any value that works for `/tellraw`'s message field. (JSON text or 
 
 You can use a tellraw generator like [MinecraftJson](https://www.minecraftjson.com/) to create this JSON text with a graphical interface and preview.
 
-Examples: `"Alexandra"`, `{"text":"Alex","color":"green","bold":true}`
+Examples:
+
+- `"Alexandra"` — plain name, no extra permissions
+- `{"text":"Alex","color":"green"}` — needs `essentialcommands.nickname.style.color`
+- `{"text":"Alex","bold":true}` — needs `essentialcommands.nickname.style.fancy`
+- `{"text":"Alex","hoverEvent":{"action":"show_text","contents":"Hello"}}` — needs `essentialcommands.nickname.style.hover`
+- `{"text":"Alex","clickEvent":{"action":"suggest_command","value":"/msg Alex "}}` — needs `essentialcommands.nickname.style.click`
+
+See [Feature Guide — Nicknames](Feature-Guide.md#nicknames) for the `/nickname set` examples.
