@@ -37,8 +37,8 @@ Grant access to all subcommands using wildcards, like so:
 | /back                                          | `essentialcommands.back`                      | Teleport to your previous location.                                                                          |
 | /spawn tp \|\| /spawn                          | `essentialcommands.spawn.tp`                  | Teleport to the server spawn.                                                                                |
 | /spawn set                                     | `essentialcommands.spawn.set`                 | Set the server spawn.                                                                                        |
-| /nickname set \<nickname>                      | `essentialcommands.nickname.self`             | Set your own nickname to specified MinecraftText.                                                            |
-| /nickname set \<target-player> \<nickname>     | `essentialcommands.nickname.others`           | Set target player's nickname to specified MinecraftText.                                                     |
+| /nickname set \<nickname>                      | `essentialcommands.nickname.self`             | Set your own nickname to specified [MinecraftText](./Minecraft-Text.md).                                     |
+| /nickname set \<target-player> \<nickname>     | `essentialcommands.nickname.others`           | Set target player's nickname to specified [MinecraftText](./Minecraft-Text.md).                              |
 | /nickname clear                                | `essentialcommands.nickname.self`             | Clear your own nickname.                                                                                     |
 | /nickname clear \<target-player>               | `essentialcommands.nickname.others`           | Clear target player's nickname.                                                                              |
 | /nickname reveal \<player-nickname>            | `essentialcommands.nickname.reveal`           | Get list of players with the provided nickname (String, case-insensitive).                                   |
@@ -78,6 +78,8 @@ Grant access to all subcommands using wildcards, like so:
 | N/A                                            | `essentialcommands.nickname.style.fancy`      | Allows setting nicknames that have special formatting (italic, bold, etc.)                                   |
 | N/A                                            | `essentialcommands.nickname.style.hover`      | Allows setting nicknames that show text on hover.                                                            |
 | N/A                                            | `essentialcommands.nickname.style.click`      | Allows setting nicknames that execute an action on click.                                                    |
+| N/A                                            | `essentialcommands.nickname.placeholders`     | Parse Placeholder API tags in `/nickname set`.                                                               |
+| N/A                                            | `essentialcommands.nickname.style.selector_and_context` | Resolve selectors in nickname text.                                                                |
 | /essentialcommands config reload               | `essentialcommands.config.reload`             | Reload essentialcommands config.                                                                             |
 
 ## Rules/Config Bypass Permissions
@@ -90,13 +92,3 @@ Permission | Description
 `essentialcommands.bypass.allow_teleport_between_dimensions` | Ignore `allow_teleport_between_dimensions`.
 `essentialcommands.bypass.teleport_interrupt_on_damaged` | Ignore `teleport_interrupt_on_damaged`.
 `essentialcommands.bypass.teleport_interrupt_on_move` | Ignore `teleport_interrupt_on_move`.
-
-## Types
-
-### MinecraftText
-
-Essentially, any value that works for `/tellraw`'s message field. (JSON text or string enclosed by quotes)
-
-You can use a tellraw generator like [MinecraftJson](https://www.minecraftjson.com/) to create this JSON text with a graphical interface and preview.
-
-Examples: `"Alexandra"`, `{"text":"Alex","color":"green","bold":true}`

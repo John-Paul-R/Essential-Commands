@@ -199,11 +199,19 @@ Customize player display names.
 | Clear other's nickname | `/nickname clear <player>` | `essentialcommands.nickname.others` |
 | Find player by nickname | `/nickname reveal <nickname>` | `essentialcommands.nickname.reveal` |
 
+The `<nickname>` is [MinecraftText](./Minecraft-Text.md), meaning it can be one of:
+
+1. A plain name with no spaces like `Alex`
+2. A [Minecraft Text JSON object](./Minecraft-Text) like `{"text":"Alex","color":"green"}`
+3. A [Text Placeholder API styled string](https://placeholders.pb4.eu/user/text-format/) like `<green>Alex</green>`
+
 **Additional Permissions:**
 - `essentialcommands.nickname.style.color` - Use colored nicknames
-- `essentialcommands.nickname.style.fancy` - Use formatted nicknames (bold, italic)
+- `essentialcommands.nickname.style.fancy` - Use formatted nicknames (bold, italic, underline, strikethrough, obfuscated, or a non-default font)
 - `essentialcommands.nickname.style.hover` - Use hover effects on nicknames
 - `essentialcommands.nickname.style.click` - Use click actions on nicknames
+- `essentialcommands.nickname.placeholders` - Parse [Placeholder API tags](https://placeholders.pb4.eu/user/default-placeholders/) in the nickname
+- `essentialcommands.nickname.style.selector_and_context` - Resolve selectors (for example `@s`) against the target player
 
 **Related Config Options:**
 - `enable_nick` - Enables/disables nickname functionality - Default: `true`
