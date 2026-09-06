@@ -199,26 +199,18 @@ Customize player display names.
 | Clear other's nickname | `/nickname clear <player>` | `essentialcommands.nickname.others` |
 | Find player by nickname | `/nickname reveal <nickname>` | `essentialcommands.nickname.reveal` |
 
-**Styling**
+The `<nickname>` is [MinecraftText](./Minecraft-Text.md), meaning it can be one of:
 
-`/nickname set` takes the same JSON (or quoted string) as `/tellraw`. A plain name needs no extra permissions. Color, bold/italic, hover text, and click actions each need their own node — without it the command fails.
-
-```
-/nickname set "Alex"
-/nickname set {"text":"Alex","color":"gold"}
-/nickname set {"text":"Alex","bold":true,"italic":true}
-/nickname set {"text":"Alex","hoverEvent":{"action":"show_text","contents":"Hello"}}
-/nickname set {"text":"Alex","clickEvent":{"action":"suggest_command","value":"/msg Alex "}}
-```
-
-You can build the JSON in a tellraw generator such as [MinecraftJson](https://www.minecraftjson.com/).
+1. A plain name with no spaces like `Alex`
+2. A [Minecraft Text JSON object](./Minecraft-Text) like `{"text":"Alex","color":"green"}`
+3. A [Text Placeholder API styled string](https://placeholders.pb4.eu/user/text-format/) like `<green>Alex</green>`
 
 **Additional Permissions:**
 - `essentialcommands.nickname.style.color` - Use colored nicknames
 - `essentialcommands.nickname.style.fancy` - Use formatted nicknames (bold, italic, underline, strikethrough, obfuscated, or a non-default font)
 - `essentialcommands.nickname.style.hover` - Use hover effects on nicknames
 - `essentialcommands.nickname.style.click` - Use click actions on nicknames
-- `essentialcommands.nickname.placeholders` - Parse Placeholder API tags in the nickname
+- `essentialcommands.nickname.placeholders` - Parse [Placeholder API tags](https://placeholders.pb4.eu/user/default-placeholders/) in the nickname
 - `essentialcommands.nickname.style.selector_and_context` - Resolve selectors (for example `@s`) against the target player
 
 **Related Config Options:**
