@@ -206,12 +206,15 @@ The `<nickname>` is [MinecraftText](./Minecraft-Text.md), meaning it can be one 
 3. A [Text Placeholder API styled string](https://placeholders.pb4.eu/user/text-format/) like `<green>Alex</green>`
 
 **Additional Permissions:**
-- `essentialcommands.nickname.style.color` - Use colored nicknames
-- `essentialcommands.nickname.style.fancy` - Use formatted nicknames (bold, italic, underline, strikethrough, obfuscated, or a non-default font)
-- `essentialcommands.nickname.style.hover` - Use hover effects on nicknames
-- `essentialcommands.nickname.style.click` - Use click actions on nicknames
-- `essentialcommands.nickname.placeholders` - Parse [Placeholder API tags](https://placeholders.pb4.eu/user/default-placeholders/) in the nickname
-- `essentialcommands.nickname.style.selector_and_context` - Resolve selectors (for example `@s`) against the target player
+
+Style permissions are checked on the player who wears the nickname, not on whoever runs `/nickname set`. They do not grant the set or clear commands.
+
+- `essentialcommands.nickname.style.color` - Color may be applied to this player's nickname
+- `essentialcommands.nickname.style.fancy` - Bold, italic, underline, strikethrough, obfuscated, or a non-default font may be applied to this player's nickname
+- `essentialcommands.nickname.style.hover` - Hover text may be applied to this player's nickname
+- `essentialcommands.nickname.style.click` - Click actions may be applied to this player's nickname
+- `essentialcommands.nickname.placeholders` - The command sender may parse [Placeholder API tags](https://placeholders.pb4.eu/user/default-placeholders/) in the nickname
+- `essentialcommands.nickname.style.selector_and_context` - The command sender may resolve selectors (for example `@s`) against the target player
 
 **Related Config Options:**
 - `enable_nick` - Enables/disables nickname functionality - Default: `true`
