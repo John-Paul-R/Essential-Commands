@@ -23,7 +23,7 @@ public class ClientboundPlayerInfoUpdatePacketActionMixin {
     ClientboundPlayerInfoUpdatePacket.Action.Writer writer;
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
-    public void ctor(String string, int i, ClientboundPlayerInfoUpdatePacket.Action.Reader reader, ClientboundPlayerInfoUpdatePacket.Action.Writer argWriter, CallbackInfo ci) {
+    public void ctor(String string, int id, int idAgain, ClientboundPlayerInfoUpdatePacket.Action.Reader reader, ClientboundPlayerInfoUpdatePacket.Action.Writer argWriter, CallbackInfo ci) {
         if (!"ADD_PLAYER".equals(string)) {
             return;
         }
@@ -32,8 +32,8 @@ public class ClientboundPlayerInfoUpdatePacketActionMixin {
         writer = (buf, entry) -> {
             // Need to use the backing config, since this lambda captures the field value.
             if (BACKING_CONFIG.NICKNAME_ABOVE_HEAD.getValue()) {
-                var id = entry.profileId();
-                var playerData = PlayerDataManager.getInstance().getByUuid(id);
+                var profileId = entry.profileId();
+                var playerData = PlayerDataManager.getInstance().getByUuid(profileId);
                 if (playerData == null) {
                     // playerData may return null in some cases.
                     // One known case is when a Taterzen from the Taterzens mod
