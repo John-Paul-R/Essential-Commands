@@ -9,18 +9,18 @@ import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 import com.fibermc.essentialcommands.types.MinecraftLocation;
 
-import net.minecraft.resources.Identifier;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -152,7 +152,7 @@ public final class PlayerTeleporter {
                 }
             } else {
                 targetWorld.getChunk((int) targetVec.x >> 4, (int) targetVec.z >> 4);
-                pet.randomTeleport(targetVec.x, targetVec.y + 0.5, targetVec.z, false);
+                pet.randomTeleport(targetVec.x, targetVec.y + 0.5, targetVec.z, false, BlockTags.CAT_DOES_NOT_TELEPORT_TO);
             }
         }
     }

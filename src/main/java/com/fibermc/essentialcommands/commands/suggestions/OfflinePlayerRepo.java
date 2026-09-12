@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.yggdrasil.response.NameAndId;
+import com.mojang.authlib.services.response.NameAndId;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
