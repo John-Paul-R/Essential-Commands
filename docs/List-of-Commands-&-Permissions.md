@@ -74,12 +74,12 @@ Grant access to all subcommands using wildcards, like so:
 | /repair                                        | `essentialcommands.repair`                    | Repair held item.                                                                                            |
 | /extinguish                                    | `essentialcommands.extinguish.self`           | Stop burning on self.                                                                                        |
 | /extinguish \<target-player>                   | `essentialcommands.extinguish.others`         | Stop burning on target player.                                                                               |
-| N/A                                            | `essentialcommands.nickname.style.color`      | Allows setting colorful nicknames.                                                                           |
-| N/A                                            | `essentialcommands.nickname.style.fancy`      | Allows setting nicknames that have special formatting (italic, bold, etc.)                                   |
-| N/A                                            | `essentialcommands.nickname.style.hover`      | Allows setting nicknames that show text on hover.                                                            |
-| N/A                                            | `essentialcommands.nickname.style.click`      | Allows setting nicknames that execute an action on click.                                                    |
-| N/A                                            | `essentialcommands.nickname.placeholders`     | Parse Placeholder API tags in `/nickname set`.                                                               |
-| N/A                                            | `essentialcommands.nickname.style.selector_and_context` | Resolve selectors in nickname text.                                                                |
+| N/A                                            | `essentialcommands.nickname.style.color`      | Allow color on this player's nickname. Does not grant `/nickname set`.                                       |
+| N/A                                            | `essentialcommands.nickname.style.fancy`      | Allow bold/italic/etc. on this player's nickname. Does not grant `/nickname set`.                            |
+| N/A                                            | `essentialcommands.nickname.style.hover`      | Allow hover text on this player's nickname. Does not grant `/nickname set`.                                  |
+| N/A                                            | `essentialcommands.nickname.style.click`      | Allow click actions on this player's nickname. Does not grant `/nickname set`.                               |
+| N/A                                            | `essentialcommands.nickname.placeholders`     | Command sender may parse Placeholder API tags in `/nickname set`.                                            |
+| N/A                                            | `essentialcommands.nickname.style.selector_and_context` | Command sender may resolve selectors in nickname text.                                             |
 | /essentialcommands config reload               | `essentialcommands.config.reload`             | Reload essentialcommands config.                                                                             |
 
 ## Rules/Config Bypass Permissions
