@@ -514,6 +514,16 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
     }
 
     public int setNickname(Component nickname) {
+        return setNickname(nickname, this.player.createCommandSourceStack());
+    }
+
+    /**
+     * @param permissionSource The source whose permissions are checked for the nickname's styling
+     *                         (color, fancy, hover, click). This should be whoever is *setting* the
+     *                         nickname, which is not necessarily the player who will receive it
+     *                         (e.g. an OP setting another player's nickname).
+     */
+    public int setNickname(Component nickname, CommandSourceStack permissionSource) {
         String oldNormalizedNickname = this.normalizedNickname;
         int resultCode = 0;
         // Reset nickname
@@ -531,10 +541,11 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
                 return -2;
             }
             // Ensure player has permissions required to set the specified nickname
-            boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, this.player.createCommandSourceStack());
+            boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, permissionSource);
             if (!hasRequiredPerms) {
                 EssentialCommands.LOGGER.info(
-                    "{} attempted to set nickname to '{}', with insufficient permissions to do so.",
+                    "{} attempted to set {}'s nickname to '{}', with insufficient permissions to do so.",
+                    permissionSource.getTextName(),
                     this.player.getGameProfile().name(),
                     nickname
                 );

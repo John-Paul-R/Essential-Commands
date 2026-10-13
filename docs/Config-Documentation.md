@@ -1,4 +1,3 @@
-
 # Config Documentation
 
 The config file can be found at `config/EssentialCommands.properties`
@@ -64,6 +63,7 @@ The config file can be found at `config/EssentialCommands.properties`
 | nickname_above_head                                    | false                      | boolean                      |
 | nickname_max_length                                    | 32                         | integer                      |
 | nickname_prefix                                        | {"text":"~","color":"red"} | MinecraftText                |
+| nickname_style_perms_check_target                      | false                      | boolean                      |
 | nicknames_as_command_arg                               | Never                      | NicknameCommandArgMode       |
 | nicknames_in_player_list                               | true                       | boolean                      |
 | nicknames_must_be_unique                               | false                      | boolean                      |

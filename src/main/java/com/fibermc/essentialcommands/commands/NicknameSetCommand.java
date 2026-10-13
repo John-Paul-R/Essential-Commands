@@ -42,18 +42,23 @@ public class NicknameSetCommand implements Command<CommandSourceStack> {
 
         var nicknameWithContext = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_selector_and_ctx, 2)
             ? ComponentUtils.resolve(
-                ResolutionContext.builder()
-                    .withSource(context.getSource())
-                    .withEntityOverride(targetPlayer)
-                    .build(),
-                rawNicknameText,
-                0)
+            ResolutionContext.builder()
+                .withSource(context.getSource())
+                .withEntityOverride(targetPlayer)
+                .build(),
+            rawNicknameText,
+            0)
             : rawNicknameText;
 
         var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders, 2)
             ? TagParser.DEFAULT_SAFE.parseComponent(TextNode.convert(nicknameWithContext), ParserContext.of())
             : nicknameWithContext;
-        int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText);
+        // By default, the person running the command needs the style permissions (color, fancy, etc.).
+        // nickname_style_perms_check_target=true restores the old behavior of checking the target player.
+        var permissionSource = CONFIG.NICKNAME_STYLE_PERMS_CHECK_TARGET
+            ? targetPlayer.createCommandSourceStack()
+            : context.getSource();
+        int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText, permissionSource);
 
         var senderPlayer = context.getSource().getPlayer();
         var senderFeedbackReceiver = FeedbackReceiver.ofSource(context.getSource());

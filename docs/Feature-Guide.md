@@ -83,12 +83,12 @@ Server-wide spawn point management.
 **Related Config Options:**
 - `enable_spawn` - Enables/disables spawn commands - Default: `true`
 - `respawn_at_ec_spawn` - Controls when players respawn at the EC spawn point. Accepts these values as an [Expression](Config-Documentation.md#expression) - Default: `Never`
-  - `Never` - Players never respawn at EC spawn (default)
-  - `Always` - Players always respawn at EC spawn
-  - `NoBed` - Players respawn at EC spawn only when they don't have a bed
-  - `SameWorld` - Players respawn at EC spawn if they're in the same world as the spawn
-  - `FirstJoin` - Players respawn at EC spawn only on their first join
-  
+    - `Never` - Players never respawn at EC spawn (default)
+    - `Always` - Players always respawn at EC spawn
+    - `NoBed` - Players respawn at EC spawn only when they don't have a bed
+    - `SameWorld` - Players respawn at EC spawn if they're in the same world as the spawn
+    - `FirstJoin` - Players respawn at EC spawn only on their first join
+
   You can combine these using logical operators, for example: `NoBed OR SameWorld` will use the EC spawn if either condition is true.
 
 ### Other Teleportation Features
@@ -115,15 +115,15 @@ Teleport to a random location in the world.
 **Related Config Options:**
 - `enable_rtp` - Enables/disables random teleport - Default: `true`
 - `rtp_center` - Where to center the region of available locations - Default: `Spawn`
-  - Also accepts comma-separated coordinates in `x,z` format, e.g. `500,1000`
+    - Also accepts comma-separated coordinates in `x,z` format, e.g. `500,1000`
 - `rtp_radius` - Maximum distance for random teleport - Default: `1000`
 - `rtp_min_radius` - Minimum distance for random teleport - Default: Same as `rtp_radius` (`1000`)
 - `rtp_cooldown` - Cooldown between random teleports (seconds) - Default: `30`
 - `rtp_max_attempts` - Maximum tries to find valid location - Default: `15`
 - `rtp_enabled_worlds` - Worlds where RTP is enabled - Default: `overworld`
-  - valid values are the registry keys of worlds that exist on your server. In vanilla, that's: `minecraft:overworld`, `minecraft:the_nether`, `minecraft:the_end`
-  - any number of entries may be provided, separated by commas, e.g. `overworld,the_nether,the_end`
-  - milelage may vary in The End, as the RTP algorithm currently struggles to quickly find safe locations in void-heavy worlds
+    - valid values are the registry keys of worlds that exist on your server. In vanilla, that's: `minecraft:overworld`, `minecraft:the_nether`, `minecraft:the_end`
+    - any number of entries may be provided, separated by commas, e.g. `overworld,the_nether,the_end`
+    - milelage may vary in The End, as the RTP algorithm currently struggles to quickly find safe locations in void-heavy worlds
 
 #### Bed Command
 Teleport to your bed or spawnpoint.
@@ -221,10 +221,11 @@ The `<nickname>` is [MinecraftText](./Minecraft-Text.md), meaning it can be one 
 - `nickname_above_head` - Show nickname above player's head - Default: `false`
 - `nicknames_in_player_list` - Show nicknames in tab list - Default: `true`
 - `nicknames_as_command_arg` - Whether nicknames can be used as player arguments in commands - Default: `Never`
-  - `Never` - Nicknames are not resolved in any command argument
-  - `EssentialCommandsOnly` - Nicknames resolve and suggest only in Essential Commands
-  - `Everywhere` - Nicknames resolve and suggest in all commands (e.g. `/tp`, `/give`)
+    - `Never` - Nicknames are not resolved in any command argument
+    - `EssentialCommandsOnly` - Nicknames resolve and suggest only in Essential Commands
+    - `Everywhere` - Nicknames resolve and suggest in all commands (e.g. `/tp`, `/give`)
 - `nicknames_must_be_unique` - Block nicknames that duplicate another player's nickname or match an existing username (case-insensitive) - Default: `false`
+- `nickname_style_perms_check_target` - If `true`, nickname style permissions (color, fancy, hover, click) are checked against the player receiving the nickname instead of the player running the command (the behavior before #300 was fixed) - Default: `false`
 
 ## Utility Commands
 

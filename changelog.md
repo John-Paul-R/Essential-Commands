@@ -2,6 +2,11 @@
 
 update to mc 26.3 by @arnokeesman
 
+Fixes:
+
+- Fix OPs being unable to set styled nicknames for other players when `use_permissions_api` is `false` (#300). Nickname style permissions are now checked against the player running the command.
+    - New config option, `nickname_style_perms_check_target` (default `false`), restores the old behavior of checking the target player.
+
 --- --- ---
 
 ## Essential Commands `v0.42.0` (mc 26.2)
@@ -15,7 +20,7 @@ update to mc 26.3 by @arnokeesman
 Fixes:
 
 - night/day commands incorrectly upgraded (@arnokeesman)
-- fix EssentialsX home conversion breaking for players online during the conversion & more (#399) (by @ImTau) 
+- fix EssentialsX home conversion breaking for players online during the conversion & more (#399) (by @ImTau)
 
 Language updates:
 
@@ -34,7 +39,7 @@ Language updates:
 ## Essential Commands `v0.40.0-beta1` (mc 26.2.0 snapshot 2)
 
 - upgrade to Minecraft 26.2.0 (snapshot 2) (#391) by @eclipseisoffline
-- fix server placeholders (#388) by @arnokeesman 
+- fix server placeholders (#388) by @arnokeesman
 - resolve unexpected CR box characters in /rules output (#388) by @tiehu
 - fix permissions system not handling "Permissions Only, not OP" correctly (#380)
 - migrate to Server Translations for langfiles (#384)
@@ -130,7 +135,7 @@ This upgrade includes:
 ## Essential Commands `v0.38.2` (mc 1.21.7)
 
 - fix parsing mistake that caused EC player data from some older versions to be lost
-  - the offending versions have either been taken down or been marked with large warnings 
+    - the offending versions have either been taken down or been marked with large warnings
 
 --- --- ---
 
@@ -143,7 +148,7 @@ This upgrade includes:
 
 ## Essential Commands `v0.38.1` (mc 1.21.7)
 
-- fix reading certain old EssentialCommands `world_data.dat` formats causing a crash on startup 
+- fix reading certain old EssentialCommands `world_data.dat` formats causing a crash on startup
 
 --- --- ---
 
@@ -208,7 +213,7 @@ translations:
 > This is a beta release. I _**STRONGLY**_ recommend backing up at least the `world` folder of your server before experimenting with this.
 >
 > The MC crew changed how a lot of NBT stuff works, which affects how Essential Commands stores information. Still attempting to verify there is no data loss.
-> 
+>
 > If anyone can send me a message on the [dev room discord](https://discord.jpcode.dev) with whether things do or do not work smoothly for you, I'd appreciate it!
 
 - Spanish Translations by @KelviNosse
@@ -231,7 +236,7 @@ translations:
 ## Essential Commands `v0.36.1` (mc 1.21.3)
 
 - Change bundled `fabric-permissions-api` version to `0.3.3` to benefit from
-bugfixes
+  bugfixes
 
 --- --- ---
 
@@ -313,8 +318,8 @@ A couple of rapid fire releases! (including patch notes from `v0.35.1`, since th
 
 - Additional Chinese translations, by @LittleCircleOO (#267)
 - add experimental utility command: `/essentialcommands deleteAllPlayerData`
-  - requires permission: op level 4
-  - Addressing the use case in #242
+    - requires permission: op level 4
+    - Addressing the use case in #242
 
 Much of the version updates to mc 1.20.4 handled by @arnokeesman.
 
@@ -327,8 +332,8 @@ Much of the version updates to mc 1.20.4 handled by @arnokeesman.
 
 - Additional Chinese translations, by @LittleCircleOO (#267)
 - add experimental utility command: `/essentialcommands deleteAllPlayerData`
-  - requires permission: op level 4
-  - Addressing the use case in #242
+    - requires permission: op level 4
+    - Addressing the use case in #242
 
 also, all the utility commands from #248 (by @arnokeesman)
 
@@ -724,8 +729,8 @@ fix: `PlayerData` lost on respawn if EC spawn not set
 
 - New [Expressions](https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation#expression) config option type.
 - `respawn_at_ec_spawn` enhancements:
-  - Add `NoBed` respawn condition option (If a player does not have a bed spawn, they will respawn at the EC spawn)
-  - Use the new Expression config option type, allowing values in the form: `NoBed AND SameWorld`
+    - Add `NoBed` respawn condition option (If a player does not have a bed spawn, they will respawn at the EC spawn)
+    - Use the new Expression config option type, allowing values in the form: `NoBed AND SameWorld`
 - Log an error on startup if `excluded_top_level_commands` is malformed (#203, by @arnokeesman)
 - Add `nickname_above_head` feature and config option. (Max 16 chars, no color) (`1.19.4+`)
 
@@ -754,8 +759,8 @@ fix: `PlayerData` lost on respawn if EC spawn not set
 
 - New [Expressions](https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation#expression) config option type.
 - `respawn_at_ec_spawn` enhancements:
-  - Add `NoBed` respawn condition option (If a player does not have a bed spawn, they will respawn at the EC spawn)
-  - Use the new Expression config option type, allowing values in the form: `NoBed AND SameWorld`
+    - Add `NoBed` respawn condition option (If a player does not have a bed spawn, they will respawn at the EC spawn)
+    - Use the new Expression config option type, allowing values in the form: `NoBed AND SameWorld`
 - Log an error on startup if `excluded_top_level_commands` is malformed (#203, by @arnokeesman)
 - Add `nickname_above_head` feature and config option. (Max 16 chars, no color) (`1.19.4+`)
 
@@ -784,8 +789,8 @@ fix: `PlayerData` lost on respawn if EC spawn not set
 
 - New [Expressions](https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation#expression) config option type.
 - `respawn_at_ec_spawn` enhancements:
-  - Add `NoBed` respawn condition option (If a player does not have a bed spawn, they will respawn at the EC spawn)
-  - Use the new Expression config option type, allowing values in the form: `NoBed AND SameWorld`
+    - Add `NoBed` respawn condition option (If a player does not have a bed spawn, they will respawn at the EC spawn)
+    - Use the new Expression config option type, allowing values in the form: `NoBed AND SameWorld`
 - Log an error on startup if `excluded_top_level_commands` is malformed (#203, by @arnokeesman)
 - Add `nickname_above_head` feature and config option. (Max 16 chars, no color) (`1.19.4+`)
 
@@ -814,8 +819,8 @@ fix: `PlayerData` lost on respawn if EC spawn not set
 
 - New [Expressions](https://github.com/John-Paul-R/Essential-Commands/wiki/Config-Documentation#expression) config option type.
 - `respawn_at_ec_spawn` enhancements:
-  - Add `NoBed` respawn condition option (If a player does not have a bed spawn, they will respawn at the EC spawn)
-  - Use the new Expression config option type, allowing values in the form: `NoBed AND SameWorld`
+    - Add `NoBed` respawn condition option (If a player does not have a bed spawn, they will respawn at the EC spawn)
+    - Use the new Expression config option type, allowing values in the form: `NoBed AND SameWorld`
 - Log an error on startup if `excluded_top_level_commands` is malformed (#203, by @arnokeesman)
 - Add `nickname_above_head` feature and config option. (Max 16 chars, no color) (`1.19.4+`)
 
@@ -894,7 +899,7 @@ Fixes, minor:
 New Features
 
 - Persistent `/back` locations, by @justinbchen
-  - Config Option: `persist_back_location`, default `false`
+    - Config Option: `persist_back_location`, default `false`
 
 Fixes, minor:
 
@@ -978,7 +983,7 @@ Changes
 - add `pt_br` translations, courtesy of AnonymozzY on CF
 - fix crash on first startup (Missing EssentialCommands.properties) (This would resolve itself on second run, but...)
 - fix: `continue` queuedTeleport loop on "moved" interrupt
-  - Previously, if a player hit the "teleport interrupt on move" distance threshold on the same tick that the teleport would execute, crash ensued. (_very_ tiny chance of happening, but possible)
+    - Previously, if a player hit the "teleport interrupt on move" distance threshold on the same tick that the teleport would execute, crash ensued. (_very_ tiny chance of happening, but possible)
 
 --- --- ---
 
@@ -991,15 +996,15 @@ Changes
 
 - Update to 1.19.3 courtesy of @LagPixelLOL (#160)
 - Add `bed` command - allows player to teleport to their `spawnpoint`
-  - config: `enable_bed` (default `false`)
-  - permission: `essentialcommands.bed`
+    - config: `enable_bed` (default `false`)
+    - permission: `essentialcommands.bed`
 - Add config option `recheck_player_ability_permissions_on_dimension_change` (default `false`). If true, on world change, a player with `fly` or `invuln` enabled, but without the appropriate permission in the new world, will lose the ability upon arrival.
-  - This is primarily to better support per-world permissions. 
+    - This is primarily to better support per-world permissions.
 - Fix bug that always allowed ops to bypass teleport_interrupt_on_move, regardless of whether they had the `bypass.teleport_interrupt_on_move` permission.
 - Fixes to `rules` command feedback courtesy of @arnokeesman
 - Don't write to the `config/EssentialCommands.properties` file (updating the timestamp), unless there are meaningful changes to be made to the file (#153)
 - EssentialsXParser bugfixes (it's still super buggy!)
-  - Further improvements potentially coming next release, in large part thanks to @disymayufei (#157)
+    - Further improvements potentially coming next release, in large part thanks to @disymayufei (#157)
 
 --- --- ---
 
@@ -1033,9 +1038,9 @@ Changes
 - Show home/warp name in teleport completion message.
 - (#142) Add config option `respawn_at_ec_spawn` for respawning at `spawn`.
   available options:
-  - `Always`
-  - `SameWorld`
-  - `Never`
+    - `Always`
+    - `SameWorld`
+    - `Never`
 
 (this release previously did not include the feature addressing #142, but `0.29.0-mc1.19` did. That has since been rectified. (the current jar attached to this release _does_ include the stated feature))
 
@@ -1049,9 +1054,9 @@ Changes
 - Show home/warp name in teleport completion message.
 - (#142) Add config option `respawn_at_ec_spawn` for respawning at `spawn`.
   available options:
-  - `Always`
-  - `SameWorld`
-  - `Never`
+    - `Always`
+    - `SameWorld`
+    - `Never`
 
 --- --- ---
 
@@ -1139,13 +1144,13 @@ This is a beta release and may be unstable. Make sure you have a backup of your 
 Changes:
 
 - Add player profiles (`/essentialcommands profile {get/set} <optionKey> <optionValue>`)
-  - Right now, the only option is `printTeleportCoordinates` (Resolving #131)
+    - Right now, the only option is `printTeleportCoordinates` (Resolving #131)
 - Fix a text parsing error that could cause unstyled text to be rendered with
   "formatting_default" instead.
 - Added config options, allowing easier CommandAliases redirects
-   (This resolves #50 & #47 - CommandAliases configs for Essentials-style home/warp syntax  can be found in #50's comments.) 
-  - `register_top_level_commands`, default `true`
-  - `excluded_top_level_commands`, default `[]`
+  (This resolves #50 & #47 - CommandAliases configs for Essentials-style home/warp syntax  can be found in #50's comments.)
+    - `register_top_level_commands`, default `true`
+    - `excluded_top_level_commands`, default `[]`
 - Add `/warp tp_other <playerName> <warpName>` (Resolving #100)
 
 Internal changes:
@@ -1204,10 +1209,10 @@ Changes:
 Changes:
 
 - Add "auto afk" feature - Automatically mark players as AFK after a certain period has elapsed.
-  - if a player has been marked AFK in this manner (not with the command), they will be excluded
-    from the sleep percentage calculation.
+    - if a player has been marked AFK in this manner (not with the command), they will be excluded
+      from the sleep percentage calculation.
 - Add option `teleport_interrupt_on_move`, `teleport_interrupt_on_move_max_blocks`
-  - Related permission: `teleport_interrupt_on_move`
+    - Related permission: `teleport_interrupt_on_move`
 - Fix `[AFK]` prefix not updating in player list
 - Various lang fixes
 - Rework Config & Text tech
@@ -1222,10 +1227,10 @@ Changes:
 Changes:
 
 - Add `/afk` command
-  - Config Options:
-    - `enable_afk` (default true)
-    - `afk_prefix` (for chat)
-    - `invuln_while_afk` (default false) - If set to true, using `/afk` while in combat is disallowed.
+    - Config Options:
+        - `enable_afk` (default true)
+        - `afk_prefix` (for chat)
+        - `invuln_while_afk` (default false) - If set to true, using `/afk` while in combat is disallowed.
 - Fix broken `getNickname` null check.
 
 --- --- ---
@@ -1277,7 +1282,7 @@ Changes:
 Changes:
 
 - Update `zh_cn` translations, courtesy of @Leo204-LKY in #107
-- Fix #106 
+- Fix #106
 
 --- --- ---
 
@@ -1289,7 +1294,7 @@ Changes:
 Changes:
 
 - Update `zh_cn` translations, courtesy of @Leo204-LKY in #107
-- Fix #106 
+- Fix #106
 
 --- --- ---
 
@@ -1321,7 +1326,7 @@ Changes:
 
 ## Essential Commands `v0.24.0-beta` (mc 1.19)
 
-Note: this is a beta release for mc 1.19. Expect some bugs. A more complete release should be out within a week or so. 
+Note: this is a beta release for mc 1.19. Expect some bugs. A more complete release should be out within a week or so.
 
 Changes:
 
@@ -1372,8 +1377,8 @@ Changes:
 
 Changes:
 
-- Add `/home tp_other`, enabling teleporting to another (presently online) player's home. (intended for admin use) 
-  - The permission node is `essentialcommands.home_tp_others`. Requires OP by default.
+- Add `/home tp_other`, enabling teleporting to another (presently online) player's home. (intended for admin use)
+    - The permission node is `essentialcommands.home_tp_others`. Requires OP by default.
 
 --- --- ---
 
@@ -1408,8 +1413,8 @@ Changes:
 
 Changes:
 
-  - Fix items potentially getting deleted in Anvil, Grindstone, and Stonecutter commands (#86).
-  - Fix display text for all "bench" commands, using Mincrafts built-in translations.
+- Fix items potentially getting deleted in Anvil, Grindstone, and Stonecutter commands (#86).
+- Fix display text for all "bench" commands, using Mincrafts built-in translations.
 
 --- --- ---
 
@@ -1420,7 +1425,7 @@ Changes:
 
 Changes:
 
-  - Change the way EC grants all perms to OPs.
+- Change the way EC grants all perms to OPs.
     - Old version was causing broad mod compatability issues. Investigated and Resolved by @braunly in #94.
 
 --- --- ---
@@ -1432,14 +1437,14 @@ Changes:
 
 Changes:
 
-  - RTP performance enchancements (Thanks @Wesley1808!) (https://github.com/Wesley1808/ServerCore/issues/16)
-  - Russian (ru_ru) translations (thanks **oldbrowze#9618** on Discord!)
-  - Add workbench-style commands:
+- RTP performance enchancements (Thanks @Wesley1808!) (https://github.com/Wesley1808/ServerCore/issues/16)
+- Russian (ru_ru) translations (thanks **oldbrowze#9618** on Discord!)
+- Add workbench-style commands:
     - `/stonecutter`
     - `/grindstone`
     - `/wastebin`
     - `/anvil`
-  - Optional computed permissions for warps. (e.g. `essentialcommands.warp.tp_named.{warp_name}`)
+- Optional computed permissions for warps. (e.g. `essentialcommands.warp.tp_named.{warp_name}`)
 
 --- --- ---
 
@@ -1463,8 +1468,8 @@ Changes:
 ## Essential Commands `v0.18.2` (mc 1.18.1)
 
 Changes:
-  - A mod compatability fix for [StyledChat](https://github.com/Patbox/StyledChat) by [Patbox](https://github.com/Patbox).
-    - Fixes #83, a bug where EssentialCommands nicknames would completely overwrite StyledChat's `displayName` setting. 
+- A mod compatability fix for [StyledChat](https://github.com/Patbox/StyledChat) by [Patbox](https://github.com/Patbox).
+    - Fixes #83, a bug where EssentialCommands nicknames would completely overwrite StyledChat's `displayName` setting.
 
 --- --- ---
 
@@ -1476,11 +1481,11 @@ Changes:
 A small update to support Minecraft `1.18.1`
 
 Other changes:
-  - RTP has been disabled in the nether, as it allowed players to get on
-top of the uppermost bedrock layer.
-  - Don't allow spamming same target with tp requests.
-  - Add tpcancel as per #64. Better backend system for ending tp requests.
-  - Fix bug that could prevent config from being generated in some scenarios.
+- RTP has been disabled in the nether, as it allowed players to get on
+  top of the uppermost bedrock layer.
+- Don't allow spamming same target with tp requests.
+- Add tpcancel as per #64. Better backend system for ending tp requests.
+- Fix bug that could prevent config from being generated in some scenarios.
 
 --- --- ---
 
@@ -1502,15 +1507,15 @@ A bunch of community-submitted improvements for this release!
 
 ### New
 
-  - [Chinese (zh_cn) localization][zh_cn-file], by [MikhailTapio](https://github.com/MikhailTapio)
-  - Feature: Message of the Day (MOTD), by [SonarBeserk](https://github.com/SonarBeserk)
+- [Chinese (zh_cn) localization][zh_cn-file], by [MikhailTapio](https://github.com/MikhailTapio)
+- Feature: Message of the Day (MOTD), by [SonarBeserk](https://github.com/SonarBeserk)
 
 ### Bugfixes
 
 (both by [SonarBeserk](https://github.com/SonarBeserk))
 
-  - Change NicknameClearCommand to use the name of target player for feedback (instead of sender player)
-  - Correctly display config via `/essentialcommands config display`
+- Change NicknameClearCommand to use the name of target player for feedback (instead of sender player)
+- Correctly display config via `/essentialcommands config display`
 
 [zh_cn-file]: https://github.com/John-Paul-R/Essential-Commands/commit/759791240f244ebdd95e75971a1a5222af4d4f59
 
@@ -1540,11 +1545,11 @@ Note that the Fabric loader is *not* the Fabric API. [Get the Fabric Loader Inst
 **Essential Commands** **v0.16.2** (mc `1.17.x`)
 
 **Bugfix:**
-  - Changed `/fly` to use PAL, improving compatability with other mods.
-  - `/fly` should now always persist until it is manually disabled.
-  - Flight can no longer be disabled in creative mode.
-  - Using an elytra should no longer grant the wearer the ability to creative-fly.
-  - Switching from creative to survival no longer leaves flight enabled, unless the player has `/fly` enabled.
+- Changed `/fly` to use PAL, improving compatability with other mods.
+- `/fly` should now always persist until it is manually disabled.
+- Flight can no longer be disabled in creative mode.
+- Using an elytra should no longer grant the wearer the ability to creative-fly.
+- Switching from creative to survival no longer leaves flight enabled, unless the player has `/fly` enabled.
 
 --- --- ---
 
@@ -1554,8 +1559,8 @@ Note that the Fabric loader is *not* the Fabric API. [Get the Fabric Loader Inst
 **Essential Commands** **v0.16.1** (mc `1.17.x`)
 
 **Bugfix:**
-  - Fix bug that caused `/fly` with the `persist` flag set to true
-    to not actually persist when using `/execute in <dimension> run tp <player> <destination>`
+- Fix bug that caused `/fly` with the `persist` flag set to true
+  to not actually persist when using `/execute in <dimension> run tp <player> <destination>`
 
 --- --- ---
 
@@ -1698,8 +1703,8 @@ Particularly affected `/nickname set <player> <nickname>`
 **Essential Commands** **v0.13.4** (mc 1.17.x)
 
 Changes
-  - Fixed bug that caused (uncolored) nicknames to override team colors by default.
-  - Update playerlist every 5s (from 30s).
+- Fixed bug that caused (uncolored) nicknames to override team colors by default.
+- Update playerlist every 5s (from 30s).
 
 
 --- --- ---
@@ -1722,18 +1727,18 @@ A lot of bugfixes and prep for translations support.
 
 
 Changes
-  - Show only commands/subcommands that the player has permission to use in autocomplete. 
-    (Root nodes require perms for at least 1 subcommand)
-  - No longer allow overwriting via `/home set` or `/warp set` (require explicit deletion)
-  - Use new lang file for all command feedback and other user-facing text. This will soon enable translations support.
-  - Fix bug that made console unable to set player nicknames.
-  - More descriptive tpaccept and tpdeny error in the case where there is no pending request from specified player.
-  - Gracefully handle error for rtp when spawn is not set.
+- Show only commands/subcommands that the player has permission to use in autocomplete.
+  (Root nodes require perms for at least 1 subcommand)
+- No longer allow overwriting via `/home set` or `/warp set` (require explicit deletion)
+- Use new lang file for all command feedback and other user-facing text. This will soon enable translations support.
+- Fix bug that made console unable to set player nicknames.
+- More descriptive tpaccept and tpdeny error in the case where there is no pending request from specified player.
+- Gracefully handle error for rtp when spawn is not set.
 
 Minor
-  - Save playerdata more frequently for nickname changes.
-  - Add build timestamps for GH Actions builds.
-  - Home/Warp storage rework.
+- Save playerdata more frequently for nickname changes.
+- Add build timestamps for GH Actions builds.
+- Home/Warp storage rework.
 
 
 --- --- ---
@@ -1753,8 +1758,8 @@ Fix broken default nickname prefix.
 **Essential Commands** **v0.13.1**
 
 Small bugfix:
-  - **Bug:** cleared nicknames never update in PlayerList.
-  - **Fix:** cleared nicknames are now properly synced with clients PlayerLists. (in 30second intervals)
+- **Bug:** cleared nicknames never update in PlayerList.
+- **Fix:** cleared nicknames are now properly synced with clients PlayerLists. (in 30second intervals)
 
 --- --- ---
 
@@ -1788,14 +1793,14 @@ This version is for 1.17 only.
 Working on a way to bring these features to 1.16.5.
 
 New Features
-  - Homes and Warps listed with their respective `list` commands
-    (i.e. `/home list`) can now be clicked to teleport to them.
-  - Player nicknames show real name on hover.
+- Homes and Warps listed with their respective `list` commands
+  (i.e. `/home list`) can now be clicked to teleport to them.
+- Player nicknames show real name on hover.
     - +Config opt `nick_reveal_on_hover` to toggle this. Default `true`.
-  - Add support for FabricPlaceholderAPI for all Text fields and JiJ said API.
+- Add support for FabricPlaceholderAPI for all Text fields and JiJ said API.
 
 Other changes
-  - Latest unstable builds now available through GitHub Actions.
+- Latest unstable builds now available through GitHub Actions.
 
 --- --- ---
 
@@ -1911,11 +1916,11 @@ Changelog:
 
 Changelog:
 
-  - Correctly grant OPs all permissions.
+- Correctly grant OPs all permissions.
     - This means that the `ops_bypass_teleport_rules` config only has an effect if `use_permissions_api` is set to `false`.
-  - Display nicknames in player list (TAB). Can be disabled by `nicknames_in_player_list` config option.
-  - Add customizable nickname prefix to designate when users are using a nickname. Add `nickname_prefix` config option.
-  - Add command `/nickname reveal <nickname>`. Shows list of players matching the provided nickname.
+- Display nicknames in player list (TAB). Can be disabled by `nicknames_in_player_list` config option.
+- Add customizable nickname prefix to designate when users are using a nickname. Add `nickname_prefix` config option.
+- Add command `/nickname reveal <nickname>`. Shows list of players matching the provided nickname.
     - Requires the permission `essentialcommands.nickname.reveal`.
 
 --- --- ---
@@ -1994,13 +1999,13 @@ Rework config to use Map instead of list of entries internally. (it was bad).
 New config option: `ops_bypass_teleport_rules`
 
 New permissions:
-  - `essentialcommands.bypass.teleport_delay`
-  - `essentialcommands.bypass.allow_teleport_between_dimensions`
-  - `essentialcommands.bypass.teleport_interrupt_on_damaged`
+- `essentialcommands.bypass.teleport_delay`
+- `essentialcommands.bypass.allow_teleport_between_dimensions`
+- `essentialcommands.bypass.teleport_interrupt_on_damaged`
 
 Improve config error handling and parsing.
-  - Give informational and descriptive console logs of errors found when parsing config. 
-    (Fails gracefully, but loudly/clearly.)
+- Give informational and descriptive console logs of errors found when parsing config.
+  (Fails gracefully, but loudly/clearly.)
 
 --- --- ---
 
@@ -2015,9 +2020,9 @@ Port `0.6.0-mc1.17` to 1.16
 
 
 Add config option `allow_teleport_between_dimensions`.
-  - Bypassed by ops.
-  - Default true.
-  - Setting to false disallows teleporting between dimensions via EssentialCommands commands.
+- Bypassed by ops.
+- Default true.
+- Setting to false disallows teleporting between dimensions via EssentialCommands commands.
 
 --- --- ---
 
@@ -2025,19 +2030,19 @@ Add config option `allow_teleport_between_dimensions`.
 
 
 New Features:
-  - Add option to interrupt teleports on damage taken.
-  - Implemented `allow_back_on_death` config option. (default `false`)
-  - Self-Update checker & `check_for_updates` config option. (default `true`)
-  - Add option to interrupt teleports on damage taken.
+- Add option to interrupt teleports on damage taken.
+- Implemented `allow_back_on_death` config option. (default `false`)
+- Self-Update checker & `check_for_updates` config option. (default `true`)
+- Add option to interrupt teleports on damage taken.
     - New config option `teleport_interrupt_on_damaged`, default `true`.
-  - Add hot-reload config command: `/essentialcommands config reload`. Requires permission `essentialcommands.config.reload`.
-  - Add ability to style command feedback using Style json, instead of just a single formatting code.
+- Add hot-reload config command: `/essentialcommands config reload`. Requires permission `essentialcommands.config.reload`.
+- Add ability to style command feedback using Style json, instead of just a single formatting code.
     - Ex: `{"bold"\:"true", "color":"light_purple"}`
     - Old format still works (Ex: `light_purple`)
 
 Minor/Bugfix:
-  - Changed tpa/tpaccept/tpdeny permissions nodes to match permissions.md.
-  - Bumped fabric loader/api & yarn mappings versions
+- Changed tpa/tpaccept/tpdeny permissions nodes to match permissions.md.
+- Bumped fabric loader/api & yarn mappings versions
 
 --- --- ---
 
@@ -2051,13 +2056,13 @@ Port to `1.16.5` from `1.17`.
 ## 0.4.1-mc1.17
 
 New Features:
-  - Added /spawn command. (Finally!)
-  - Implement teleport_delay config option. Improve teleport messages. 
-  - Add /essentialcommands for easy listing of EC commands.
+- Added /spawn command. (Finally!)
+- Implement teleport_delay config option. Improve teleport messages.
+- Add /essentialcommands for easy listing of EC commands.
 
 Minor improvements:
-  - Don't create/init managers if their relevant features are disabled. (So disabled features won't have any impact on performance, ideally.)
-  - Add permissions docs (permissions.md) (GitHub repo)
+- Don't create/init managers if their relevant features are disabled. (So disabled features won't have any impact on performance, ideally.)
+- Add permissions docs (permissions.md) (GitHub repo)
 
 --- --- ---
 
@@ -2068,8 +2073,8 @@ Singletonified most-all manager classes.
 This was done to fix bug where loaded warps persist between different singleplayer worlds opened in the same game instance. ('twas a mess)
 
 Other small changes:
-  - Sort properties in config file.
-  - Remove salmon.png
+- Sort properties in config file.
+- Remove salmon.png
 
 
 --- --- ---
