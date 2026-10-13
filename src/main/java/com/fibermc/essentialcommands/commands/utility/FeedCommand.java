@@ -1,6 +1,7 @@
 package com.fibermc.essentialcommands.commands.utility;
 
 import com.fibermc.essentialcommands.commands.CommandUtil;
+import com.fibermc.essentialcommands.mixin.FoodDataAccessor;
 import com.fibermc.essentialcommands.playerdata.PlayerData;
 
 import com.mojang.brigadier.Command;
@@ -25,8 +26,7 @@ public class FeedCommand implements Command<CommandSourceStack> {
 
         hungerManager.setFoodLevel(20);
         hungerManager.setSaturation(5);
-//        hungerManager.setExhaustion(0);
-        // idk, you ca only add to it now
+        ((FoodDataAccessor) hungerManager).essentialcommands$setExhaustionLevel(0);
 
         senderPlayerData.sendCommandFeedback("cmd.feed.feedback");
 
