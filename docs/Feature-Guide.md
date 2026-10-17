@@ -225,6 +225,7 @@ The `<nickname>` is [MinecraftText](./Minecraft-Text.md), meaning it can be one 
   - `EssentialCommandsOnly` - Nicknames resolve and suggest only in Essential Commands
   - `Everywhere` - Nicknames resolve and suggest in all commands (e.g. `/tp`, `/give`)
 - `nicknames_must_be_unique` - Block nicknames that duplicate another player's nickname or match an existing username (case-insensitive) - Default: `false`
+- `nickname_style_perms_check_target` - If `true`, nickname style permissions (color, fancy, hover, click) are checked against the player receiving the nickname instead of the player running the command (the behavior before #300 was fixed) - Default: `false`
 
 ## Utility Commands
 
