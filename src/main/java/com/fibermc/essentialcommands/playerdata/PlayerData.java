@@ -517,13 +517,7 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
         return setNickname(nickname, this.player.createCommandSourceStack());
     }
 
-    /**
-     * @param permissionSource The source whose permissions are checked for the nickname's styling
-     *                         (color, fancy, hover, click). This should be whoever is *setting* the
-     *                         nickname, which is not necessarily the player who will receive it
-     *                         (e.g. an OP setting another player's nickname).
-     */
-    public int setNickname(Component nickname, CommandSourceStack permissionSource) {
+    public int setNickname(Component nickname, CommandSourceStack actorPermsSrc) {
         String oldNormalizedNickname = this.normalizedNickname;
         int resultCode = 0;
         // Reset nickname
@@ -540,6 +534,13 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
             if (nickname.getString().length() > CONFIG.NICKNAME_MAX_LENGTH) {
                 return -2;
             }
+
+            // By default, the person running the command needs the style permissions (color, fancy, etc.).
+            // nickname_style_perms_check_target=true restores the old behavior of checking the target player.
+            var permissionSource = CONFIG.NICKNAME_STYLE_PERMS_CHECK_TARGET
+                ? this.player.createCommandSourceStack()
+                : actorPermsSrc;
+
             // Ensure player has permissions required to set the specified nickname
             boolean hasRequiredPerms = NicknameTextUtil.checkPerms(nickname, permissionSource);
             if (!hasRequiredPerms) {
@@ -550,13 +551,13 @@ public class PlayerData extends SavedData implements IServerPlayerEntityData, IF
                     nickname
                 );
                 return -1;
-            } else {
-                EssentialCommands.LOGGER.info(
-                    "Set {}'s nickname to '{}'.",
-                    this.player.getGameProfile().name(),
-                    nickname
-                );
             }
+
+            EssentialCommands.LOGGER.info(
+                "Set {}'s nickname to '{}'.",
+                this.player.getGameProfile().name(),
+                nickname
+            );
 
             String candidateNormalized = normalizeNickname(nickname.getString());
 

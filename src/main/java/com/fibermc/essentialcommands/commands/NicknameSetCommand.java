@@ -39,31 +39,27 @@ public class NicknameSetCommand implements Command<CommandSourceStack> {
 
     public static int exec(CommandContext<CommandSourceStack> context, Component rawNicknameText) throws CommandSyntaxException {
         ServerPlayer targetPlayer = CommandUtil.getCommandTargetPlayer(context);
+        var sender = context.getSource();
 
-        var nicknameWithContext = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_selector_and_ctx, 2)
+        var nicknameWithContext = ECPerms.check(sender, ECPerms.Registry.nickname_selector_and_ctx, 2)
             ? ComponentUtils.resolve(
-            ResolutionContext.builder()
-                .withSource(context.getSource())
-                .withEntityOverride(targetPlayer)
-                .build(),
-            rawNicknameText,
-            0)
+                ResolutionContext.builder()
+                    .withSource(sender)
+                    .withEntityOverride(targetPlayer)
+                    .build(),
+                rawNicknameText,
+                0)
             : rawNicknameText;
 
-        var nicknameText = ECPerms.check(context.getSource(), ECPerms.Registry.nickname_placeholders, 2)
+        var nicknameText = ECPerms.check(sender, ECPerms.Registry.nickname_placeholders, 2)
             ? TagParser.DEFAULT_SAFE.parseComponent(TextNode.convert(nicknameWithContext), ParserContext.of())
             : nicknameWithContext;
-        // By default, the person running the command needs the style permissions (color, fancy, etc.).
-        // nickname_style_perms_check_target=true restores the old behavior of checking the target player.
-        var permissionSource = CONFIG.NICKNAME_STYLE_PERMS_CHECK_TARGET
-            ? targetPlayer.createCommandSourceStack()
-            : context.getSource();
-        int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText, permissionSource);
 
-        var senderPlayer = context.getSource().getPlayer();
-        var senderFeedbackReceiver = FeedbackReceiver.ofSource(context.getSource());
+        int successCode = PlayerData.access(targetPlayer).setNickname(nicknameText, sender);
 
-        var ecText = ECText.access(senderPlayer);
+        var senderFeedbackReceiver = FeedbackReceiver.ofSource(sender);
+
+        var ecText = ECText.access(sender.getPlayer());
 
         //inform command sender that the nickname has been set
         if (successCode >= 0) {
