@@ -92,6 +92,7 @@ public final class EssentialCommandsConfig extends Config<EssentialCommandsConfi
     @ConfigOption public final Option<NicknameCommandArgMode> NICKNAMES_AS_COMMAND_ARG = new Option<>("nicknames_as_command_arg", NicknameCommandArgMode.Never, NicknameCommandArgMode::valueOf);
     @ConfigOption public final Option<Boolean> NICKNAMES_MUST_BE_UNIQUE = new Option<>("nicknames_must_be_unique", false, Boolean::parseBoolean);
     @ConfigOption public final Option<Boolean> NICKNAME_ABOVE_HEAD =    new Option<>("nickname_above_head", false, Boolean::parseBoolean);
+    @ConfigOption public final Option<Boolean> NICKNAME_STYLE_PERMS_CHECK_TARGET = new Option<>("nickname_style_perms_check_target", false, Boolean::parseBoolean);
     @ConfigOption public final Option<RtpCenter> RTP_CENTER =           new Option<>("rtp_center", RtpCenter.spawn(), RtpCenter::parse, RtpCenter::serialize);
     @ConfigOption public final Option<Integer> RTP_RADIUS =             new Option<>("rtp_radius", 1000, ConfigUtil::parseInt);
     @ConfigOption public final Option<Integer> RTP_MIN_RADIUS =         new Option<>("rtp_min_radius", RTP_RADIUS.getValue(), (String s) -> parseIntOrDefault(s, RTP_RADIUS.getValue()));

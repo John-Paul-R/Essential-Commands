@@ -70,6 +70,7 @@ public final class EssentialCommandsConfigSnapshot {
     public final int NICKNAME_MAX_LENGTH;
     public final NicknameCommandArgMode NICKNAMES_AS_COMMAND_ARG;
     public final boolean NICKNAMES_MUST_BE_UNIQUE;
+    public final boolean NICKNAME_STYLE_PERMS_CHECK_TARGET;
     public final boolean NICKNAME_ABOVE_HEAD;
     public final RtpCenter RTP_CENTER;
     public final int RTP_RADIUS;
@@ -151,6 +152,7 @@ public final class EssentialCommandsConfigSnapshot {
         this.NICKNAME_MAX_LENGTH                = config.NICKNAME_MAX_LENGTH.getValue();
         this.NICKNAMES_AS_COMMAND_ARG           = config.NICKNAMES_AS_COMMAND_ARG.getValue();
         this.NICKNAMES_MUST_BE_UNIQUE           = config.NICKNAMES_MUST_BE_UNIQUE.getValue();
+        this.NICKNAME_STYLE_PERMS_CHECK_TARGET  = config.NICKNAME_STYLE_PERMS_CHECK_TARGET.getValue();
         this.NICKNAME_ABOVE_HEAD                = config.NICKNAME_ABOVE_HEAD.getValue();
         this.RTP_CENTER                         = config.RTP_CENTER.getValue();
         this.RTP_RADIUS                         = config.RTP_RADIUS.getValue();
