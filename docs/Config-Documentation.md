@@ -1,3 +1,4 @@
+
 # Config Documentation
 
 The config file can be found at `config/EssentialCommands.properties`
