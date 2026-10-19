@@ -3,11 +3,15 @@ package com.fibermc.essentialcommands.playerdata;
 import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
 import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.access.ServerPlayerEntityAccess;
+import com.fibermc.essentialcommands.commands.CommandUtil;
+import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.types.AllowTeleportRequests;
 import com.fibermc.essentialcommands.types.IStyleProvider;
 import com.fibermc.essentialcommands.types.ProfileOption;
 import org.jetbrains.annotations.NotNull;
@@ -19,9 +23,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -46,6 +52,7 @@ public class PlayerProfile extends SavedData implements IServerPlayerEntityData,
         private Optional<Style> formattingAccent = Optional.empty();
         private Optional<Style> formattingError = Optional.empty();
         private Optional<Boolean> printTeleportCoordinates = Optional.empty();
+        private Optional<AllowTeleportRequests> allowTeleportRequests = Optional.empty();
     }
 
     public static final Map<String, ProfileOption<?>> OPTIONS = Map.ofEntries(
@@ -56,6 +63,24 @@ public class PlayerProfile extends SavedData implements IServerPlayerEntityData,
                 false,
                 (context, name, profile) -> profile.profileOptions.printTeleportCoordinates = Optional.of(BoolArgumentType.getBool(context, name)),
                 (profile) -> profile.profileOptions.printTeleportCoordinates)),
+        new SimpleEntry<>(
+            StorageKey.ALLOW_TELEPORT_REQUESTS,
+            new ProfileOption<>(
+                StringArgumentType.word(),
+                AllowTeleportRequests.ON.getId(),
+                (context, name, profile) -> {
+                    var id = StringArgumentType.getString(context, name);
+                    var value = AllowTeleportRequests.fromId(id);
+                    if (value.isEmpty()) {
+                        throw CommandUtil.createSimpleException(
+                            ECText.access(profile.getPlayer()).getText("cmd.profile.error.invalid_value", Component.literal(id)));
+                    }
+                    profile.profileOptions.allowTeleportRequests = value;
+                },
+                (profile) -> profile.profileOptions.allowTeleportRequests.map(AllowTeleportRequests::getId),
+                (context, builder) -> SharedSuggestionProvider.suggest(
+                    Arrays.stream(AllowTeleportRequests.values()).map(AllowTeleportRequests::getId),
+                    builder))),
         new SimpleEntry<>(
             StorageKey.FORMATTING_DEAULT,
             new ProfileOption<>(
@@ -83,6 +108,14 @@ public class PlayerProfile extends SavedData implements IServerPlayerEntityData,
         return profileOptions.printTeleportCoordinates;
     }
 
+    public AllowTeleportRequests getAllowTeleportRequests() {
+        return profileOptions.allowTeleportRequests.orElse(AllowTeleportRequests.ON);
+    }
+
+    public void setAllowTeleportRequests(AllowTeleportRequests allowTeleportRequests) {
+        profileOptions.allowTeleportRequests = Optional.of(allowTeleportRequests);
+    }
+
     public @Nullable Style getFormattingDefault() {
         return profileOptions.formattingDefault.orElse(null);
     }
@@ -100,6 +133,7 @@ public class PlayerProfile extends SavedData implements IServerPlayerEntityData,
         static final String FORMATTING_ACCENT = "formattingAccent";
         static final String FORMATTING_ERROR = "formattingError";
         static final String PRINT_TELEPORT_COORDINATES = "printTeleportCoordinates";
+        static final String ALLOW_TELEPORT_REQUESTS = "allowTeleportRequests";
     }
 
     public void fromNbt(CompoundTag tag) {
@@ -117,6 +151,9 @@ public class PlayerProfile extends SavedData implements IServerPlayerEntityData,
             .flatMap(s -> Optional.ofNullable(ConfigUtil.parseStyle(s)));
 
         this.profileOptions.printTeleportCoordinates = dataTag.getBoolean(StorageKey.PRINT_TELEPORT_COORDINATES);
+
+        this.profileOptions.allowTeleportRequests = dataTag.getString(StorageKey.ALLOW_TELEPORT_REQUESTS)
+            .flatMap(AllowTeleportRequests::fromId);
     }
 
     public CompoundTag writeNbt(CompoundTag tag, HolderLookup.Provider wrapperLookup) {
@@ -131,6 +168,9 @@ public class PlayerProfile extends SavedData implements IServerPlayerEntityData,
 
         this.profileOptions.printTeleportCoordinates.ifPresent(
             printTeleportCoordinates -> tag.putBoolean(StorageKey.PRINT_TELEPORT_COORDINATES, printTeleportCoordinates));
+
+        this.profileOptions.allowTeleportRequests.ifPresent(
+            allowTeleportRequests -> tag.putString(StorageKey.ALLOW_TELEPORT_REQUESTS, allowTeleportRequests.getId()));
 
         return tag;
     }

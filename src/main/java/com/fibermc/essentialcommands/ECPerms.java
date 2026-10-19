@@ -27,6 +27,7 @@ public final class ECPerms {
         public static final Identifier tpahere = of("tpahere");
         public static final Identifier tpaccept = of("tpaccept");
         public static final Identifier tpdeny = of("tpdeny");
+        public static final Identifier tptoggle = of("tptoggle");
         public static final Identifier home_set = of("home.set");
         public static final Identifier home_tp = of("home.tp");
         public static final Identifier home_tp_others = of("home_tp_others");
@@ -89,7 +90,7 @@ public final class ECPerms {
         public static final Identifier admin_lastpos = of("admin.lastpos");
 
         public static final class Group {
-            public static final Identifier[] tpa_group = {tpa, tpahere, tpaccept, tpdeny};
+            public static final Identifier[] tpa_group = {tpa, tpahere, tpaccept, tpdeny, tptoggle};
             public static final Identifier[] home_group = {home_set, home_tp, home_delete};
             public static final Identifier[] warp_group = {warp_set, warp_tp, warp_delete};
             public static final Identifier[] spawn_group = {spawn_tp, spawn_set};

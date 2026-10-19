@@ -37,6 +37,7 @@ Essential Commands provides a request-based teleportation system that allows any
 | Accept teleport request | `/tpaccept <player>` | `essentialcommands.tpaccept` |
 | Deny teleport request | `/tpdeny <player>` | `essentialcommands.tpdeny` |
 | Cancel teleport request | `/tpcancel <player>` | Same as original teleport |
+| Toggle receiving teleport requests | `/tptoggle [on/off/off-silent]` | `essentialcommands.tptoggle` |
 
 **Related Config Options:**
 - `teleport_request_duration` - How long teleport requests remain valid (seconds) - Default: `60`

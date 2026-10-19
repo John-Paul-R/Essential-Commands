@@ -1,3 +1,11 @@
+Features:
+
+- Add `/tptoggle [on/off/off-silent]` (permission `essentialcommands.tptoggle`)
+  to control whether other players can send you teleport requests. Backed by
+  the new `allowTeleportRequests` player profile option.
+    - `off` auto-denies requests and tells you someone tried.
+    - `off-silent` auto-denies requests without notifying you.
+
 Fixes:
 
 - Fix OPs being unable to set styled nicknames for other players when
