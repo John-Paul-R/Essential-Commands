@@ -14,6 +14,7 @@ import com.fibermc.essentialcommands.commands.suggestions.TeleportResponseSugges
 import com.fibermc.essentialcommands.commands.suggestions.WarpSuggestion;
 import com.fibermc.essentialcommands.commands.utility.*;
 import com.fibermc.essentialcommands.text.ECText;
+import com.fibermc.essentialcommands.types.AllowTeleportRequests;
 import com.fibermc.essentialcommands.types.NamedMinecraftLocation;
 import com.fibermc.essentialcommands.util.EssentialsConvertor;
 import com.fibermc.essentialcommands.util.EssentialsXParser;
@@ -112,6 +113,17 @@ public final class EssentialCommandRegistry {
                 .requires(ECPerms.require(ECPerms.Registry.tpahere, 0))
                 .then(NicknameTargetResolver.targetPlayerArgument()
                     .executes(new TeleportAskHereCommand()))
+                .build());
+
+            registerNode.accept(Commands.literal("tptoggle")
+                .requires(ECPerms.require(ECPerms.Registry.tptoggle, 0))
+                .executes(TeleportToggleCommand::toggle)
+                .then(Commands.literal("on")
+                    .executes(TeleportToggleCommand.setTo(AllowTeleportRequests.ON)))
+                .then(Commands.literal("off")
+                    .executes(TeleportToggleCommand.setTo(AllowTeleportRequests.OFF)))
+                .then(Commands.literal("off-silent")
+                    .executes(TeleportToggleCommand.setTo(AllowTeleportRequests.OFF_SILENT)))
                 .build());
         }
 

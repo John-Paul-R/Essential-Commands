@@ -21,6 +21,7 @@ Grant access to all subcommands using wildcards, like so:
 | /tpahere \<player>                             | `essentialcommands.tpahere`                   | Request that a player teleports to you.                                                                      |
 | /tpaccept \<player>                            | `essentialcommands.tpaccept`                  | Accept player's teleport request.                                                                            |
 | /tpdeny \<player>                              | `essentialcommands.tpdeny`                    | Deny player's teleport request.                                                                              |
+| /tptoggle [on/off/off-silent]                  | `essentialcommands.tptoggle`                  | Toggle whether you accept teleport requests. See [Player Profiles](Player-Profiles.md).                      |
 | /home set \<home_name>                         | `essentialcommands.home.set`                  | Set a personal home location.                                                                                |
 | /home tp \<home_name>                          | `essentialcommands.home.tp`                   | Teleport to your home.                                                                                       |
 | /home delete \<home_name>                      | `essentialcommands.home.delete`               | Delete your home.                                                                                            |

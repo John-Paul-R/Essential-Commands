@@ -27,8 +27,12 @@ public final class ProfileCommand {
             var name = entry.getKey();
             var option = entry.getValue();
 
+            var valueArgument = argument("value", option.argumentType());
+            if (option.suggestionProvider() != null) {
+                valueArgument.suggests(option.suggestionProvider());
+            }
             set.then(Commands.literal(name)
-                .then(argument("value", option.argumentType()).executes((context) -> {
+                .then(valueArgument.executes((context) -> {
                     var player = context.getSource().getPlayerOrException();
                     var profile = ((ServerPlayerEntityAccess) player).ec$getProfile();
                     option.profileSetter().setValue(context, "value", profile);

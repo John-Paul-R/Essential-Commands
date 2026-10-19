@@ -40,6 +40,10 @@ public class TeleportAskCommand implements Command<CommandSourceStack> {
             }
         }
 
+        if (TeleportToggleCommand.denyIfDisallowed(senderPlayer, targetPlayer)) {
+            return 0;
+        }
+
         //inform target player of tp request via chat
         var targetPlayerEcText = ECText.access(targetPlayer);
         var targetPlayerProfile = PlayerProfile.access(targetPlayer);

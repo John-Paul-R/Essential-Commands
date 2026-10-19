@@ -36,6 +36,7 @@ teleport to `warp`s, and to use `/rtp`:
 /lp group default permission set essentialcommands.tpahere true
 /lp group default permission set essentialcommands.tpaccept true
 /lp group default permission set essentialcommands.tpdeny true
+/lp group default permission set essentialcommands.tptoggle true
 
 /lp group default permission set essentialcommands.home.{set,tp,delete} true
 /lp group default permission set essentialcommands.warp.tp true
@@ -76,6 +77,7 @@ this:
                 "essentialcommands.tpahere": "allow",
                 "essentialcommands.tpaccept": "allow",
                 "essentialcommands.tpdeny": "allow",
+                "essentialcommands.tptoggle": "allow",
                 "essentialcommands.home.set": "allow",
                 "essentialcommands.home.tp": "allow",
                 "essentialcommands.home.delete": "allow",
