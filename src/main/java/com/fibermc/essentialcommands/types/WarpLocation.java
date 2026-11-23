@@ -1,12 +1,16 @@
 package com.fibermc.essentialcommands.types;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import com.fibermc.essentialcommands.ECPerms;
+import com.fibermc.essentialcommands.EssentialCommands;
 import com.fibermc.essentialcommands.codec.Codecs;
 
 import com.mojang.serialization.Codec;
 
+import net.minecraft.IdentifierException;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
@@ -78,9 +82,33 @@ public class WarpLocation extends NamedMinecraftLocation {
         return permissionString;
     }
 
+    /**
+     * The permission node is an {@code Identifier} built from the warp's permission string
+     * ({@code essentialcommands:warp.tp_named.<name>}), but Identifier paths only allow
+     * {@code [a-z0-9/._-]} while warp names were historically unvalidated (e.g. {@code Pyramid}).
+     * Calling {@code withSuffix} on such a name throws {@code IdentifierException}, which takes
+     * down /warp, /warp tp and tab completion, so degrade step by step instead: original node,
+     * then the lower-cased node, then the "all named warps" parent node. The worst case is
+     * simply "no permission" - never a thrown exception.
+     */
     public boolean hasPermission(ServerPlayer player) {
-        return permissionString == null || ECPerms.check(
-            player.createCommandSourceStack(),
-            ECPerms.Registry.warp_tp_named.withSuffix("." + permissionString));
+        if (permissionString == null) {
+            return true;
+        }
+        CommandSourceStack source = player.createCommandSourceStack();
+        String suffix = "." + permissionString;
+        try {
+            return ECPerms.check(source, ECPerms.Registry.warp_tp_named.withSuffix(suffix));
+        } catch (IdentifierException ex) {
+            try {
+                return ECPerms.check(source,
+                    ECPerms.Registry.warp_tp_named.withSuffix(suffix.toLowerCase(Locale.ROOT)));
+            } catch (IdentifierException ignored) {
+                EssentialCommands.LOGGER.warn(
+                    "Warp '{}' has an illegal permission node '{}'; falling back to '{}'.",
+                    getName(), permissionString, ECPerms.Registry.warp_tp_named);
+                return ECPerms.check(source, ECPerms.Registry.warp_tp_named);
+            }
+        }
     }
 }
